@@ -1,4 +1,4 @@
-import { asArray } from './functions'
+import { asArray } from '../functions'
 
 export default (function(PromiseClass){
   let q = function(fn){return new PromiseClass(fn);}
