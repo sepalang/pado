@@ -1,9 +1,8 @@
-import promise from './modules/promise.js'
 import * as functions from './functions/functions.js'
+import promise from './modules/promise.js'
 
-console.log("export functions", functions)
 
-export {
+module.exports = {
+  ...functions,
   promise
-}
-
+};
