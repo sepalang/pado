@@ -1,3 +1,3 @@
-import promise from './packages/promise'
+import promise from './src/promise'
 
 promise(resolve=>resolve()).then(e=>console.log("promise works!"));
