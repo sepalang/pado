@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "1": "babel-node src/train.module.js",
     "start": "babel-node index.js",
     "build": "rimraf dist && babel src --out-dir dist",
     "test": "jest ''"

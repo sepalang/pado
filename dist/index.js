@@ -15,14 +15,6 @@
 
   var functions = _interopRequireWildcard(_functions);
 
-  var _promise2 = _interopRequireDefault(_promise);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
   function _interopRequireWildcard(obj) {
     if (obj && obj.__esModule) {
       return obj;
@@ -41,6 +33,6 @@
   }
 
   module.exports = Object.assign({}, functions, {
-    promise: _promise2.default
+    promise: _promise.promise
   });
 });

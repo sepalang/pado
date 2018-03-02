@@ -1,21 +1,17 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
+    define(["module"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports);
+    factory(module);
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports);
+    factory(mod);
     global.functions = mod.exports;
   }
-})(this, function (exports) {
+})(this, function (module) {
   "use strict";
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
 
   var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
     return typeof obj;
@@ -23,30 +19,32 @@
     return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
   };
 
-  var IS_NULLIFY = exports.IS_NULLIFY = function IS_NULLIFY(data) {
+  var FUNCTION_EXPORTS = {};
+
+  var IS_NULLIFY = FUNCTION_EXPORTS.IS_NULLIFY = function (data) {
     if (typeof data === "number") return isNaN(data);
     return data === undefined || data === null;
   };
 
-  var IS_OBJECT = function IS_OBJECT(object) {
+  var IS_OBJECT = FUNCTION_EXPORTS.IS_OBJECT = function (object) {
     return object !== null && (typeof object === "undefined" ? "undefined" : _typeof(object)) === "object" ? true : false;
   };
-  var IS_ARRAY = function IS_ARRAY(data) {
+  var IS_ARRAY = FUNCTION_EXPORTS.IS_ARRAY = function (data) {
     return data instanceof Array;
   };
-  var IS_FUNCTION = function IS_FUNCTION(f) {
+  var IS_FUNCTION = FUNCTION_EXPORTS.IS_FUNCTION = function (f) {
     return typeof f === "function";
   };
-  var IS_NUMBER = function IS_NUMBER(n) {
+  var IS_NUMBER = FUNCTION_EXPORTS.IS_NUMBER = function (n) {
     return typeof n === "number" && !isNaN(n);
   };
-  var IS_NUMBER_LIKE = function IS_NUMBER_LIKE(t) {
+  var IS_NUMBER_LIKE = FUNCTION_EXPORTS.IS_NUMBER_LIKE = function (t) {
     return typeof t === "number" ? true : typeof t === "string" ? parseFloat(t) + "" == t + "" : false;
   };
-  var IS_NODE = function IS_NODE(a) {
+  var IS_NODE = FUNCTION_EXPORTS.IS_NODE = function (a) {
     return IS_OBJECT(a) && typeof a.nodeType === "number";
   };
-  var IS_EMPTY = function IS_EMPTY() {
+  var IS_EMPTY = FUNCTION_EXPORTS.IS_EMPTY = function () {
     if (typeof o === "undefined") return true;
     if (typeof o === "string") return o.trim().length < 1 ? true : false;
     if ((typeof o === "undefined" ? "undefined" : _typeof(o)) === "object") {
@@ -66,11 +64,11 @@
     return true;
   };
 
-  var IS_PATTERN = function IS_PATTERN(s) {
+  var IS_PATTERN = FUNCTION_EXPORTS.IS_PATTERN = function (s) {
     return typeof s === "string" || s instanceof RegExp;
   };
 
-  var TO_ARRAY = function TO_ARRAY(data, option) {
+  var TO_ARRAY = FUNCTION_EXPORTS.TO_ARRAY = function (data, option) {
     if (typeof data === "undefined" || data === null || data === NaN) return [];
     if (IS_ARRAY(data)) return Array.prototype.slice.call(data);
     if ((typeof data === "undefined" ? "undefined" : _typeof(data)) === "object" && typeof data.toArray === "function") return data.toArray();
@@ -78,7 +76,7 @@
     return [data];
   };
 
-  var AS_ARRAY = exports.AS_ARRAY = function AS_ARRAY(data) {
+  var AS_ARRAY = FUNCTION_EXPORTS.AS_ARRAY = function (data) {
     var defaultArray = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
 
     if (IS_ARRAY(data)) {
@@ -93,7 +91,7 @@
     return [data];
   };
 
-  var IS_POSITIVE_PROP = exports.IS_POSITIVE_PROP = function IS_POSITIVE_PROP(value) {
+  var IS_POSITIVE_PROP = FUNCTION_EXPORTS.IS_POSITIVE_PROP = function (value) {
     if (value === true) {
       return true;
     }
@@ -107,11 +105,11 @@
     }
   };
 
-  var IS_NEGATIVE_PROP = exports.IS_NEGATIVE_PROP = function IS_NEGATIVE_PROP(value) {
+  var IS_NEGATIVE_PROP = FUNCTION_EXPORTS.IS_NEGATIVE_PROP = function (value) {
     return !IS_POSITIVE_PROP(value);
   };
 
-  var INSTANCE = exports.INSTANCE = function INSTANCE(func, proto) {
+  var INSTANCE = FUNCTION_EXPORTS.INSTANCE = function (func, proto) {
     var ins,
         DummyInstance = function DummyInstance(param) {
       if ((typeof param === "undefined" ? "undefined" : _typeof(param)) === "object") for (var k in param) {
@@ -129,7 +127,7 @@
     return ins;
   };
 
-  var REFRESH_DATA = exports.REFRESH_DATA = function REFRESH_DATA(oldData, newData, getId, afterHook) {
+  var REFRESH_DATA = FUNCTION_EXPORTS.REFRESH_DATA = function (oldData, newData, getId, afterHook) {
     if (!/string|function/.test(typeof getId === "undefined" ? "undefined" : _typeof(getId))) throw new Error("REFRESH_DATA need getId");
     if (typeof getId === "string") {
       var getIdString = getId;
@@ -190,7 +188,7 @@
     return result;
   };
 
-  var ALL = exports.ALL = function ALL(data, fn) {
+  var ALL = FUNCTION_EXPORTS.ALL = function (data, fn) {
     data = AS_ARRAY(data);
 
     if (data.length === 0) {
@@ -206,7 +204,7 @@
     return true;
   };
 
-  var ALLOC = exports.ALLOC = function ALLOC(init) {
+  var ALLOC = FUNCTION_EXPORTS.ALLOC = function (init) {
     var fn = init(),
         rn = function rn() {
       return fn.apply(this, Array.prototype.slice.call(arguments));
@@ -216,7 +214,7 @@
     }, rn.$originalFunction = fn, rn;
   };
 
-  var UNIQUE = exports.UNIQUE = function UNIQUE(array) {
+  var UNIQUE = FUNCTION_EXPORTS.UNIQUE = function (array) {
     var value = [],
         result = [],
         array = TO_ARRAY(array);
@@ -232,7 +230,7 @@
     return result;
   };
 
-  var HAS_VALUE = exports.HAS_VALUE = function () {
+  var HAS_VALUE = FUNCTION_EXPORTS.HAS_VALUE = function () {
     var defaultObjectValueFunc = function defaultObjectValueFunc(object, value) {
       return object === value;
     };
@@ -297,7 +295,7 @@
     };
   }();
 
-  var GET = exports.GET = function GET(target, path) {
+  var GET = FUNCTION_EXPORTS.GET = function (target, path) {
     if ((typeof target === "undefined" ? "undefined" : _typeof(target)) === "object") {
       switch (typeof path === "undefined" ? "undefined" : _typeof(path)) {
         case "number":
@@ -313,7 +311,7 @@
     return target;
   };
 
-  var GET_KEY_BY = exports.GET_KEY_BY = function GET_KEY_BY(object, value) {
+  var GET_KEY_BY = FUNCTION_EXPORTS.GET_KEY_BY = function (object, value) {
     if (IS_FUNCTION(value)) {
       if (IS_ARRAY(object)) for (var i = 0, l = object.length; i < l; i++) {
         if (value(object[i], i) === true) return i;
@@ -329,7 +327,7 @@
     }
   };
 
-  var STRING_CAST = exports.STRING_CAST = function () {
+  var STRING_CAST = FUNCTION_EXPORTS.STRING_CAST = function () {
     return function (text, defaultOrder, finder, at) {
       if (typeof text === "string" || typeof text === "number") {
         var idxs = [];
@@ -422,7 +420,7 @@
     bow.findIndexes("hello world",/l/) [2,3,9]
     bow.findIndexes("hello world",/\s/) [5]
   */
-  var FIND_INDEXES = exports.FIND_INDEXES = function () {
+  var FIND_INDEXES = FUNCTION_EXPORTS.FIND_INDEXES = function () {
     var __find_string = function __find_string(c, s, p) {
       return c.indexOf(s, p);
     };
@@ -453,7 +451,7 @@
     };
   }();
 
-  var EACH_PROC = exports.EACH_PROC = function EACH_PROC(arr, proc) {
+  var EACH_PROC = FUNCTION_EXPORTS.EACH_PROC = function (arr, proc) {
     if (arr.length > 1) {
       for (var i = 0, l = arr.length - 1; i < l; proc(arr[i], i, false), i++) {}
       proc(arr[arr.length - 1], arr.length - 1, true);
@@ -463,7 +461,7 @@
     return arr;
   };
 
-  var STATIC_FOR_EACH_PROC = exports.STATIC_FOR_EACH_PROC = function STATIC_FOR_EACH_PROC(obj, proc) {
+  var STATIC_FOR_EACH_PROC = FUNCTION_EXPORTS.STATIC_FOR_EACH_PROC = function (obj, proc) {
     if ((typeof obj === "undefined" ? "undefined" : _typeof(obj)) === "object") for (var i = 0, a = obj instanceof Array, al = a ? obj.length : NaN, keys = Object.keys(obj), l = keys.length; i < l; proc(obj[keys[i]], keys[i], i, l, al), i++) {}
     return obj;
   };
@@ -482,7 +480,7 @@
   };
 
   //PINPONGPOOL TRANSFORM
-  var REMOVE_VALUE = exports.REMOVE_VALUE = function REMOVE_VALUE(obj, value) {
+  var REMOVE_VALUE = FUNCTION_EXPORTS.REMOVE_VALUE = function (obj, value) {
     var detect = true;
     var array = IS_ARRAY(obj);
 
@@ -501,7 +499,7 @@
     return obj;
   };
 
-  var CLEAR_OF = exports.CLEAR_OF = function CLEAR_OF(data, fillFn, sp) {
+  var CLEAR_OF = FUNCTION_EXPORTS.CLEAR_OF = function (data, fillFn, sp) {
     if (data instanceof Array) {
       sp = Array.prototype.splice.call(data, 0, data.length);
     } else if ((typeof data === "undefined" ? "undefined" : _typeof(data)) == "object") {
@@ -513,26 +511,26 @@
     return fillFn && fillFn(data, sp), data;
   };
 
-  var INSERT_OF = exports.INSERT_OF = function INSERT_OF(data, v, a) {
+  var INSERT_OF = FUNCTION_EXPORTS.INSERT_OF = function (data, v, a) {
     IS_ARRAY(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
     return data;
   };
 
-  var MOVE_OF = exports.MOVE_OF = function MOVE_OF(data, oldIndex, newIndex) {
+  var MOVE_OF = FUNCTION_EXPORTS.MOVE_OF = function (data, oldIndex, newIndex) {
     if (oldIndex !== newIndex && IS_ARRAY(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
       Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
     }
     return data;
   };
 
-  var CONCAT_OF = exports.CONCAT_OF = function CONCAT_OF(data, appends) {
+  var CONCAT_OF = FUNCTION_EXPORTS.CONCAT_OF = function (data, appends) {
     var data = AS_ARRAY(data);
     return EACH(appends, function (value) {
       data.push(value);
     }), data;
   };
 
-  var FILTER_OF = exports.FILTER_OF = function FILTER_OF(data, func, exitFn) {
+  var FILTER_OF = FUNCTION_EXPORTS.FILTER_OF = function (data, func, exitFn) {
     var data = AS_ARRAY(data);
     var exitCnt = 0;
 
@@ -551,7 +549,7 @@
     return data;
   };
 
-  var SORT_OF = exports.SORT_OF = function SORT_OF(data, filter) {
+  var SORT_OF = FUNCTION_EXPORTS.SORT_OF = function (data, filter) {
     if (data.length == 0) {
       return data;
     }
@@ -594,7 +592,7 @@
     return data;
   };
 
-  var REBASE = exports.REBASE = function REBASE(obj, ref) {
+  var REBASE = FUNCTION_EXPORTS.REBASE = function (obj, ref) {
     var result = {};
     for (var key in obj) {
       if (key === ".*") {
@@ -640,7 +638,7 @@
   };
 
   //PINPONGPOOL FORMAT
-  var RANGE = exports.RANGE = function RANGE(value, step, sizeBase) {
+  var RANGE = FUNCTION_EXPORTS.RANGE = function (value, step, sizeBase) {
     var r = [],
         start,
         end,
@@ -694,7 +692,7 @@
   };
 
   //TODO: Union HAS_VALUE
-  var NESTED_HAS_PROC = exports.NESTED_HAS_PROC = function NESTED_HAS_PROC(obj, key) {
+  var NESTED_HAS_PROC = FUNCTION_EXPORTS.NESTED_HAS_PROC = function (obj, key) {
     var keys = key.split(".");
     if (!keys.length) return false;
 
@@ -711,7 +709,7 @@
     return true;
   };
 
-  var APART = exports.APART = function APART(text, split, block, blockEnd) {
+  var APART = FUNCTION_EXPORTS.APART = function (text, split, block, blockEnd) {
     if (typeof text !== "string") return [text];
 
     var result = text.split(split === true ? /\s+/ : split || /\s+/);
@@ -744,7 +742,7 @@
     }
   };
 
-  var DIFF_STRUCTURE = exports.DIFF_STRUCTURE = function DIFF_STRUCTURE(before, after) {
+  var DIFF_STRUCTURE = FUNCTION_EXPORTS.DIFF_STRUCTURE = function (before, after) {
     var afterKeys = Object.keys(after);
     var beforeKeys;
     var canDiff = false;
@@ -807,7 +805,7 @@
   };
 
   //PINPONGPOOL INTERFACE
-  var TOGGLE = exports.TOGGLE = function TOGGLE(ta, cv, set) {
+  var TOGGLE = FUNCTION_EXPORTS.TOGGLE = function (ta, cv, set) {
     var index = -1;
     for (var d = AS_ARRAY(ta), _l2 = d.length, _i2 = 0; _i2 < _l2; _i2++) {
       if (d[_i2] == cv) {
@@ -820,7 +818,7 @@
     return ta[index];
   };
 
-  var TRUN = function TRUN(i, p, ts) {
+  var TRUN = FUNCTION_EXPORTS.TRUN = function (i, p, ts) {
     if (i < 0) {
       var abs = Math.abs(i / ts);i = p - (abs > p ? abs % p : abs);
     };
@@ -829,7 +827,7 @@
   };
 
   //PINPONGPOOL GENERATOR
-  var RAND64 = function () {
+  var RAND64 = FUNCTION_EXPORTS.RAND64 = function () {
     var rand64Token = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     return function (length, codeAt, codeLength) {
       length = isNaN(length) ? 1 : parseInt(length);
@@ -842,9 +840,21 @@
     };
   }();
 
-  var TOKENIZE = exports.TOKENIZE = function TOKENIZE(seed, digits) {
+  var TOKENIZE = FUNCTION_EXPORTS.TOKENIZE = function (seed, digits) {
     return Math.floor(Math.abs(Math.sin(Number((seed + "").replace(/./g, function (s, i) {
       return s.charCodeAt(0);
     }))) * 16777215) % 16777215).toString(digits || 16);
   };
+
+  var FINALLY_EXPORTS = Object.keys(FUNCTION_EXPORTS).reduce(function (dest, key) {
+    var camelKey = key.toLowerCase().replace(/\_[\w]/g, function (s) {
+      return s.substr(1).toUpperCase();
+    });
+
+    dest[camelKey] = FUNCTION_EXPORTS[key];
+
+    return dest;
+  }, {});
+
+  module.exports = Object.assign({}, FINALLY_EXPORTS);
 });
