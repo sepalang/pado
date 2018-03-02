@@ -6,7 +6,7 @@
   "scripts": {
     "1": "babel-node src/train.module.js",
     "start": "babel-node index.js",
-    "build": "babel src --out-dir dist",
+    "build": "rimraf dist && babel src --out-dir dist",
     "test": "jest ''"
   },
   "keywords": [
@@ -17,9 +17,27 @@
   "license": "MIT",
   "babel": {
     "presets": [
-      "stage-3"
+      [
+        "env",
+        {
+          "targets": {
+            "browsers": [
+              "last 2 versions",
+              "safari >= 7"
+            ]
+          },
+          "loose": true,
+          "useBuiltIns": true
+        }
+      ]
     ],
     "plugins": [
+      [
+        "transform-object-rest-spread",
+        {
+          "useBuiltIns": true
+        }
+      ],
       "transform-es2015-modules-umd"
     ]
   },
@@ -36,8 +54,9 @@
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
     "babel-jest": "^22.4.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
-    "babel-preset-stage-3": "^6.24.1",
-    "jest": "^22.4.2"
+    "jest": "^22.4.2",
+    "rimraf": "^2.6.2"
   }
 }
