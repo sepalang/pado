@@ -1,4 +1,4 @@
-import { factory } from './train.core.js'
+import { factory } from './pado.core.js'
 import * as functions from './index.js'
 
 const DEFAULT = factory({ ...functions });

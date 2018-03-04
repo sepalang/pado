@@ -8,7 +8,7 @@
       exports: {}
     };
     factory(mod.exports, global.index);
-    global.trainCore = mod.exports;
+    global.padoCore = mod.exports;
   }
 })(this, function (exports, _index) {
   'use strict';

@@ -2,10 +2,10 @@ import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 
 export default {
-  input: 'dist/commonjs/trainman.js',
+  input: 'dist/commonjs/pado.js',
   output: {
-    name: "tm",
-    file: 'dist/trainman.js',
+    name: "pado",
+    file: 'dist/pado.js',
     format: 'umd'
   },
   plugins: [

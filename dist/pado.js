@@ -1,7 +1,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
-	(global.tm = factory());
+	(global.pado = factory());
 }(this, (function () { 'use strict';
 
 function unwrapExports (x) {
@@ -1076,7 +1076,7 @@ module.exports = Object.assign({}, functions$$1, {
 
 unwrapExports(commonjs);
 
-var train_core = createCommonjsModule(function (module, exports) {
+var pado_core = createCommonjsModule(function (module, exports) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -1112,10 +1112,10 @@ var factory = exports.factory = BowFactory;
 exports.default = DEFAULT;
 });
 
-unwrapExports(train_core);
-var train_core_1 = train_core.factory;
+unwrapExports(pado_core);
+var pado_core_1 = pado_core.factory;
 
-var trainman = createCommonjsModule(function (module, exports) {
+var pado = createCommonjsModule(function (module, exports) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -1129,13 +1129,13 @@ var functions = _interopRequireWildcard(commonjs);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-var DEFAULT = (0, train_core.factory)(Object.assign({}, functions));
+var DEFAULT = (0, pado_core.factory)(Object.assign({}, functions));
 
 exports.default = DEFAULT;
 });
 
-var trainman$1 = unwrapExports(trainman);
+var pado$1 = unwrapExports(pado);
 
-return trainman$1;
+return pado$1;
 
 })));

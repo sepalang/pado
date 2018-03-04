@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', './train.core.js', './index.js'], factory);
+    define(['exports', './pado.core.js', './index.js'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('./train.core.js'), require('./index.js'));
+    factory(exports, require('./pado.core.js'), require('./index.js'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.trainCore, global.index);
-    global.trainman = mod.exports;
+    factory(mod.exports, global.padoCore, global.index);
+    global.pado = mod.exports;
   }
-})(this, function (exports, _trainCore, _index) {
+})(this, function (exports, _padoCore, _index) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -36,7 +36,7 @@
     }
   }
 
-  var DEFAULT = (0, _trainCore.factory)(Object.assign({}, functions));
+  var DEFAULT = (0, _padoCore.factory)(Object.assign({}, functions));
 
   exports.default = DEFAULT;
 });
