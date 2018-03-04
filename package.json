@@ -5,41 +5,19 @@
   "main": "index.js",
   "scripts": {
     "start": "babel-node index.js",
-    "build": "rimraf dist && babel src --out-dir dist",
+    "clear:dist": "rimraf dist && mkdirp dist",
+    "build": "npm run clear:dist && npm run babel:build:default && npm run babel:build:umd && npm run rollup:build && rimraf dist/commonjs",
+    "babel:build:default": "babel src --out-dir dist/commonjs --plugins=transform-es2015-modules-commonjs",
+    "babel:build:umd": "babel src --out-dir dist/umd --plugins=transform-es2015-modules-umd",
+    "rollup:build": "rollup -c build.rollup.js",
     "test": "jest ''"
   },
+  "author": "AHN HO JUNG",
+  "license": "MIT",
   "keywords": [
     "function",
     "functions"
   ],
-  "author": "AHN HO JUNG",
-  "license": "MIT",
-  "babel": {
-    "presets": [
-      [
-        "env",
-        {
-          "targets": {
-            "browsers": [
-              "last 2 versions",
-              "safari >= 7"
-            ]
-          },
-          "loose": true,
-          "useBuiltIns": true
-        }
-      ]
-    ],
-    "plugins": [
-      [
-        "transform-object-rest-spread",
-        {
-          "useBuiltIns": true
-        }
-      ],
-      "transform-es2015-modules-umd"
-    ]
-  },
   "jest": {
     "moduleFileExtensions": [
       "js"
@@ -56,6 +34,10 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "jest": "^22.4.2",
-    "rimraf": "^2.6.2"
+    "mkdirp": "^0.5.1",
+    "rimraf": "^2.6.2",
+    "rollup": "^0.56.3",
+    "rollup-plugin-commonjs": "^8.3.0",
+    "rollup-plugin-node-resolve": "^3.0.3"
   }
 }
