@@ -1,7 +1,7 @@
 {
-  "name": "useful-functions",
-  "version": "1.0.0",
-  "description": "",
+  "name": "trainman",
+  "version": "0.1.0",
+  "description": "Yet another functional programming helper",
   "main": "index.js",
   "scripts": {
     "start": "babel-node index.js",

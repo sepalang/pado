@@ -1,7 +1,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
-	(global.train = factory());
+	(global.tm = factory());
 }(this, (function () { 'use strict';
 
 function unwrapExports (x) {
@@ -1115,7 +1115,7 @@ exports.default = DEFAULT;
 unwrapExports(train_core);
 var train_core_1 = train_core.factory;
 
-var train = createCommonjsModule(function (module, exports) {
+var trainman = createCommonjsModule(function (module, exports) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -1134,8 +1134,8 @@ var DEFAULT = (0, train_core.factory)(Object.assign({}, functions));
 exports.default = DEFAULT;
 });
 
-var train$1 = unwrapExports(train);
+var trainman$1 = unwrapExports(trainman);
 
-return train$1;
+return trainman$1;
 
 })));

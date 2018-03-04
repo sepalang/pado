@@ -8,7 +8,7 @@
       exports: {}
     };
     factory(mod.exports, global.trainCore, global.index);
-    global.train = mod.exports;
+    global.trainman = mod.exports;
   }
 })(this, function (exports, _trainCore, _index) {
   'use strict';
