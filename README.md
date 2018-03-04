@@ -20,7 +20,7 @@ data;
 ##  build style
 
 ```javascript
-var plusOne = ib().map(v=>v+1}).build()
+var plusOne = pd().map(v=>v+1}).build()
 
 plusOne([1,2,3]);
 //=> [2,3,4];
