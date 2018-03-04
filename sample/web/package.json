@@ -1,0 +1,13 @@
+{
+  "name": "trainman-sample-web",
+  "version": "1.0.0",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server ./"
+  },
+  "author": "AHN HO JUNG",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.0"
+  }
+}

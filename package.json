@@ -10,6 +10,7 @@
     "babel:build:default": "babel src --out-dir dist/commonjs --plugins=transform-es2015-modules-commonjs",
     "babel:build:umd": "babel src --out-dir dist/umd --plugins=transform-es2015-modules-umd",
     "rollup:build": "rollup -c build.rollup.js",
+    "s:web": "cd sample/web && npm start",
     "test": "jest ''"
   },
   "author": "AHN HO JUNG",
