@@ -4,7 +4,7 @@
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "scripts": {
-    "start": "babel-node index.js",
+    "start": "babel-node test/src-test.js",
     "clear:dist": "rimraf dist && mkdirp dist",
     "build": "npm run clear:dist && npm run babel:build:default && npm run babel:build:umd && npm run rollup:build && rimraf dist/commonjs",
     "babel:build:default": "babel src --out-dir dist/commonjs --plugins=transform-es2015-modules-commonjs",
