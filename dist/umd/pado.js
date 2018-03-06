@@ -36,7 +36,21 @@
     }
   }
 
-  var DEFAULT = (0, _padoCore.factory)(Object.assign({}, functions));
+  var _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  var DEFAULT = (0, _padoCore.factory)(_extends({}, functions));
 
   exports.default = DEFAULT;
 });

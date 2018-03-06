@@ -12,6 +12,8 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var FUNCTION_EXPORTS = {};
@@ -679,6 +681,54 @@ var RANGE = FUNCTION_EXPORTS.RANGE = function (value, step, sizeBase) {
   return reverse ? r.reverse() : r;
 };
 
+var DOMAIN_RANGE_VALUE = FUNCTION_EXPORTS.DOMAIN_RANGE_VALUE = function (domain, range, vs, nice) {
+  /*
+  return forMap(cloneDeep(vs),function(v,sel){
+    var $range  = sel ? range[sel]  : range;
+    var $domain = sel ? domain[sel] : domain;
+    if(!$range || !$domain){ return v; }
+                    
+    var dSize = $domain[1] - $domain[0];
+    var sSize = $range[1] - $range[0];
+    var dRate = (v - $domain[0]) / dSize;
+    var calc  = $range[0] + sSize * dRate;
+                    
+    return nice ? Math.floor(calc) : calc;
+  });
+  */
+};
+
+//matrixRange([1],[3]) // [[1], [2], [3]] 
+//matrixRange([1,1],[3,3]) // [[1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
+
+var MATRIX_RANGE = FUNCTION_EXPORTS.DOMAIN_RANGE_VALUE = function (start, end, step, sizeBase) {
+  /*
+  var scales=[];
+  var maxLength = max([start.length,end.length]);
+  
+  var selectLengthes = times(maxLength,function(scaleIndex){
+      var range = NT.range([start[scaleIndex],end[scaleIndex]],step,sizeBase)
+      scales.push(range);
+      return range.length;
+  });
+   var result = times(reduce(selectLengthes,function(redu,value){
+      return redu * value;
+  },1),function(){ return new Array(maxLength); });
+  
+  var turnSize = 1;
+  
+  each(scales,function(scaleCase,scaleIndex){
+      var scaleCaseLength = scaleCase.length;
+      times(result.length,function(time){
+          result[time][scaleIndex] = scaleCase[NT.turn(time,scaleCaseLength,turnSize)];
+      });
+      turnSize = turnSize * scaleCaseLength;
+  });
+  
+  return result;
+  */
+};
+
 //TODO: Union HAS_VALUE
 var NESTED_HAS_PROC = FUNCTION_EXPORTS.NESTED_HAS_PROC = function (obj, key) {
   var keys = key.split(".");
@@ -842,11 +892,13 @@ var FINALLY_EXPORTS = Object.keys(FUNCTION_EXPORTS).reduce(function (dest, key) 
   return dest;
 }, {});
 
-var functions = Object.assign({}, FINALLY_EXPORTS);
+var functions = _extends({}, FINALLY_EXPORTS);
 
 var functions$1 = {
 
 };
+
+var _extends$1 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -1055,11 +1107,13 @@ Object.keys(PromiseExports).forEach(function (key) {
   PromiseFunction[key] = PromiseExports[key];
 });
 
-var promise_1 = Object.assign({}, PromiseExports, {
+var promise_1 = _extends$1({}, PromiseExports, {
   promise: PromiseFunction
 });
 
 var commonjs = createCommonjsModule(function (module) {
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 
 
@@ -1069,7 +1123,7 @@ var functions$$1 = _interopRequireWildcard(functions);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-module.exports = Object.assign({}, functions$$1, {
+module.exports = _extends({}, functions$$1, {
   promise: promise_1.promise
 });
 });
@@ -1082,6 +1136,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.factory = undefined;
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 
 
@@ -1106,7 +1162,7 @@ var BowFactory = function BowFactory(fns) {
   return BOX;
 };
 
-var DEFAULT = BowFactory(Object.assign({}, functions));
+var DEFAULT = BowFactory(_extends({}, functions));
 
 var factory = exports.factory = BowFactory;
 exports.default = DEFAULT;
@@ -1121,6 +1177,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 
 
 
@@ -1129,7 +1187,7 @@ var functions = _interopRequireWildcard(commonjs);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-var DEFAULT = (0, pado_core.factory)(Object.assign({}, functions));
+var DEFAULT = (0, pado_core.factory)(_extends({}, functions));
 
 exports.default = DEFAULT;
 });

@@ -13,6 +13,20 @@
 })(this, function (module, _functions) {
   "use strict";
 
+  var _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
   var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
     return typeof obj;
   } : function (obj) {
@@ -222,7 +236,7 @@
     PromiseFunction[key] = PromiseExports[key];
   });
 
-  module.exports = Object.assign({}, PromiseExports, {
+  module.exports = _extends({}, PromiseExports, {
     promise: PromiseFunction
   });
 });

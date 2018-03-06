@@ -29,10 +29,10 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
     "babel-jest": "^22.4.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "jest": "^22.4.2",
     "mkdirp": "^0.5.1",

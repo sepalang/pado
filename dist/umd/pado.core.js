@@ -37,6 +37,20 @@
     }
   }
 
+  var _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
   var Bow = function Bow() {};
   var BowFactory = function BowFactory(fns) {
     var BOX = function BOX(payload) {
@@ -54,7 +68,7 @@
     return BOX;
   };
 
-  var DEFAULT = BowFactory(Object.assign({}, functions));
+  var DEFAULT = BowFactory(_extends({}, functions));
 
   var factory = exports.factory = BowFactory;
   exports.default = DEFAULT;

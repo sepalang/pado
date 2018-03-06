@@ -13,6 +13,20 @@
 })(this, function (module) {
   "use strict";
 
+  var _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
   var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
     return typeof obj;
   } : function (obj) {
@@ -691,6 +705,54 @@
     return reverse ? r.reverse() : r;
   };
 
+  var DOMAIN_RANGE_VALUE = FUNCTION_EXPORTS.DOMAIN_RANGE_VALUE = function (domain, range, vs, nice) {
+    /*
+    return forMap(cloneDeep(vs),function(v,sel){
+      var $range  = sel ? range[sel]  : range;
+      var $domain = sel ? domain[sel] : domain;
+      if(!$range || !$domain){ return v; }
+                      
+      var dSize = $domain[1] - $domain[0];
+      var sSize = $range[1] - $range[0];
+      var dRate = (v - $domain[0]) / dSize;
+      var calc  = $range[0] + sSize * dRate;
+                      
+      return nice ? Math.floor(calc) : calc;
+    });
+    */
+  };
+
+  //matrixRange([1],[3]) // [[1], [2], [3]] 
+  //matrixRange([1,1],[3,3]) // [[1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
+
+  var MATRIX_RANGE = FUNCTION_EXPORTS.DOMAIN_RANGE_VALUE = function (start, end, step, sizeBase) {
+    /*
+    var scales=[];
+    var maxLength = max([start.length,end.length]);
+    
+    var selectLengthes = times(maxLength,function(scaleIndex){
+        var range = NT.range([start[scaleIndex],end[scaleIndex]],step,sizeBase)
+        scales.push(range);
+        return range.length;
+    });
+     var result = times(reduce(selectLengthes,function(redu,value){
+        return redu * value;
+    },1),function(){ return new Array(maxLength); });
+    
+    var turnSize = 1;
+    
+    each(scales,function(scaleCase,scaleIndex){
+        var scaleCaseLength = scaleCase.length;
+        times(result.length,function(time){
+            result[time][scaleIndex] = scaleCase[NT.turn(time,scaleCaseLength,turnSize)];
+        });
+        turnSize = turnSize * scaleCaseLength;
+    });
+    
+    return result;
+    */
+  };
+
   //TODO: Union HAS_VALUE
   var NESTED_HAS_PROC = FUNCTION_EXPORTS.NESTED_HAS_PROC = function (obj, key) {
     var keys = key.split(".");
@@ -856,5 +918,5 @@
     return dest;
   }, {});
 
-  module.exports = Object.assign({}, FINALLY_EXPORTS);
+  module.exports = _extends({}, FINALLY_EXPORTS);
 });
