@@ -1,8 +1,12 @@
 {
   "name": "pado",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Yet another functional programming helper",
   "main": "dist/pado.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/padowave/pado"
+  },
   "scripts": {
     "start": "babel-node test/src-test.js",
     "clear:dist": "rimraf dist && mkdirp dist",
@@ -29,6 +33,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "padoc": "padowave/padoc",
     "babel-cli": "^6.26.0",
     "babel-jest": "^22.4.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
