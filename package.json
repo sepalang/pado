@@ -5,7 +5,7 @@
   "main": "dist/pado.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/padowave/pado"
+    "url": "https://github.com/sepalang/pado"
   },
   "scripts": {
     "start": "babel-node test/src-test.js",
@@ -35,7 +35,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "padoc": "padowave/padoc",
+    "padoc": "sepalang/padoc",
     "babel-jest": "^22.4.1",
     "jest": "^22.4.2",
     "mkdirp": "^0.5.1",
