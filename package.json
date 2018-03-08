@@ -15,7 +15,9 @@
     "babel:build:umd": "babel src --out-dir dist/umd --plugins=transform-es2015-modules-umd",
     "rollup:build": "rollup -c build.rollup.js",
     "s:web": "cd sample/web && npm start",
-    "test": "jest ''"
+    "test": "jest ''",
+    "cc": "padoc src -s compile -o dist/commonjs -t es6 -m commonjs",
+    "cr": "padoc dist/commonjs/pado.js -s rollup -o dist/pado.js -m iife -n pd"
   },
   "author": "AHN HO JUNG",
   "license": "MIT",
@@ -34,16 +36,9 @@
   "dependencies": {},
   "devDependencies": {
     "padoc": "padowave/padoc",
-    "babel-cli": "^6.26.0",
     "babel-jest": "^22.4.1",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
     "jest": "^22.4.2",
     "mkdirp": "^0.5.1",
-    "rimraf": "^2.6.2",
-    "rollup": "^0.56.3",
-    "rollup-plugin-commonjs": "^8.3.0",
-    "rollup-plugin-node-resolve": "^3.0.3"
+    "rimraf": "^2.6.2"
   }
 }
