@@ -1,4 +1,4 @@
-import { promise } from '@/util';
+import { promise } from './promise';
 import _assign from 'lodash/assign';
 
 
