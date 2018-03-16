@@ -894,10 +894,6 @@ var FINALLY_EXPORTS = Object.keys(FUNCTION_EXPORTS).reduce(function (dest, key) 
 
 var functions = _extends({}, FINALLY_EXPORTS);
 
-var functions$1 = {
-
-};
-
 var _extends$1 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -915,10 +911,8 @@ var PromiseExports = {};
 PromiseExports.all = Promise.all;
 PromiseExports.resolve = Promise.resolve;
 PromiseExports.reject = Promise.reject;
-
 PromiseExports.timeout = function (fn, time) {
   if (typeof fn === "number") {
-    //fn => time, time => result
     return q(function (resolve) {
       return setTimeout(function () {
         return resolve(time);
@@ -939,22 +933,15 @@ PromiseExports.valueOf = function (maybeQ) {
   });
 };
 
-PromiseExports.break = function (notifyConsole) {
-  return new PromiseClass(function (e) {
-    if (notifyConsole === true) {
-      console.warn("break promise", e);
-    }
-  });
-};
+PromiseExports.abort = function () {
+  var notifyConsole = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : undefined;
 
-PromiseExports.timeoutTest = function (time) {
-  return function (value) {
-    return promise(function (resolve) {
-      setTimeout(function (e) {
-        return resolve(value);
-      }, time);
-    });
-  };
+  return new PromiseClass(function (resolve, reject) {
+    if (notifyConsole === true) {
+      console.warn("break promise");
+    }
+    reject(abortMessage);
+  });
 };
 
 PromiseExports.defer = function () {
@@ -973,19 +960,19 @@ PromiseExports.defer = function () {
 PromiseExports.wheel = function (tasks, option) {
 
   if (!(tasks instanceof Array)) {
-    return PromiseFunction.reject(new Error("tasks must be array"));
+    return q.reject(new Error("tasks must be array"));
   }
 
   if (!tasks.length || !tasks.some(function (e) {
     return typeof e === "function";
   })) {
-    return PromiseFunction.reject(new Error("not found wheel executable"));
+    return q.reject(new Error("not found wheel executable"));
   }
 
   if (!tasks.some(function (e) {
     return typeof e !== "function" || typeof e !== "number";
   })) {
-    return PromiseFunction.reject(new Error("wheel task only function or number executable"));
+    return q.reject(new Error("wheel task only function or number executable"));
   }
 
   if ((typeof option === "undefined" ? "undefined" : _typeof$1(option)) !== "object") {
@@ -993,40 +980,22 @@ PromiseExports.wheel = function (tasks, option) {
   }
 
   var finished = false;
-  var defer = PromiseFunction.defer();
-  var limit = typeof option.limit === "number" && option.limit > 0 ? parseInt(option.limit) : 10000;
+  var defer = q.defer();
+  var limit = typeof option.limit === "number" && option.limit > 0 ? parseInt(option.limit, 10) : 10000;
   var taskLength = tasks.length;
   var wheelTick = 0;
   var resetScope = 0;
-
-  defer.promise.then(function (e) {
-    if (finished === null) return PromiseFunction.break();
-    finished = true;
-    return e;
-  }).catch(function (e) {
-    if (finished === null) return PromiseFunction.break();
-    finished = true;
-    return e;
-  });
-
-  defer.stop = function () {
-    finished = null;
-  };
-
-  defer.reset = function (resetTick) {
-    resetScope += 1;
-    wheelTick = typeof resetTick === "number" ? resetTick : 0;
-    finished = false;
-    nextWheelTick(wheelTick++, option.value, resetScope);
-  };
-
   var nextWheelTick = function nextWheelTick(tick, value, tickScope) {
     var nowAction = tasks[turn(tick, taskLength, 1)];
 
+    var isActiveFn = function isActiveFn() {
+      return tickScope === resetScope;
+    };
+
     var nextTickFn = function nextTickFn(passValue) {
-      //if reset called
-      if (tickScope !== resetScope) return;
-      //if over tick
+      // if reset called
+      if (!isActiveFn()) return;
+      // if over tick
       if (wheelTick > limit) {
         return defer.reject(new Error("limit"));
       }
@@ -1038,9 +1007,10 @@ PromiseExports.wheel = function (tasks, option) {
     if (typeof nowAction === "function") {
       nowAction({
         value: value,
+        next: nextTickFn,
+        isActive: isActiveFn,
         resolve: defer.resolve,
-        reject: defer.reject,
-        next: nextTickFn
+        reject: defer.reject
       }, Math.floor(tick / tasks.length), tick);
     } else if (typeof nowAction === "number") {
       setTimeout(function () {
@@ -1049,65 +1019,44 @@ PromiseExports.wheel = function (tasks, option) {
     }
   };
 
+  defer.promise.then(function (e) {
+    if (finished === null) return q.abort();
+    finished = true;
+    return e;
+  }).catch(function (e) {
+    if (finished === null) return q.abort();
+    finished = true;
+    return e;
+  });
+
+  defer.stop = function (resetTick) {
+    finished = null;
+    resetScope += 1;
+  };
+
+  defer.start = function (resetTick) {
+    if (finished === null) {
+      finished = false;
+      wheelTick = typeof resetTick === "number" ? resetTick : 0;
+      nextWheelTick(wheelTick++, option.value, resetScope);
+    }
+  };
+
+  defer.reset = function (resetTick) {
+    defer.stop();
+    defer.start(resetTick);
+  };
+
   defer.reset(0);
 
   return defer;
-};
-
-PromiseExports.sequance = function (data, fn, serialPipeOutMode) {
-  if (typeof fn === "undefined") {
-    fn = function fn(datum) {
-      if (typeof datum === "function") {
-        return q(datum);
-      }
-    };
-  }
-
-  return q(function (resolve, reject) {
-    data = (0, functions$1.asArray)(data);
-
-    if (typeof serialPipeOutMode === "undefined") {
-      serialPipeOutMode = typeof data[0] === "function";
-    }
-
-    var resolveResult = [];
-    var index = 0;
-    var nextFn = function nextFn(beforeResolved) {
-      if (index < data.length) {
-        var fnResult;
-        if (serialPipeOutMode) {
-          var serialPipeOutModeFunc = data[index++];
-          if (typeof serialPipeOutModeFunc === "function") {
-            fnResult = serialPipeOutModeFunc(beforeResolved, index, data.length);
-          } else {
-            fnResult = serialPipeOutModeFunc;
-          }
-        } else {
-          fnResult = fn(data[index++], index - 1);
-        }
-
-        PromiseFunction.valueOf(fnResult).then(function (r) {
-          if (r === PromiseFunction.break) return;
-          resolveResult.push(r), nextFn(r);
-        }).catch(function (reason) {
-          if (!serialPipeOutMode && reason instanceof Error) {
-            reason["success"] = data.slice(index - 1);
-          }
-          reject(reason);
-        });
-      } else {
-        return resolve(serialPipeOutMode ? beforeResolved : resolveResult);
-      }
-    };
-    nextFn(fn);
-  });
 };
 
 Object.keys(PromiseExports).forEach(function (key) {
   PromiseFunction[key] = PromiseExports[key];
 });
 
-var promise_1 = _extends$1({}, PromiseExports, {
+var promise = _extends$1({}, PromiseExports, {
   promise: PromiseFunction
 });
 
@@ -1124,7 +1073,7 @@ var functions$$1 = _interopRequireWildcard(functions);
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 module.exports = _extends({}, functions$$1, {
-  promise: promise_1.promise
+  promise: promise.promise
 });
 });
 

@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', '@/util', 'lodash/assign'], factory);
+    define(['exports', './promise', 'lodash/assign'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('@/util'), require('lodash/assign'));
+    factory(exports, require('./promise'), require('lodash/assign'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.util, global.assign);
+    factory(mod.exports, global.promise, global.assign);
     global.paginate = mod.exports;
   }
-})(this, function (exports, _util, _assign2) {
+})(this, function (exports, _promise, _assign2) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -75,7 +75,7 @@
       var _this = this;
 
       if (this.$fetchState != -1) {
-        return _util.promise.reject(new Error("paginate::다른 페이징 작업 중에 페이징 처리를 할 수 없습니다."));
+        return _promise.promise.reject(new Error("paginate::다른 페이징 작업 중에 페이징 처리를 할 수 없습니다."));
       }
 
       if ((typeof payload === 'undefined' ? 'undefined' : _typeof(payload)) === "object") {
@@ -85,8 +85,8 @@
       this.$fetchState = 0;
       this.$pending = true;
 
-      return (0, _util.promise)(function (resolve, reject) {
-        _util.promise.valueOf(_this.$fetchFn(payload)).then(function (e) {
+      return (0, _promise.promise)(function (resolve, reject) {
+        _promise.promise.valueOf(_this.$fetchFn(payload)).then(function (e) {
           if (_this.$fetchState == 0) {
             console.warn("paginate::fetch중엔 반드시 update를 해 주십시오");
           }
@@ -138,7 +138,7 @@
     fetchIndex: function fetchIndex(pageIndex) {
       // 설정할수 있는 페이지보다 너무 높으면
       if (pageIndex < 0) {
-        return _util.promise.reject("paginate::-1 이하로 페이지네이션에 접근 할 수 없습니다.");
+        return _promise.promise.reject("paginate::-1 이하로 페이지네이션에 접근 할 수 없습니다.");
       }
 
       if (this.pageLimit < pageIndex) {
@@ -196,7 +196,7 @@
       if (action) {
         return action();
       } else {
-        return _util.promise.reject("paginate::unknown command", command);
+        return _promise.promise.reject("paginate::unknown command", command);
       }
     }
   };
