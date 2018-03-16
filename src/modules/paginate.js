@@ -1,6 +1,4 @@
-import { promise } from './promise';
-import _assign from 'lodash/assign';
-
+import { promise } from '.promise';
 
 const PaginateClass = function(opts) {
   // current page index
@@ -48,7 +46,7 @@ PaginateClass.prototype = {
     }
 
     if(typeof payload === "object") {
-      payload = _assign(this.pageState, this.parameters, payload);
+      payload = Object.assign(this.pageState, this.parameters, payload);
     }
 
     this.$fetchState = 0;
@@ -84,7 +82,7 @@ PaginateClass.prototype = {
     this.totalItems = (typeof updateOpts.totalItems === "number") ? updateOpts.totalItems : this.totalItems;
 
     if(typeof updateOpts.parameters === "object") {
-      this.parameters = _assign({}, this.parameters, updateOpts.parameters);
+      this.parameters = Object.assign({}, this.parameters, updateOpts.parameters);
     }
 
     if(typeof this.$renderFn === "function") {

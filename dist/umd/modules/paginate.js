@@ -1,30 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', './promise', 'lodash/assign'], factory);
+    define(['exports', '.promise'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('./promise'), require('lodash/assign'));
+    factory(exports, require('.promise'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.promise, global.assign);
+    factory(mod.exports, global.promise);
     global.paginate = mod.exports;
   }
-})(this, function (exports, _promise, _assign2) {
+})(this, function (exports, _promise) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
   exports.paginate = exports.Paginate = undefined;
-
-  var _assign3 = _interopRequireDefault(_assign2);
-
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
 
   var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
     return typeof obj;
@@ -79,7 +71,7 @@
       }
 
       if ((typeof payload === 'undefined' ? 'undefined' : _typeof(payload)) === "object") {
-        payload = (0, _assign3.default)(this.pageState, this.parameters, payload);
+        payload = Object.assign(this.pageState, this.parameters, payload);
       }
 
       this.$fetchState = 0;
@@ -113,7 +105,7 @@
       this.totalItems = typeof updateOpts.totalItems === "number" ? updateOpts.totalItems : this.totalItems;
 
       if (_typeof(updateOpts.parameters) === "object") {
-        this.parameters = (0, _assign3.default)({}, this.parameters, updateOpts.parameters);
+        this.parameters = Object.assign({}, this.parameters, updateOpts.parameters);
       }
 
       if (typeof this.$renderFn === "function") {
