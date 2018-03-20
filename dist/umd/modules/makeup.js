@@ -16,7 +16,7 @@
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.awaitCompose = exports.awaitLeadOnly = undefined;
+  exports.watchChange = exports.awaitCompose = exports.awaitLeadOnly = undefined;
   var awaitLeadOnly = exports.awaitLeadOnly = function awaitLeadOnly(func) {
     return alloc(function () {
       var $pending = false;
@@ -106,5 +106,59 @@
         });
       };
     });
+  };
+
+  /*
+    수동 watch로직 입니다.
+    let watcher = watchChange(newValue=>{ doSomething... })
+    watcher.change("newValue")
+  */
+  var watchChange = exports.watchChange = function watchChange() {
+    var changeValue = function changeValue(watchman, newValue) {
+      var countScope = watchman.$count;
+      var destOldValue = _cloneDeep(newValue);
+
+      watchman.$setter.forEach(function (effect) {
+        effect(newValue, watchman.$oldValue, countScope);
+      });
+
+      watchman.$oldValue = destOldValue;
+    };
+
+    var Watchman = function Watchman(equalityLogic) {
+      this.$setter = [];
+      this.$oldValue = undefined;
+      this.$count = 0;
+      this.$equalityLogic = equalityLogic;
+    };
+
+    Watchman.prototype = {
+      setter: function setter(changeListeners) {
+        var _this3 = this;
+
+        asArray(changeListeners).forEach(function (fn) {
+          if (typeof fn === "function") {
+            _this3.$setter.push(fn);
+          }
+        });
+      },
+      change: function change(newValue) {
+        var newValue;
+        if (this.$equalityLogic) {
+          if (!_isEqual(this.$oldValue, newValue)) {
+            changeValue(this, newValue);
+          }
+        } else {
+          if (this.$oldValue != newValue) {
+            changeValue(this, newValue);
+          }
+        }
+      }
+    };
+    return function (effect, equalityLogic) {
+      var watch = new Watchman(equalityLogic);
+      watch.setter(effect);
+      return watch;
+    };
   };
 });

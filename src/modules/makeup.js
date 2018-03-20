@@ -62,3 +62,55 @@ export const awaitCompose = function(funcArgs) {
     };
   });
 };
+
+/*
+  수동 watch로직 입니다.
+  let watcher = watchChange(newValue=>{ doSomething... })
+  watcher.change("newValue")
+*/
+export const watchChange = (function(){
+  const changeValue = function(watchman,newValue){
+    const countScope   = watchman.$count;
+    const destOldValue = _cloneDeep(newValue);
+    
+    watchman.$setter.forEach(effect=>{
+      effect(newValue, watchman.$oldValue, countScope);
+    })
+    
+    watchman.$oldValue = destOldValue;
+  }
+  
+  var Watchman = function(equalityLogic){
+    this.$setter   = [];
+    this.$oldValue = undefined;
+    this.$count    = 0;
+    this.$equalityLogic = equalityLogic;
+  };
+  
+  Watchman.prototype = {
+    setter (changeListeners){
+      asArray(changeListeners).forEach(fn=>{
+        if(typeof fn === "function"){
+          this.$setter.push(fn);
+        }
+      });
+    },
+    change (newValue){
+      var newValue;
+      if(this.$equalityLogic){
+        if(!_isEqual(this.$oldValue,newValue)){
+          changeValue(this,newValue);
+        }
+      } else {
+        if(this.$oldValue != newValue){
+          changeValue(this,newValue);
+        }
+      }
+    }
+  }
+  return function(effect,equalityLogic){
+    const watch = new Watchman(equalityLogic);
+    watch.setter(effect);
+    return watch;
+  }
+})
