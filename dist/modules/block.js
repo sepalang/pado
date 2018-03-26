@@ -16,12 +16,10 @@
   //Scale foundation
   //정의역과 치역을 계산하여 결과값을 리턴함, 속성별로 정의하여 다중 차원 지원
   (function (FN, REMOVE_VALUE, HAS_VALUE, REDUCE, SELECT, CLONE, FOR_MAP, RANGE, DOMAIN_RANGE_VALUE) {
-
     var Block = function Block(posSize, syncOpt) {
       this.$space = void 0;
       this.$posSize;
       this.$mask;
-
       this.$compute;
       this.$sync;
       this.sync(posSize, syncOpt);
@@ -33,15 +31,17 @@
           block = this.$sync();
         } else if (typeof block === "function") {
           this.$sync = block;
+
           if (syncOpt == true) {
             block = this.$sync();
           } else {
             return this;
           }
         }
+
         if (block instanceof Block) {
-          this.$posSize = CLONE(block.$posSize);
-          //.. this.$sync    = this.$sync || block.$sync
+          this.$posSize = CLONE(block.$posSize); //.. this.$sync    = this.$sync || block.$sync
+
           this.$space = this.$space || block.$space;
           this.$mask = this.$mask || block.$mask;
         } else {
@@ -49,16 +49,21 @@
             return !_.isArray(posSize) ? [posSize, 0] : posSize;
           });
         }
+
         return this;
       },
       clone: function clone() {
         return new Block(this);
       },
       setPosition: function setPosition(value, sel) {
-        var $posSize = SELECT(this.$posSize, sel);if ($posSize instanceof Array) $posSize[0] = value;return this;
+        var $posSize = SELECT(this.$posSize, sel);
+        if ($posSize instanceof Array) $posSize[0] = value;
+        return this;
       },
       setSize: function setSize(value, sel) {
-        var $posSize = SELECT(this.$posSize, sel);if ($posSize instanceof Array) $posSize[1] = value;return this;
+        var $posSize = SELECT(this.$posSize, sel);
+        if ($posSize instanceof Array) $posSize[1] = value;
+        return this;
       },
       get: function get() {
         return CLONE(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
@@ -88,11 +93,9 @@
 
           if (selectOtherBlock instanceof Block) {
             //다른 블럭이 현재 블럭과 같거나 space가 다를때는 평가하지 않음
-            if (selectOtherBlock === this || selectOtherBlock.$space != this.$space) return red;
+            if (selectOtherBlock === this || selectOtherBlock.$space != this.$space) return red; //
 
-            //
             var inspectResult = [];
-
             FOR_MAP(this.get(), function (thisPos, key) {
               var otherPos = SELECT(selectOtherBlock.get(), key);
               if (otherPos[0] < thisPos[0] && otherPos[0] + otherPos[1] <= thisPos[0]) return inspectResult.push(false);
@@ -104,6 +107,7 @@
               red.push(block);
             }
           }
+
           return red;
         }.bind(this), []);
       },
@@ -147,7 +151,6 @@
       },
       rangeMap: function rangeMap() {
         var rangeSize = this.rangeSize();
-
         return FOR_MAP(this.rangeStart(), function ($start, sel) {
           var $size = sel ? rangeSize[sel] : rangeSize;
           return {
@@ -160,10 +163,8 @@
       map: function map() {
         var domainMap = this.domainMap();
         var rangeMap = this.rangeMap();
-
         var blockMap = FOR_MAP(rangeMap, function (map, key) {
           map.rangeStart = map.start, map.rangeSize = map.size, map.rangeEnd = map.end;
-
           var $domainMap = SELECT(domainMap, key);
           map.domainStart = $domainMap.start, map.domainSize = $domainMap.size, map.domainEnd = $domainMap.end;
           delete map.start;
@@ -171,7 +172,6 @@
           delete map.end;
           return map;
         });
-
         return blockMap;
       },
       rangeEnd: function rangeEnd() {
@@ -185,6 +185,7 @@
         } else {
           this.$compute && this.$compute(this.map());
         }
+
         return this;
       },
       call: function call(f) {
@@ -196,12 +197,14 @@
       this.$space = space;
       this.$domainMask = FOR_MAP(CLONE(domainMask), function (mask, sel) {
         if (typeof mask === "number") mask = [mask];
+
         if (mask instanceof Array) {
           if (!mask[0]) mask[0] = 0;
           if (!mask[1]) mask[1] = function (v) {
             return v;
           };
         }
+
         return mask;
       });
     };
@@ -221,7 +224,6 @@
           return [cursorPoint, SELECT(domainGrid, key)];
         }));
         var blockMap = block.map();
-
         callback && callback.call(block, blockMap, block);
         return block;
       }
@@ -241,6 +243,7 @@
           if (!domain[2]) {
             domain[2] = 1;
           }
+
           return domain;
         });
         this.$domain = _domain;
@@ -260,6 +263,7 @@
           if (!range[2]) {
             range[2] = 1;
           }
+
           return range;
         });
         this.$range = range;
@@ -268,14 +272,18 @@
         return FOR_MAP(CLONE(this.$range), function (range) {
           for (var i = 0, l = range.length; i < l; i++) {
             if (typeof range[i] === "function") range[i] = range[i]();
-          }return range;
+          }
+
+          return range;
         });
       },
       getDomain: function getDomain() {
         return FOR_MAP(CLONE(this.$domain), function (domain) {
           for (var i = 0, l = domain.length; i < l; i++) {
             if (typeof domain[i] === "function") domain[i] = domain[i]();
-          }return domain;
+          }
+
+          return domain;
         });
       },
       domainRangeSize: function domainRangeSize(vs) {

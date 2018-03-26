@@ -146,7 +146,6 @@ Object.keys(PromiseExports).forEach(key=>{
   PromiseFunction[key] = PromiseExports[key];
 })
 
-module.exports = {
-  ...PromiseExports,
-  promise:PromiseFunction
-}
+
+module.exports = PromiseExports;
+export const promise = PromiseFunction;

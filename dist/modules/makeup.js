@@ -1,29 +1,30 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./promise"], factory);
+    define(["exports", "regenerator-runtime/runtime", "./promise"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./promise"));
+    factory(exports, require("regenerator-runtime/runtime"), require("./promise"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.promise);
+    factory(mod.exports, global.runtime, global.promise);
     global.makeup = mod.exports;
   }
-})(this, function (exports, _promise) {
+})(this, function (_exports, _runtime, _promise) {
   "use strict";
 
-  Object.defineProperty(exports, "__esModule", {
+  Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  exports.watchChange = exports.awaitCompose = exports.awaitLeadOnly = undefined;
-  var awaitLeadOnly = exports.awaitLeadOnly = function awaitLeadOnly(func) {
+  _exports.watchChange = _exports.awaitCompose = _exports.awaitLeadOnly = void 0;
+
+  var awaitLeadOnly = function awaitLeadOnly(func) {
     return alloc(function () {
       var $pending = false;
       return function () {
         var _this = this;
 
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
 
@@ -45,19 +46,21 @@
     });
   };
 
-  var awaitCompose = exports.awaitCompose = function awaitCompose(funcArgs) {
+  _exports.awaitLeadOnly = awaitLeadOnly;
+
+  var awaitCompose = function awaitCompose(funcArgs) {
     return alloc(function () {
       var composeFuncs = [];
-
       asArray(funcArgs).forEach(function (f) {
         typeof f === "function" && composeFuncs.push(f);
       });
-
       return function (payload) {
         var _this2 = this;
 
         return (0, _promise.promise)(function (resolve, reject) {
-          var _marked = /*#__PURE__*/regeneratorRuntime.mark(iterator);
+          var _marked =
+          /*#__PURE__*/
+          regeneratorRuntime.mark(iterator);
 
           function iterator() {
             var d, i, l;
@@ -107,21 +110,24 @@
       };
     });
   };
-
   /*
     수동 watch로직 입니다.
     let watcher = watchChange(newValue=>{ doSomething... })
     watcher.change("newValue")
   */
-  var watchChange = exports.watchChange = function watchChange() {
+
+
+  _exports.awaitCompose = awaitCompose;
+
+  var watchChange = function watchChange() {
     var changeValue = function changeValue(watchman, newValue) {
       var countScope = watchman.$count;
+
       var destOldValue = _cloneDeep(newValue);
 
       watchman.$setter.forEach(function (effect) {
         effect(newValue, watchman.$oldValue, countScope);
       });
-
       watchman.$oldValue = destOldValue;
     };
 
@@ -144,6 +150,7 @@
       },
       change: function change(newValue) {
         var newValue;
+
         if (this.$equalityLogic) {
           if (!_isEqual(this.$oldValue, newValue)) {
             changeValue(this, newValue);
@@ -161,4 +168,6 @@
       return watch;
     };
   };
+
+  _exports.watchChange = watchChange;
 });

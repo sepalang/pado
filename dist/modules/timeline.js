@@ -1,15 +1,15 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["./functions.js"], factory);
+    define(["./functions"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("./functions.js"));
+    factory(require("./functions"));
   } else {
     var mod = {
       exports: {}
     };
     factory(global.functions);
-    global.index = mod.exports;
+    global.timeline = mod.exports;
   }
-})(this, function () {
+})(this, function (_functions) {
   "use strict";
 });

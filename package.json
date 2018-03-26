@@ -10,14 +10,11 @@
   "scripts": {
     "start": "babel-node test/src-test.js",
     "clear:dist": "rimraf dist && mkdirp dist",
-    "build": "npm run clear:dist && npm run babel:build:default && npm run babel:build:umd && npm run rollup:build && rimraf dist/commonjs",
-    "babel:build:default": "babel src --out-dir dist/commonjs --plugins=transform-es2015-modules-commonjs",
-    "babel:build:umd": "babel src --out-dir dist/umd --plugins=transform-es2015-modules-umd",
-    "rollup:build": "rollup -c build.rollup.js",
+    "build:default": "padoc src dist -m umd",
+    "build:pack": "padoc --pack src/pado.js dist/pado.js -m umd",
+    "build": "npm run clear:dist && npm run build:default && npm run build:pack",
     "s:web": "cd sample/web && npm start",
-    "test": "jest ''",
-    "cc": "padoc src -s compile -o dist/commonjs -t es6 -m commonjs",
-    "cr": "padoc dist/commonjs/pado.js -s rollup -o dist/pado.js -m iife -n pd"
+    "test": "jest ''"
   },
   "author": "AHN HO JUNG",
   "license": "MIT",
@@ -33,7 +30,6 @@
       "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
     }
   },
-  "dependencies": {},
   "devDependencies": {
     "padoc": "sepalang/padoc",
     "babel-jest": "^22.4.1",
