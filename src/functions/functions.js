@@ -385,6 +385,17 @@ const STATIC_FOR_EACH_PROC = FUNCTION_EXPORTS.STATIC_FOR_EACH_PROC = function(ob
     return obj;
 }
 
+import _cloneDeep from 'lodash/cloneDeep';
+const FREE = FUNCTION_EXPORTS.FREE = function(datum){
+  const dest = {}
+  Object.keys(datum).forEach(key=>{
+    if(!/^\$/.test(key)){
+      dest[key] = _cloneDeep(datum[key])
+    }
+  })
+  return dest
+}
+
 let EACH     = (value,proc)=>EACH_PROC(AS_ARRAY(value),proc)
 let FOR_EACH = (value,proc)=>STATIC_FOR_EACH_PROC(value,proc)
 let REDUCE   = function(value,proc,meta){

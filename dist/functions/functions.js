@@ -1,17 +1,21 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.array.find-index", "core-js/modules/es6.regexp.split"], factory);
+    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.array.find-index", "core-js/modules/es6.regexp.split", "lodash/cloneDeep"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.regexp.split"));
+    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.regexp.split"), require("lodash/cloneDeep"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(global.es6Regexp, global.es6Object, global.es6Regexp, global.es6Regexp, global.es6Array, global.es6Regexp);
+    factory(global.es6Regexp, global.es6Object, global.es6Regexp, global.es6Regexp, global.es6Array, global.es6Regexp, global.cloneDeep);
     global.functions = mod.exports;
   }
-})(this, function (_es6Regexp, _es6Object, _es6Regexp2, _es6Regexp3, _es6Array, _es6Regexp4) {
+})(this, function (_es6Regexp, _es6Object, _es6Regexp2, _es6Regexp3, _es6Array, _es6Regexp4, _cloneDeep2) {
   "use strict";
+
+  _cloneDeep2 = _interopRequireDefault(_cloneDeep2);
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
   function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
@@ -522,6 +526,16 @@
       ;
     }
     return obj;
+  };
+
+  var FREE = FUNCTION_EXPORTS.FREE = function (datum) {
+    var dest = {};
+    Object.keys(datum).forEach(function (key) {
+      if (!/^\$/.test(key)) {
+        dest[key] = (0, _cloneDeep2.default)(datum[key]);
+      }
+    });
+    return dest;
   };
 
   var EACH = function EACH(value, proc) {
