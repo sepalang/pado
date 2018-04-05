@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.editable = _exports.beginEditable = _exports.changedEditable = _exports.commitEditable = _exports.cancleEditable = _exports.exitEditable = _exports.enterEditable = _exports.isEditable = void 0;
+  _exports.editable = _exports.expandEditable = _exports.beginEditable = _exports.changedEditable = _exports.commitEditable = _exports.cancleEditable = _exports.exitEditable = _exports.enterEditable = _exports.isEditable = void 0;
   _get2 = _interopRequireDefault(_get2);
   _isEqual2 = _interopRequireDefault(_isEqual2);
   _cloneDeep2 = _interopRequireDefault(_cloneDeep2);
@@ -24,14 +24,9 @@
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  /*
-  var a = {name:"foo"}
-  beginEditable(a)
-  a // => {name:"foo", $editable:[{name:"foo"}]}
-  */
   var EDITABLE_DEFAULT_KEY = "$editable";
 
-  var isEditableModel = function isEditableModel(model) {
+  var isEditPossibleDataType = function isEditPossibleDataType(model) {
     return (0, _isPlainObject2.default)(model);
   };
 
@@ -39,7 +34,7 @@
     return model[EDITABLE_DEFAULT_KEY] !== undefined;
   };
 
-  var extendEditModel = function extendEditModel(model) {
+  var editableModelize = function editableModelize(model) {
     model[EDITABLE_DEFAULT_KEY] = [];
     return model;
   };
@@ -71,7 +66,7 @@
 
   var pushEditModel = function pushEditModel(model, pushModel) {
     if (!isEditableState(model)) {
-      extendEditModel(model);
+      editableModelize(model);
     }
 
     var editableMeta = model[EDITABLE_DEFAULT_KEY];
@@ -80,7 +75,7 @@
   };
 
   var removeEditModel = function removeEditModel(model) {
-    if (isEditableModel(model) && isEditableState(model)) {
+    if (isEditPossibleDataType(model) && isEditableState(model)) {
       model[EDITABLE_DEFAULT_KEY] = undefined;
     }
 
@@ -97,14 +92,14 @@
   };
 
   var _isEditable = function isEditable(model) {
-    if (!isEditableModel(model)) return false;
+    if (!isEditPossibleDataType(model)) return false;
     return isEditableState(model);
   };
 
   _exports.isEditable = _isEditable;
 
   var enterEditable = function enterEditable(model) {
-    if (!isEditableModel(model)) return model;
+    if (!isEditPossibleDataType(model)) return model;
 
     if (model[EDITABLE_DEFAULT_KEY] !== undefined) {
       return model;
@@ -120,9 +115,9 @@
       extendModel = undefined;
     }
 
-    if (!isEditableModel(model)) return model;
+    if (!isEditPossibleDataType(model)) return model;
 
-    if (isEditableModel(extendModel)) {
+    if (isEditPossibleDataType(extendModel)) {
       var currentExtendModel = cloneCurrentModel(extendModel);
       Object.keys(currentExtendModel).forEach(function (key) {
         model[key] = currentExtendModel[key];
@@ -136,7 +131,7 @@
   _exports.exitEditable = exitEditable;
 
   var cancleEditable = function cancleEditable(model) {
-    if (!isEditableModel(model)) return model;
+    if (!isEditPossibleDataType(model)) return model;
     var originalModel = getOriginalModel(model);
     removeEditModel(model);
     putEditModel(model, originalModel);
@@ -145,21 +140,21 @@
   _exports.cancleEditable = cancleEditable;
 
   var commitEditable = function commitEditable(model) {
-    if (!isEditableModel(model)) return model;
+    if (!isEditPossibleDataType(model)) return model;
     return pushEditModel(model, model);
   };
 
   _exports.commitEditable = commitEditable;
 
   var changedEditable = function changedEditable(model) {
-    if (!isEditableModel(model) || !_isEditable(model)) return false;
+    if (!isEditPossibleDataType(model) || !_isEditable(model)) return false;
     return !(0, _isEqual2.default)(cloneCurrentModel(model), getLastModel(model));
   };
 
   _exports.changedEditable = changedEditable;
 
   var beginEditable = function beginEditable(model) {
-    if (!isEditableModel(model)) return model;
+    if (!isEditPossibleDataType(model)) return model;
 
     if (!isEditableState(model)) {
       enterEditable(model);
@@ -175,6 +170,16 @@
 
   _exports.beginEditable = beginEditable;
 
+  var expandEditable = function expandEditable(model) {
+    if (!model.hasOwnProperty(EDITABLE_DEFAULT_KEY)) {
+      model[EDITABLE_DEFAULT_KEY] = undefined;
+    }
+
+    return model;
+  };
+
+  _exports.expandEditable = expandEditable;
+
   var editable = function editable(model) {
     var editableQuery = {
       isEditable: function isEditable() {
@@ -189,13 +194,8 @@
       free: function free() {
         return (0, _functions.free)(model);
       },
-      viewmodel: function viewmodel() {
-        //ready for vue template binding
-        if (!model.hasOwnProperty(EDITABLE_DEFAULT_KEY)) {
-          model[EDITABLE_DEFAULT_KEY] = undefined;
-        }
-
-        return model;
+      expand: function expand() {
+        return expandEditable(model);
       },
       begin: function begin() {
         beginEditable(model);

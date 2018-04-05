@@ -4,19 +4,13 @@ import _isEqual from 'lodash/isEqual';
 import _cloneDeep from 'lodash/cloneDeep';
 import _isPlainObject from 'lodash/isPlainObject';
 
-/*
-var a = {name:"foo"}
-beginEditable(a)
-a // => {name:"foo", $editable:[{name:"foo"}]}
-*/
-
 const EDITABLE_DEFAULT_KEY = "$editable";
 
-const isEditableModel = model=>_isPlainObject(model)
+const isEditPossibleDataType = model=>_isPlainObject(model)
 
 const isEditableState = model=>model[EDITABLE_DEFAULT_KEY] !== undefined
 
-const extendEditModel = function(model){
+const editableModelize = function(model){
   model[EDITABLE_DEFAULT_KEY] = [];
   return model;
 }
@@ -51,7 +45,7 @@ const cloneCurrentModel = function(model){
 
 const pushEditModel = function(model,pushModel){
   if(!isEditableState(model)){
-    extendEditModel(model)
+    editableModelize(model)
   }
   const editableMeta = model[EDITABLE_DEFAULT_KEY];
   editableMeta.push(cloneCurrentModel(pushModel));
@@ -59,7 +53,7 @@ const pushEditModel = function(model,pushModel){
 }
 
 const removeEditModel = function(model){
-  if(isEditableModel(model) && isEditableState(model)){
+  if(isEditPossibleDataType(model) && isEditableState(model)){
     model[EDITABLE_DEFAULT_KEY] = undefined;
   }
   return model
@@ -75,12 +69,12 @@ const getLastModel = function(model){
 }
 
 export const isEditable = function(model){
-  if(!isEditableModel(model)) return false;
+  if(!isEditPossibleDataType(model)) return false;
   return isEditableState(model);
 }
 
 export const enterEditable = function(model){
-  if(!isEditableModel(model)) return model;
+  if(!isEditPossibleDataType(model)) return model;
   if(model[EDITABLE_DEFAULT_KEY] !== undefined){
     return model;
   } else {
@@ -89,8 +83,8 @@ export const enterEditable = function(model){
 }
 
 export const exitEditable = function(model, extendModel=undefined){
-  if(!isEditableModel(model)) return model;
-  if(isEditableModel(extendModel)){
+  if(!isEditPossibleDataType(model)) return model;
+  if(isEditPossibleDataType(extendModel)){
     const currentExtendModel = cloneCurrentModel(extendModel);
     Object.keys(currentExtendModel).forEach(key=>{
       model[key] = currentExtendModel[key]
@@ -101,24 +95,24 @@ export const exitEditable = function(model, extendModel=undefined){
 }
 
 export const cancleEditable = function(model){
-  if(!isEditableModel(model)) return model;
+  if(!isEditPossibleDataType(model)) return model;
   const originalModel = getOriginalModel(model);
   removeEditModel(model);
   putEditModel(model, originalModel);
 }
 
 export const commitEditable = function(model){
-  if(!isEditableModel(model)) return model;
+  if(!isEditPossibleDataType(model)) return model;
   return pushEditModel(model,model);
 }
 
 export const changedEditable = function(model){
-  if(!isEditableModel(model) || !isEditable(model)) return false;
+  if(!isEditPossibleDataType(model) || !isEditable(model)) return false;
   return !_isEqual(cloneCurrentModel(model),getLastModel(model));
 }
 
 export const beginEditable = function(model){
-  if(!isEditableModel(model)) return model;
+  if(!isEditPossibleDataType(model)) return model;
   if(!isEditableState(model)){
     enterEditable(model);
   } else {
@@ -131,21 +125,22 @@ export const beginEditable = function(model){
   return model;
 }
 
+export const expandEditable = function(model){
+  if(!model.hasOwnProperty(EDITABLE_DEFAULT_KEY)){
+    model[EDITABLE_DEFAULT_KEY] = undefined;
+  }
+  return model;
+}
+
 export const editable = function(model){
   const editableQuery = {
     isEditable:()=>isEditable(model),
     isChanged :()=>changedEditable(model),
     output    :()=>cloneCurrentModel(model),
     free      :()=>free(model),
-    viewmodel:()=>{
-      //ready for vue template binding
-      if(!model.hasOwnProperty(EDITABLE_DEFAULT_KEY)){
-        model[EDITABLE_DEFAULT_KEY] = undefined;
-      }
-      return model;
-    },
+    expand    :()=>expandEditable(model),
     begin:()=>{
-      beginEditable(model)
+      beginEditable(model);
       return editableQuery;
     },
     enter:()=>{
@@ -157,7 +152,7 @@ export const editable = function(model){
       return editableQuery;
     },
     cancle:()=>{
-      cancleEditable(model)
+      cancleEditable(model);
       return editableQuery;
     },
     commit:()=>{
