@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.array.find-index", "core-js/modules/es6.regexp.split", "lodash/cloneDeep"], factory);
+    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "./isLike", "./asTo", "./transform", "lodash/cloneDeep"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.regexp.split"), require("lodash/cloneDeep"));
+    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("./isLike"), require("./asTo"), require("./transform"), require("lodash/cloneDeep"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(global.es6Regexp, global.es6Object, global.es6Regexp, global.es6Regexp, global.es6Array, global.es6Regexp, global.cloneDeep);
+    factory(global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Regexp, global.es6Regexp, global.isLike, global.asTo, global.transform, global.cloneDeep);
     global.functions = mod.exports;
   }
-})(this, function (_es6Regexp, _es6Object, _es6Regexp2, _es6Regexp3, _es6Array, _es6Regexp4, _cloneDeep2) {
+})(this, function (_es6Regexp, _es6Regexp2, _es6Object, _es6Regexp3, _es6Regexp4, _isLike, _asTo, _transform, _cloneDeep2) {
   "use strict";
 
   _cloneDeep2 = _interopRequireDefault(_cloneDeep2);
@@ -23,202 +23,8 @@
 
   var FUNCTION_EXPORTS = {};
 
-  var IS_NULLIFY = FUNCTION_EXPORTS.IS_NULLIFY = function (data) {
-    if (typeof data === "number") return isNaN(data);
-    return data === undefined || data === null;
-  };
-
-  var IS_OBJECT = FUNCTION_EXPORTS.IS_OBJECT = function (object) {
-    return object !== null && typeof object === "object" ? true : false;
-  };
-
-  var IS_ARRAY = FUNCTION_EXPORTS.IS_ARRAY = function (data) {
-    return data instanceof Array;
-  };
-
-  var IS_FUNCTION = FUNCTION_EXPORTS.IS_FUNCTION = function (f) {
-    return typeof f === "function";
-  };
-
-  var IS_NUMBER = FUNCTION_EXPORTS.IS_NUMBER = function (n) {
-    return typeof n === "number" && !isNaN(n);
-  };
-
-  var IS_NUMBER_LIKE = FUNCTION_EXPORTS.IS_NUMBER_LIKE = function (t) {
-    return typeof t === "number" ? true : typeof t === "string" ? parseFloat(t) + "" == t + "" : false;
-  };
-
-  var IS_NODE = FUNCTION_EXPORTS.IS_NODE = function (a) {
-    return IS_OBJECT(a) && typeof a.nodeType === "number";
-  };
-
-  var IS_EMPTY = FUNCTION_EXPORTS.IS_EMPTY = function () {
-    if (typeof o === "undefined") return true;
-    if (typeof o === "string") return o.trim().length < 1 ? true : false;
-
-    if (typeof o === "object") {
-      if (o == null) return true;
-      if (o instanceof RegExp) return false;
-
-      if (IS_ARRAY(o)) {
-        return !o.length;
-      } else {
-        for (var prop in o) {
-          return false;
-        }
-
-        return true;
-      }
-    }
-
-    if (typeof o === "number") return false;
-    if (typeof o === "function") return false;
-    if (typeof o === "boolean") return false;
-    return true;
-  };
-
-  var IS_PATTERN = FUNCTION_EXPORTS.IS_PATTERN = function (s) {
-    return typeof s === "string" || s instanceof RegExp;
-  };
-
-  var TO_ARRAY = FUNCTION_EXPORTS.TO_ARRAY = function (data, option) {
-    if (typeof data === "undefined" || data === null || data === NaN) return [];
-    if (IS_ARRAY(data)) return Array.prototype.slice.call(data);
-    if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
-    if (typeof data === "string", typeof option === "string") return data.split(option);
-    return [data];
-  };
-
-  var AS_ARRAY = FUNCTION_EXPORTS.AS_ARRAY = function (data, defaultArray) {
-    if (defaultArray === void 0) {
-      defaultArray = undefined;
-    }
-
-    if (IS_ARRAY(data)) {
-      return data;
-    }
-
-    if (IS_NULLIFY(data)) {
-      return IS_ARRAY(defaultArray) ? defaultArray : IS_NULLIFY(defaultArray) ? [] : [defaultArray];
-    }
-
-    if (typeof data === "object" && typeof data.toArray === "function") {
-      return data.toArray();
-    }
-
-    return [data];
-  };
-
-  var IS_POSITIVE_PROP = FUNCTION_EXPORTS.IS_POSITIVE_PROP = function (value) {
-    if (value === true) {
-      return true;
-    }
-
-    if (value === false) {
-      return false;
-    }
-
-    if (typeof value === "string" || typeof value === "number") {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  var IS_NEGATIVE_PROP = FUNCTION_EXPORTS.IS_NEGATIVE_PROP = function (value) {
-    return !IS_POSITIVE_PROP(value);
-  };
-
-  var INSTANCE = FUNCTION_EXPORTS.INSTANCE = function (func, proto) {
-    var ins,
-        DummyInstance = function DummyInstance(param) {
-      if (typeof param === "object") for (var k in param) {
-        this[k] = param[k];
-      }
-    };
-
-    if (typeof func == "object") {
-      if (typeof proto === "object") DummyInstance.prototype = proto;
-      ins = new DummyInstance(func);
-    }
-
-    if (typeof func == "function") {
-      if (typeof proto === "object") func.prototype = proto;
-      ins = new func();
-    }
-
-    return ins;
-  };
-
-  var REFRESH_DATA = FUNCTION_EXPORTS.REFRESH_DATA = function (oldData, newData, getId, afterHook) {
-    if (!/string|function/.test(typeof getId)) throw new Error("REFRESH_DATA need getId");
-
-    if (typeof getId === "string") {
-      var getIdString = getId;
-
-      getId = function getId(e) {
-        return _.get(e, getIdString);
-      };
-    }
-
-    oldData = AS_ARRAY(oldData);
-    newData = AS_ARRAY(newData);
-    var result = [];
-
-    var oldDataMap = _.map(oldData, function (e) {
-      return {
-        id: getId(e),
-        ref: e
-      };
-    });
-
-    _.each(newData, function (newDatum, i) {
-      var newId = getId(newDatum);
-
-      var oldDatum = _.get(oldDataMap[_.findIndex(oldDataMap, function (e) {
-        return e.id === newId;
-      })], "ref");
-
-      var genDatum;
-      var dirty = false;
-
-      if (oldDatum) {
-        // change is not dirty, modify is dirty
-        if (typeof oldDatum !== typeof newDatum) {
-          dirty = false;
-        } else {
-          // same type
-          var oldOwnKeys = Object.keys(oldDatum).filter(function (key) {
-            return !(key.indexOf("$") === 0);
-          });
-          var newOwnKeys = Object.keys(newDatum).filter(function (key) {
-            return !(key.indexOf("$") === 0);
-          }); //inspect key chnage
-
-          if (_.isEqual(oldOwnKeys, newOwnKeys)) {
-            dirty = !_.isEqual(_.pick(oldDatum, oldOwnKeys), _.pick(newDatum, newOwnKeys));
-          } else {
-            dirty = true;
-          }
-        }
-
-        genDatum = _.assign({}, oldDatum, newDatum);
-      } else {
-        genDatum = _.assign({}, newDatum);
-      }
-
-      if (typeof afterHook === "function") {
-        afterHook(genDatum, i, dirty);
-      }
-
-      result.push(genDatum);
-    });
-
-    return result;
-  };
-
   var ALL = FUNCTION_EXPORTS.ALL = function (data, fn) {
-    data = AS_ARRAY(data);
+    data = (0, _asTo.asArray)(data);
 
     if (data.length === 0) {
       return false;
@@ -234,21 +40,10 @@
     return true;
   };
 
-  var ALLOC = FUNCTION_EXPORTS.ALLOC = function (init) {
-    var fn = init(),
-        rn = function rn() {
-      return fn.apply(this, Array.prototype.slice.call(arguments));
-    };
-
-    return rn.reset = function () {
-      fn = init(rn, rn);
-    }, rn.$originalFunction = fn, rn;
-  };
-
   var UNIQUE = FUNCTION_EXPORTS.UNIQUE = function (array) {
     var value = [],
         result = [],
-        array = TO_ARRAY(array);
+        array = (0, _asTo.toArray)(array);
 
     for (var i = 0, l = array.length; i < l; i++) {
       var unique = true;
@@ -298,14 +93,14 @@
 
       if (obj === value) {
         return true;
-      } else if (IS_OBJECT(obj)) {
-        if (value === void 0 && key === void 0) return !IS_EMPTY(obj);
+      } else if ((0, _isLike.isObject)(obj)) {
+        if (value === void 0 && key === void 0) return !(0, _isLike.isEmpty)(obj);
         var proc;
 
         if (key) {
           if (typeof key === "function") {
             proc = functionKeyObjectValueProc(key);
-          } else if (IS_ARRAY(key) && key.length > 1) {
+          } else if ((0, _isLike.isArray)(key) && key.length > 1) {
             proc = selectKeyObjectValueProc(key[0], key[1]);
           } else if (typeof key === "string" || typeof key === "number") {
             proc = selectKeyObjectValueProc(key, key);
@@ -314,7 +109,7 @@
           proc = defaultObjectValueFunc;
         }
 
-        if (IS_ARRAY(obj)) {
+        if ((0, _isLike.isArray)(obj)) {
           for (var i = 0, l = obj.length; i < l; i++) {
             if (proc(obj[i], value)) return getKey ? i : true;
           }
@@ -349,18 +144,18 @@
   };
 
   var GET_KEY_BY = FUNCTION_EXPORTS.GET_KEY_BY = function (object, value) {
-    if (IS_FUNCTION(value)) {
-      if (IS_ARRAY(object)) for (var i = 0, l = object.length; i < l; i++) {
+    if ((0, _isLike.isFunction)(value)) {
+      if ((0, _isLike.isArray)(object)) for (var i = 0, l = object.length; i < l; i++) {
         if (value(object[i], i) === true) return i;
       }
-      if (IS_OBJECT(object)) for (var key in object) {
+      if ((0, _isLike.isObject)(object)) for (var key in object) {
         if (value(object[key], key) === true) return key;
       }
     } else {
-      if (IS_ARRAY(object)) for (var i = 0, l = object.length; i < l; i++) {
+      if ((0, _isLike.isArray)(object)) for (var i = 0, l = object.length; i < l; i++) {
         if (object[i] === value) return i;
       }
-      if (IS_OBJECT(object)) for (var key in object) {
+      if ((0, _isLike.isObject)(object)) for (var key in object) {
         if (object[key] === value) return key;
       }
     }
@@ -372,7 +167,7 @@
         var idxs = [];
         var hist = [];
         var count = 0;
-        var pin = !at || !IS_NUMBER(at) || at < 0 ? 0 : at;
+        var pin = !at || !(0, _isLike.isNumber)(at) || at < 0 ? 0 : at;
         var strlen = text.length;
         var order = defaultOrder;
         var next;
@@ -429,7 +224,7 @@
 
             var nextOrder = finder && finder(true, struct, hist, count);
 
-            if (IS_PATTERN(nextOrder)) {
+            if ((0, _isLike.likeRegexp)(nextOrder)) {
               order = nextOrder;
             } else {
               order = defaultOrder;
@@ -485,8 +280,8 @@
       if (typeof c === "string" || typeof c === "number") {
         var idxs = [],
             mvc = c + "",
-            s = IS_PATTERN(s) ? s : s + "",
-            at = !at || !IS_NUMBER(at) || at < 0 ? 0 : at,
+            s = (0, _isLike.likeRegexp)(s) ? s : s + "",
+            at = !at || !(0, _isLike.isNumber)(at) || at < 0 ? 0 : at,
             __find = s instanceof RegExp ? __find_regexp : __find_string,
             next;
 
@@ -539,7 +334,7 @@
   };
 
   var EACH = function EACH(value, proc) {
-    return EACH_PROC(AS_ARRAY(value), proc);
+    return EACH_PROC((0, _asTo.asArray)(value), proc);
   };
 
   var FOR_EACH = function FOR_EACH(value, proc) {
@@ -547,7 +342,7 @@
   };
 
   var REDUCE = function REDUCE(value, proc, meta) {
-    value = AS_ARRAY(value);
+    value = (0, _asTo.asArray)(value);
     return EACH_PROC(value, function (v, i, l) {
       meta = proc(meta, v, i, l);
     }), meta;
@@ -556,7 +351,7 @@
 
   var REMOVE_VALUE = FUNCTION_EXPORTS.REMOVE_VALUE = function (obj, value) {
     var detect = true;
-    var array = IS_ARRAY(obj);
+    var array = (0, _isLike.isArray)(obj);
 
     while (detect) {
       var key = GET_KEY_BY(obj, value);
@@ -591,12 +386,12 @@
   };
 
   var INSERT_OF = FUNCTION_EXPORTS.INSERT_OF = function (data, v, a) {
-    IS_ARRAY(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
+    (0, _isLike.isArray)(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
     return data;
   };
 
   var MOVE_OF = FUNCTION_EXPORTS.MOVE_OF = function (data, oldIndex, newIndex) {
-    if (oldIndex !== newIndex && IS_ARRAY(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
+    if (oldIndex !== newIndex && (0, _isLike.isArray)(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
       Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
     }
 
@@ -604,14 +399,14 @@
   };
 
   var CONCAT_OF = FUNCTION_EXPORTS.CONCAT_OF = function (data, appends) {
-    var data = AS_ARRAY(data);
+    var data = (0, _asTo.asArray)(data);
     return EACH(appends, function (value) {
       data.push(value);
     }), data;
   };
 
   var FILTER_OF = FUNCTION_EXPORTS.FILTER_OF = function (data, func, exitFn) {
-    var data = AS_ARRAY(data);
+    var data = (0, _asTo.asArray)(data);
     var exitCnt = 0;
 
     for (var i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++) {
@@ -692,7 +487,7 @@
           if (typeof refValue === "function") {
             result[refKey] = obj[key];
           } else {
-            if (typeof refValue !== "object" && typeof refValue !== "object" || IS_NODE(refValue)) {
+            if (typeof refValue !== "object" && typeof refValue !== "object" || (0, _isLike.isNode)(refValue)) {
               result[refKey] = refValue;
             } else {
               result[refKey] = Object.assign(result[refKey], refValue);
@@ -706,10 +501,10 @@
           if (typeof obj[key] === "function") {
             result[deepKey] = obj[key];
           } else {
-            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || IS_NODE(obj[key])) {
+            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || (0, _isLike.isNode)(obj[key])) {
               result[deepKey] = obj[key];
             } else {
-              result[deepKey] = Object.assign(result[deepKey] || (IS_ARRAY(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
+              result[deepKey] = Object.assign(result[deepKey] || ((0, _isLike.isArray)(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
             }
           }
         });
@@ -717,7 +512,7 @@
         if (typeof obj[key] === "function") {
           result[key] = obj[key];
         } else {
-          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || IS_NODE(obj[key])) {
+          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || (0, _isLike.isNode)(obj[key])) {
             result[key] = obj[key];
           } else {
             result[key] = Object.assign(result[key], obj[key]);
@@ -858,8 +653,8 @@
     if (typeof text !== "string") return [text];
     var result = text.split(split === true ? /\s+/ : split || /\s+/);
 
-    if (IS_PATTERN(block)) {
-      if (!IS_PATTERN(blockEnd)) {
+    if ((0, _isLike.likeRegexp)(block)) {
+      if (!(0, _isLike.likeRegexp)(blockEnd)) {
         blockEnd = block;
       }
 
@@ -893,8 +688,8 @@
     var beforeKeys;
     var canDiff = false;
 
-    if (IS_OBJECT(before)) {
-      if (IS_ARRAY(before)) {
+    if ((0, _isLike.isObject)(before)) {
+      if ((0, _isLike.isArray)(before)) {
         beforeKeys = before;
       } else {
         beforeKeys = Object.keys(before);
@@ -952,7 +747,7 @@
   var TOGGLE = FUNCTION_EXPORTS.TOGGLE = function (ta, cv, set) {
     var index = -1;
 
-    for (var d = AS_ARRAY(ta), _l2 = d.length, _i2 = 0; _i2 < _l2; _i2++) {
+    for (var d = (0, _asTo.asArray)(ta), _l2 = d.length, _i2 = 0; _i2 < _l2; _i2++) {
       if (d[_i2] == cv) {
         index = _i2 + 1;
         break;
