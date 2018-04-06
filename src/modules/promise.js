@@ -1,14 +1,20 @@
 import { asArray } from '../functions'
 
+const isMaybePromise = (target)=>(typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function");
+const resolveFn = PromiseClass.resolve;
+const rejectFn = PromiseClass.reject;
 const PromiseFunction = (function(PromiseClass){
-  return function(fn){return new PromiseClass(fn);}
+  return new PromiseClass((r,c)=>{
+    const maybeAwaiter = fn(r,c);
+    isMaybePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
+  });
 }(Promise));
 
 const PromiseExports = {};
 
 PromiseExports.all     = Promise.all;
-PromiseExports.resolve = Promise.resolve;
-PromiseExports.reject  = Promise.reject;
+PromiseExports.resolve = resolveFn;
+PromiseExports.reject  = rejectFn;
 PromiseExports.timeout = function(fn,time){
   if(typeof fn === "number"){
     return q( resolve => setTimeout(() => resolve(time), fn) );
@@ -19,16 +25,25 @@ PromiseExports.timeout = function(fn,time){
 
 PromiseExports.valueOf = function(maybeQ){
   return q(function(resolve,reject){
-    typeof maybeQ === "object" && maybeQ !== null && maybeQ.then ?
+    isMaybePromise(maybeQ) ?
     maybeQ.then(resolve).catch(reject) :
     resolve(maybeQ) ;
   });
 };
 
+const abortMessage = new (function() {
+  Object.defineProperty(this, "message", {
+    get: ()=>":abort"
+  });
+  Object.defineProperty(this, "abort", {
+    get: ()=>true
+  });
+})();
+
 PromiseExports.abort = function(notifyConsole = undefined) {
   return new PromiseClass((resolve, reject)=>{
     if(notifyConsole === true) {
-      console.warn("break promise");
+      console.warn("abort promise");
     }
     reject(abortMessage);
   });
