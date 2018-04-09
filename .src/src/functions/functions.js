@@ -243,43 +243,11 @@ const STATIC_FOR_EACH_PROC = FUNCTION_EXPORTS.STATIC_FOR_EACH_PROC = function(ob
     return obj;
 }
 
-import _cloneDeep from 'lodash/cloneDeep';
-const FREE = FUNCTION_EXPORTS.FREE = function(datum){
-  const dest = {}
-  Object.keys(datum).forEach(key=>{
-    if(!/^\$/.test(key)){
-      dest[key] = _cloneDeep(datum[key])
-    }
-  })
-  return dest
-}
-
 let EACH     = (value,proc)=>EACH_PROC(asArray(value),proc)
 let FOR_EACH = (value,proc)=>STATIC_FOR_EACH_PROC(value,proc)
 let REDUCE   = function(value,proc,meta){
   value = asArray(value);
   return EACH_PROC(value,function(v,i,l){ meta = proc(meta,v,i,l); }),meta;
-}
-
-
-//PINPONGPOOL TRANSFORM
-const REMOVE_VALUE = FUNCTION_EXPORTS.REMOVE_VALUE = function(obj,value){
-  var detect = true;
-  var array  = isArray(obj);
-
-  while(detect) {
-    var key = GET_KEY_BY(obj,value);
-    if(typeof key === "undefined"){
-      detect = false;
-    } else {
-      if(array){
-        obj.splice(key,1);
-      } else {
-        delete obj[key];
-      }
-    }
-  }
-  return obj;
 }
 
 const CLEAR_OF = FUNCTION_EXPORTS.CLEAR_OF = function(data,fillFn,sp){

@@ -1,8 +1,8 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.function.name", "core-js/modules/es6.object.assign", ".promise"], factory);
+    define(["exports", "core-js/modules/es6.function.name", "core-js/modules/es6.object.assign", "./promise"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.function.name"), require("core-js/modules/es6.object.assign"), require(".promise"));
+    factory(exports, require("core-js/modules/es6.function.name"), require("core-js/modules/es6.object.assign"), require("./promise"));
   } else {
     var mod = {
       exports: {}

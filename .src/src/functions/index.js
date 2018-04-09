@@ -1,15 +1,8 @@
-import './functions.js'
-
-import './isLike'
-
-import './transform'
-
-import './enumerator'
-
-import './accurate'
-
-import './reducer'
-
-import './random'
-
-import './matrix'
+export * from './functions'
+export * from './isLike'
+export * from './transform'
+export * from './enumerator'
+export * from './accurate'
+export * from './reducer'
+export * from './random'
+export * from './matrix'

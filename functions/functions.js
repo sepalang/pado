@@ -1,21 +1,17 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "./isLike", "./transform", "./reducer", "lodash/cloneDeep"], factory);
+    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "./isLike", "./transform", "./reducer"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("./isLike"), require("./transform"), require("./reducer"), require("lodash/cloneDeep"));
+    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("./isLike"), require("./transform"), require("./reducer"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Regexp, global.es6Regexp, global.isLike, global.transform, global.reducer, global.cloneDeep);
+    factory(global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Regexp, global.es6Regexp, global.isLike, global.transform, global.reducer);
     global.functions = mod.exports;
   }
-})(this, function (_es6Regexp, _es6Regexp2, _es6Object, _es6Regexp3, _es6Regexp4, _isLike, _transform, _reducer, _cloneDeep2) {
+})(this, function (_es6Regexp, _es6Regexp2, _es6Object, _es6Regexp3, _es6Regexp4, _isLike, _transform, _reducer) {
   "use strict";
-
-  _cloneDeep2 = _interopRequireDefault(_cloneDeep2);
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
   function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
@@ -287,16 +283,6 @@
     return obj;
   };
 
-  var FREE = FUNCTION_EXPORTS.FREE = function (datum) {
-    var dest = {};
-    Object.keys(datum).forEach(function (key) {
-      if (!/^\$/.test(key)) {
-        dest[key] = (0, _cloneDeep2.default)(datum[key]);
-      }
-    });
-    return dest;
-  };
-
   var EACH = function EACH(value, proc) {
     return EACH_PROC((0, _transform.asArray)(value), proc);
   };
@@ -310,28 +296,6 @@
     return EACH_PROC(value, function (v, i, l) {
       meta = proc(meta, v, i, l);
     }), meta;
-  }; //PINPONGPOOL TRANSFORM
-
-
-  var REMOVE_VALUE = FUNCTION_EXPORTS.REMOVE_VALUE = function (obj, value) {
-    var detect = true;
-    var array = (0, _isLike.isArray)(obj);
-
-    while (detect) {
-      var key = GET_KEY_BY(obj, value);
-
-      if (typeof key === "undefined") {
-        detect = false;
-      } else {
-        if (array) {
-          obj.splice(key, 1);
-        } else {
-          delete obj[key];
-        }
-      }
-    }
-
-    return obj;
   };
 
   var CLEAR_OF = FUNCTION_EXPORTS.CLEAR_OF = function (data, fillFn, sp) {

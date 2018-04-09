@@ -1,6 +1,6 @@
 {
   "name": "pado",
-  "version": "0.2.0",
+  "version": "0.2.5",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -13,7 +13,7 @@
     "build:default": "padoc .src/src ./ -m umd",
     "build:pack": "padoc --pack .src/src/pado.js ./pado.js -m umd",
     "build": "npm run clear:dist && npm run build:default && npm run build:pack",
-    "s:web": "cd .src/sample/web && npm start",
+    "t": "padoc --exec .src/src/functions",
     "test": "jest ''"
   },
   "author": "AHN HO JUNG",

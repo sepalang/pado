@@ -157,10 +157,8 @@ PromiseExports.wheel = function(tasks, option) {
   return defer;
 }
 
-Object.keys(PromiseExports).forEach(key=>{
-  PromiseFunction[key] = PromiseExports[key];
-})
-
-
-module.exports = PromiseExports;
 export const promise = PromiseFunction;
+export const resolve = PromiseFunction.resolve;
+export const reject  = PromiseFunction.reject;
+export const valueOf = PromiseFunction.valueOf;
+export const abort   = PromiseFunction.abort;

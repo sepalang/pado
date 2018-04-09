@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.promise = void 0;
+  _exports.abort = _exports.valueOf = _exports.reject = _exports.resolve = _exports.promise = void 0;
 
   var isMaybePromise = function isMaybePromise(target) {
     return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";
@@ -194,10 +194,14 @@
     return defer;
   };
 
-  Object.keys(PromiseExports).forEach(function (key) {
-    PromiseFunction[key] = PromiseExports[key];
-  });
-  module.exports = PromiseExports;
   var promise = PromiseFunction;
   _exports.promise = promise;
+  var resolve = PromiseFunction.resolve;
+  _exports.resolve = resolve;
+  var reject = PromiseFunction.reject;
+  _exports.reject = reject;
+  var valueOf = PromiseFunction.valueOf;
+  _exports.valueOf = valueOf;
+  var abort = PromiseFunction.abort;
+  _exports.abort = abort;
 });

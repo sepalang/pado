@@ -82,7 +82,7 @@
   };
 
   _exports.cleanObject = cleanObject;
-  var cloneDeep = _.cloneDeep;
+  var cloneDeep = _cloneDeep2.default;
   _exports.cloneDeep = cloneDeep;
 
   var free = function free(datum) {

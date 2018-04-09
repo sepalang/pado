@@ -42,7 +42,7 @@ const range = function(value,step,sizeBase){
   return reverse ? r.reverse() : r;
 }
 
-const domainRangeValue = FUNCTION_EXPORTS.DOMAIN_RANGE_VALUE = function(domain,range,vs,nice){
+const domainRangeValue = function(domain,range,vs,nice){
   return forMap(cloneDeep(vs),function(v,sel){
     var $range  = sel ? range[sel]  : range;
     var $domain = sel ? domain[sel] : domain;

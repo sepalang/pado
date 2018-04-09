@@ -1,1 +1,1 @@
-import { asArray } from './functions'
+import { asArray } from '../functions'

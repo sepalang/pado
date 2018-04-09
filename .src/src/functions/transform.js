@@ -46,7 +46,7 @@ export const cleanObject = function(data){
   return data
 }
 
-export const cloneDeep = _.cloneDeep
+export const cloneDeep = _cloneDeep
 
 export const free = function(datum){
   const dest = {}

@@ -71,7 +71,7 @@
     return reverse ? r.reverse() : r;
   };
 
-  var domainRangeValue = FUNCTION_EXPORTS.DOMAIN_RANGE_VALUE = function (domain, range, vs, nice) {
+  var domainRangeValue = function domainRangeValue(domain, range, vs, nice) {
     return forMap(cloneDeep(vs), function (v, sel) {
       var $range = sel ? range[sel] : range;
       var $domain = sel ? domain[sel] : domain;

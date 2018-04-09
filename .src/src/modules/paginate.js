@@ -1,4 +1,4 @@
-import { promise } from '.promise';
+import { promise } from './promise';
 
 const PaginateClass = function(opts) {
   // current page index

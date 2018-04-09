@@ -21,8 +21,6 @@
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  function _readOnlyError(name) { throw new Error("\"" + name + "\" is read-only"); }
-
   var isAbsoluteNaN = function isAbsoluteNaN(number) {
     return number !== number && typeof number === "number";
   };
@@ -176,8 +174,10 @@
   };
 
   _exports.isExsist = isExsist;
-  var notExsist = _exports.notExsist = notExsist = (_readOnlyError("notExsist"), function (value) {
+
+  var notExsist = function notExsist(value) {
     return !isExsist(value);
-  });
+  };
+
   _exports.notExsist = notExsist;
 });

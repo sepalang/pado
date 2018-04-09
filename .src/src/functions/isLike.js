@@ -108,4 +108,4 @@ export const isExsist = function(value){
   }
 }
 
-export const notExsist = notExsist = value=>!isExsist(value)
+export const notExsist = value=>!isExsist(value)
