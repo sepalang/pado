@@ -3501,13 +3501,13 @@
    * // => false
    */
 
-  function cloneDeep(value) {
+  function cloneDeep$1(value) {
     return _baseClone(value, CLONE_DEEP_FLAG$1 | CLONE_SYMBOLS_FLAG$1);
   }
 
-  var cloneDeep_1 = cloneDeep;
+  var cloneDeep_1 = cloneDeep$1;
 
-  var cloneDeep$1 = _.cloneDeep;
+  var cloneDeep$2 = _.cloneDeep;
 
   var get = function get(target, path) {
     if (typeof target === "object") {
@@ -3528,9 +3528,9 @@
     return target;
   };
 
-  var FUNCTION_EXPORTS = {};
+  var FUNCTION_EXPORTS$1 = {};
 
-  var UNIQUE = FUNCTION_EXPORTS.UNIQUE = function (array) {
+  var UNIQUE = FUNCTION_EXPORTS$1.UNIQUE = function (array) {
     var result = [],
         array = toArray(array);
 
@@ -3550,7 +3550,7 @@
     return result;
   };
 
-  var HAS_VALUE = FUNCTION_EXPORTS.HAS_VALUE = function () {
+  var HAS_VALUE = FUNCTION_EXPORTS$1.HAS_VALUE = function () {
     var defaultObjectValueFunc = function defaultObjectValueFunc(object, value) {
       return object === value;
     };
@@ -3613,7 +3613,7 @@
     };
   }();
 
-  var GET_KEY_BY = FUNCTION_EXPORTS.GET_KEY_BY = function (object, value) {
+  var GET_KEY_BY = FUNCTION_EXPORTS$1.GET_KEY_BY = function (object, value) {
     if (isFunction(value)) {
       if (isArray$1(object)) for (var i = 0, l = object.length; i < l; i++) {
         if (value(object[i], i) === true) return i;
@@ -3631,7 +3631,7 @@
     }
   };
 
-  var STRING_CAST = FUNCTION_EXPORTS.STRING_CAST = function () {
+  var STRING_CAST = FUNCTION_EXPORTS$1.STRING_CAST = function () {
     return function (text, defaultOrder, finder, at) {
       if (typeof text === "string" || typeof text === "number") {
         var idxs = [];
@@ -3736,7 +3736,7 @@
   */
 
 
-  var FIND_INDEXES = FUNCTION_EXPORTS.FIND_INDEXES = function () {
+  var FIND_INDEXES = FUNCTION_EXPORTS$1.FIND_INDEXES = function () {
     var __find_string = function __find_string(c, s, p) {
       return c.indexOf(s, p);
     };
@@ -3771,7 +3771,7 @@
     };
   }();
 
-  var EACH_PROC = FUNCTION_EXPORTS.EACH_PROC = function (arr, proc) {
+  var EACH_PROC = FUNCTION_EXPORTS$1.EACH_PROC = function (arr, proc) {
     if (arr.length > 1) {
       for (var i = 0, l = arr.length - 1; i < l; proc(arr[i], i, false), i++) {
       }
@@ -3784,13 +3784,13 @@
     return arr;
   };
 
-  var STATIC_FOR_EACH_PROC = FUNCTION_EXPORTS.STATIC_FOR_EACH_PROC = function (obj, proc) {
+  var STATIC_FOR_EACH_PROC = FUNCTION_EXPORTS$1.STATIC_FOR_EACH_PROC = function (obj, proc) {
     if (typeof obj === "object") for (var i = 0, a = obj instanceof Array, al = a ? obj.length : NaN, keys = Object.keys(obj), l = keys.length; i < l; proc(obj[keys[i]], keys[i], i, l, al), i++) {
     }
     return obj;
   };
 
-  var FREE = FUNCTION_EXPORTS.FREE = function (datum) {
+  var FREE = FUNCTION_EXPORTS$1.FREE = function (datum) {
     var dest = {};
     Object.keys(datum).forEach(function (key) {
       if (!/^\$/.test(key)) {
@@ -3812,7 +3812,7 @@
   }; //PINPONGPOOL TRANSFORM
 
 
-  var REMOVE_VALUE = FUNCTION_EXPORTS.REMOVE_VALUE = function (obj, value) {
+  var REMOVE_VALUE = FUNCTION_EXPORTS$1.REMOVE_VALUE = function (obj, value) {
     var detect = true;
     var array = isArray$1(obj);
 
@@ -3833,7 +3833,7 @@
     return obj;
   };
 
-  var CLEAR_OF = FUNCTION_EXPORTS.CLEAR_OF = function (data, fillFn, sp) {
+  var CLEAR_OF = FUNCTION_EXPORTS$1.CLEAR_OF = function (data, fillFn, sp) {
     if (data instanceof Array) {
       sp = Array.prototype.splice.call(data, 0, data.length);
     } else if (typeof data == "object") {
@@ -3848,12 +3848,12 @@
     return fillFn && fillFn(data, sp), data;
   };
 
-  var INSERT_OF = FUNCTION_EXPORTS.INSERT_OF = function (data, v, a) {
+  var INSERT_OF = FUNCTION_EXPORTS$1.INSERT_OF = function (data, v, a) {
     isArray$1(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
     return data;
   };
 
-  var MOVE_OF = FUNCTION_EXPORTS.MOVE_OF = function (data, oldIndex, newIndex) {
+  var MOVE_OF = FUNCTION_EXPORTS$1.MOVE_OF = function (data, oldIndex, newIndex) {
     if (oldIndex !== newIndex && isArray$1(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
       Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
     }
@@ -3861,14 +3861,14 @@
     return data;
   };
 
-  var CONCAT_OF = FUNCTION_EXPORTS.CONCAT_OF = function (data, appends) {
+  var CONCAT_OF = FUNCTION_EXPORTS$1.CONCAT_OF = function (data, appends) {
     var data = asArray$1(data);
     return EACH(appends, function (value) {
       data.push(value);
     }), data;
   };
 
-  var FILTER_OF = FUNCTION_EXPORTS.FILTER_OF = function (data, func, exitFn) {
+  var FILTER_OF = FUNCTION_EXPORTS$1.FILTER_OF = function (data, func, exitFn) {
     var data = asArray$1(data);
     var exitCnt = 0;
 
@@ -3888,7 +3888,7 @@
     return data;
   };
 
-  var SORT_OF = FUNCTION_EXPORTS.SORT_OF = function (data, filter) {
+  var SORT_OF = FUNCTION_EXPORTS$1.SORT_OF = function (data, filter) {
     if (data.length == 0) {
       return data;
     }
@@ -3936,7 +3936,7 @@
     return data;
   };
 
-  var REBASE = FUNCTION_EXPORTS.REBASE = function (obj, ref) {
+  var REBASE = FUNCTION_EXPORTS$1.REBASE = function (obj, ref) {
     var result = {};
 
     for (var key in obj) {
@@ -3984,114 +3984,10 @@
     }
 
     return result;
-  }; //PINPONGPOOL FORMAT
-
-
-  var RANGE = FUNCTION_EXPORTS.RANGE = function (value, step, sizeBase) {
-    var r = [],
-        start,
-        end,
-        reverse;
-
-    if (typeof value === "number") {
-      end = value;
-      start = 0;
-    } else if (typeof value === "object") {
-      start = value[0];
-      end = value[1];
-
-      if (!step && typeof value[2] === "number") {
-        step = value[2];
-      }
-
-      if (typeof sizeBase !== "boolean") {
-        sizeBase = false;
-      }
-    }
-
-    if (typeof start !== "number" || typeof end !== "number") {
-      if (typeof start !== "number" && typeof end !== "number") return r;
-      if (typeof start === "number") return r.push(start), r;
-      if (typeof end === "number") return r.push(end), r;
-    }
-
-    if (start > end) {
-      reverse = end;
-      end = start;
-      start = reverse;
-      reverse = true;
-    }
-
-    end = parseFloat(end), end = isNaN(end) ? 0 : end;
-    start = parseFloat(start), start = isNaN(start) ? 0 : start;
-    step = parseFloat(step), step = isNaN(step) || step == 0 ? 1 : step;
-
-    if (step <= 0) {
-      return console.warn("range::not support minus step"), r;
-    }
-
-    if (sizeBase == false) {
-      for (var i = start, l = end; i <= l; i = i + step) {
-        r.push(i);
-      }
-    } else {
-      for (var i = start, l = end; i < l; i = i + step) {
-        r.push(i);
-      }
-    }
-
-    return reverse ? r.reverse() : r;
-  };
-
-  var DOMAIN_RANGE_VALUE = FUNCTION_EXPORTS.DOMAIN_RANGE_VALUE = function (domain, range, vs, nice) {
-    /*
-    return forMap(cloneDeep(vs),function(v,sel){
-      var $range  = sel ? range[sel]  : range;
-      var $domain = sel ? domain[sel] : domain;
-      if(!$range || !$domain){ return v; }
-                      
-      var dSize = $domain[1] - $domain[0];
-      var sSize = $range[1] - $range[0];
-      var dRate = (v - $domain[0]) / dSize;
-      var calc  = $range[0] + sSize * dRate;
-                      
-      return nice ? Math.floor(calc) : calc;
-    });
-    */
-  }; //matrixRange([1],[3]) // [[1], [2], [3]] 
-  //matrixRange([1,1],[3,3]) // [[1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
-
-
-  var MATRIX_RANGE = FUNCTION_EXPORTS.DOMAIN_RANGE_VALUE = function (start, end, step, sizeBase) {
-    /*
-    var scales=[];
-    var maxLength = max([start.length,end.length]);
-    
-    var selectLengthes = times(maxLength,function(scaleIndex){
-        var range = NT.range([start[scaleIndex],end[scaleIndex]],step,sizeBase)
-        scales.push(range);
-        return range.length;
-    });
-     var result = times(reduce(selectLengthes,function(redu,value){
-        return redu * value;
-    },1),function(){ return new Array(maxLength); });
-    
-    var turnSize = 1;
-    
-    each(scales,function(scaleCase,scaleIndex){
-        var scaleCaseLength = scaleCase.length;
-        times(result.length,function(time){
-            result[time][scaleIndex] = scaleCase[NT.turn(time,scaleCaseLength,turnSize)];
-        });
-        turnSize = turnSize * scaleCaseLength;
-    });
-    
-    return result;
-    */
   }; //TODO: Union HAS_VALUE
 
 
-  var NESTED_HAS_PROC = FUNCTION_EXPORTS.NESTED_HAS_PROC = function (obj, key) {
+  var NESTED_HAS_PROC = FUNCTION_EXPORTS$1.NESTED_HAS_PROC = function (obj, key) {
     var keys = key.split(".");
     if (!keys.length) return false;
     var pointer = obj;
@@ -4109,7 +4005,7 @@
     return true;
   };
 
-  var APART = FUNCTION_EXPORTS.APART = function (text, split, block, blockEnd) {
+  var APART = FUNCTION_EXPORTS$1.APART = function (text, split, block, blockEnd) {
     if (typeof text !== "string") return [text];
     var result = text.split(split === true ? /\s+/ : split || /\s+/);
 
@@ -4139,7 +4035,7 @@
     }
   };
 
-  var DIFF_STRUCTURE = FUNCTION_EXPORTS.DIFF_STRUCTURE = function (before, after) {
+  var DIFF_STRUCTURE = FUNCTION_EXPORTS$1.DIFF_STRUCTURE = function (before, after) {
     var afterKeys = Object.keys(after);
     var beforeKeys;
     var canDiff = false;
@@ -4200,7 +4096,7 @@
   }; //PINPONGPOOL INTERFACE
 
 
-  var TOGGLE = FUNCTION_EXPORTS.TOGGLE = function (ta, cv, set) {
+  var TOGGLE = FUNCTION_EXPORTS$1.TOGGLE = function (ta, cv, set) {
     var index = -1;
 
     for (var d = asArray$1(ta), _l2 = d.length, _i2 = 0; _i2 < _l2; _i2++) {
@@ -4217,7 +4113,7 @@
     return ta[index];
   };
 
-  var TRUN = FUNCTION_EXPORTS.TRUN = function (i, p, ts) {
+  var TRUN = FUNCTION_EXPORTS$1.TRUN = function (i, p, ts) {
     if (i < 0) {
       var abs = Math.abs(i / ts);
       i = p - (abs > p ? abs % p : abs);
@@ -4225,36 +4121,13 @@
     ts = ts ? ts : 1;
     i = Math.floor(i / ts);
     return p > i ? i : i % p;
-  }; //PINPONGPOOL GENERATOR
-
-
-  var RAND64 = FUNCTION_EXPORTS.RAND64 = function () {
-    var rand64Token = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    return function (length, codeAt, codeLength) {
-      length = isNaN(length) ? 1 : parseInt(length);
-      codeAt = isNaN(codeAt) ? 0 : parseInt(codeAt);
-      codeLength = isNaN(codeLength) ? 62 - codeAt : parseInt(codeLength);
-      var result = "";
-
-      for (var i = 0, l = length; i < l; i++) {
-        result = result + rand64Token.charAt(codeAt + parseInt(Math.random() * codeLength));
-      }
-
-      return result;
-    };
-  }();
-
-  var TOKENIZE = FUNCTION_EXPORTS.TOKENIZE = function (seed, digits) {
-    return Math.floor(Math.abs(Math.sin(Number((seed + "").replace(/./g, function (s, i) {
-      return s.charCodeAt(0);
-    }))) * 16777215) % 16777215).toString(digits || 16);
   };
 
-  var FINALLY_EXPORTS = Object.keys(FUNCTION_EXPORTS).reduce(function (dest, key) {
+  var FINALLY_EXPORTS = Object.keys(FUNCTION_EXPORTS$1).reduce(function (dest, key) {
     var camelKey = key.toLowerCase().replace(/\_[\w]/g, function (s) {
       return s.substr(1).toUpperCase();
     });
-    dest[camelKey] = FUNCTION_EXPORTS[key];
+    dest[camelKey] = FUNCTION_EXPORTS$1[key];
     return dest;
   }, {});
   module.exports = _objectSpread({}, FINALLY_EXPORTS);
@@ -4469,12 +4342,12 @@
     return it > 0 ? min(_toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
   };
 
-  var max = Math.max;
+  var max$1 = Math.max;
   var min$1 = Math.min;
 
   var _toAbsoluteIndex = function (index, length) {
     index = _toInteger(index);
-    return index < 0 ? max(index + length, 0) : min$1(index, length);
+    return index < 0 ? max$1(index + length, 0) : min$1(index, length);
   };
 
   // false -> Array#indexOf
@@ -5472,6 +5345,23 @@
       return capability.promise;
     }
   });
+
+  var domainRangeValue = FUNCTION_EXPORTS.DOMAIN_RANGE_VALUE = function (domain, range, vs, nice) {
+    return forMap(cloneDeep(vs), function (v, sel) {
+      var $range = sel ? range[sel] : range;
+      var $domain = sel ? domain[sel] : domain;
+
+      if (!$range || !$domain) {
+        return v;
+      }
+
+      var dSize = $domain[1] - $domain[0];
+      var sSize = $range[1] - $range[0];
+      var dRate = (v - $domain[0]) / dSize;
+      var calc = $range[0] + sSize * dRate;
+      return nice ? Math.floor(calc) : calc;
+    });
+  }; //matrixRange([1],[3]) // [[1], [2], [3]]
 
   var isMaybePromise = function isMaybePromise(target) {
     return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";

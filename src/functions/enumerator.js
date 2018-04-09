@@ -15,3 +15,11 @@ export const all = function(data,fn){
   
   return true;
 };
+
+export const times = function(length,fn){
+  const result = [];
+  for(var i=0,l=length;i<l;i++){
+    result.push(fn(i));
+  }
+  return result;
+}

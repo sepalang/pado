@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.all = void 0;
+  _exports.times = _exports.all = void 0;
 
   var all = function all(data, fn) {
     data = (0, _asTo.asArray)(data);
@@ -36,4 +36,16 @@
   };
 
   _exports.all = all;
+
+  var times = function times(length, fn) {
+    var result = [];
+
+    for (var i = 0, l = length; i < l; i++) {
+      result.push(fn(i));
+    }
+
+    return result;
+  };
+
+  _exports.times = times;
 });

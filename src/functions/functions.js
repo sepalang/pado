@@ -417,96 +417,6 @@ const REBASE = FUNCTION_EXPORTS.REBASE = function(obj,ref){
   return result;
 }
 
-//PINPONGPOOL FORMAT
-const RANGE = FUNCTION_EXPORTS.RANGE = function(value,step,sizeBase){
-  var r=[],start,end,reverse;
-  
-  if(typeof value === "number"){
-    end   = value;
-    start = 0;
-  } else if(typeof value === "object"){
-    start = value[0];
-    end   = value[1];
-      
-    if(!step && typeof value[2] === "number"){
-      step = value[2];
-    }
-      
-    if(typeof sizeBase !== "boolean"){
-      sizeBase=false;
-    }
-  }
-  
-  if(typeof start !== "number" || typeof end !== "number"){
-    if(typeof start !== "number" && typeof end !== "number") return r;
-    if(typeof start === "number") return r.push(start),r;
-    if(typeof end   === "number") return r.push(end)  ,r;
-  }
-  
-  if(start > end){
-    reverse = end;
-    end     = start;
-    start   = reverse;
-    reverse = true;
-  }
-  
-  end=parseFloat(end),end=isNaN(end)?0:end;
-  start=parseFloat(start),start=isNaN(start)?0:start;
-  step=parseFloat(step),step=isNaN(step)||step==0?1:step;
-  if(step <= 0){ return console.warn("range::not support minus step"),r;};
-  if(sizeBase==false){ for(var i=start,l=end;i<=l;i=i+step) r.push(i); } else { for(var i=start,l=end;i<l;i=i+step) r.push(i); }
-  return reverse ? r.reverse() : r;
-}
-
-const DOMAIN_RANGE_VALUE = FUNCTION_EXPORTS.DOMAIN_RANGE_VALUE = function(domain,range,vs,nice){
-  /*
-  return forMap(cloneDeep(vs),function(v,sel){
-    var $range  = sel ? range[sel]  : range;
-    var $domain = sel ? domain[sel] : domain;
-    if(!$range || !$domain){ return v; }
-                    
-    var dSize = $domain[1] - $domain[0];
-    var sSize = $range[1] - $range[0];
-    var dRate = (v - $domain[0]) / dSize;
-    var calc  = $range[0] + sSize * dRate;
-                    
-    return nice ? Math.floor(calc) : calc;
-  });
-  */
-};
-
-//matrixRange([1],[3]) // [[1], [2], [3]] 
-//matrixRange([1,1],[3,3]) // [[1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
-
-const MATRIX_RANGE = FUNCTION_EXPORTS.DOMAIN_RANGE_VALUE = function(start,end,step,sizeBase){
-    /*
-    var scales=[];
-    var maxLength = max([start.length,end.length]);
-    
-    var selectLengthes = times(maxLength,function(scaleIndex){
-        var range = NT.range([start[scaleIndex],end[scaleIndex]],step,sizeBase)
-        scales.push(range);
-        return range.length;
-    });
-
-    var result = times(reduce(selectLengthes,function(redu,value){
-        return redu * value;
-    },1),function(){ return new Array(maxLength); });
-    
-    var turnSize = 1;
-    
-    each(scales,function(scaleCase,scaleIndex){
-        var scaleCaseLength = scaleCase.length;
-        times(result.length,function(time){
-            result[time][scaleIndex] = scaleCase[NT.turn(time,scaleCaseLength,turnSize)];
-        });
-        turnSize = turnSize * scaleCaseLength;
-    });
-    
-    return result;
-  */
-};
-
 
 
 //TODO: Union HAS_VALUE
@@ -635,23 +545,6 @@ const TRUN = FUNCTION_EXPORTS.TRUN = function(i,p,ts){
   if(i < 0) { var abs = Math.abs(i/ts); i = p-(abs>p?abs%p:abs); }; 
   ts=ts?ts:1;i=Math.floor(i/ts);
   return (p > i)?i:i%p;
-}
-
-//PINPONGPOOL GENERATOR
-const RAND64 = FUNCTION_EXPORTS.RAND64 = (function(){
-  var rand64Token = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  return function(length,codeAt,codeLength){
-    length     = (isNaN(length)) ? 1 : parseInt(length);
-    codeAt     = (isNaN(codeAt)) ? 0 : parseInt(codeAt);
-    codeLength = (isNaN(codeLength)) ? 62 - codeAt : parseInt(codeLength);
-    var result = "";
-    for(var i=0,l=length;i<l;i++) result = result + rand64Token.charAt( codeAt + parseInt(Math.random() * codeLength) );
-    return result;
-  }
-}())
-
-const TOKENIZE = FUNCTION_EXPORTS.TOKENIZE = function(seed,digits){
-  return Math.floor((Math.abs(Math.sin(Number((seed + "").replace(/./g,function(s,i){ return s.charCodeAt(0); }))) * 16777215)) % 16777215).toString(digits||16) 
 }
 
 let FINALLY_EXPORTS = Object.keys(FUNCTION_EXPORTS).reduce((dest,key)=>{

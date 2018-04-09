@@ -1,6 +1,10 @@
 import { 
-  isNumber
-} from './isLike';
+  isNumber,
+} from './isLike'
+
+import {
+  asArray
+} from './asTo'
 
 export const get = function(target,path){
   if(typeof target === "object"){
@@ -15,54 +19,24 @@ export const get = function(target,path){
   return target;
 }
 
+export const turn = function(i, p, ts) {
+  if(i < 0) { var abs = Math.abs(i / ts); i = p - (abs > p ? abs % p : abs); }
+  ts = ts || 1; i = Math.floor(i / ts);
+  return (p > i) ? i : i % p;
+};
 
-export const accurateTimeout = (function(originalTimeout){
-  return function(trigger,time=0,resolutionRatio=0.75,coverage=25){
-    let destTime = Date.now() + time;
-    
-    if(!isNumber(time)){
-      time=0;
-    }
-    
-    if(!isNumber(resolutionRatio)){
-      resolutionRatio = 0.75
-    }
-    
-    if(!isNumber(coverage)){
-      resolutionRatio = 25
-    }
-    
-    if(resolutionRatio > 1){
-      resolutionRatio = 1;
-    }
-        
-    if(resolutionRatio < 0.1){
-      resolutionRatio = 0.1;
-    }
-    
-    if(coverage < 5){
-      coverage = 5;
-    }
-        
-    function preparation(restTime){
-      const preparaTime = Math.floor(restTime * resolutionRatio);
-      originalTimeout(execution,preparaTime);
-    }
-        
-    function execution(){
-      const restTime = destTime - Date.now();
-        
-      if(restTime < coverage){
-        if(restTime < 1){
-          originalTimeout(trigger,0);
-        } else {
-          originalTimeout(trigger,restTime);
-        }
-      } else {
-        preparation(restTime);
+export const max = function(numberList){
+  let result;
+  asArray(numberList).forEach(n=>{
+    if(isNumber(n)){
+      if(typeof result !== "number"){
+        result = n;
+        return;
+      } 
+      if(result < n){
+        result = n;
       }
     }
-    
-    execution();
-  }
-}(setTimeout))
+  })
+  return result;
+};

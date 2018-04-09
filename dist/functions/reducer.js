@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./isLike"], factory);
+    define(["exports", "./isLike", "./asTo"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./isLike"));
+    factory(exports, require("./isLike"), require("./asTo"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.isLike);
+    factory(mod.exports, global.isLike, global.asTo);
     global.reducer = mod.exports;
   }
-})(this, function (_exports, _isLike) {
+})(this, function (_exports, _isLike, _asTo) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.accurateTimeout = _exports.get = void 0;
+  _exports.max = _exports.turn = _exports.get = void 0;
 
   var get = function get(target, path) {
     if (typeof target === "object") {
@@ -39,68 +39,35 @@
 
   _exports.get = get;
 
-  var accurateTimeout = function (originalTimeout) {
-    return function (trigger, time, resolutionRatio, coverage) {
-      if (time === void 0) {
-        time = 0;
-      }
+  var turn = function turn(i, p, ts) {
+    if (i < 0) {
+      var abs = Math.abs(i / ts);
+      i = p - (abs > p ? abs % p : abs);
+    }
 
-      if (resolutionRatio === void 0) {
-        resolutionRatio = 0.75;
-      }
+    ts = ts || 1;
+    i = Math.floor(i / ts);
+    return p > i ? i : i % p;
+  };
 
-      if (coverage === void 0) {
-        coverage = 25;
-      }
+  _exports.turn = turn;
 
-      var destTime = Date.now() + time;
+  var max = function max(numberList) {
+    var result;
+    (0, _asTo.asArray)(numberList).forEach(function (n) {
+      if ((0, _isLike.isNumber)(n)) {
+        if (typeof result !== "number") {
+          result = n;
+          return;
+        }
 
-      if (!(0, _isLike.isNumber)(time)) {
-        time = 0;
-      }
-
-      if (!(0, _isLike.isNumber)(resolutionRatio)) {
-        resolutionRatio = 0.75;
-      }
-
-      if (!(0, _isLike.isNumber)(coverage)) {
-        resolutionRatio = 25;
-      }
-
-      if (resolutionRatio > 1) {
-        resolutionRatio = 1;
-      }
-
-      if (resolutionRatio < 0.1) {
-        resolutionRatio = 0.1;
-      }
-
-      if (coverage < 5) {
-        coverage = 5;
-      }
-
-      function preparation(restTime) {
-        var preparaTime = Math.floor(restTime * resolutionRatio);
-        originalTimeout(execution, preparaTime);
-      }
-
-      function execution() {
-        var restTime = destTime - Date.now();
-
-        if (restTime < coverage) {
-          if (restTime < 1) {
-            originalTimeout(trigger, 0);
-          } else {
-            originalTimeout(trigger, restTime);
-          }
-        } else {
-          preparation(restTime);
+        if (result < n) {
+          result = n;
         }
       }
+    });
+    return result;
+  };
 
-      execution();
-    };
-  }(setTimeout);
-
-  _exports.accurateTimeout = accurateTimeout;
+  _exports.max = max;
 });
