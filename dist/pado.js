@@ -3509,22 +3509,26 @@
 
   var cloneDeep$1 = _.cloneDeep;
 
-  var FUNCTION_EXPORTS = {};
+  var get = function get(target, path) {
+    if (typeof target === "object") {
+      switch (typeof path) {
+        case "number":
+          path += "";
 
-  var ALL = FUNCTION_EXPORTS.ALL = function (data, fn) {
-    data = asArray$1(data);
+        case "string":
+          return path.indexOf("[") == 0 ? eval("target" + path) : eval("target." + path);
 
-    if (data.length === 0) {
-      return false;
-    }
-
-    for (var i = 0, l = data.length; i < l; i++) {
-      if (!fn(data[i], i)) {
-        return false;
+        case "function":
+          return path.call(this, target);
       }
+    } else if (typeof target === "function") {
+      return target.apply(this, Array.prototype.slice.call(arguments, 1));
     }
-    return true;
+
+    return target;
   };
+
+  var FUNCTION_EXPORTS = {};
 
   var UNIQUE = FUNCTION_EXPORTS.UNIQUE = function (array) {
     var result = [],
@@ -3563,7 +3567,7 @@
       return function (object, value) {
         if (useLeftSelector && !object.hasOwnProperty(leftSelect)) return false;
         if (useRightSelector && !value.hasOwnProperty(rightSelect)) return false;
-        return (useLeftSelector ? GET(object, leftSelect) : object) === (useRightSelector ? GET(value, rightSelect) : value);
+        return (useLeftSelector ? get(object, leftSelect) : object) === (useRightSelector ? get(value, rightSelect) : value);
       };
     };
 
@@ -3608,25 +3612,6 @@
       return getKey ? void 0 : false;
     };
   }();
-
-  var GET = FUNCTION_EXPORTS.GET = function (target, path) {
-    if (typeof target === "object") {
-      switch (typeof path) {
-        case "number":
-          path += "";
-
-        case "string":
-          return path.indexOf("[") == 0 ? eval("target" + path) : eval("target." + path);
-
-        case "function":
-          return path.call(this, target);
-      }
-    } else if (typeof target === "function") {
-      return target.apply(this, Array.prototype.slice.call(arguments, 1));
-    }
-
-    return target;
-  };
 
   var GET_KEY_BY = FUNCTION_EXPORTS.GET_KEY_BY = function (object, value) {
     if (isFunction(value)) {
@@ -4192,7 +4177,7 @@
         analysis.match.push(key);
         analysis.keys[key] = "match";
 
-        if (canDiff && !angular.equals(GET(after, key), GET(before, key))) {
+        if (canDiff && !angular.equals(get(after, key), get(before, key))) {
           analysis.diff.push(key);
           analysis.keys[key] = "diff";
         }
@@ -5488,16 +5473,24 @@
     }
   });
 
+  var isMaybePromise = function isMaybePromise(target) {
+    return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";
+  };
+
+  var resolveFn = PromiseClass.resolve;
+  var rejectFn = PromiseClass.reject;
+
   var PromiseFunction = function (PromiseClass) {
-    return function (fn) {
-      return new PromiseClass(fn);
-    };
+    return new PromiseClass(function (r, c) {
+      var maybeAwaiter = fn(r, c);
+      isMaybePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
+    });
   }(Promise);
 
   var PromiseExports = {};
   PromiseExports.all = Promise.all;
-  PromiseExports.resolve = Promise.resolve;
-  PromiseExports.reject = Promise.reject;
+  PromiseExports.resolve = resolveFn;
+  PromiseExports.reject = rejectFn;
 
   PromiseExports.timeout = function (fn, time) {
     if (typeof fn === "number") {
@@ -5517,9 +5510,22 @@
 
   PromiseExports.valueOf = function (maybeQ) {
     return q(function (resolve, reject) {
-      typeof maybeQ === "object" && maybeQ !== null && maybeQ.then ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
+      isMaybePromise(maybeQ) ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
     });
   };
+
+  var abortMessage = new function () {
+    Object.defineProperty(this, "message", {
+      get: function get() {
+        return ":abort";
+      }
+    });
+    Object.defineProperty(this, "abort", {
+      get: function get() {
+        return true;
+      }
+    });
+  }();
 
   PromiseExports.abort = function (notifyConsole) {
     if (notifyConsole === void 0) {
@@ -5528,7 +5534,7 @@
 
     return new PromiseClass(function (resolve, reject) {
       if (notifyConsole === true) {
-        console.warn("break promise");
+        console.warn("abort promise");
       }
 
       reject(abortMessage);

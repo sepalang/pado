@@ -21,21 +21,11 @@ import {
   instance
 } from './transform'
 
-const FUNCTION_EXPORTS = {};
+import {
+  get
+} from './reducer';
 
-const ALL = FUNCTION_EXPORTS.ALL = function(data,fn){
-  data = asArray(data);
-  
-  if(data.length === 0){
-    return false;
-  }
-  
-  for(let i=0,l=data.length;i<l;i++) if(!fn(data[i],i)){
-    return false;
-  };
-  
-  return true;
-};
+const FUNCTION_EXPORTS = {};
 
 const UNIQUE = FUNCTION_EXPORTS.UNIQUE = function(array){
   var value = [],result = [], array = toArray(array);
@@ -70,7 +60,7 @@ const HAS_VALUE = FUNCTION_EXPORTS.HAS_VALUE = (function(){
       if(useLeftSelector  && !object.hasOwnProperty(leftSelect)) return false;
       if(useRightSelector && !value.hasOwnProperty(rightSelect)) return false;
             
-      return (useLeftSelector ? GET(object,leftSelect) : object) === (useRightSelector ? GET(value,rightSelect) : value);
+      return (useLeftSelector ? get(object,leftSelect) : object) === (useRightSelector ? get(value,rightSelect) : value);
     };
   };
     
@@ -111,19 +101,6 @@ const HAS_VALUE = FUNCTION_EXPORTS.HAS_VALUE = (function(){
     return getKey ? void 0 : false;
   }
 }());
-
-const GET = FUNCTION_EXPORTS.GET = function(target,path){
-  if(typeof target === "object"){
-    switch(typeof path){
-      case "number": path += "";
-      case "string": return path.indexOf("[") == 0 ? eval("target"+path) : eval("target."+path);
-      case "function": return path.call(this,target);
-    }
-  } else if(typeof target === "function"){
-    return target.apply(this,Array.prototype.slice.call(arguments,1));
-  }
-  return target;
-}
 
 const GET_KEY_BY = FUNCTION_EXPORTS.GET_KEY_BY = function(object,value){
   if(isFunction(value)){
@@ -619,7 +596,7 @@ const DIFF_STRUCTURE = FUNCTION_EXPORTS.DIFF_STRUCTURE = function(before,after){
       analysis.match.push(key);
       analysis.keys[key] = "match";
 
-      if(canDiff && !angular.equals(GET(after,key),GET(before,key))) {
+      if(canDiff && !angular.equals(get(after,key),get(before,key))) {
         analysis.diff.push(key);
         analysis.keys[key] = "diff";
       }

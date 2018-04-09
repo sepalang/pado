@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "./isLike", "./asTo", "./transform", "lodash/cloneDeep"], factory);
+    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "./isLike", "./asTo", "./transform", "./reducer", "lodash/cloneDeep"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("./isLike"), require("./asTo"), require("./transform"), require("lodash/cloneDeep"));
+    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("./isLike"), require("./asTo"), require("./transform"), require("./reducer"), require("lodash/cloneDeep"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Regexp, global.es6Regexp, global.isLike, global.asTo, global.transform, global.cloneDeep);
+    factory(global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Regexp, global.es6Regexp, global.isLike, global.asTo, global.transform, global.reducer, global.cloneDeep);
     global.functions = mod.exports;
   }
-})(this, function (_es6Regexp, _es6Regexp2, _es6Object, _es6Regexp3, _es6Regexp4, _isLike, _asTo, _transform, _cloneDeep2) {
+})(this, function (_es6Regexp, _es6Regexp2, _es6Object, _es6Regexp3, _es6Regexp4, _isLike, _asTo, _transform, _reducer, _cloneDeep2) {
   "use strict";
 
   _cloneDeep2 = _interopRequireDefault(_cloneDeep2);
@@ -22,23 +22,6 @@
   function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
   var FUNCTION_EXPORTS = {};
-
-  var ALL = FUNCTION_EXPORTS.ALL = function (data, fn) {
-    data = (0, _asTo.asArray)(data);
-
-    if (data.length === 0) {
-      return false;
-    }
-
-    for (var i = 0, l = data.length; i < l; i++) {
-      if (!fn(data[i], i)) {
-        return false;
-      }
-    }
-
-    ;
-    return true;
-  };
 
   var UNIQUE = FUNCTION_EXPORTS.UNIQUE = function (array) {
     var value = [],
@@ -78,7 +61,7 @@
       return function (object, value) {
         if (useLeftSelector && !object.hasOwnProperty(leftSelect)) return false;
         if (useRightSelector && !value.hasOwnProperty(rightSelect)) return false;
-        return (useLeftSelector ? GET(object, leftSelect) : object) === (useRightSelector ? GET(value, rightSelect) : value);
+        return (useLeftSelector ? (0, _reducer.get)(object, leftSelect) : object) === (useRightSelector ? (0, _reducer.get)(value, rightSelect) : value);
       };
     };
 
@@ -123,25 +106,6 @@
       return getKey ? void 0 : false;
     };
   }();
-
-  var GET = FUNCTION_EXPORTS.GET = function (target, path) {
-    if (typeof target === "object") {
-      switch (typeof path) {
-        case "number":
-          path += "";
-
-        case "string":
-          return path.indexOf("[") == 0 ? eval("target" + path) : eval("target." + path);
-
-        case "function":
-          return path.call(this, target);
-      }
-    } else if (typeof target === "function") {
-      return target.apply(this, Array.prototype.slice.call(arguments, 1));
-    }
-
-    return target;
-  };
 
   var GET_KEY_BY = FUNCTION_EXPORTS.GET_KEY_BY = function (object, value) {
     if ((0, _isLike.isFunction)(value)) {
@@ -721,7 +685,7 @@
         analysis.match.push(key);
         analysis.keys[key] = "match";
 
-        if (canDiff && !angular.equals(GET(after, key), GET(before, key))) {
+        if (canDiff && !angular.equals((0, _reducer.get)(after, key), (0, _reducer.get)(before, key))) {
           analysis.diff.push(key);
           analysis.keys[key] = "diff";
         }

@@ -18,16 +18,24 @@
   });
   _exports.promise = void 0;
 
+  var isMaybePromise = function isMaybePromise(target) {
+    return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";
+  };
+
+  var resolveFn = PromiseClass.resolve;
+  var rejectFn = PromiseClass.reject;
+
   var PromiseFunction = function (PromiseClass) {
-    return function (fn) {
-      return new PromiseClass(fn);
-    };
+    return new PromiseClass(function (r, c) {
+      var maybeAwaiter = fn(r, c);
+      isMaybePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
+    });
   }(Promise);
 
   var PromiseExports = {};
   PromiseExports.all = Promise.all;
-  PromiseExports.resolve = Promise.resolve;
-  PromiseExports.reject = Promise.reject;
+  PromiseExports.resolve = resolveFn;
+  PromiseExports.reject = rejectFn;
 
   PromiseExports.timeout = function (fn, time) {
     if (typeof fn === "number") {
@@ -47,9 +55,22 @@
 
   PromiseExports.valueOf = function (maybeQ) {
     return q(function (resolve, reject) {
-      typeof maybeQ === "object" && maybeQ !== null && maybeQ.then ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
+      isMaybePromise(maybeQ) ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
     });
   };
+
+  var abortMessage = new function () {
+    Object.defineProperty(this, "message", {
+      get: function get() {
+        return ":abort";
+      }
+    });
+    Object.defineProperty(this, "abort", {
+      get: function get() {
+        return true;
+      }
+    });
+  }();
 
   PromiseExports.abort = function (notifyConsole) {
     if (notifyConsole === void 0) {
@@ -58,7 +79,7 @@
 
     return new PromiseClass(function (resolve, reject) {
       if (notifyConsole === true) {
-        console.warn("break promise");
+        console.warn("abort promise");
       }
 
       reject(abortMessage);
