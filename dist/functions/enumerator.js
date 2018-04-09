@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./asTo"], factory);
+    define(["exports", "./transform"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./asTo"));
+    factory(exports, require("./transform"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.asTo);
+    factory(mod.exports, global.transform);
     global.enumerator = mod.exports;
   }
-})(this, function (_exports, _asTo) {
+})(this, function (_exports, _transform) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -19,7 +19,7 @@
   _exports.times = _exports.all = void 0;
 
   var all = function all(data, fn) {
-    data = (0, _asTo.asArray)(data);
+    data = (0, _transform.asArray)(data);
 
     if (data.length === 0) {
       return false;

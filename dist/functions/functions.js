@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "./isLike", "./asTo", "./transform", "./reducer", "lodash/cloneDeep"], factory);
+    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "./isLike", "./transform", "./reducer", "lodash/cloneDeep"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("./isLike"), require("./asTo"), require("./transform"), require("./reducer"), require("lodash/cloneDeep"));
+    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("./isLike"), require("./transform"), require("./reducer"), require("lodash/cloneDeep"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Regexp, global.es6Regexp, global.isLike, global.asTo, global.transform, global.reducer, global.cloneDeep);
+    factory(global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Regexp, global.es6Regexp, global.isLike, global.transform, global.reducer, global.cloneDeep);
     global.functions = mod.exports;
   }
-})(this, function (_es6Regexp, _es6Regexp2, _es6Object, _es6Regexp3, _es6Regexp4, _isLike, _asTo, _transform, _reducer, _cloneDeep2) {
+})(this, function (_es6Regexp, _es6Regexp2, _es6Object, _es6Regexp3, _es6Regexp4, _isLike, _transform, _reducer, _cloneDeep2) {
   "use strict";
 
   _cloneDeep2 = _interopRequireDefault(_cloneDeep2);
@@ -26,7 +26,7 @@
   var UNIQUE = FUNCTION_EXPORTS.UNIQUE = function (array) {
     var value = [],
         result = [],
-        array = (0, _asTo.toArray)(array);
+        array = (0, _transform.toArray)(array);
 
     for (var i = 0, l = array.length; i < l; i++) {
       var unique = true;
@@ -298,7 +298,7 @@
   };
 
   var EACH = function EACH(value, proc) {
-    return EACH_PROC((0, _asTo.asArray)(value), proc);
+    return EACH_PROC((0, _transform.asArray)(value), proc);
   };
 
   var FOR_EACH = function FOR_EACH(value, proc) {
@@ -306,7 +306,7 @@
   };
 
   var REDUCE = function REDUCE(value, proc, meta) {
-    value = (0, _asTo.asArray)(value);
+    value = (0, _transform.asArray)(value);
     return EACH_PROC(value, function (v, i, l) {
       meta = proc(meta, v, i, l);
     }), meta;
@@ -363,14 +363,14 @@
   };
 
   var CONCAT_OF = FUNCTION_EXPORTS.CONCAT_OF = function (data, appends) {
-    var data = (0, _asTo.asArray)(data);
+    var data = (0, _transform.asArray)(data);
     return EACH(appends, function (value) {
       data.push(value);
     }), data;
   };
 
   var FILTER_OF = FUNCTION_EXPORTS.FILTER_OF = function (data, func, exitFn) {
-    var data = (0, _asTo.asArray)(data);
+    var data = (0, _transform.asArray)(data);
     var exitCnt = 0;
 
     for (var i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++) {
@@ -605,7 +605,7 @@
   var TOGGLE = FUNCTION_EXPORTS.TOGGLE = function (ta, cv, set) {
     var index = -1;
 
-    for (var d = (0, _asTo.asArray)(ta), _l2 = d.length, _i2 = 0; _i2 < _l2; _i2++) {
+    for (var d = (0, _transform.asArray)(ta), _l2 = d.length, _i2 = 0; _i2 < _l2; _i2++) {
       if (d[_i2] == cv) {
         index = _i2 + 1;
         break;

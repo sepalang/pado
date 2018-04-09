@@ -1035,33 +1035,6 @@
     return !isExsist(value);
   });
 
-  var asArray$1 = function asArray(data, defaultArray) {
-    if (defaultArray === void 0) {
-      defaultArray = undefined;
-    }
-
-    if (isArray$1(data)) {
-      return data;
-    }
-
-    if (isNone(data)) {
-      return isArray$1(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
-    }
-
-    if (typeof data === "object" && typeof data.toArray === "function") {
-      return data.toArray();
-    }
-
-    return [data];
-  };
-  var toArray = function toArray(data, option) {
-    if (typeof data === "undefined" || data === null || data === NaN) return [];
-    if (isArray$1(data)) return Array.prototype.slice.call(data);
-    if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
-    if (typeof option === "string") return data.split(option);
-    return [data];
-  };
-
   var $export$3 = require('./_export');
 
   var $find = require('./_array-methods')(6);
@@ -3507,6 +3480,32 @@
 
   var cloneDeep_1 = cloneDeep$1;
 
+  var asArray = function asArray(data, defaultArray) {
+    if (defaultArray === void 0) {
+      defaultArray = undefined;
+    }
+
+    if (isArray$1(data)) {
+      return data;
+    }
+
+    if (isNone(data)) {
+      return isArray$1(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
+    }
+
+    if (typeof data === "object" && typeof data.toArray === "function") {
+      return data.toArray();
+    }
+
+    return [data];
+  };
+  var toArray = function toArray(data, option) {
+    if (typeof data === "undefined" || data === null || data === NaN) return [];
+    if (isArray$1(data)) return Array.prototype.slice.call(data);
+    if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
+    if (typeof option === "string") return data.split(option);
+    return [data];
+  };
   var cloneDeep$2 = _.cloneDeep;
 
   var get = function get(target, path) {
@@ -3801,11 +3800,11 @@
   };
 
   var EACH = function EACH(value, proc) {
-    return EACH_PROC(asArray$1(value), proc);
+    return EACH_PROC(asArray(value), proc);
   };
 
   var REDUCE = function REDUCE(value, proc, meta) {
-    value = asArray$1(value);
+    value = asArray(value);
     return EACH_PROC(value, function (v, i, l) {
       meta = proc(meta, v, i, l);
     }), meta;
@@ -3862,14 +3861,14 @@
   };
 
   var CONCAT_OF = FUNCTION_EXPORTS$1.CONCAT_OF = function (data, appends) {
-    var data = asArray$1(data);
+    var data = asArray(data);
     return EACH(appends, function (value) {
       data.push(value);
     }), data;
   };
 
   var FILTER_OF = FUNCTION_EXPORTS$1.FILTER_OF = function (data, func, exitFn) {
-    var data = asArray$1(data);
+    var data = asArray(data);
     var exitCnt = 0;
 
     for (var i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++) {
@@ -4099,7 +4098,7 @@
   var TOGGLE = FUNCTION_EXPORTS$1.TOGGLE = function (ta, cv, set) {
     var index = -1;
 
-    for (var d = asArray$1(ta), _l2 = d.length, _i2 = 0; _i2 < _l2; _i2++) {
+    for (var d = asArray(ta), _l2 = d.length, _i2 = 0; _i2 < _l2; _i2++) {
       if (d[_i2] == cv) {
         index = _i2 + 1;
         break;

@@ -1,25 +1,73 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.find-index", "lodash/cloneDeep", "./isLike"], factory);
+    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.regexp.split", "lodash/cloneDeep", "./isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.find-index"), require("lodash/cloneDeep"), require("./isLike"));
+    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.regexp.split"), require("lodash/cloneDeep"), require("./isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.cloneDeep, global.isLike);
+    factory(mod.exports, global.es6Array, global.es6Regexp, global.cloneDeep, global.isLike);
     global.transform = mod.exports;
   }
-})(this, function (_exports, _es6Array, _cloneDeep2, _isLike) {
+})(this, function (_exports, _es6Array, _es6Regexp, _cloneDeep2, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.cloneDeep = _exports.cleanObject = void 0;
+  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.cloneDeep = _exports.cleanObject = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
   _cloneDeep2 = _interopRequireDefault(_cloneDeep2);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+  var asArray = function asArray(data, defaultArray) {
+    if (defaultArray === void 0) {
+      defaultArray = undefined;
+    }
+
+    if ((0, _isLike.isArray)(data)) {
+      return data;
+    }
+
+    if ((0, _isLike.isNone)(data)) {
+      return (0, _isLike.isArray)(defaultArray) ? defaultArray : (0, _isLike.isNone)(defaultArray) ? [] : [defaultArray];
+    }
+
+    if (typeof data === "object" && typeof data.toArray === "function") {
+      return data.toArray();
+    }
+
+    return [data];
+  };
+
+  _exports.asArray = asArray;
+
+  var toArray = function toArray(data, option) {
+    if (typeof data === "undefined" || data === null || data === NaN) return [];
+    if ((0, _isLike.isArray)(data)) return Array.prototype.slice.call(data);
+    if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
+    if (typeof data === "string", typeof option === "string") return data.split(option);
+    return [data];
+  };
+
+  _exports.toArray = toArray;
+
+  var asObject = function asObject(data, defaultKey) {
+    if (defaultKey === void 0) {
+      defaultKey = "value";
+    }
+
+    if ((0, _isLike.isPlainObject)(data)) {
+      return data;
+    } else {
+      var _ref;
+
+      return _ref = {}, _ref[defaultKey] = data, _ref;
+    }
+  };
+
+  _exports.asObject = asObject;
 
   var cleanObject = function cleanObject(data) {
     if (data instanceof Array) {

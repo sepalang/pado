@@ -4,7 +4,7 @@ import {
 
 import {
   asArray
-} from './asTo'
+} from './transform'
 
 export const get = function(target,path){
   if(typeof target === "object"){

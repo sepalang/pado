@@ -14,10 +14,7 @@ import {
 
 import {
   toArray,
-  asArray
-} from './asTo'
-
-import {
+  asArray,
   instance
 } from './transform'
 

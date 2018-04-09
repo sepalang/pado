@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./isLike", "./asTo"], factory);
+    define(["exports", "./isLike", "./transform"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./isLike"), require("./asTo"));
+    factory(exports, require("./isLike"), require("./transform"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.isLike, global.asTo);
+    factory(mod.exports, global.isLike, global.transform);
     global.reducer = mod.exports;
   }
-})(this, function (_exports, _isLike, _asTo) {
+})(this, function (_exports, _isLike, _transform) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -54,7 +54,7 @@
 
   var max = function max(numberList) {
     var result;
-    (0, _asTo.asArray)(numberList).forEach(function (n) {
+    (0, _transform.asArray)(numberList).forEach(function (n) {
       if ((0, _isLike.isNumber)(n)) {
         if (typeof result !== "number") {
           result = n;
