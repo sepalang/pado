@@ -1,19 +1,19 @@
 {
   "name": "pado",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Yet another functional programming helper",
-  "main": "dist/pado.js",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/sepalang/pado"
   },
   "scripts": {
-    "start": "babel-node test/src-test.js",
-    "clear:dist": "rimraf dist && mkdirp dist",
-    "build:default": "padoc src dist -m umd",
-    "build:pack": "padoc --pack src/pado.js dist/pado.js -m umd",
+    "start": "babel-node .src/test/src-test.js",
+    "clear:dist": "rimraf ./*.js ./*.js.map ./functions ./modules",
+    "build:default": "padoc .src/src ./ -m umd",
+    "build:pack": "padoc --pack .src/src/pado.js ./pado.js -m umd",
     "build": "npm run clear:dist && npm run build:default && npm run build:pack",
-    "s:web": "cd sample/web && npm start",
+    "s:web": "cd .src/sample/web && npm start",
     "test": "jest ''"
   },
   "author": "AHN HO JUNG",

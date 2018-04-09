@@ -4183,8 +4183,6 @@
 
   var hide$2 = require('./_hide');
 
-  var has$2 = require('./_has');
-
   var Iterators = require('./_iterators');
 
   var $iterCreate = require('./_iter-create');
@@ -4233,7 +4231,7 @@
     var VALUES_BUG = false;
     var proto = Base.prototype;
     var $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT];
-    var $default = !BUGGY && $native || getMethod(DEFAULT);
+    var $default = $native || getMethod(DEFAULT);
     var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
     var $anyNative = NAME == 'Array' ? proto.entries || $native : $native;
     var methods, key, IteratorPrototype; // Fix native
@@ -4245,7 +4243,7 @@
         // Set @@toStringTag to native iterators
         setToStringTag$1(IteratorPrototype, TAG, true); // fix for some old engines
 
-        if (!LIBRARY && !has$2(IteratorPrototype, ITERATOR)) hide$2(IteratorPrototype, ITERATOR, returnThis);
+        if (!LIBRARY && typeof IteratorPrototype[ITERATOR] != 'function') hide$2(IteratorPrototype, ITERATOR, returnThis);
       }
     } // fix Array#{values, @@iterator}.name in V8 / FF
 
@@ -4601,7 +4599,7 @@
 
   var _core = createCommonjsModule(function (module) {
   var core = module.exports = {
-    version: '2.5.3'
+    version: '2.5.5'
   };
   if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
   });
@@ -5079,7 +5077,7 @@
         var resolve = reaction.resolve;
         var reject = reaction.reject;
         var domain = reaction.domain;
-        var result, then;
+        var result, then, exited;
 
         try {
           if (handler) {
@@ -5090,8 +5088,12 @@
 
             if (handler === true) result = value;else {
               if (domain) domain.enter();
-              result = handler(value);
-              if (domain) domain.exit();
+              result = handler(value); // may throw
+
+              if (domain) {
+                domain.exit();
+                exited = true;
+              }
             }
 
             if (result === reaction.promise) {
@@ -5101,6 +5103,7 @@
             } else resolve(result);
           } else reject(value);
         } catch (e) {
+          if (domain && !exited) domain.exit();
           reject(e);
         }
       };
