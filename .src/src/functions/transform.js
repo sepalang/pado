@@ -1,6 +1,7 @@
 import {
   isArray,
   isNone,
+  isAbsoluteNaN,
   isPlainObject,
   isObject
 } from './isLike'
@@ -34,6 +35,12 @@ export const asObject = function(data, defaultKey = "value") {
     return { [defaultKey]:data }
   }
 };
+
+export const toNumber = function(v,d){
+  switch(typeof v){ case "number":return v;case "string":var r=v.replace(/[^.\d\-]/g,"")*1;return isAbsoluteNaN(r)?0:r;break; }
+  switch(typeof d){ case "number":return d;case "string":var r=d*1;return isAbsoluteNaN(r)?0:r;break; }
+  return 0;
+}
 
 export const cleanObject = function(data){
   if(data instanceof Array){

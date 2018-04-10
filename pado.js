@@ -976,6 +976,29 @@
       return _ref = {}, _ref[defaultKey] = data, _ref;
     }
   };
+  var toNumber = function toNumber(v, d) {
+    switch (typeof v) {
+      case "number":
+        return v;
+
+      case "string":
+        var r = v.replace(/[^.\d\-]/g, "") * 1;
+        return isAbsoluteNaN(r) ? 0 : r;
+        break;
+    }
+
+    switch (typeof d) {
+      case "number":
+        return d;
+
+      case "string":
+        var r = d * 1;
+        return isAbsoluteNaN(r) ? 0 : r;
+        break;
+    }
+
+    return 0;
+  };
   var cleanObject = function cleanObject(data) {
     if (data instanceof Array) {
       Array.prototype.splice.call(data, 0, data.length);
@@ -1868,6 +1891,104 @@
     return Math.floor(Math.abs(Math.sin(Number((seed + "").replace(/./g, function (s, i) {
       return s.charCodeAt(0);
     }))) * 16777215) % 16777215).toString(digits || 16);
+  };
+
+  var dateExp = function dateExp(dv, format, pad) {
+    if (isArray$1(dv)) dv = dv.join(' ');
+    var dt = /(\d\d\d\d|)[^\d]?(\d\d|\d|).?(\d\d|\d|)[^\d]?(\d\d|\d|)[^\d]?(\d\d|\d|)[^\d]?(\d\d|\d|)/.exec(dv);
+    dt[1] = dt[1] || new Date().getYear() + 1900 + '';
+    dt[2] = dt[2] || new Date().getMonth() + 1;
+    dt[3] = dt[3] || new Date().getDate();
+    dt[4] = dt[4] || "00";
+    dt[5] = dt[5] || "00";
+    dt[6] = dt[6] || "00";
+    var r = [dt[1], dt[2], dt[3], dt[4], dt[5], dt[6], dt[0]];
+    r.year = dt[1], r.month = dt[2], r.date = dt[3], r.hour = dt[4], r.minute = dt[5], r.second = dt[6], r.init = dt[7];
+
+    r.format = function (s) {
+      return s.replace('YYYY', r.year).replace(/(MM|M)/, r.month).replace(/(DD|D)/, r.date).replace(/(hh|h)/, r.hour).replace(/(mm|m)/, r.minute).replace(/(ss|s)/, r.second).replace(/(A)/, toNumber(r.hour) > 12 ? 'PM' : 'AM');
+    };
+
+    if (typeof format === 'string') return r.format(format);
+    return r;
+  };
+  var timestampExp = function timestampExp(exp) {
+    if (arguments.length === 0) {
+      return +new Date();
+    }
+
+    if (typeof exp === "string") {
+      exp = dateExp(exp);
+    }
+
+    if (typeof exp === "number") {
+      return exp;
+    }
+
+    if (isArray$1(exp) && exp.length == 7) {
+      exp = new Date(exp[0], exp[1], exp[2], exp[3], exp[4], exp[5]);
+    }
+
+    if (exp instanceof Date) {
+      return +exp;
+    }
+
+    return 0;
+  };
+  var timescaleExp = function timescaleExp(exp) {
+    var scale = 0;
+
+    if (typeof exp === "number") {
+      return exp;
+    }
+
+    if (typeof exp === "string") {
+      // 
+      exp = exp.replace(/\d+(Y|year)/, function (t) {
+        t.replace(/\d+/, function (d) {
+          scale += d * 31536000000;
+        });
+        return "";
+      });
+      exp = exp.replace(/\d+(M|month)/, function (t) {
+        t.replace(/\d+/, function (d) {
+          scale += d * 2678400000;
+        });
+        return "";
+      });
+      exp = exp.replace(/\d+(D|day)/, function (t) {
+        t.replace(/\d+/, function (d) {
+          scale += d * 86400000;
+        });
+        return "";
+      });
+      exp = exp.replace(/\d+(h|hour)/, function (t) {
+        t.replace(/\d+/, function (d) {
+          scale += d * 3600000;
+        });
+        return "";
+      });
+      exp = exp.replace(/\d+(ms|millisecond)/, function (t) {
+        t.replace(/\d+/, function (d) {
+          scale += d * 1;
+        });
+        return "";
+      });
+      exp = exp.replace(/\d+(m|minute)/, function (t) {
+        t.replace(/\d+/, function (d) {
+          scale += d * 60000;
+        });
+        return "";
+      });
+      exp = exp.replace(/\d+(s|second)/, function (t) {
+        t.replace(/\d+/, function (d) {
+          scale += d * 1000;
+        });
+        return "";
+      });
+    }
+
+    return scale;
   };
 
   //Scale foundation
@@ -7083,6 +7204,7 @@
     asArray: asArray$1,
     toArray: toArray,
     asObject: asObject,
+    toNumber: toNumber,
     cleanObject: cleanObject,
     clone: clone,
     cloneDeep: cloneDeep,
@@ -7098,6 +7220,9 @@
     max: max,
     rand64: rand64,
     tokenize: tokenize,
+    dateExp: dateExp,
+    timestampExp: timestampExp,
+    timescaleExp: timescaleExp,
     isEditable: _isEditable,
     enterEditable: enterEditable,
     exitEditable: exitEditable,

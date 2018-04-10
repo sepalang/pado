@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.regexp.split", "./isLike"], factory);
+    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.regexp.split"), require("./isLike"));
+    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Regexp, global.isLike);
+    factory(mod.exports, global.es6Array, global.es6Regexp, global.es6Regexp, global.isLike);
     global.transform = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Regexp, _isLike) {
+})(this, function (_exports, _es6Array, _es6Regexp, _es6Regexp2, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
+  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
 
   var asArray = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
@@ -65,6 +65,32 @@
   };
 
   _exports.asObject = asObject;
+
+  var toNumber = function toNumber(v, d) {
+    switch (typeof v) {
+      case "number":
+        return v;
+
+      case "string":
+        var r = v.replace(/[^.\d\-]/g, "") * 1;
+        return (0, _isLike.isAbsoluteNaN)(r) ? 0 : r;
+        break;
+    }
+
+    switch (typeof d) {
+      case "number":
+        return d;
+
+      case "string":
+        var r = d * 1;
+        return (0, _isLike.isAbsoluteNaN)(r) ? 0 : r;
+        break;
+    }
+
+    return 0;
+  };
+
+  _exports.toNumber = toNumber;
 
   var cleanObject = function cleanObject(data) {
     if (data instanceof Array) {
