@@ -1,5 +1,3 @@
-import _isPlainObject from "lodash/isPlainObject"
-
 export const isAbsoluteNaN = function(number){
   return number!==number && typeof number === "number"
 }
@@ -92,7 +90,29 @@ export const isEmpty = function(){
 
 export const likeRegexp = (s)=> (typeof s === "string") || (s instanceof RegExp)
 
-export const isPlainObject = data => _isPlainObject(data)
+export const isPlainObject = data => {
+  if(typeof data !== "object"){
+    return false;
+  }
+  
+  if(isArray(data)){
+    return false;
+  }
+  
+  if(Object.prototype.toString.call(data) === '[object Object]'){
+    return true;
+  }
+  
+  if(typeof o.constructor === "function"){
+    return false;
+  }
+  
+  if(data.prototype.hasOwnProperty('isPrototypeOf') === false) {
+    return false;
+  }
+  
+  return true;
+}
 
 export const isExsist = function(value){
   if(value === true){

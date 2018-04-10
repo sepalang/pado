@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["./isLike", "./reducer", "./enumerator"], factory);
+    define(["./transform", "./isLike", "./reducer", "./enumerator"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("./isLike"), require("./reducer"), require("./enumerator"));
+    factory(require("./transform"), require("./isLike"), require("./reducer"), require("./enumerator"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(global.isLike, global.reducer, global.enumerator);
+    factory(global.transform, global.isLike, global.reducer, global.enumerator);
     global.matrix = mod.exports;
   }
-})(this, function (_isLike, _reducer, _enumerator) {
+})(this, function (_transform, _isLike, _reducer, _enumerator) {
   "use strict";
 
   var range = function range(value, step, sizeBase) {
@@ -72,7 +72,7 @@
   };
 
   var domainRangeValue = function domainRangeValue(domain, range, vs, nice) {
-    return forMap(cloneDeep(vs), function (v, sel) {
+    return forMap((0, _transform.cloneDeep)(vs), function (v, sel) {
       var $range = sel ? range[sel] : range;
       var $domain = sel ? domain[sel] : domain;
 

@@ -1,33 +1,30 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "../functions", "lodash/get", "lodash/isEqual", "lodash/cloneDeep", "lodash/isPlainObject"], factory);
+    define(["exports", "../functions", "lodash/isEqual"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("../functions"), require("lodash/get"), require("lodash/isEqual"), require("lodash/cloneDeep"), require("lodash/isPlainObject"));
+    factory(exports, require("../functions"), require("lodash/isEqual"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.functions, global.get, global.isEqual, global.cloneDeep, global.isPlainObject);
+    factory(mod.exports, global.functions, global.isEqual);
     global.editable = mod.exports;
   }
-})(this, function (_exports, _functions, _get2, _isEqual2, _cloneDeep2, _isPlainObject2) {
+})(this, function (_exports, _functions, _isEqual2) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
   _exports.editable = _exports.expandEditable = _exports.beginEditable = _exports.changedEditable = _exports.commitEditable = _exports.cancleEditable = _exports.exitEditable = _exports.enterEditable = _exports.isEditable = void 0;
-  _get2 = _interopRequireDefault(_get2);
   _isEqual2 = _interopRequireDefault(_isEqual2);
-  _cloneDeep2 = _interopRequireDefault(_cloneDeep2);
-  _isPlainObject2 = _interopRequireDefault(_isPlainObject2);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
   var EDITABLE_DEFAULT_KEY = "$editable";
 
   var isEditPossibleDataType = function isEditPossibleDataType(model) {
-    return (0, _isPlainObject2.default)(model);
+    return (0, _functions.isPlainObject)(model);
   };
 
   var isEditableState = function isEditableState(model) {
@@ -40,7 +37,7 @@
   };
 
   var putEditModel = function putEditModel(destModel, setModel) {
-    var putModel = (0, _cloneDeep2.default)(setModel);
+    var putModel = (0, _functions.cloneDeep)(setModel);
     Object.keys(destModel).forEach(function (key) {
       if (key !== EDITABLE_DEFAULT_KEY) {
         destModel[key] = undefined;
@@ -61,7 +58,7 @@
         currentModelValues[key] = model[key];
       }
     });
-    return (0, _cloneDeep2.default)(currentModelValues);
+    return (0, _functions.cloneDeep)(currentModelValues);
   };
 
   var pushEditModel = function pushEditModel(model, pushModel) {
@@ -83,11 +80,11 @@
   };
 
   var getOriginalModel = function getOriginalModel(model) {
-    return (0, _get2.default)(model, "[" + EDITABLE_DEFAULT_KEY + "][0]");
+    return (0, _functions.get)(model, "[" + EDITABLE_DEFAULT_KEY + "][0]");
   };
 
   var getLastModel = function getLastModel(model) {
-    var changeHistory = (0, _get2.default)(model, "[" + EDITABLE_DEFAULT_KEY + "]");
+    var changeHistory = (0, _functions.get)(model, "[" + EDITABLE_DEFAULT_KEY + "]");
     return changeHistory && changeHistory[changeHistory.length - 1];
   };
 

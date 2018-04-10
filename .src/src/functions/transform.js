@@ -1,5 +1,3 @@
-import _cloneDeep from 'lodash/cloneDeep'
-
 import {
   isArray,
   isNone,
@@ -46,7 +44,60 @@ export const cleanObject = function(data){
   return data
 }
 
-export const cloneDeep = _cloneDeep
+
+export const clone = function(target){
+  switch(typeof target){
+  case "undefined": case "function": case "boolean": case "number": case "string": return target; break;
+  case "object":
+    if(target === null) return target;
+    
+    if(isArray(target)){
+      let r=[];
+      for(let i=0,length=target.length;i<length;i++)r.push(target[i]);
+      return r;
+    }
+    
+    if(!isPlainObject(target)){
+      if(target instanceof Date){
+        let r=new Date();
+        r.setTime(target.getTime());
+        return r;
+      }
+      return target;
+    }
+    
+    let r={};
+    Object.keys(target).forEach(k=>{
+      if(target.hasOwnProperty(k)) r[k]=target[k];
+    })
+    return r;
+    break;
+  default : 
+    console.error("clone::copy failed : target => ",target);
+    return target; 
+    break
+  }
+}
+
+export const cloneDeep = function(target){
+  var d;
+  if(typeof target === "object"){
+  	if(isArray(target)) {
+  		if(!isArray(d)) { d = [] };
+  		for (var i=0,l=target.length;i<l;i++) d.push( ((typeof target[i] === "object" && target[i] !== null ) ? clone(target[i]) : target[i]) )
+  		return d;
+  	} else {
+  		d = {}
+      Object.keys(target).forEach(p=>{
+        (typeof target[p] === "object" && target[p] !== null && d[p]) ? clone(target[p],d[p]) : d[p] = target[p];
+      })
+  		return d;
+  	}
+  } else {
+    clone(target);
+  }
+};
+  
 
 export const free = function(datum){
   const dest = {}

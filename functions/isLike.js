@@ -1,25 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "lodash/isPlainObject"], factory);
+    define(["exports"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("lodash/isPlainObject"));
+    factory(exports);
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.isPlainObject);
+    factory(mod.exports);
     global.isLike = mod.exports;
   }
-})(this, function (_exports, _isPlainObject2) {
+})(this, function (_exports) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
   _exports.notExsist = _exports.isExsist = _exports.isPlainObject = _exports.likeRegexp = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
-  _isPlainObject2 = _interopRequireDefault(_isPlainObject2);
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
   var isAbsoluteNaN = function isAbsoluteNaN(number) {
     return number !== number && typeof number === "number";
@@ -152,7 +149,27 @@
   _exports.likeRegexp = likeRegexp;
 
   var isPlainObject = function isPlainObject(data) {
-    return (0, _isPlainObject2.default)(data);
+    if (typeof data !== "object") {
+      return false;
+    }
+
+    if (isArray(data)) {
+      return false;
+    }
+
+    if (Object.prototype.toString.call(data) === '[object Object]') {
+      return true;
+    }
+
+    if (typeof o.constructor === "function") {
+      return false;
+    }
+
+    if (data.prototype.hasOwnProperty('isPrototypeOf') === false) {
+      return false;
+    }
+
+    return true;
   };
 
   _exports.isPlainObject = isPlainObject;

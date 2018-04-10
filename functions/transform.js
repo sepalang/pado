@@ -1,25 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.regexp.split", "lodash/cloneDeep", "./isLike"], factory);
+    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.regexp.split", "./isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.regexp.split"), require("lodash/cloneDeep"), require("./isLike"));
+    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.regexp.split"), require("./isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Regexp, global.cloneDeep, global.isLike);
+    factory(mod.exports, global.es6Array, global.es6Regexp, global.isLike);
     global.transform = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Regexp, _cloneDeep2, _isLike) {
+})(this, function (_exports, _es6Array, _es6Regexp, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.cloneDeep = _exports.cleanObject = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
-  _cloneDeep2 = _interopRequireDefault(_cloneDeep2);
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
 
   var asArray = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
@@ -82,14 +79,93 @@
   };
 
   _exports.cleanObject = cleanObject;
-  var cloneDeep = _cloneDeep2.default;
+
+  var clone = function clone(target) {
+    switch (typeof target) {
+      case "undefined":
+      case "function":
+      case "boolean":
+      case "number":
+      case "string":
+        return target;
+        break;
+
+      case "object":
+        if (target === null) return target;
+
+        if ((0, _isLike.isArray)(target)) {
+          var _r = [];
+
+          for (var i = 0, length = target.length; i < length; i++) {
+            _r.push(target[i]);
+          }
+
+          return _r;
+        }
+
+        if (!(0, _isLike.isPlainObject)(target)) {
+          if (target instanceof Date) {
+            var _r2 = new Date();
+
+            _r2.setTime(target.getTime());
+
+            return _r2;
+          }
+
+          return target;
+        }
+
+        var r = {};
+        Object.keys(target).forEach(function (k) {
+          if (target.hasOwnProperty(k)) r[k] = target[k];
+        });
+        return r;
+        break;
+
+      default:
+        console.error("clone::copy failed : target => ", target);
+        return target;
+        break;
+    }
+  };
+
+  _exports.clone = clone;
+
+  var cloneDeep = function cloneDeep(target) {
+    var d;
+
+    if (typeof target === "object") {
+      if ((0, _isLike.isArray)(target)) {
+        if (!(0, _isLike.isArray)(d)) {
+          d = [];
+        }
+
+        ;
+
+        for (var i = 0, l = target.length; i < l; i++) {
+          d.push(typeof target[i] === "object" && target[i] !== null ? clone(target[i]) : target[i]);
+        }
+
+        return d;
+      } else {
+        d = {};
+        Object.keys(target).forEach(function (p) {
+          typeof target[p] === "object" && target[p] !== null && d[p] ? clone(target[p], d[p]) : d[p] = target[p];
+        });
+        return d;
+      }
+    } else {
+      clone(target);
+    }
+  };
+
   _exports.cloneDeep = cloneDeep;
 
   var free = function free(datum) {
     var dest = {};
     Object.keys(datum).forEach(function (key) {
       if (!/^\$/.test(key)) {
-        dest[key] = (0, _cloneDeep2.default)(datum[key]);
+        dest[key] = _cloneDeep(datum[key]);
       }
     });
     return dest;
