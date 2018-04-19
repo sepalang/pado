@@ -10,8 +10,6 @@ const op = operate({
   }
 });
 
-console.log("op",op);
-
 op.push(1);
 op.push(2);
 op.push(3);

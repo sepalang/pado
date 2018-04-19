@@ -5,12 +5,13 @@ const PromiseClass = Promise;
 const isMaybePromise = (target)=>(typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function");
 const resolveFn = PromiseClass.resolve;
 const rejectFn = PromiseClass.reject;
-const PromiseFunction = (function(PromiseClass){
+
+const PromiseFunction = function(fn) { 
   return new PromiseClass((r,c)=>{
     const maybeAwaiter = fn(r,c);
     isMaybePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
   });
-}(Promise));
+};
 
 const PromiseExports = {};
 
