@@ -13,7 +13,7 @@
     "build:default": "padoc .src/src ./ -m umd",
     "build:pack": "padoc --pack .src/src/pado.js ./pado.js -m umd",
     "build": "npm run clear:dist && npm run build:default && npm run build:pack",
-    "t": "padoc --exec .src/src/functions",
+    "t": "padoc --exec .src/sample/use/operate.use.js",
     "test": "jest ''"
   },
   "author": "AHN HO JUNG",
