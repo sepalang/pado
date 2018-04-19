@@ -1,5 +1,7 @@
 import { asArray } from '../functions'
 
+const PromiseClass = Promise;
+
 const isMaybePromise = (target)=>(typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function");
 const resolveFn = PromiseClass.resolve;
 const rejectFn = PromiseClass.reject;
