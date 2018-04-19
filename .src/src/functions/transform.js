@@ -174,7 +174,7 @@ const syncData = (function(){
   const UPDATE_HOOK = (oldDatum, newDatum)=>_.assign({}, oldDatum, newDatum);
   
   return function(oldData, newData, getId, options) {
-    if(!/string|function/.test(typeof getId)) throw new Error("refreshData need getId");
+    if(!/string|function/.test(typeof getId)) throw new Error("syncData need getId");
   
     if(typeof getId === "string") {
       const getIdString = getId;
