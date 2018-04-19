@@ -5,19 +5,18 @@ const PromiseClass = Promise;
 const isMaybePromise = (target)=>(typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function");
 const resolveFn = PromiseClass.resolve;
 const rejectFn = PromiseClass.reject;
-const PromiseFunction = (function(PromiseClass){
+
+const PromiseFunction = function(fn) { 
   return new PromiseClass((r,c)=>{
     const maybeAwaiter = fn(r,c);
     isMaybePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
   });
-}(Promise));
-
-const PromiseExports = {};
-
-PromiseExports.all     = Promise.all;
-PromiseExports.resolve = resolveFn;
-PromiseExports.reject  = rejectFn;
-PromiseExports.timeout = function(fn,time){
+};
+export const promise = PromiseFunction;
+export const all     = PromiseFunction.all = Promise.all;
+export const resolve = PromiseFunction.resolve = resolveFn;
+export const reject  = PromiseFunction.reject = rejectFn;
+export const timeout = PromiseFunction.timeout = function(fn,time){
   if(typeof fn === "number"){
     return q( resolve => setTimeout(() => resolve(time), fn) );
   } else {
@@ -25,7 +24,7 @@ PromiseExports.timeout = function(fn,time){
   }
 };
 
-PromiseExports.valueOf = function(maybeQ){
+export const valueOf = PromiseFunction.valueOf = function(maybeQ){
   return q(function(resolve,reject){
     isMaybePromise(maybeQ) ?
     maybeQ.then(resolve).catch(reject) :
@@ -42,7 +41,7 @@ const abortMessage = new (function() {
   });
 })();
 
-PromiseExports.abort = function(notifyConsole = undefined) {
+export const abort = PromiseFunction.abort = function(notifyConsole = undefined) {
   return new PromiseClass((resolve, reject)=>{
     if(notifyConsole === true) {
       console.warn("abort promise");
@@ -51,7 +50,7 @@ PromiseExports.abort = function(notifyConsole = undefined) {
   });
 };
 
-PromiseExports.defer = function(){
+export const defer = PromiseFunction.defer = function(){
   var resolve, reject;
   var promise = new PromiseClass(function() {
     resolve = arguments[0];
@@ -64,7 +63,7 @@ PromiseExports.defer = function(){
   };
 };
 
-PromiseExports.wheel = function(tasks, option) {
+export const wheel = PromiseFunction.wheel = function(tasks, option) {
 
   if(!(tasks instanceof Array)) {
     return q.reject(new Error("tasks must be array"));
@@ -158,9 +157,3 @@ PromiseExports.wheel = function(tasks, option) {
 
   return defer;
 }
-
-export const promise = PromiseFunction;
-export const resolve = PromiseFunction.resolve;
-export const reject  = PromiseFunction.reject;
-export const valueOf = PromiseFunction.valueOf;
-export const abort   = PromiseFunction.abort;

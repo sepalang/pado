@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.max = _exports.turn = _exports.get = void 0;
+  _exports.max = _exports.turn = _exports.hasValue = _exports.get = void 0;
 
   var get = function get(target, path) {
     if (typeof target === "object") {
@@ -38,6 +38,27 @@
   };
 
   _exports.get = get;
+
+  var hasValue = function hasValue(obj, value, key) {
+    if (arguments.length == 1 && _.isObject(obj)) return _.isEmpty(obj);
+    if (_.isArray(obj)) for (var i = 0, l = obj.length; i < l; i++) {
+      if (obj[i] === value) return true;
+    }
+
+    if (_.isObject(obj)) {
+      if (key) {
+        return _.get(obj, key) === value;
+      } else {
+        for (var key in obj) {
+          if (_.get(obj, key) === value) return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  _exports.hasValue = hasValue;
 
   var turn = function turn(i, p, ts) {
     if (i < 0) {

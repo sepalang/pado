@@ -1,7 +1,7 @@
 import {
   hasValue,
-  reduce,
-  select,
+  asArray,
+  get,
   cloneDeep,
   forMap,
   domainRangeValue
@@ -43,8 +43,8 @@ Block.prototype = {
     return this; 
   },
   clone:function(){ return new Block(this); },
-  setPosition:function(value,sel){ var $posSize = select(this.$posSize,sel); if($posSize instanceof Array) $posSize[0] = value; return this;},
-  setSize:function(value,sel){ var $posSize = select(this.$posSize,sel); if($posSize instanceof Array) $posSize[1] = value; return this; },
+  setPosition:function(value,sel){ var $posSize = get(this.$posSize,sel); if($posSize instanceof Array) $posSize[0] = value; return this;},
+  setSize:function(value,sel){ var $posSize = get(this.$posSize,sel); if($posSize instanceof Array) $posSize[1] = value; return this; },
   get:function(){ return _cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize); },
   domainValue:function(){ return forMap(_cloneDeep(this.get()),function(posSize){return posSize[0];}); },
   domainSize :function(){ return forMap(_cloneDeep(this.get()),function(posSize){return posSize[1];}); },
@@ -58,8 +58,8 @@ Block.prototype = {
     });
   },
   conflicts:function(otherBlocks,selector){
-    return reduce(otherBlocks,function(red,block){
-      var selectOtherBlock = select(block,selector);
+    return asArray(otherBlocks).reduce(function(red,block){
+      var selectOtherBlock = get(block,selector);
                   
       if(selectOtherBlock instanceof Block){
         //다른 블럭이 현재 블럭과 같거나 space가 다를때는 평가하지 않음
@@ -69,7 +69,7 @@ Block.prototype = {
         var inspectResult = [];
                       
         forMap(this.get(),function(thisPos,key){
-          var otherPos = select(selectOtherBlock.get(),key);
+          var otherPos = get(selectOtherBlock.get(),key);
           if(otherPos[0] < thisPos[0] && (otherPos[0] + otherPos[1]) <= thisPos[0]) return inspectResult.push(false);
           if(otherPos[0] > thisPos[0] && (thisPos[0]  + thisPos[1])  <= otherPos[0]) return inspectResult.push(false);
           return inspectResult.push(true);
@@ -88,9 +88,9 @@ Block.prototype = {
     var spaceDomain   = this.$space.getDomain();
     var overflowDomain = (mask && _cloneDeep(mask)) || (this.$space && this.$space.getDomain()) || [];
     return forMap(overflowDomain,function($overflowSelected,sel){
-      var $posSize = select(blockPosSize,sel);
-      var $domain  = select(spaceDomain,sel);
-      return ( $posSize[0] < select($overflowSelected[0],$domain[0]) || ($posSize[0] + $posSize[1]) > select($overflowSelected[1],$domain[1]) );
+      var $posSize = get(blockPosSize,sel);
+      var $domain  = get(spaceDomain,sel);
+      return ( $posSize[0] < get($overflowSelected[0],$domain[0]) || ($posSize[0] + $posSize[1]) > get($overflowSelected[1],$domain[1]) );
     });
   },
   isOverflow:function(mask){
@@ -123,7 +123,7 @@ Block.prototype = {
       map.rangeSize  = map.size,
       map.rangeEnd   = map.end;
                   
-      var $domainMap  = select(domainMap,key);
+      var $domainMap  = get(domainMap,key);
       map.domainStart = $domainMap.start,
       map.domainSize  = $domainMap.size,
       map.domainEnd   = $domainMap.end;
@@ -167,7 +167,7 @@ Tracker.prototype = {
   },
   domainBlock:function(cursor,callback){
     var domainGrid = forMap(this.$space.getRange(),function(range){ return range[2]; });
-    var block      = this.block(forMap(this.$space.rangeDomain(cursor),function(cursorPoint,key){ return [cursorPoint,select(domainGrid,key)]; }));
+    var block      = this.block(forMap(this.$space.rangeDomain(cursor),function(cursorPoint,key){ return [cursorPoint,get(domainGrid,key)]; }));
     var blockMap   = block.map();
               
     callback && callback.call(block,blockMap,block);

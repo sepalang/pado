@@ -1,17 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["./transform", "./isLike", "./reducer", "./enumerator"], factory);
+    define(["exports", "./transform", "./isLike", "./reducer", "./enumerator"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("./transform"), require("./isLike"), require("./reducer"), require("./enumerator"));
+    factory(exports, require("./transform"), require("./isLike"), require("./reducer"), require("./enumerator"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(global.transform, global.isLike, global.reducer, global.enumerator);
+    factory(mod.exports, global.transform, global.isLike, global.reducer, global.enumerator);
     global.matrix = mod.exports;
   }
-})(this, function (_transform, _isLike, _reducer, _enumerator) {
+})(this, function (_exports, _transform, _isLike, _reducer, _enumerator) {
   "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.matrixRange = _exports.domainRangeValue = _exports.range = void 0;
 
   var range = function range(value, step, sizeBase) {
     var r = [],
@@ -71,6 +76,8 @@
     return reverse ? r.reverse() : r;
   };
 
+  _exports.range = range;
+
   var domainRangeValue = function domainRangeValue(domain, range, vs, nice) {
     return forMap((0, _transform.cloneDeep)(vs), function (v, sel) {
       var $range = sel ? range[sel] : range;
@@ -89,6 +96,8 @@
   }; //matrixRange([1],[3]) // [[1], [2], [3]] 
   //matrixRange([1,1],[3,3]) // [[1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
 
+
+  _exports.domainRangeValue = domainRangeValue;
 
   var matrixRange = function matrixRange(start, end, step, sizeBase) {
     var scales = [];
@@ -113,4 +122,6 @@
     });
     return result;
   };
+
+  _exports.matrixRange = matrixRange;
 });

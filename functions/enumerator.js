@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.times = _exports.all = void 0;
+  _exports.forMap = _exports.times = _exports.all = void 0;
 
   var all = function all(data, fn) {
     data = (0, _transform.asArray)(data);
@@ -48,4 +48,13 @@
   };
 
   _exports.times = times;
+
+  var forMap = function forMap(object, fn) {
+    return Object.keys(object).reduce(function (dest, key) {
+      dest[key] = fn(object[key], key);
+      return dest;
+    }, object);
+  };
+
+  _exports.forMap = forMap;
 });

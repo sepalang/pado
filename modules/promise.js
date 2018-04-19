@@ -16,7 +16,8 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.abort = _exports.valueOf = _exports.reject = _exports.resolve = _exports.promise = void 0;
+  _exports.wheel = _exports.defer = _exports.abort = _exports.valueOf = _exports.timeout = _exports.reject = _exports.resolve = _exports.all = _exports.promise = void 0;
+  var PromiseClass = Promise;
 
   var isMaybePromise = function isMaybePromise(target) {
     return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";
@@ -25,19 +26,23 @@
   var resolveFn = PromiseClass.resolve;
   var rejectFn = PromiseClass.reject;
 
-  var PromiseFunction = function (PromiseClass) {
+  var PromiseFunction = function PromiseFunction(fn) {
     return new PromiseClass(function (r, c) {
       var maybeAwaiter = fn(r, c);
       isMaybePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
     });
-  }(Promise);
+  };
 
-  var PromiseExports = {};
-  PromiseExports.all = Promise.all;
-  PromiseExports.resolve = resolveFn;
-  PromiseExports.reject = rejectFn;
+  var promise = PromiseFunction;
+  _exports.promise = promise;
+  var all = PromiseFunction.all = Promise.all;
+  _exports.all = all;
+  var resolve = PromiseFunction.resolve = resolveFn;
+  _exports.resolve = resolve;
+  var reject = PromiseFunction.reject = rejectFn;
+  _exports.reject = reject;
 
-  PromiseExports.timeout = function (fn, time) {
+  var timeout = PromiseFunction.timeout = function (fn, time) {
     if (typeof fn === "number") {
       return q(function (resolve) {
         return setTimeout(function () {
@@ -53,12 +58,15 @@
     }
   };
 
-  PromiseExports.valueOf = function (maybeQ) {
+  _exports.timeout = timeout;
+
+  var valueOf = PromiseFunction.valueOf = function (maybeQ) {
     return q(function (resolve, reject) {
       isMaybePromise(maybeQ) ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
     });
   };
 
+  _exports.valueOf = valueOf;
   var abortMessage = new function () {
     Object.defineProperty(this, "message", {
       get: function get() {
@@ -72,7 +80,7 @@
     });
   }();
 
-  PromiseExports.abort = function (notifyConsole) {
+  var abort = PromiseFunction.abort = function (notifyConsole) {
     if (notifyConsole === void 0) {
       notifyConsole = undefined;
     }
@@ -86,7 +94,9 @@
     });
   };
 
-  PromiseExports.defer = function () {
+  _exports.abort = abort;
+
+  var defer = PromiseFunction.defer = function () {
     var resolve, reject;
     var promise = new PromiseClass(function () {
       resolve = arguments[0];
@@ -99,7 +109,9 @@
     };
   };
 
-  PromiseExports.wheel = function (tasks, option) {
+  _exports.defer = defer;
+
+  var wheel = PromiseFunction.wheel = function (tasks, option) {
     if (!(tasks instanceof Array)) {
       return q.reject(new Error("tasks must be array"));
     }
@@ -194,14 +206,5 @@
     return defer;
   };
 
-  var promise = PromiseFunction;
-  _exports.promise = promise;
-  var resolve = PromiseFunction.resolve;
-  _exports.resolve = resolve;
-  var reject = PromiseFunction.reject;
-  _exports.reject = reject;
-  var valueOf = PromiseFunction.valueOf;
-  _exports.valueOf = valueOf;
-  var abort = PromiseFunction.abort;
-  _exports.abort = abort;
+  _exports.wheel = wheel;
 });

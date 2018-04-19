@@ -16,8 +16,18 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
+  var _exportNames = {
+    promise: true
+  };
+  Object.defineProperty(_exports, "promise", {
+    enumerable: true,
+    get: function get() {
+      return _promise.promise;
+    }
+  });
   Object.keys(_block).forEach(function (key) {
     if (key === "default" || key === "__esModule") return;
+    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
     Object.defineProperty(_exports, key, {
       enumerable: true,
       get: function get() {
@@ -27,6 +37,7 @@
   });
   Object.keys(_editable).forEach(function (key) {
     if (key === "default" || key === "__esModule") return;
+    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
     Object.defineProperty(_exports, key, {
       enumerable: true,
       get: function get() {
@@ -36,6 +47,7 @@
   });
   Object.keys(_makeup).forEach(function (key) {
     if (key === "default" || key === "__esModule") return;
+    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
     Object.defineProperty(_exports, key, {
       enumerable: true,
       get: function get() {
@@ -45,6 +57,7 @@
   });
   Object.keys(_paginate).forEach(function (key) {
     if (key === "default" || key === "__esModule") return;
+    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
     Object.defineProperty(_exports, key, {
       enumerable: true,
       get: function get() {
@@ -52,17 +65,9 @@
       }
     });
   });
-  Object.keys(_promise).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(_exports, key, {
-      enumerable: true,
-      get: function get() {
-        return _promise[key];
-      }
-    });
-  });
   Object.keys(_timeline).forEach(function (key) {
     if (key === "default" || key === "__esModule") return;
+    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
     Object.defineProperty(_exports, key, {
       enumerable: true,
       get: function get() {
