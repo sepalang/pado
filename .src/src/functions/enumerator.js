@@ -22,4 +22,11 @@ export const times = function(length,fn){
     result.push(fn(i));
   }
   return result;
-}
+};
+
+export const forMap = function(object,fn){
+  return Object.keys(object).reduce((dest,key)=>{
+    dest[key]=fn(object[key],key);
+    return dest;
+  },object);
+};

@@ -3,7 +3,7 @@ import { isAbsoluteNaN } from './isLike'
 import { max, turn } from './reducer';
 import { times } from './enumerator';
 
-const range = function(value,step,sizeBase){
+export const range = function(value,step,sizeBase){
   var r=[],start,end,reverse;
   
   if(typeof value === "number"){
@@ -43,7 +43,7 @@ const range = function(value,step,sizeBase){
   return reverse ? r.reverse() : r;
 }
 
-const domainRangeValue = function(domain,range,vs,nice){
+export const domainRangeValue = function(domain,range,vs,nice){
   return forMap(cloneDeep(vs),function(v,sel){
     var $range  = sel ? range[sel]  : range;
     var $domain = sel ? domain[sel] : domain;
@@ -61,7 +61,7 @@ const domainRangeValue = function(domain,range,vs,nice){
 //matrixRange([1],[3]) // [[1], [2], [3]] 
 //matrixRange([1,1],[3,3]) // [[1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
 
-const matrixRange = function(start,end,step,sizeBase){
+export const matrixRange = function(start,end,step,sizeBase){
   var scales=[];
   var maxLength = max([start.length,end.length]);
     

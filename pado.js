@@ -1109,7 +1109,7 @@
     return undefined;
   };
 
-  var removeValue$1 = function removeValue(obj, value) {
+  var removeValue = function removeValue(obj, value) {
     var detect = true;
     var array = isArray$1(obj);
 
@@ -1185,6 +1185,24 @@
     }
 
     return target;
+  };
+  var hasValue = function hasValue(obj, value, key) {
+    if (arguments.length == 1 && _.isObject(obj)) return _.isEmpty(obj);
+    if (_.isArray(obj)) for (var i = 0, l = obj.length; i < l; i++) {
+      if (obj[i] === value) return true;
+    }
+
+    if (_.isObject(obj)) {
+      if (key) {
+        return _.get(obj, key) === value;
+      } else {
+        for (var key in obj) {
+          if (_.get(obj, key) === value) return true;
+        }
+      }
+    }
+
+    return false;
   };
   var turn$1 = function turn(i, p, ts) {
     if (i < 0) {
@@ -1808,6 +1826,12 @@
 
     return result;
   };
+  var forMap$1 = function forMap(object, fn) {
+    return Object.keys(object).reduce(function (dest, key) {
+      dest[key] = fn(object[key], key);
+      return dest;
+    }, object);
+  };
 
   var accurateTimeout = function (originalTimeout) {
     return function (trigger, time, resolutionRatio, coverage) {
@@ -1891,6 +1915,103 @@
     return Math.floor(Math.abs(Math.sin(Number((seed + "").replace(/./g, function (s, i) {
       return s.charCodeAt(0);
     }))) * 16777215) % 16777215).toString(digits || 16);
+  };
+
+  var range = function range(value, step, sizeBase) {
+    var r = [],
+        start,
+        end,
+        reverse;
+
+    if (typeof value === "number") {
+      end = value;
+      start = 0;
+    } else if (typeof value === "object") {
+      start = value[0];
+      end = value[1];
+
+      if (!step && typeof value[2] === "number") {
+        step = value[2];
+      }
+
+      if (typeof sizeBase !== "boolean") {
+        sizeBase = false;
+      }
+    }
+
+    if (typeof start !== "number" || typeof end !== "number") {
+      if (typeof start !== "number" && typeof end !== "number") return r;
+      if (typeof start === "number") return r.push(start), r;
+      if (typeof end === "number") return r.push(end), r;
+    }
+
+    if (start > end) {
+      reverse = end;
+      end = start;
+      start = reverse;
+      reverse = true;
+    }
+
+    end = parseFloat(end), end = isAbsoluteNaN(end) ? 0 : end;
+    start = parseFloat(start), start = isAbsoluteNaN(start) ? 0 : start;
+    step = parseFloat(step), step = isAbsoluteNaN(step) || step == 0 ? 1 : step;
+
+    if (step <= 0) {
+      return console.warn("range::not support minus step"), r;
+    }
+
+    if (sizeBase == false) {
+      for (var i = start, l = end; i <= l; i = i + step) {
+        r.push(i);
+      }
+    } else {
+      for (var i = start, l = end; i < l; i = i + step) {
+        r.push(i);
+      }
+    }
+
+    return reverse ? r.reverse() : r;
+  };
+  var domainRangeValue = function domainRangeValue(domain, range, vs, nice) {
+    return forMap(cloneDeep(vs), function (v, sel) {
+      var $range = sel ? range[sel] : range;
+      var $domain = sel ? domain[sel] : domain;
+
+      if (!$range || !$domain) {
+        return v;
+      }
+
+      var dSize = $domain[1] - $domain[0];
+      var sSize = $range[1] - $range[0];
+      var dRate = (v - $domain[0]) / dSize;
+      var calc = $range[0] + sSize * dRate;
+      return nice ? Math.floor(calc) : calc;
+    });
+  }; //matrixRange([1],[3]) // [[1], [2], [3]] 
+  //matrixRange([1,1],[3,3]) // [[1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
+
+  var matrixRange = function matrixRange(start, end, step, sizeBase) {
+    var scales = [];
+    var maxLength = max([start.length, end.length]);
+    var selectLengthes = times(maxLength, function (scaleIndex) {
+      var range = range([start[scaleIndex], end[scaleIndex]], step, sizeBase);
+      scales.push(range);
+      return range.length;
+    });
+    var result = times(reduce(selectLengthes, function (redu, value) {
+      return redu * value;
+    }, 1), function () {
+      return new Array(maxLength);
+    });
+    var turnSize = 1;
+    each(scales, function (scaleCase, scaleIndex) {
+      var scaleCaseLength = scaleCase.length;
+      times(result.length, function (time) {
+        result[time][scaleIndex] = scaleCase[turn$1(time, scaleCaseLength, turnSize)];
+      });
+      turnSize = turnSize * scaleCaseLength;
+    });
+    return result;
   };
 
   var dateExp = function dateExp(dv, format, pad) {
@@ -1991,315 +2112,301 @@
     return scale;
   };
 
-  //Scale foundation
   //정의역과 치역을 계산하여 결과값을 리턴함, 속성별로 정의하여 다중 차원 지원
-  (function (FN, REMOVE_VALUE, HAS_VALUE, REDUCE, SELECT, CLONE, FOR_MAP, RANGE, DOMAIN_RANGE_VALUE) {
-    var Block = function Block(posSize, syncOpt) {
-      this.$space = void 0;
-      this.$posSize;
-      this.$mask;
-      this.$compute;
-      this.$sync;
-      this.sync(posSize, syncOpt);
-    };
 
-    Block.prototype = {
-      sync: function sync(block, syncOpt) {
-        if (!arguments.length && this.$sync) {
+  var Block = function Block(posSize, syncOpt) {
+    this.$space = void 0;
+    this.$posSize;
+    this.$mask;
+    this.$compute;
+    this.$sync;
+    this.sync(posSize, syncOpt);
+  };
+
+  Block.prototype = {
+    sync: function sync(block, syncOpt) {
+      if (!arguments.length && this.$sync) {
+        block = this.$sync();
+      } else if (typeof block === "function") {
+        this.$sync = block;
+
+        if (syncOpt == true) {
           block = this.$sync();
-        } else if (typeof block === "function") {
-          this.$sync = block;
-
-          if (syncOpt == true) {
-            block = this.$sync();
-          } else {
-            return this;
-          }
-        }
-
-        if (block instanceof Block) {
-          this.$posSize = CLONE(block.$posSize); //.. this.$sync    = this.$sync || block.$sync
-
-          this.$space = this.$space || block.$space;
-          this.$mask = this.$mask || block.$mask;
         } else {
-          this.$posSize = FOR_MAP(CLONE(block), function (posSize) {
-            return !_.isArray(posSize) ? [posSize, 0] : posSize;
-          });
+          return this;
         }
-
-        return this;
-      },
-      clone: function clone() {
-        return new Block(this);
-      },
-      setPosition: function setPosition(value, sel) {
-        var $posSize = SELECT(this.$posSize, sel);
-        if ($posSize instanceof Array) $posSize[0] = value;
-        return this;
-      },
-      setSize: function setSize(value, sel) {
-        var $posSize = SELECT(this.$posSize, sel);
-        if ($posSize instanceof Array) $posSize[1] = value;
-        return this;
-      },
-      get: function get() {
-        return CLONE(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
-      },
-      domainValue: function domainValue() {
-        return FOR_MAP(CLONE(this.get()), function (posSize) {
-          return posSize[0];
-        });
-      },
-      domainSize: function domainSize() {
-        return FOR_MAP(CLONE(this.get()), function (posSize) {
-          return posSize[1];
-        });
-      },
-      domainMap: function domainMap() {
-        return FOR_MAP(CLONE(this.get()), function (posSize) {
-          return {
-            start: posSize[0],
-            size: posSize[1],
-            end: posSize[0] + posSize[1]
-          };
-        });
-      },
-      conflicts: function conflicts(otherBlocks, selector) {
-        return REDUCE(otherBlocks, function (red, block) {
-          var selectOtherBlock = SELECT(block, selector);
-
-          if (selectOtherBlock instanceof Block) {
-            //다른 블럭이 현재 블럭과 같거나 space가 다를때는 평가하지 않음
-            if (selectOtherBlock === this || selectOtherBlock.$space != this.$space) return red; //
-
-            var inspectResult = [];
-            FOR_MAP(this.get(), function (thisPos, key) {
-              var otherPos = SELECT(selectOtherBlock.get(), key);
-              if (otherPos[0] < thisPos[0] && otherPos[0] + otherPos[1] <= thisPos[0]) return inspectResult.push(false);
-              if (otherPos[0] > thisPos[0] && thisPos[0] + thisPos[1] <= otherPos[0]) return inspectResult.push(false);
-              return inspectResult.push(true);
-            });
-
-            if (inspectResult.length && !HAS_VALUE(inspectResult, false)) {
-              red.push(block);
-            }
-          }
-
-          return red;
-        }.bind(this), []);
-      },
-      hasConflicts: function hasConflicts(otherBlocks, selector) {
-        return !!this.conflicts(otherBlocks, selector).length;
-      },
-      overflow: function overflow(mask) {
-        var blockPosSize = this.get();
-        var spaceDomain = this.$space.getDomain();
-        var overflowDomain = mask && CLONE(mask) || this.$space && this.$space.getDomain() || [];
-        return FOR_MAP(overflowDomain, function ($overflowSelected, sel) {
-          var $posSize = SELECT(blockPosSize, sel);
-          var $domain = SELECT(spaceDomain, sel);
-          return $posSize[0] < SELECT($overflowSelected[0], $domain[0]) || $posSize[0] + $posSize[1] > SELECT($overflowSelected[1], $domain[1]);
-        });
-      },
-      isOverflow: function isOverflow(mask) {
-        var overflow = false;
-        FOR_MAP(this.overflow(mask), function (f) {
-          if (f) {
-            overflow = true;
-          }
-        });
-        return overflow;
-      },
-      maskOverflow: function maskOverflow(mask) {
-        return this.overflow(this.$mask || mask);
-      },
-      isMaskOverflow: function isMaskOverflow(mask) {
-        return this.isOverflow(this.$mask || mask);
-      },
-      rangeStart: function rangeStart() {
-        return this.$space.domainRange(FOR_MAP(this.get(), function (posSize) {
-          return posSize[0];
-        }));
-      },
-      rangeSize: function rangeSize() {
-        return this.$space.domainRangeSize(FOR_MAP(this.get(), function (posSize) {
-          return posSize[1];
-        }));
-      },
-      rangeMap: function rangeMap() {
-        var rangeSize = this.rangeSize();
-        return FOR_MAP(this.rangeStart(), function ($start, sel) {
-          var $size = sel ? rangeSize[sel] : rangeSize;
-          return {
-            start: $start,
-            size: $size,
-            end: $start + $size
-          };
-        }.bind(this));
-      },
-      map: function map() {
-        var domainMap = this.domainMap();
-        var rangeMap = this.rangeMap();
-        var blockMap = FOR_MAP(rangeMap, function (map, key) {
-          map.rangeStart = map.start, map.rangeSize = map.size, map.rangeEnd = map.end;
-          var $domainMap = SELECT(domainMap, key);
-          map.domainStart = $domainMap.start, map.domainSize = $domainMap.size, map.domainEnd = $domainMap.end;
-          delete map.start;
-          delete map.size;
-          delete map.end;
-          return map;
-        });
-        return blockMap;
-      },
-      rangeEnd: function rangeEnd() {
-        return this.rangeMap(this.rangeMap(), function (map) {
-          return map.end;
-        });
-      },
-      compute: function compute(func) {
-        if (typeof func === "function") {
-          this.$compute = func;
-        } else {
-          this.$compute && this.$compute(this.map());
-        }
-
-        return this;
-      },
-      call: function call(f) {
-        typeof f === "function" && f.call(this, this.rangeMap());
       }
-    };
 
-    var Tracker = function Tracker(space, domainMask) {
-      this.$space = space;
-      this.$domainMask = FOR_MAP(CLONE(domainMask), function (mask, sel) {
-        if (typeof mask === "number") mask = [mask];
+      if (block instanceof Block) {
+        this.$posSize = _cloneDeep(block.$posSize); //.. this.$sync    = this.$sync || block.$sync
 
-        if (mask instanceof Array) {
-          if (!mask[0]) mask[0] = 0;
-          if (!mask[1]) mask[1] = function (v) {
-            return v;
-          };
-        }
+        this.$space = this.$space || block.$space;
+        this.$mask = this.$mask || block.$mask;
+      } else {
+        this.$posSize = forMap$1(_cloneDeep(block), function (posSize) {
+          return !_.isArray(posSize) ? [posSize, 0] : posSize;
+        });
+      }
 
-        return mask;
+      return this;
+    },
+    clone: function clone$$1() {
+      return new Block(this);
+    },
+    setPosition: function setPosition(value, sel) {
+      var $posSize = get(this.$posSize, sel);
+      if ($posSize instanceof Array) $posSize[0] = value;
+      return this;
+    },
+    setSize: function setSize(value, sel) {
+      var $posSize = get(this.$posSize, sel);
+      if ($posSize instanceof Array) $posSize[1] = value;
+      return this;
+    },
+    get: function get$$1() {
+      return _cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
+    },
+    domainValue: function domainValue() {
+      return forMap$1(_cloneDeep(this.get()), function (posSize) {
+        return posSize[0];
       });
-    };
+    },
+    domainSize: function domainSize() {
+      return forMap$1(_cloneDeep(this.get()), function (posSize) {
+        return posSize[1];
+      });
+    },
+    domainMap: function domainMap() {
+      return forMap$1(_cloneDeep(this.get()), function (posSize) {
+        return {
+          start: posSize[0],
+          size: posSize[1],
+          end: posSize[0] + posSize[1]
+        };
+      });
+    },
+    conflicts: function conflicts(otherBlocks, selector) {
+      return asArray$1(otherBlocks).reduce(function (red, block) {
+        var selectOtherBlock = get(block, selector);
 
-    Tracker.prototype = {
-      block: function block(posSize, syncOpt) {
-        var block = new Block(posSize, syncOpt);
-        block.$space = this.$space;
-        block.$mask = this.$domainMask;
-        return block;
-      },
-      domainBlock: function domainBlock(cursor, callback) {
-        var domainGrid = FOR_MAP(this.$space.getRange(), function (range) {
-          return range[2];
-        });
-        var block = this.block(FOR_MAP(this.$space.rangeDomain(cursor), function (cursorPoint, key) {
-          return [cursorPoint, SELECT(domainGrid, key)];
-        }));
-        var blockMap = block.map();
-        callback && callback.call(block, blockMap, block);
-        return block;
-      }
-    };
+        if (selectOtherBlock instanceof Block) {
+          //다른 블럭이 현재 블럭과 같거나 space가 다를때는 평가하지 않음
+          if (selectOtherBlock === this || selectOtherBlock.$space != this.$space) return red; //
 
-    var Space = function Space(domain, range) {
-      this.domain(domain);
-      this.range(range);
-      this.$niceDomain = true;
-      this.$niceRange = true;
-    };
+          var inspectResult = [];
+          forMap$1(this.get(), function (thisPos, key) {
+            var otherPos = get(selectOtherBlock.get(), key);
+            if (otherPos[0] < thisPos[0] && otherPos[0] + otherPos[1] <= thisPos[0]) return inspectResult.push(false);
+            if (otherPos[0] > thisPos[0] && thisPos[0] + thisPos[1] <= otherPos[0]) return inspectResult.push(false);
+            return inspectResult.push(true);
+          });
 
-    Space.prototype = {
-      domain: function domain(_domain) {
-        //default grid scale
-        _domain = FOR_MAP(_domain, function (domain) {
-          if (!domain[2]) {
-            domain[2] = 1;
+          if (inspectResult.length && !hasValue(inspectResult, false)) {
+            red.push(block);
           }
-
-          return domain;
-        });
-        this.$domain = _domain;
-      },
-      range: function (_range) {
-        function range(_x) {
-          return _range.apply(this, arguments);
         }
 
-        range.toString = function () {
-          return _range.toString();
+        return red;
+      }.bind(this), []);
+    },
+    hasConflicts: function hasConflicts(otherBlocks, selector) {
+      return !!this.conflicts(otherBlocks, selector).length;
+    },
+    overflow: function overflow(mask) {
+      var blockPosSize = this.get();
+      var spaceDomain = this.$space.getDomain();
+      var overflowDomain = mask && _cloneDeep(mask) || this.$space && this.$space.getDomain() || [];
+      return forMap$1(overflowDomain, function ($overflowSelected, sel) {
+        var $posSize = get(blockPosSize, sel);
+        var $domain = get(spaceDomain, sel);
+        return $posSize[0] < get($overflowSelected[0], $domain[0]) || $posSize[0] + $posSize[1] > get($overflowSelected[1], $domain[1]);
+      });
+    },
+    isOverflow: function isOverflow(mask) {
+      var overflow = false;
+      forMap$1(this.overflow(mask), function (f) {
+        if (f) {
+          overflow = true;
+        }
+      });
+      return overflow;
+    },
+    maskOverflow: function maskOverflow(mask) {
+      return this.overflow(this.$mask || mask);
+    },
+    isMaskOverflow: function isMaskOverflow(mask) {
+      return this.isOverflow(this.$mask || mask);
+    },
+    rangeStart: function rangeStart() {
+      return this.$space.domainRange(forMap$1(this.get(), function (posSize) {
+        return posSize[0];
+      }));
+    },
+    rangeSize: function rangeSize() {
+      return this.$space.domainRangeSize(forMap$1(this.get(), function (posSize) {
+        return posSize[1];
+      }));
+    },
+    rangeMap: function rangeMap() {
+      var rangeSize = this.rangeSize();
+      return forMap$1(this.rangeStart(), function ($start, sel) {
+        var $size = sel ? rangeSize[sel] : rangeSize;
+        return {
+          start: $start,
+          size: $size,
+          end: $start + $size
         };
-
-        return range;
-      }(function (range) {
-        range = FOR_MAP(range, function (range) {
-          if (!range[2]) {
-            range[2] = 1;
-          }
-
-          return range;
-        });
-        this.$range = range;
-      }),
-      getRange: function getRange() {
-        return FOR_MAP(CLONE(this.$range), function (range) {
-          for (var i = 0, l = range.length; i < l; i++) {
-            if (typeof range[i] === "function") range[i] = range[i]();
-          }
-
-          return range;
-        });
-      },
-      getDomain: function getDomain() {
-        return FOR_MAP(CLONE(this.$domain), function (domain) {
-          for (var i = 0, l = domain.length; i < l; i++) {
-            if (typeof domain[i] === "function") domain[i] = domain[i]();
-          }
-
-          return domain;
-        });
-      },
-      domainRangeSize: function domainRangeSize(vs) {
-        return FOR_MAP(vs, function (v, sel) {
-          var $range = sel ? this.getRange()[sel] : this.getRange();
-          var $domain = sel ? this.getDomain()[sel] : this.getDomain();
-          return v / ($domain[1] - $domain[0]) * ($range[1] - $range[0]);
-        }.bind(this));
-      },
-      domainRange: function domainRange(vs) {
-        return DOMAIN_RANGE_VALUE(this.getDomain(), this.getRange(), vs, this.$niceRange);
-      },
-      rangeDomain: function rangeDomain(vs) {
-        return DOMAIN_RANGE_VALUE(this.getRange(), this.getDomain(), vs, this.$niceDomain);
-      },
-      block: function block(posSize, syncOpt) {
-        var block = new Block(posSize, syncOpt);
-        block.$space = this;
-        return block;
-      },
-      tracker: function tracker(domainMask) {
-        var tracker = new Tracker(this, domainMask);
-        return tracker;
+      }.bind(this));
+    },
+    map: function map() {
+      var domainMap = this.domainMap();
+      var rangeMap = this.rangeMap();
+      var blockMap = forMap$1(rangeMap, function (map, key) {
+        map.rangeStart = map.start, map.rangeSize = map.size, map.rangeEnd = map.end;
+        var $domainMap = get(domainMap, key);
+        map.domainStart = $domainMap.start, map.domainSize = $domainMap.size, map.domainEnd = $domainMap.end;
+        delete map.start;
+        delete map.size;
+        delete map.end;
+        return map;
+      });
+      return blockMap;
+    },
+    rangeEnd: function rangeEnd() {
+      return this.rangeMap(this.rangeMap(), function (map) {
+        return map.end;
+      });
+    },
+    compute: function compute(func) {
+      if (typeof func === "function") {
+        this.$compute = func;
+      } else {
+        this.$compute && this.$compute(this.map());
       }
+
+      return this;
+    },
+    call: function call(f) {
+      typeof f === "function" && f.call(this, this.rangeMap());
+    }
+  };
+
+  var Tracker = function Tracker(space, domainMask) {
+    this.$space = space;
+    this.$domainMask = forMap$1(_cloneDeep(domainMask), function (mask, sel) {
+      if (typeof mask === "number") mask = [mask];
+
+      if (mask instanceof Array) {
+        if (!mask[0]) mask[0] = 0;
+        if (!mask[1]) mask[1] = function (v) {
+          return v;
+        };
+      }
+
+      return mask;
+    });
+  };
+
+  Tracker.prototype = {
+    block: function block(posSize, syncOpt) {
+      var block = new Block(posSize, syncOpt);
+      block.$space = this.$space;
+      block.$mask = this.$domainMask;
+      return block;
+    },
+    domainBlock: function domainBlock(cursor, callback) {
+      var domainGrid = forMap$1(this.$space.getRange(), function (range$$1) {
+        return range$$1[2];
+      });
+      var block = this.block(forMap$1(this.$space.rangeDomain(cursor), function (cursorPoint, key) {
+        return [cursorPoint, get(domainGrid, key)];
+      }));
+      var blockMap = block.map();
+      callback && callback.call(block, blockMap, block);
+      return block;
+    }
+  };
+
+  var Space = function Space(domain, range$$1) {
+    this.domain(domain);
+    this.range(range$$1);
+    this.$niceDomain = true;
+    this.$niceRange = true;
+  };
+
+  Space.prototype = {
+    domain: function domain(_domain) {
+      //default grid scale
+      _domain = forMap$1(_domain, function (domain) {
+        if (!domain[2]) {
+          domain[2] = 1;
+        }
+
+        return domain;
+      });
+      this.$domain = _domain;
+    },
+    range: function range$$1(_range) {
+      _range = forMap$1(_range, function (range$$1) {
+        if (!range$$1[2]) {
+          range$$1[2] = 1;
+        }
+
+        return range$$1;
+      });
+      this.$range = _range;
+    },
+    getRange: function getRange() {
+      return forMap$1(_cloneDeep(this.$range), function (range$$1) {
+        for (var i = 0, l = range$$1.length; i < l; i++) {
+          if (typeof range$$1[i] === "function") range$$1[i] = range$$1[i]();
+        }
+
+        return range$$1;
+      });
+    },
+    getDomain: function getDomain() {
+      return forMap$1(_cloneDeep(this.$domain), function (domain) {
+        for (var i = 0, l = domain.length; i < l; i++) {
+          if (typeof domain[i] === "function") domain[i] = domain[i]();
+        }
+
+        return domain;
+      });
+    },
+    domainRangeSize: function domainRangeSize(vs) {
+      return forMap$1(vs, function (v, sel) {
+        var $range = sel ? this.getRange()[sel] : this.getRange();
+        var $domain = sel ? this.getDomain()[sel] : this.getDomain();
+        return v / ($domain[1] - $domain[0]) * ($range[1] - $range[0]);
+      }.bind(this));
+    },
+    domainRange: function domainRange(vs) {
+      return domainRangeValue(this.getDomain(), this.getRange(), vs, this.$niceRange);
+    },
+    rangeDomain: function rangeDomain(vs) {
+      return domainRangeValue(this.getRange(), this.getDomain(), vs, this.$niceDomain);
+    },
+    block: function block(posSize, syncOpt) {
+      var block = new Block(posSize, syncOpt);
+      block.$space = this;
+      return block;
+    },
+    tracker: function tracker(domainMask) {
+      var tracker = new Tracker(this, domainMask);
+      return tracker;
+    }
+  };
+  var space = function () {
+    return function (domain, range$$1) {
+      return new Space(domain, range$$1);
     };
-
-    FN.space = function () {
-      return function (domain, range) {
-        return new Space(domain, range);
-      };
-    }();
-
-    FN.block = function () {
-      return function (posSize, syncOpt) {
-        return new Block(posSize, syncOpt);
-      };
-    }();
-  })(own, removeValue, hasValue, reduce, select, _.cloneDeep, forMap, range, domainRangeValue);
+  }();
+  var block = function () {
+    return function (posSize, syncOpt) {
+      return new Block(posSize, syncOpt);
+    };
+  }();
 
   /**
    * Removes all key-value entries from the list cache.
@@ -6680,6 +6787,8 @@
     }
   }
 
+  var PromiseClass = Promise;
+
   var isMaybePromise = function isMaybePromise(target) {
     return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";
   };
@@ -6687,13 +6796,37 @@
   var resolveFn = PromiseClass.resolve;
   var rejectFn = PromiseClass.reject;
 
-  var PromiseFunction = function (PromiseClass) {
+  var PromiseFunction = function PromiseFunction(fn) {
     return new PromiseClass(function (r, c) {
       var maybeAwaiter = fn(r, c);
       isMaybePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
     });
-  }(Promise);
+  };
 
+  var promise = PromiseFunction;
+  var all$1 = PromiseFunction.all = Promise.all;
+  var resolve = PromiseFunction.resolve = resolveFn;
+  var reject = PromiseFunction.reject = rejectFn;
+  var timeout = PromiseFunction.timeout = function (fn, time) {
+    if (typeof fn === "number") {
+      return q(function (resolve) {
+        return setTimeout(function () {
+          return resolve(time);
+        }, fn);
+      });
+    } else {
+      return q(function (resolve) {
+        return setTimeout(function () {
+          return resolve(typeof fn === "function" ? fn() : fn);
+        }, time);
+      });
+    }
+  };
+  var valueOf = PromiseFunction.valueOf = function (maybeQ) {
+    return q(function (resolve, reject) {
+      isMaybePromise(maybeQ) ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
+    });
+  };
   var abortMessage = new function () {
     Object.defineProperty(this, "message", {
       get: function get$$1() {
@@ -6706,12 +6839,125 @@
       }
     });
   }();
+  var abort = PromiseFunction.abort = function (notifyConsole) {
+    if (notifyConsole === void 0) {
+      notifyConsole = undefined;
+    }
 
-  var promise = PromiseFunction;
-  var resolve = PromiseFunction.resolve;
-  var reject = PromiseFunction.reject;
-  var valueOf = PromiseFunction.valueOf;
-  var abort = PromiseFunction.abort;
+    return new PromiseClass(function (resolve, reject) {
+      if (notifyConsole === true) {
+        console.warn("abort promise");
+      }
+
+      reject(abortMessage);
+    });
+  };
+  var defer$1 = PromiseFunction.defer = function () {
+    var resolve, reject;
+    var promise = new PromiseClass(function () {
+      resolve = arguments[0];
+      reject = arguments[1];
+    });
+    return {
+      resolve: resolve,
+      reject: reject,
+      promise: promise
+    };
+  };
+  var wheel = PromiseFunction.wheel = function (tasks, option) {
+    if (!(tasks instanceof Array)) {
+      return q.reject(new Error("tasks must be array"));
+    }
+
+    if (!tasks.length || !tasks.some(function (e) {
+      return typeof e === "function";
+    })) {
+      return q.reject(new Error("not found wheel executable"));
+    }
+
+    if (!tasks.some(function (e) {
+      return typeof e !== "function" || typeof e !== "number";
+    })) {
+      return q.reject(new Error("wheel task only function or number executable"));
+    }
+
+    if (typeof option !== "object") {
+      option = {};
+    }
+
+    var finished = false;
+    var defer = q.defer();
+    var limit = typeof option.limit === "number" && option.limit > 0 ? parseInt(option.limit, 10) : 10000;
+    var taskLength = tasks.length;
+    var wheelTick = 0;
+    var resetScope = 0;
+
+    var nextWheelTick = function nextWheelTick(tick, value, tickScope) {
+      var nowAction = tasks[turn(tick, taskLength, 1)];
+
+      var isActiveFn = function isActiveFn() {
+        return tickScope === resetScope;
+      };
+
+      var nextTickFn = function nextTickFn(passValue) {
+        // if reset called
+        if (!isActiveFn()) return; // if over tick
+
+        if (wheelTick > limit) {
+          return defer.reject(new Error("limit"));
+        }
+
+        if (finished === false) {
+          nextWheelTick(wheelTick++, passValue, tickScope);
+        }
+      };
+
+      if (typeof nowAction === "function") {
+        nowAction({
+          value: value,
+          next: nextTickFn,
+          isActive: isActiveFn,
+          resolve: defer.resolve,
+          reject: defer.reject
+        }, Math.floor(tick / tasks.length), tick);
+      } else if (typeof nowAction === "number") {
+        setTimeout(function () {
+          nextTickFn(value);
+        }, nowAction);
+      }
+    };
+
+    defer.promise.then(function (e) {
+      if (finished === null) return q.abort();
+      finished = true;
+      return e;
+    }).catch(function (e) {
+      if (finished === null) return q.abort();
+      finished = true;
+      return e;
+    });
+
+    defer.stop = function (resetTick) {
+      finished = null;
+      resetScope += 1;
+    };
+
+    defer.start = function (resetTick) {
+      if (finished === null) {
+        finished = false;
+        wheelTick = typeof resetTick === "number" ? resetTick : 0;
+        nextWheelTick(wheelTick++, option.value, resetScope);
+      }
+    };
+
+    defer.reset = function (resetTick) {
+      defer.stop();
+      defer.start(resetTick);
+    };
+
+    defer.reset(0);
+    return defer;
+  };
 
   var awaitLeadOnly = function awaitLeadOnly(func) {
     return alloc(function () {
@@ -7182,6 +7428,191 @@
   var Paginate = PaginateClass;
   var paginate = paginateFactory;
 
+  // 7.1.13 ToObject(argument)
+
+
+  var _toObject = function (it) {
+    return Object(_defined(it));
+  };
+
+  var _arrayFill = function fill(value
+  /* , start = 0, end = @length */
+  ) {
+    var O = _toObject(this);
+    var length = _toLength(O.length);
+    var aLen = arguments.length;
+    var index = _toAbsoluteIndex(aLen > 1 ? arguments[1] : undefined, length);
+    var end = aLen > 2 ? arguments[2] : undefined;
+    var endPos = end === undefined ? length : _toAbsoluteIndex(end, length);
+
+    while (endPos > index) {
+      O[index++] = value;
+    }
+
+    return O;
+  };
+
+  // 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
+
+
+  $export$1($export$1.P, 'Array', {
+    fill: _arrayFill
+  });
+
+  _addToUnscopables('fill');
+
+  var operate = function () {
+    var PARENT_OUTPUT_UPDATED = "ParentOutputUpdated";
+
+    var operate = function operate(_ref) {
+      var _this = this;
+
+      var input = _ref.input,
+          output = _ref.output,
+          concurrent = _ref.concurrent,
+          limitInput = _ref.limitInput,
+          limitOutput = _ref.limitOutput;
+      this.parent = undefined;
+      this.children = [];
+      this.inputs = [];
+      this.outputs = [];
+      this.limitInput = isNumber(limitInput) || limitInput > 0 ? limitInput : Number.POSITIVE_INFINITY;
+      this.limitOutput = isNumber(limitOutput) || limitOutput > 0 ? limitOutput : Number.POSITIVE_INFINITY; //
+
+      var current = 0;
+      concurrent = isNumber(concurrent) || concurrent > 0 ? concurrent : 1;
+      Object.defineProperty(this, "avaliablePullCount", {
+        get: function get$$1() {
+          var limit = _this.limitInput - _this.inputs.length;
+          if (limit < 0) limit = 0;
+          return limit;
+        }
+      });
+      Object.defineProperty(this, "avaliableOutputCount", {
+        get: function get$$1() {
+          return _this.limitOutput + current + _this.outputs.length;
+        }
+      });
+      var inputOutput = {
+        input: input,
+        output: output
+      };
+
+      var kickStart = function kickStart() {
+        var avaliableQueLength = concurrent - current; // 작동가능한 큐
+
+        if (avaliableQueLength < 1) {
+          return;
+        } // input의 길이로 확인하여 실행 가능한 큐
+
+
+        if (avaliableQueLength > _this.inputs.length) {
+          avaliableQueLength = _this.inputs.length;
+        } // output의 제한을 확인하여 사용 가능한 큐
+
+
+        if (avaliableQueLength > _this.avaliableOutputCount) {
+          avaliableQueLength = _this.avaliableOutputCount;
+        }
+
+        if (avaliableQueLength < 1) {
+          return;
+        }
+
+        Array(avaliableQueLength).fill(inputOutput).forEach(function (_ref2) {
+          var input = _ref2.input,
+              output = _ref2.output;
+
+          var entry = _this.inputs.shift();
+
+          var outputHandle = function outputHandle(formInputDataum) {
+            if (output) {
+              output({
+                entry: formInputDataum
+              });
+            }
+
+            _this.outputs.push(formInputDataum);
+
+            _this.children.forEach(function (child) {
+              return child.emit(PARENT_OUTPUT_UPDATED);
+            });
+
+            kickStart();
+          };
+
+          if (input) {
+            input({
+              entry: entry,
+              output: outputHandle
+            });
+          } else {
+            outputHandle(entry);
+          }
+        });
+      };
+
+      Object.defineProperty(this, "push", {
+        value: function value(pushData) {
+          _this.inputs.push(pushData);
+
+          kickStart();
+          return _this;
+        }
+      });
+      Object.defineProperty(this, "emit", {
+        value: function value(eventName, payload) {
+          switch (eventName) {
+            case PARENT_OUTPUT_UPDATED:
+              if (!_this.avaliablePullCount) return;
+
+              var pullData = _this.parent.pull(_this.avaliablePullCount);
+
+              if (!pullData.length) return;
+              pullData.forEach(function (datum) {
+                return _this.inputs.push(datum);
+              });
+              kickStart();
+              break;
+          }
+        }
+      });
+      Object.defineProperty(this, "pull", {
+        value: function value(pullLength) {
+          if (!isNumber(pullLength)) return [];
+
+          var pullData = _this.outputs.splice(0, pullLength);
+
+          pullData.length && kickStart();
+          return pullData;
+        }
+      });
+    };
+
+    operate.prototype = {
+      append: function append(child) {
+        child.parent = this;
+        this.children.push(child);
+        return this;
+      },
+      remove: function remove(child) {
+        var index = this.children.indexOf(child);
+        if (index < 0) return this;
+        child.parent = undefined;
+        this.children.splice(index, 1);
+      },
+      operate: function operate(option) {
+        return this.append(operateFunction(option));
+      }
+    };
+
+    var operateFunction = function operateFunction(option) {
+      return new operate(Object.assign({}, option));
+    };
+
+    return operateFunction;
+  }();
+
 
 
   var functions = /*#__PURE__*/Object.freeze({
@@ -7209,20 +7640,28 @@
     clone: clone,
     cloneDeep: cloneDeep,
     free: free,
-    removeValue: removeValue$1,
+    removeValue: removeValue,
     instance: instance,
     alloc: alloc$1,
     all: all,
     times: times,
+    forMap: forMap$1,
     accurateTimeout: accurateTimeout,
     get: get,
+    hasValue: hasValue,
     turn: turn$1,
     max: max,
     rand64: rand64,
     tokenize: tokenize,
+    range: range,
+    domainRangeValue: domainRangeValue,
+    matrixRange: matrixRange,
     dateExp: dateExp,
     timestampExp: timestampExp,
     timescaleExp: timescaleExp,
+    promise: promise,
+    space: space,
+    block: block,
     isEditable: _isEditable,
     enterEditable: enterEditable,
     exitEditable: exitEditable,
@@ -7237,11 +7676,7 @@
     watchChange: watchChange,
     Paginate: Paginate,
     paginate: paginate,
-    promise: promise,
-    resolve: resolve,
-    reject: reject,
-    valueOf: valueOf,
-    abort: abort
+    operate: operate
   });
 
   var Bow = function Bow() {};

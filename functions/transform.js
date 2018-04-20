@@ -292,7 +292,7 @@
     };
 
     return function (oldData, newData, getId, options) {
-      if (!/string|function/.test(typeof getId)) throw new Error("refreshData need getId");
+      if (!/string|function/.test(typeof getId)) throw new Error("syncData need getId");
 
       if (typeof getId === "string") {
         var getIdString = getId;
