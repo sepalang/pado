@@ -3,10 +3,6 @@ import {
   isNumber
 } from '../functions';
 
-import { 
-  valueOf
-} from './promise';
-
 const immediate = function(fn,timeout=0){
   let reserved;
   let allArgs = [];

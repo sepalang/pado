@@ -126,12 +126,13 @@
                       var _ref4 = _asyncToGenerator(
                       /*#__PURE__*/
                       regeneratorRuntime.mark(function _callee(formInputDataum) {
+                        var out;
                         return regeneratorRuntime.wrap(function _callee$(_context) {
                           while (1) {
                             switch (_context.prev = _context.next) {
                               case 0:
-                                if (!output) {
-                                  _context.next = 3;
+                                if (!(typeof output === "function")) {
+                                  _context.next = 4;
                                   break;
                                 }
 
@@ -141,6 +142,9 @@
                                 });
 
                               case 3:
+                                out = _context.sent;
+
+                              case 4:
                                 _this.outputs.push(formInputDataum);
 
                                 current--;
@@ -151,7 +155,7 @@
 
                                 kickStart();
 
-                              case 7:
+                              case 8:
                               case "end":
                                 return _context.stop();
                             }
@@ -260,9 +264,9 @@
         value: function value(pullLength) {
           if (!((0, _functions.isNumber)(pullLength) || pullLength == Number.POSITIVE_INFINITY)) return [];
 
-          var pullData = _this.outputs.splice(0, pullLength);
+          var pullData = _this.outputs.splice(0, pullLength); //pullData.length && kickStart();
 
-          pullData.length && kickStart();
+
           return pullData;
         }
       });
