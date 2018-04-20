@@ -28,7 +28,7 @@ export const toArray = function(data,option){
   return [data];
 }
 
-export const asObject = function(data, defaultKey = "value") {
+export const asObject = function(data, defaultKey = "default") {
   if(isPlainObject(data)){
     return data;
   } else {
