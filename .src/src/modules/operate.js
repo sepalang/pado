@@ -23,7 +23,7 @@ export const operate = (function(){
   const PARENT_OUTPUT_UPDATED = "ParentOutputUpdated";
   const CHILDREN_INPUT_UPDATED = "ParentOutputUpdated";
   
-  const operate = function({ input, output, concurrent, limitInput, limitOutput }){
+  const operate = function({ input, output, concurrent, rescue, limitInput, limitOutput }){
     this.parent   = undefined;
     this.children = [];
     this.inputs   = [];
@@ -92,7 +92,12 @@ export const operate = (function(){
           try {
             outputHandle(await input({ entry }));
           } catch(e) {
-            throw e;
+            if(typeof rescue === "function"){
+              rescue(e);
+            } else {
+              throw e;
+            }
+            current--;
           }
         } else {
           outputHandle(entry);

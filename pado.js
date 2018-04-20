@@ -7888,6 +7888,7 @@
       var input = _ref.input,
           output = _ref.output,
           concurrent = _ref.concurrent,
+          rescue = _ref.rescue,
           limitInput = _ref.limitInput,
           limitOutput = _ref.limitOutput;
       this.parent = undefined;
@@ -7997,7 +7998,7 @@
                     }();
 
                     if (!input) {
-                      _context2.next = 18;
+                      _context2.next = 23;
                       break;
                     }
 
@@ -8011,22 +8012,36 @@
                   case 9:
                     _context2.t1 = _context2.sent;
                     (0, _context2.t0)(_context2.t1);
-                    _context2.next = 16;
+                    _context2.next = 21;
                     break;
 
                   case 13:
                     _context2.prev = 13;
                     _context2.t2 = _context2["catch"](5);
-                    throw _context2.t2;
 
-                  case 16:
-                    _context2.next = 19;
+                    if (!(typeof rescue === "function")) {
+                      _context2.next = 19;
+                      break;
+                    }
+
+                    rescue(_context2.t2);
+                    _context2.next = 20;
                     break;
 
-                  case 18:
+                  case 19:
+                    throw _context2.t2;
+
+                  case 20:
+                    current--;
+
+                  case 21:
+                    _context2.next = 24;
+                    break;
+
+                  case 23:
                     outputHandle(entry);
 
-                  case 19:
+                  case 24:
                   case "end":
                     return _context2.stop();
                 }
