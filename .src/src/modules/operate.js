@@ -3,6 +3,10 @@ import {
   isNumber
 } from '../functions';
 
+import { 
+  valueOf
+} from './promise';
+
 const immediate = function(fn,timeout=0){
   let reserved;
   let allArgs = [];
@@ -50,6 +54,7 @@ export const operate = (function(){
     });
     
     const inputOutput = { input, output };
+    
     const kickStart = ()=>{
       let avaliableQueLength = concurrent - current;
       
@@ -77,20 +82,20 @@ export const operate = (function(){
         current++;
         
         const outputHandle = async (formInputDataum)=>{
-          if(output){
-            await output({ entry:formInputDataum });
+          if(typeof output === "function"){
+            const out = await output({ entry:formInputDataum });
           }
           
           this.outputs.push(formInputDataum);
           current--;
-          
+        
           this.children.forEach(child=>child.emit(PARENT_OUTPUT_UPDATED));
           kickStart();
         };
         
         if(input){
           try {
-            outputHandle(await input({ entry }));
+            outputHandle(await input({ entry }))
           } catch(e) {
             if(typeof rescue === "function"){
               rescue(e);
@@ -127,7 +132,6 @@ export const operate = (function(){
           case PARENT_OUTPUT_UPDATED:
             if(this.avaliablePullCount < 1) return;
             let pullData = this.parent.pull(this.avaliablePullCount);
-            
             if(pullData.length < 1) return;
             pullData.forEach(datum=>this.inputs.push(datum));
             kickStart();
@@ -140,7 +144,7 @@ export const operate = (function(){
       value:(pullLength)=>{
         if(!(isNumber(pullLength) || pullLength == Number.POSITIVE_INFINITY)) return [];
         const pullData = this.outputs.splice(0,pullLength);
-        pullData.length && kickStart();
+        //pullData.length && kickStart();
         return pullData;
       }
     });

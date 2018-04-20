@@ -1,4 +1,4 @@
-import { operate, promise, randRange } from '../../src';
+import { operate, promise } from '../../src';
 
 console.log("start operate feature test")
 const op = operate({
@@ -11,16 +11,16 @@ const op = operate({
   }
 })
 .operate({
+  concurrent:2,
   input:({ entry })=>{
-    const wait = randRange([1800,3000]);
-    return promise.timeout(()=>{ return entry; },wait);
+    console.log("op2 start", entry);
+    return promise.timeout(()=>{ return entry; },2500);
   },
   output:({ entry })=>{
     console.log('op2 output',entry);
   }
 });
 
-
+//op.push(1)
 //op.concat([1,2,3,4,5,6]);
-op.clone.concat([1,2,3,4,5,6]);
-//op.promisify([1,2,3,4]);
+//op.clone.concat([1,2,3,4,5,6]);
