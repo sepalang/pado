@@ -1,5 +1,5 @@
 import {
-  hasValue,
+  hasProperty,
   asArray,
   get,
   cloneDeep,
@@ -75,7 +75,7 @@ Block.prototype = {
           return inspectResult.push(true);
         });
                       
-        if(inspectResult.length && !hasValue(inspectResult,false)){
+        if(inspectResult.length && !hasProperty(inspectResult,false)){
           red.push(block);
         }
       }

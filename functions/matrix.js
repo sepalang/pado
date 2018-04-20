@@ -16,13 +16,10 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.matrixRange = _exports.domainRangeValue = _exports.range = void 0;
+  _exports.matrixRange = _exports.domainRangeValue = _exports.range = _exports.rangeModel = void 0;
 
-  var range = function range(value, step, sizeBase) {
-    var r = [],
-        start,
-        end,
-        reverse;
+  var rangeModel = function rangeModel(value, step, sizeBase) {
+    var start, end, reverse;
 
     if (typeof value === "number") {
       end = value;
@@ -56,6 +53,26 @@
     end = parseFloat(end), end = (0, _isLike.isAbsoluteNaN)(end) ? 0 : end;
     start = parseFloat(start), start = (0, _isLike.isAbsoluteNaN)(start) ? 0 : start;
     step = parseFloat(step), step = (0, _isLike.isAbsoluteNaN)(step) || step == 0 ? 1 : step;
+    return {
+      start: start,
+      end: end,
+      step: step,
+      reverse: reverse,
+      sizeBase: sizeBase
+    };
+  };
+
+  _exports.rangeModel = rangeModel;
+
+  var range = function range(value, stepSize, sizeBaseRange) {
+    var r = [];
+
+    var _rangeModel = rangeModel(value, stepSize, sizeBaseRange),
+        start = _rangeModel.start,
+        end = _rangeModel.end,
+        step = _rangeModel.step,
+        reverse = _rangeModel.reverse,
+        sizeBase = _rangeModel.sizeBase;
 
     if (step <= 0) {
       return console.warn("range::not support minus step"), r;

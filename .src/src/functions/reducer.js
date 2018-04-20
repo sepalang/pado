@@ -6,6 +6,13 @@ import {
   asArray
 } from './transform'
 
+
+import _isObject from 'lodash/isObject';
+import _isEmpty from 'lodash/isEmpty';
+import _isArray from 'lodash/isArray';
+import _get from 'lodash/get';
+
+
 export const get = function(target,path){
   if(typeof target === "object"){
     switch(typeof path){
@@ -19,14 +26,14 @@ export const get = function(target,path){
   return target;
 }
 
-export const hasValue = function(obj,value,key){
-  if(arguments.length == 1 && _.isObject(obj)) return _.isEmpty(obj);
-  if(_.isArray(obj)) for(var i=0,l=obj.length;i<l;i++) if(obj[i] === value) return true;
-  if(_.isObject(obj)){
+export const hasProperty = function(obj,value,key){
+  if(arguments.length == 1 && _isObject(obj)) return _isEmpty(obj);
+  if(_isArray(obj)) for(var i=0,l=obj.length;i<l;i++) if(obj[i] === value) return true;
+  if(_isObject(obj)){
     if(key){
-      return _.get(obj,key) === value;
+      return _get(obj,key) === value;
     } else {
-      for(var key in obj) if(_.get(obj,key) === value) return true;
+      for(var key in obj) if(_get(obj,key) === value) return true;
     }
   }
   return false;

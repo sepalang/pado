@@ -1,17 +1,26 @@
-import { operate } from '../../src';
+import { operate, promise } from '../../src';
 
+console.log("start operate feature test")
 const op = operate({
-  limitOutput:1,
-  input:({ entry, output })=>{
-    output(entry)
+  input:({ entry })=>{
+    console.log("op1 start",entry);
+    return entry;
   },
   output:({ entry })=>{
-    console.log('entry',entry);
+    return promise.timeout(()=>{ console.log("op1 end", entry); return entry; },2000);
+  }
+})
+.operate({
+  concurrent:2,
+  input:({ entry })=>{
+    console.log("op2 start", entry);
+    return promise.timeout(()=>{ return entry; },2500);
+  },
+  output:({ entry })=>{
+    console.log('op2 output',entry);
   }
 });
 
-console.log("op",op);
-
-op.push(1);
-op.push(2);
-op.push(3);
+//op.push(1)
+//op.concat([1,2,3,4,5,6]);
+//op.clone.concat([1,2,3,4,5,6]);

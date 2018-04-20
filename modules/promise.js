@@ -44,13 +44,13 @@
 
   var timeout = PromiseFunction.timeout = function (fn, time) {
     if (typeof fn === "number") {
-      return q(function (resolve) {
+      return PromiseFunction(function (resolve) {
         return setTimeout(function () {
           return resolve(time);
         }, fn);
       });
     } else {
-      return q(function (resolve) {
+      return PromiseFunction(function (resolve) {
         return setTimeout(function () {
           return resolve(typeof fn === "function" ? fn() : fn);
         }, time);
@@ -61,7 +61,7 @@
   _exports.timeout = timeout;
 
   var valueOf = PromiseFunction.valueOf = function (maybeQ) {
-    return q(function (resolve, reject) {
+    return PromiseFunction(function (resolve, reject) {
       isMaybePromise(maybeQ) ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
     });
   };
@@ -113,19 +113,19 @@
 
   var wheel = PromiseFunction.wheel = function (tasks, option) {
     if (!(tasks instanceof Array)) {
-      return q.reject(new Error("tasks must be array"));
+      return PromiseFunction.reject(new Error("tasks must be array"));
     }
 
     if (!tasks.length || !tasks.some(function (e) {
       return typeof e === "function";
     })) {
-      return q.reject(new Error("not found wheel executable"));
+      return PromiseFunction.reject(new Error("not found wheel executable"));
     }
 
     if (!tasks.some(function (e) {
       return typeof e !== "function" || typeof e !== "number";
     })) {
-      return q.reject(new Error("wheel task only function or number executable"));
+      return PromiseFunction.reject(new Error("wheel task only function or number executable"));
     }
 
     if (typeof option !== "object") {
@@ -133,7 +133,7 @@
     }
 
     var finished = false;
-    var defer = q.defer();
+    var defer = PromiseFunction.defer();
     var limit = typeof option.limit === "number" && option.limit > 0 ? parseInt(option.limit, 10) : 10000;
     var taskLength = tasks.length;
     var wheelTick = 0;
@@ -175,11 +175,11 @@
     };
 
     defer.promise.then(function (e) {
-      if (finished === null) return q.abort();
+      if (finished === null) return PromiseFunction.abort();
       finished = true;
       return e;
     }).catch(function (e) {
-      if (finished === null) return q.abort();
+      if (finished === null) return PromiseFunction.abort();
       finished = true;
       return e;
     });

@@ -1,22 +1,24 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.object.assign", "core-js/modules/es6.array.fill", "../functions"], factory);
+    define(["exports", "core-js/modules/es6.promise", "core-js/modules/es6.object.assign", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "../functions"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.array.fill"), require("../functions"));
+    factory(exports, require("core-js/modules/es6.promise"), require("core-js/modules/es6.object.assign"), require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("../functions"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Object, global.es6Array, global.functions);
+    factory(mod.exports, global.es6, global.es6Object, global.runtime, global.es6Array, global.functions);
     global.operate = mod.exports;
   }
-})(this, function (_exports, _es6Object, _es6Array, _functions) {
+})(this, function (_exports, _es, _es6Object, _runtime, _es6Array, _functions) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
   _exports.operate = void 0;
+
+  function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
 
   var immediate = function immediate(fn, timeout) {
     if (timeout === void 0) {
@@ -53,6 +55,7 @@
       var input = _ref.input,
           output = _ref.output,
           concurrent = _ref.concurrent,
+          rescue = _ref.rescue,
           limitInput = _ref.limitInput,
           limitOutput = _ref.limitOutput;
       this.parent = undefined;
@@ -102,37 +105,121 @@
           return;
         }
 
-        Array(avaliableQueLength).fill(inputOutput).forEach(function (_ref2) {
-          var input = _ref2.input,
-              output = _ref2.output;
+        Array(avaliableQueLength).fill(inputOutput).forEach(
+        /*#__PURE__*/
+        function () {
+          var _ref3 = _asyncToGenerator(
+          /*#__PURE__*/
+          regeneratorRuntime.mark(function _callee2(_ref2) {
+            var input, output, entry, outputHandle;
+            return regeneratorRuntime.wrap(function _callee2$(_context2) {
+              while (1) {
+                switch (_context2.prev = _context2.next) {
+                  case 0:
+                    input = _ref2.input, output = _ref2.output;
+                    entry = _this.inputs.shift();
+                    current++;
 
-          var entry = _this.inputs.shift();
+                    outputHandle =
+                    /*#__PURE__*/
+                    function () {
+                      var _ref4 = _asyncToGenerator(
+                      /*#__PURE__*/
+                      regeneratorRuntime.mark(function _callee(formInputDataum) {
+                        return regeneratorRuntime.wrap(function _callee$(_context) {
+                          while (1) {
+                            switch (_context.prev = _context.next) {
+                              case 0:
+                                if (!output) {
+                                  _context.next = 3;
+                                  break;
+                                }
 
-          var outputHandle = function outputHandle(formInputDataum) {
-            if (output) {
-              output({
-                entry: formInputDataum
-              });
-            }
+                                _context.next = 3;
+                                return output({
+                                  entry: formInputDataum
+                                });
 
-            _this.outputs.push(formInputDataum);
+                              case 3:
+                                _this.outputs.push(formInputDataum);
 
-            _this.children.forEach(function (child) {
-              return child.emit(PARENT_OUTPUT_UPDATED);
-            });
+                                current--;
 
-            kickStart();
+                                _this.children.forEach(function (child) {
+                                  return child.emit(PARENT_OUTPUT_UPDATED);
+                                });
+
+                                kickStart();
+
+                              case 7:
+                              case "end":
+                                return _context.stop();
+                            }
+                          }
+                        }, _callee, this);
+                      }));
+
+                      return function outputHandle(_x2) {
+                        return _ref4.apply(this, arguments);
+                      };
+                    }();
+
+                    if (!input) {
+                      _context2.next = 23;
+                      break;
+                    }
+
+                    _context2.prev = 5;
+                    _context2.t0 = outputHandle;
+                    _context2.next = 9;
+                    return input({
+                      entry: entry
+                    });
+
+                  case 9:
+                    _context2.t1 = _context2.sent;
+                    (0, _context2.t0)(_context2.t1);
+                    _context2.next = 21;
+                    break;
+
+                  case 13:
+                    _context2.prev = 13;
+                    _context2.t2 = _context2["catch"](5);
+
+                    if (!(typeof rescue === "function")) {
+                      _context2.next = 19;
+                      break;
+                    }
+
+                    rescue(_context2.t2);
+                    _context2.next = 20;
+                    break;
+
+                  case 19:
+                    throw _context2.t2;
+
+                  case 20:
+                    current--;
+
+                  case 21:
+                    _context2.next = 24;
+                    break;
+
+                  case 23:
+                    outputHandle(entry);
+
+                  case 24:
+                  case "end":
+                    return _context2.stop();
+                }
+              }
+            }, _callee2, this, [[5, 13]]);
+          }));
+
+          return function (_x) {
+            return _ref3.apply(this, arguments);
           };
-
-          if (input) {
-            input({
-              entry: entry,
-              output: outputHandle
-            });
-          } else {
-            outputHandle(entry);
-          }
-        });
+        }());
       };
 
       Object.defineProperty(this, "push", {
@@ -143,15 +230,24 @@
           return _this;
         }
       });
+      Object.defineProperty(this, "concat", {
+        value: function value(pushData) {
+          (0, _functions.asArray)(pushData).forEach(function (d) {
+            return _this.inputs.push(d);
+          });
+          kickStart();
+          return _this;
+        }
+      });
       Object.defineProperty(this, "emit", {
         value: function value(eventName, payload) {
           switch (eventName) {
             case PARENT_OUTPUT_UPDATED:
-              if (!_this.avaliablePullCount) return;
+              if (_this.avaliablePullCount < 1) return;
 
               var pullData = _this.parent.pull(_this.avaliablePullCount);
 
-              if (!pullData.length) return;
+              if (pullData.length < 1) return;
               pullData.forEach(function (datum) {
                 return _this.inputs.push(datum);
               });
@@ -162,12 +258,32 @@
       });
       Object.defineProperty(this, "pull", {
         value: function value(pullLength) {
-          if (!(0, _functions.isNumber)(pullLength)) return [];
+          if (!((0, _functions.isNumber)(pullLength) || pullLength == Number.POSITIVE_INFINITY)) return [];
 
           var pullData = _this.outputs.splice(0, pullLength);
 
           pullData.length && kickStart();
           return pullData;
+        }
+      });
+      Object.defineProperty(this, "clone", {
+        value: function value(deep, parentOperate) {
+          if (deep === void 0) {
+            deep = true;
+          }
+
+          var cloneOperate = operateFunction({
+            input: input,
+            output: output,
+            concurrent: concurrent,
+            rescue: rescue,
+            limitInput: limitInput,
+            limitOutput: limitOutput
+          });
+          deep === true && _this.children.forEach(function (child) {
+            child.clone(true, cloneOperate);
+          });
+          return cloneOperate;
         }
       });
     };

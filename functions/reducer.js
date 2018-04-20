@@ -1,22 +1,28 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./isLike", "./transform"], factory);
+    define(["exports", "./isLike", "./transform", "lodash/isObject", "lodash/isEmpty", "lodash/isArray", "lodash/get"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./isLike"), require("./transform"));
+    factory(exports, require("./isLike"), require("./transform"), require("lodash/isObject"), require("lodash/isEmpty"), require("lodash/isArray"), require("lodash/get"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.isLike, global.transform);
+    factory(mod.exports, global.isLike, global.transform, global.isObject, global.isEmpty, global.isArray, global.get);
     global.reducer = mod.exports;
   }
-})(this, function (_exports, _isLike, _transform) {
+})(this, function (_exports, _isLike, _transform, _isObject2, _isEmpty2, _isArray2, _get2) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.max = _exports.turn = _exports.hasValue = _exports.get = void 0;
+  _exports.max = _exports.turn = _exports.hasProperty = _exports.get = void 0;
+  _isObject2 = _interopRequireDefault(_isObject2);
+  _isEmpty2 = _interopRequireDefault(_isEmpty2);
+  _isArray2 = _interopRequireDefault(_isArray2);
+  _get2 = _interopRequireDefault(_get2);
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
   var get = function get(target, path) {
     if (typeof target === "object") {
@@ -39,18 +45,18 @@
 
   _exports.get = get;
 
-  var hasValue = function hasValue(obj, value, key) {
-    if (arguments.length == 1 && _.isObject(obj)) return _.isEmpty(obj);
-    if (_.isArray(obj)) for (var i = 0, l = obj.length; i < l; i++) {
+  var hasProperty = function hasProperty(obj, value, key) {
+    if (arguments.length == 1 && (0, _isObject2.default)(obj)) return (0, _isEmpty2.default)(obj);
+    if ((0, _isArray2.default)(obj)) for (var i = 0, l = obj.length; i < l; i++) {
       if (obj[i] === value) return true;
     }
 
-    if (_.isObject(obj)) {
+    if ((0, _isObject2.default)(obj)) {
       if (key) {
-        return _.get(obj, key) === value;
+        return (0, _get2.default)(obj, key) === value;
       } else {
         for (var key in obj) {
-          if (_.get(obj, key) === value) return true;
+          if ((0, _get2.default)(obj, key) === value) return true;
         }
       }
     }
@@ -58,7 +64,7 @@
     return false;
   };
 
-  _exports.hasValue = hasValue;
+  _exports.hasProperty = hasProperty;
 
   var turn = function turn(i, p, ts) {
     if (i < 0) {
