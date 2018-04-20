@@ -22,4 +22,5 @@ const op = operate({
 
 
 //op.concat([1,2,3,4,5,6]);
+op.clone.concat([1,2,3,4,5,6]);
 //op.promisify([1,2,3,4]);

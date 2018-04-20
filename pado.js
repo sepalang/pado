@@ -8099,6 +8099,26 @@
           return pullData;
         }
       });
+      Object.defineProperty(this, "clone", {
+        value: function value(deep, parentOperate) {
+          if (deep === void 0) {
+            deep = true;
+          }
+
+          var cloneOperate = operateFunction({
+            input: input,
+            output: output,
+            concurrent: concurrent,
+            rescue: rescue,
+            limitInput: limitInput,
+            limitOutput: limitOutput
+          });
+          deep === true && _this.children.forEach(function (child) {
+            child.clone(true, cloneOperate);
+          });
+          return cloneOperate;
+        }
+      });
     };
 
     operate.prototype = {

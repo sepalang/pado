@@ -143,6 +143,18 @@ export const operate = (function(){
         pullData.length && kickStart();
         return pullData;
       }
+    });
+    
+    Object.defineProperty(this,"clone",{
+      value:(deep=true,parentOperate)=>{
+        let cloneOperate = operateFunction({ input, output, concurrent, rescue, limitInput, limitOutput });
+        
+        deep === true && this.children.forEach(child=>{
+          child.clone(true,cloneOperate);
+        });
+        
+        return cloneOperate;
+      }
     })
   };
   
