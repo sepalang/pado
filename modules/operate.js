@@ -20,31 +20,6 @@
 
   function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
 
-  var immediate = function immediate(fn, timeout) {
-    if (timeout === void 0) {
-      timeout = 0;
-    }
-
-    var reserved;
-    var allArgs = [];
-    return function () {
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      allArgs.push(args);
-
-      if (!reserved) {
-        reserved = setTimeout(function () {
-          fn(allArgs);
-          allArgs = [];
-          clearTimeout(reserved);
-          reserved = undefined;
-        }, 0);
-      }
-    };
-  };
-
   var operate = function () {
     var PARENT_OUTPUT_UPDATED = "ParentOutputUpdated";
     var CHILDREN_INPUT_UPDATED = "ParentOutputUpdated";

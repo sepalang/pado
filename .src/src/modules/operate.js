@@ -3,22 +3,6 @@ import {
   isNumber
 } from '../functions';
 
-const immediate = function(fn,timeout=0){
-  let reserved;
-  let allArgs = [];
-  return function(...args){
-    allArgs.push(args);
-    if(!reserved){
-      reserved = setTimeout(()=>{
-        fn(allArgs);
-        allArgs = [];
-        clearTimeout(reserved);
-        reserved = undefined;
-      },0);
-    }
-  };
-};
-
 export const operate = (function(){
   const PARENT_OUTPUT_UPDATED = "ParentOutputUpdated";
   const CHILDREN_INPUT_UPDATED = "ParentOutputUpdated";
