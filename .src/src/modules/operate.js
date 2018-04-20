@@ -1,4 +1,5 @@
 import { 
+  asArray,
   isNumber
 } from '../functions';
 
@@ -71,28 +72,45 @@ export const operate = (function(){
         return;
       }
       
-      Array(avaliableQueLength).fill(inputOutput).forEach(({input, output})=>{
+      Array(avaliableQueLength).fill(inputOutput).forEach(async ({input, output})=>{
         let entry = this.inputs.shift();
-        const outputHandle = (formInputDataum)=>{
+        current++;
+        
+        const outputHandle = async (formInputDataum)=>{
           if(output){
-            output({ entry:formInputDataum });
+            await output({ entry:formInputDataum });
           }
+          
           this.outputs.push(formInputDataum);
+          current--;
+          
           this.children.forEach(child=>child.emit(PARENT_OUTPUT_UPDATED));
           kickStart();
         };
         
         if(input){
-          input({ entry, output:outputHandle });
+          try {
+            outputHandle(await input({ entry }));
+          } catch(e) {
+            throw e;
+          }
         } else {
           outputHandle(entry);
         }
       });
     };
-    
+
     Object.defineProperty(this,"push",{
       value:(pushData)=>{
         this.inputs.push(pushData);
+        kickStart();
+        return this;
+      }
+    });
+    
+    Object.defineProperty(this,"concat",{
+      value:(pushData)=>{
+        asArray(pushData).forEach(d=>this.inputs.push(d));
         kickStart();
         return this;
       }
@@ -102,9 +120,10 @@ export const operate = (function(){
       value:(eventName, payload)=>{
         switch(eventName){
           case PARENT_OUTPUT_UPDATED:
-            if(!this.avaliablePullCount) return;
+            if(this.avaliablePullCount < 1) return;
             let pullData = this.parent.pull(this.avaliablePullCount);
-            if(!pullData.length) return;
+            
+            if(pullData.length < 1) return;
             pullData.forEach(datum=>this.inputs.push(datum));
             kickStart();
             break;
@@ -114,7 +133,7 @@ export const operate = (function(){
     
     Object.defineProperty(this,"pull",{
       value:(pullLength)=>{
-        if(!isNumber(pullLength)) return [];
+        if(!(isNumber(pullLength) || pullLength == Number.POSITIVE_INFINITY)) return [];
         const pullData = this.outputs.splice(0,pullLength);
         pullData.length && kickStart();
         return pullData;
@@ -144,4 +163,5 @@ export const operate = (function(){
   };
   
   return operateFunction;
+  
 }());

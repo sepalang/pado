@@ -1,15 +1,25 @@
-import { operate } from '../../src';
+import { operate, promise, randRange } from '../../src';
 
+console.log("start operate feature test")
 const op = operate({
-  limitOutput:1,
-  input:({ entry, output })=>{
-    output(entry)
+  input:({ entry })=>{
+    console.log("op1 start",entry);
+    return entry;
   },
   output:({ entry })=>{
-    console.log('entry',entry);
+    return promise.timeout(()=>{ console.log("op1 end", entry); return entry; },2000);
+  }
+})
+.operate({
+  input:({ entry })=>{
+    const wait = randRange([1800,3000]);
+    return promise.timeout(()=>{ return entry; },wait);
+  },
+  output:({ entry })=>{
+    console.log('op2 output',entry);
   }
 });
 
-op.push(1);
-op.push(2);
-op.push(3);
+
+//op.concat([1,2,3,4,5,6]);
+//op.promisify([1,2,3,4]);

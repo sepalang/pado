@@ -12,20 +12,21 @@ const PromiseFunction = function(fn) {
     isMaybePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
   });
 };
+
 export const promise = PromiseFunction;
 export const all     = PromiseFunction.all = Promise.all;
 export const resolve = PromiseFunction.resolve = resolveFn;
 export const reject  = PromiseFunction.reject = rejectFn;
 export const timeout = PromiseFunction.timeout = function(fn,time){
   if(typeof fn === "number"){
-    return q( resolve => setTimeout(() => resolve(time), fn) );
+    return PromiseFunction( resolve => setTimeout(() => resolve(time), fn) );
   } else {
-    return q( resolve => setTimeout(() => resolve(typeof fn === "function" ? fn() : fn),time) );
+    return PromiseFunction( resolve => setTimeout(() => resolve(typeof fn === "function" ? fn() : fn),time) );
   }
 };
 
 export const valueOf = PromiseFunction.valueOf = function(maybeQ){
-  return q(function(resolve,reject){
+  return PromiseFunction(function(resolve,reject){
     isMaybePromise(maybeQ) ?
     maybeQ.then(resolve).catch(reject) :
     resolve(maybeQ) ;
@@ -66,15 +67,15 @@ export const defer = PromiseFunction.defer = function(){
 export const wheel = PromiseFunction.wheel = function(tasks, option) {
 
   if(!(tasks instanceof Array)) {
-    return q.reject(new Error("tasks must be array"));
+    return PromiseFunction.reject(new Error("tasks must be array"));
   }
 
   if(!tasks.length || !tasks.some(e=>typeof e === "function")) {
-    return q.reject(new Error("not found wheel executable"));
+    return PromiseFunction.reject(new Error("not found wheel executable"));
   }
 
   if(!tasks.some(e=>(typeof e !== "function" || typeof e !== "number"))) {
-    return q.reject(new Error("wheel task only function or number executable"));
+    return PromiseFunction.reject(new Error("wheel task only function or number executable"));
   }
 
   if(typeof option !== "object") {
@@ -82,7 +83,7 @@ export const wheel = PromiseFunction.wheel = function(tasks, option) {
   }
 
   let finished = false;
-  const defer = q.defer();
+  const defer = PromiseFunction.defer();
   const limit = (typeof option.limit === "number" && option.limit > 0) ? parseInt(option.limit, 10) : 10000;
   const taskLength = tasks.length;
   let wheelTick = 0;
@@ -125,12 +126,12 @@ export const wheel = PromiseFunction.wheel = function(tasks, option) {
 
   defer.promise
   .then(e=>{
-    if(finished === null) return q.abort();
+    if(finished === null) return PromiseFunction.abort();
     finished = true;
     return e;
   })
   .catch(e=>{
-    if(finished === null) return q.abort();
+    if(finished === null) return PromiseFunction.abort();
     finished = true;
     return e;
   });

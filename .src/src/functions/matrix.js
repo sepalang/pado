@@ -3,8 +3,8 @@ import { isAbsoluteNaN } from './isLike'
 import { max, turn } from './reducer';
 import { times } from './enumerator';
 
-export const range = function(value,step,sizeBase){
-  var r=[],start,end,reverse;
+export const rangeModel = function(value,step,sizeBase){
+  var start,end,reverse;
   
   if(typeof value === "number"){
     end   = value;
@@ -38,6 +38,26 @@ export const range = function(value,step,sizeBase){
   end=parseFloat(end),end=isAbsoluteNaN(end)?0:end;
   start=parseFloat(start),start=isAbsoluteNaN(start)?0:start;
   step=parseFloat(step),step=isAbsoluteNaN(step)||step==0?1:step;
+  
+  return {
+    start,
+    end,
+    step,
+    reverse,
+    sizeBase
+  }
+};
+
+export const range = function(value,stepSize,sizeBaseRange){
+  let r=[];
+  let {
+    start,
+    end,
+    step,
+    reverse,
+    sizeBase
+  } = rangeModel(value,stepSize,sizeBaseRange);
+  
   if(step <= 0){ return console.warn("range::not support minus step"),r;};
   if(sizeBase==false){ for(var i=start,l=end;i<=l;i=i+step) r.push(i); } else { for(var i=start,l=end;i<l;i=i+step) r.push(i); }
   return reverse ? r.reverse() : r;

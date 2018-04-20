@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.replace", "./isLike"], factory);
+    define(["exports", "core-js/modules/es6.regexp.replace", "./isLike", "./matrix"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.replace"), require("./isLike"));
+    factory(exports, require("core-js/modules/es6.regexp.replace"), require("./isLike"), require("./matrix"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.isLike);
+    factory(mod.exports, global.es6Regexp, global.isLike, global.matrix);
     global.random = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _isLike) {
+})(this, function (_exports, _es6Regexp, _isLike, _matrix) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.tokenize = _exports.rand64 = void 0;
+  _exports.randRange = _exports.tokenize = _exports.rand64 = void 0;
 
   var rand64 = function () {
     var rand64Token = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -43,4 +43,15 @@
   };
 
   _exports.tokenize = tokenize;
+
+  var randRange = function randRange(rangeValue, nice) {
+    var _rangeModel = (0, _matrix.rangeModel)(rangeValue),
+        start = _rangeModel.start,
+        end = _rangeModel.end;
+
+    var result = start + Math.random() * (end - start);
+    return nice === true ? Math.ceil(result) : result;
+  };
+
+  _exports.randRange = randRange;
 });
