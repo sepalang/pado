@@ -1,22 +1,25 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.promise", "../functions"], factory);
+    define(["exports", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/es6.string.repeat", "core-js/modules/web.dom.iterable", "core-js/modules/es6.promise", "../functions", "./operate"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.promise"), require("../functions"));
+    factory(exports, require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.string.repeat"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.promise"), require("../functions"), require("./operate"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.es6, global.functions);
+    factory(mod.exports, global.runtime, global.es6Array, global.es6String, global.webDom, global.es6, global.functions, global.operate);
     global.promise = mod.exports;
   }
-})(this, function (_exports, _webDom, _es, _functions) {
+})(this, function (_exports, _runtime, _es6Array, _es6String, _webDom, _es, _functions, _operate) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.wheel = _exports.defer = _exports.abort = _exports.valueOf = _exports.timeout = _exports.reject = _exports.resolve = _exports.all = _exports.promise = void 0;
+  _exports.sequance = _exports.wheel = _exports.defer = _exports.abort = _exports.valueOf = _exports.timeout = _exports.reject = _exports.resolve = _exports.all = _exports.promise = void 0;
+
+  function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
+
   var PromiseClass = Promise;
 
   var isMaybePromise = function isMaybePromise(target) {
@@ -207,4 +210,122 @@
   };
 
   _exports.wheel = wheel;
+
+  var sequance = PromiseFunction.sequance = function (funcArray, opts) {
+    return q(function (resolve, reject) {
+      var option = (0, _functions.asObject)(opts, "concurrent");
+
+      if (option.concurrent === true) {
+        option.concurrent = Number.POSITIVE_INFINITY;
+      } else if (!(0, _functions.isNumber)(option.concurrent) || option.concurrent < 1) {
+        option.concurrent = 1;
+      }
+
+      if (!(0, _functions.isNumber)(option.interval) || option.interval < -1) {
+        option.interval = -1;
+      }
+
+      if (!(0, _functions.isNumber)(option.repeat) || option.repeat < 1) {
+        option.repeat = 1;
+      } //set task with repeat
+
+
+      var sequanceTaskEntries = Array(option.repeat).fill((0, _functions.asArray)(funcArray)).reduce(function (dest, tasks) {
+        tasks.forEach(function (fn, index) {
+          return dest.push([index, fn]);
+        });
+        return dest;
+      }, []);
+      var sequanceLength = sequanceTaskEntries.length;
+      var sequanceComplete = 0;
+      var sequanceReseult = Array(sequanceTaskEntries.length);
+      var sequanceOperator = (0, _operate.operate)({
+        output: function () {
+          var _output = _asyncToGenerator(
+          /*#__PURE__*/
+          regeneratorRuntime.mark(function _callee(_ref) {
+            var entry;
+            return regeneratorRuntime.wrap(function _callee$(_context) {
+              while (1) {
+                switch (_context.prev = _context.next) {
+                  case 0:
+                    entry = _ref.entry;
+
+                    if (!(option.interval > -1)) {
+                      _context.next = 4;
+                      break;
+                    }
+
+                    _context.next = 4;
+                    return q.timeout(option.interval);
+
+                  case 4:
+                    return _context.abrupt("return", entry);
+
+                  case 5:
+                  case "end":
+                    return _context.stop();
+                }
+              }
+            }, _callee, this);
+          }));
+
+          return function output(_x) {
+            return _output.apply(this, arguments);
+          };
+        }(),
+        limitOutput: 1
+      }).operate({
+        concurrent: option.concurrent,
+        input: function () {
+          var _input = _asyncToGenerator(
+          /*#__PURE__*/
+          regeneratorRuntime.mark(function _callee2(_ref2) {
+            var entry, index, fn;
+            return regeneratorRuntime.wrap(function _callee2$(_context2) {
+              while (1) {
+                switch (_context2.prev = _context2.next) {
+                  case 0:
+                    entry = _ref2.entry;
+                    index = entry[0], fn = entry[1];
+                    _context2.t0 = entry;
+                    _context2.next = 5;
+                    return fn();
+
+                  case 5:
+                    _context2.t1 = _context2.sent;
+
+                    _context2.t0.push.call(_context2.t0, _context2.t1);
+
+                    return _context2.abrupt("return", entry);
+
+                  case 8:
+                  case "end":
+                    return _context2.stop();
+                }
+              }
+            }, _callee2, this);
+          }));
+
+          return function input(_x2) {
+            return _input.apply(this, arguments);
+          };
+        }(),
+        output: function output(_ref3) {
+          var entry = _ref3.entry;
+          var index = entry[0],
+              fn = entry[1],
+              result = entry[2];
+          sequanceReseult[index] = result;
+          sequanceComplete++;
+
+          if (sequanceComplete === sequanceLength) {
+            resolve(sequanceReseult);
+          }
+        }
+      }).concat(sequanceTaskEntries);
+    });
+  };
+
+  _exports.sequance = sequance;
 });

@@ -52,7 +52,7 @@
 
   var asObject = function asObject(data, defaultKey) {
     if (defaultKey === void 0) {
-      defaultKey = "value";
+      defaultKey = "default";
     }
 
     if ((0, _isLike.isPlainObject)(data)) {

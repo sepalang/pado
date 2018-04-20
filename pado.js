@@ -324,12 +324,12 @@
 
   $exports.store = store;
 
-  var require$$0 = /*#__PURE__*/Object.freeze({
+  var wks = /*#__PURE__*/Object.freeze({
 
   });
 
   var _fixReWks = function (KEY, length, exec) {
-    var SYMBOL = require$$0(KEY);
+    var SYMBOL = wks(KEY);
     var fns = exec(_defined, SYMBOL, ''[KEY]);
     var strfn = fns[0];
     var rxfn = fns[1];
@@ -467,7 +467,7 @@
 
   var uid$1 = require('./_uid');
 
-  var wks = require('./_wks');
+  var wks$1 = require('./_wks');
 
   var wksExt = require('./_wks-ext');
 
@@ -506,8 +506,8 @@
   var _stringify = $JSON && $JSON.stringify;
 
   var PROTOTYPE$1 = 'prototype';
-  var HIDDEN = wks('_hidden');
-  var TO_PRIMITIVE = wks('toPrimitive');
+  var HIDDEN = wks$1('_hidden');
+  var TO_PRIMITIVE = wks$1('toPrimitive');
   var isEnum = {}.propertyIsEnumerable;
   var SymbolRegistry = shared('symbol-registry');
   var AllSymbols = shared('symbols');
@@ -662,7 +662,7 @@
     }
 
     wksExt.f = function (name) {
-      return wrap(wks(name));
+      return wrap(wks$1(name));
     };
   }
 
@@ -672,10 +672,10 @@
 
   for (var es6Symbols = // 19.4.2.2, 19.4.2.3, 19.4.2.4, 19.4.2.6, 19.4.2.8, 19.4.2.9, 19.4.2.10, 19.4.2.11, 19.4.2.12, 19.4.2.13, 19.4.2.14
   'hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables'.split(','), j = 0; es6Symbols.length > j;) {
-    wks(es6Symbols[j++]);
+    wks$1(es6Symbols[j++]);
   }
 
-  for (var wellKnownSymbols = $keys(wks.store), k = 0; wellKnownSymbols.length > k;) {
+  for (var wellKnownSymbols = $keys(wks$1.store), k = 0; wellKnownSymbols.length > k;) {
     wksDefine(wellKnownSymbols[k++]);
   }
 
@@ -1001,7 +1001,7 @@
   };
   var asObject = function asObject(data, defaultKey) {
     if (defaultKey === void 0) {
-      defaultKey = "value";
+      defaultKey = "default";
     }
 
     if (isPlainObject(data)) {
@@ -5285,7 +5285,7 @@
   // getting tag from 19.1.3.6 Object.prototype.toString()
 
 
-  var TAG = require$$0('toStringTag'); // ES3 wrong here
+  var TAG = wks('toStringTag'); // ES3 wrong here
 
 
   var ARG = _cof(function () {
@@ -5334,7 +5334,7 @@
   // check on default Array iterator
 
 
-  var ITERATOR = require$$0('iterator');
+  var ITERATOR = wks('iterator');
 
   var ArrayProto = Array.prototype;
 
@@ -5367,7 +5367,7 @@
   });
   var _core_1 = _core.version;
 
-  var ITERATOR$1 = require$$0('iterator');
+  var ITERATOR$1 = wks('iterator');
 
 
 
@@ -5406,7 +5406,7 @@
 
 
 
-  var SPECIES = require$$0('species');
+  var SPECIES = wks('species');
 
   var _speciesConstructor = function (O, D) {
     var C = _anObject(O).constructor;
@@ -5674,7 +5674,7 @@
 
 
 
-  var TAG$1 = require$$0('toStringTag');
+  var TAG$1 = wks('toStringTag');
 
   var _setToStringTag = function (it, tag, stat) {
     if (it && !_has(it = stat ? it : it.prototype, TAG$1)) def(it, TAG$1, {
@@ -5683,7 +5683,7 @@
     });
   };
 
-  var SPECIES$1 = require$$0('species');
+  var SPECIES$1 = wks('species');
 
   var _setSpecies = function (KEY) {
     var C = _global[KEY];
@@ -5815,7 +5815,7 @@
       // correct subclassing with @@species support
       var promise = $Promise.resolve(1);
 
-      var FakePromise = (promise.constructor = {})[require$$0('species')] = function (exec) {
+      var FakePromise = (promise.constructor = {})[wks('species')] = function (exec) {
         exec(empty, empty);
       }; // unhandled rejections tracking support, NodeJS Promise without it fails @@species test
 
@@ -6870,8 +6870,40 @@
     return this;
   }() || Function("return this")());
 
+  // 7.1.13 ToObject(argument)
+
+
+  var _toObject = function (it) {
+    return Object(_defined(it));
+  };
+
+  var max$1 = Math.max;
+  var min$1 = Math.min;
+
+  var _toAbsoluteIndex = function (index, length) {
+    index = _toInteger(index);
+    return index < 0 ? max$1(index + length, 0) : min$1(index, length);
+  };
+
+  var _arrayFill = function fill(value
+  /* , start = 0, end = @length */
+  ) {
+    var O = _toObject(this);
+    var length = _toLength(O.length);
+    var aLen = arguments.length;
+    var index = _toAbsoluteIndex(aLen > 1 ? arguments[1] : undefined, length);
+    var end = aLen > 2 ? arguments[2] : undefined;
+    var endPos = end === undefined ? length : _toAbsoluteIndex(end, length);
+
+    while (endPos > index) {
+      O[index++] = value;
+    }
+
+    return O;
+  };
+
   // 22.1.3.31 Array.prototype[@@unscopables]
-  var UNSCOPABLES = require$$0('unscopables');
+  var UNSCOPABLES = wks('unscopables');
 
   var ArrayProto$1 = Array.prototype;
   if (ArrayProto$1[UNSCOPABLES] == undefined) _hide(ArrayProto$1, UNSCOPABLES, {});
@@ -6879,6 +6911,33 @@
   var _addToUnscopables = function (key) {
     ArrayProto$1[UNSCOPABLES][key] = true;
   };
+
+  // 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
+
+
+  $export$1($export$1.P, 'Array', {
+    fill: _arrayFill
+  });
+
+  _addToUnscopables('fill');
+
+  var _stringRepeat = function repeat(count) {
+    var str = String(_defined(this));
+    var res = '';
+    var n = _toInteger(count);
+    if (n < 0 || n == Infinity) throw RangeError("Count can't be negative");
+
+    for (; n > 0; (n >>>= 1) && (str += str)) {
+      if (n & 1) res += str;
+    }
+
+    return res;
+  };
+
+  $export$1($export$1.P, 'String', {
+    // 21.1.3.13 String.prototype.repeat(count)
+    repeat: _stringRepeat
+  });
 
   var _iterStep = function (done, value) {
     return {
@@ -7049,14 +7108,6 @@
   _addToUnscopables('values');
   _addToUnscopables('entries');
 
-  var max$1 = Math.max;
-  var min$1 = Math.min;
-
-  var _toAbsoluteIndex = function (index, length) {
-    index = _toInteger(index);
-    return index < 0 ? max$1(index + length, 0) : min$1(index, length);
-  };
-
   // false -> Array#indexOf
   // true  -> Array#includes
 
@@ -7148,8 +7199,8 @@
     return _objectKeysInternal(O, _enumBugKeys);
   };
 
-  var ITERATOR$4 = require$$0('iterator');
-  var TO_STRING_TAG = require$$0('toStringTag');
+  var ITERATOR$4 = wks('iterator');
+  var TO_STRING_TAG = wks('toStringTag');
   var ArrayValues = _iterators.Array;
   var DOMIterables = {
     CSSRuleList: true,
@@ -7204,6 +7255,276 @@
       }
     }
   }
+
+  var operate = function () {
+    var PARENT_OUTPUT_UPDATED = "ParentOutputUpdated";
+
+    var operate = function operate(_ref) {
+      var _this = this;
+
+      var input = _ref.input,
+          output = _ref.output,
+          concurrent = _ref.concurrent,
+          rescue = _ref.rescue,
+          limitInput = _ref.limitInput,
+          limitOutput = _ref.limitOutput;
+      this.parent = undefined;
+      this.children = [];
+      this.inputs = [];
+      this.outputs = [];
+      this.limitInput = isNumber(limitInput) || limitInput > 0 ? limitInput : Number.POSITIVE_INFINITY;
+      this.limitOutput = isNumber(limitOutput) || limitOutput > 0 ? limitOutput : Number.POSITIVE_INFINITY; //
+
+      var current = 0;
+      concurrent = isNumber(concurrent) || concurrent > 0 ? concurrent : 1;
+      Object.defineProperty(this, "avaliablePullCount", {
+        get: function get() {
+          var limit = _this.limitInput - _this.inputs.length;
+          if (limit < 0) limit = 0;
+          return limit;
+        }
+      });
+      Object.defineProperty(this, "avaliableOutputCount", {
+        get: function get() {
+          return _this.limitOutput + current + _this.outputs.length;
+        }
+      });
+      var inputOutput = {
+        input: input,
+        output: output
+      };
+
+      var kickStart = function kickStart() {
+        var avaliableQueLength = concurrent - current; // 작동가능한 큐
+
+        if (avaliableQueLength < 1) {
+          return;
+        } // input의 길이로 확인하여 실행 가능한 큐
+
+
+        if (avaliableQueLength > _this.inputs.length) {
+          avaliableQueLength = _this.inputs.length;
+        } // output의 제한을 확인하여 사용 가능한 큐
+
+
+        if (avaliableQueLength > _this.avaliableOutputCount) {
+          avaliableQueLength = _this.avaliableOutputCount;
+        }
+
+        if (avaliableQueLength < 1) {
+          return;
+        }
+
+        Array(avaliableQueLength).fill(inputOutput).forEach(
+        /*#__PURE__*/
+        function () {
+          var _ref3 = _asyncToGenerator(
+          /*#__PURE__*/
+          regeneratorRuntime.mark(function _callee2(_ref2) {
+            var input, output, entry, outputHandle;
+            return regeneratorRuntime.wrap(function _callee2$(_context2) {
+              while (1) {
+                switch (_context2.prev = _context2.next) {
+                  case 0:
+                    input = _ref2.input, output = _ref2.output;
+                    entry = _this.inputs.shift();
+                    current++;
+
+                    outputHandle =
+                    /*#__PURE__*/
+                    function () {
+                      var _ref4 = _asyncToGenerator(
+                      /*#__PURE__*/
+                      regeneratorRuntime.mark(function _callee(formInputDataum) {
+                        var out;
+                        return regeneratorRuntime.wrap(function _callee$(_context) {
+                          while (1) {
+                            switch (_context.prev = _context.next) {
+                              case 0:
+                                if (!(typeof output === "function")) {
+                                  _context.next = 4;
+                                  break;
+                                }
+
+                                _context.next = 3;
+                                return output({
+                                  entry: formInputDataum
+                                });
+
+                              case 3:
+                                out = _context.sent;
+
+                              case 4:
+                                _this.outputs.push(formInputDataum);
+
+                                current--;
+
+                                _this.children.forEach(function (child) {
+                                  return child.emit(PARENT_OUTPUT_UPDATED);
+                                });
+
+                                kickStart();
+
+                              case 8:
+                              case "end":
+                                return _context.stop();
+                            }
+                          }
+                        }, _callee, this);
+                      }));
+
+                      return function outputHandle(_x2) {
+                        return _ref4.apply(this, arguments);
+                      };
+                    }();
+
+                    if (!input) {
+                      _context2.next = 23;
+                      break;
+                    }
+
+                    _context2.prev = 5;
+                    _context2.t0 = outputHandle;
+                    _context2.next = 9;
+                    return input({
+                      entry: entry
+                    });
+
+                  case 9:
+                    _context2.t1 = _context2.sent;
+                    (0, _context2.t0)(_context2.t1);
+                    _context2.next = 21;
+                    break;
+
+                  case 13:
+                    _context2.prev = 13;
+                    _context2.t2 = _context2["catch"](5);
+
+                    if (!(typeof rescue === "function")) {
+                      _context2.next = 19;
+                      break;
+                    }
+
+                    rescue(_context2.t2);
+                    _context2.next = 20;
+                    break;
+
+                  case 19:
+                    throw _context2.t2;
+
+                  case 20:
+                    current--;
+
+                  case 21:
+                    _context2.next = 24;
+                    break;
+
+                  case 23:
+                    outputHandle(entry);
+
+                  case 24:
+                  case "end":
+                    return _context2.stop();
+                }
+              }
+            }, _callee2, this, [[5, 13]]);
+          }));
+
+          return function (_x) {
+            return _ref3.apply(this, arguments);
+          };
+        }());
+      };
+
+      Object.defineProperty(this, "push", {
+        value: function value(pushData) {
+          _this.inputs.push(pushData);
+
+          kickStart();
+          return _this;
+        }
+      });
+      Object.defineProperty(this, "concat", {
+        value: function value(pushData) {
+          asArray$1(pushData).forEach(function (d) {
+            return _this.inputs.push(d);
+          });
+          kickStart();
+          return _this;
+        }
+      });
+      Object.defineProperty(this, "emit", {
+        value: function value(eventName, payload) {
+          switch (eventName) {
+            case PARENT_OUTPUT_UPDATED:
+              if (_this.avaliablePullCount < 1) return;
+
+              var pullData = _this.parent.pull(_this.avaliablePullCount);
+
+              if (pullData.length < 1) return;
+              pullData.forEach(function (datum) {
+                return _this.inputs.push(datum);
+              });
+              kickStart();
+              break;
+          }
+        }
+      });
+      Object.defineProperty(this, "pull", {
+        value: function value(pullLength) {
+          if (!(isNumber(pullLength) || pullLength == Number.POSITIVE_INFINITY)) return [];
+
+          var pullData = _this.outputs.splice(0, pullLength); //pullData.length && kickStart();
+
+
+          return pullData;
+        }
+      });
+      Object.defineProperty(this, "clone", {
+        value: function value(deep, parentOperate) {
+          if (deep === void 0) {
+            deep = true;
+          }
+
+          var cloneOperate = operateFunction({
+            input: input,
+            output: output,
+            concurrent: concurrent,
+            rescue: rescue,
+            limitInput: limitInput,
+            limitOutput: limitOutput
+          });
+          deep === true && _this.children.forEach(function (child) {
+            child.clone(true, cloneOperate);
+          });
+          return cloneOperate;
+        }
+      });
+    };
+
+    operate.prototype = {
+      append: function append(child) {
+        child.parent = this;
+        this.children.push(child);
+        return this;
+      },
+      remove: function remove(child) {
+        var index = this.children.indexOf(child);
+        if (index < 0) return this;
+        child.parent = undefined;
+        this.children.splice(index, 1);
+      },
+      operate: function operate(option) {
+        return this.append(operateFunction(option));
+      }
+    };
+
+    var operateFunction = function operateFunction(option) {
+      return new operate(Object.assign({}, option));
+    };
+
+    return operateFunction;
+  }();
 
   var PromiseClass = Promise;
 
@@ -7375,6 +7696,121 @@
 
     defer.reset(0);
     return defer;
+  };
+  var sequance = PromiseFunction.sequance = function (funcArray, opts) {
+    return q(function (resolve, reject) {
+      var option = asObject(opts, "concurrent");
+
+      if (option.concurrent === true) {
+        option.concurrent = Number.POSITIVE_INFINITY;
+      } else if (!isNumber(option.concurrent) || option.concurrent < 1) {
+        option.concurrent = 1;
+      }
+
+      if (!isNumber(option.interval) || option.interval < -1) {
+        option.interval = -1;
+      }
+
+      if (!isNumber(option.repeat) || option.repeat < 1) {
+        option.repeat = 1;
+      } //set task with repeat
+
+
+      var sequanceTaskEntries = Array(option.repeat).fill(asArray$1(funcArray)).reduce(function (dest, tasks) {
+        tasks.forEach(function (fn, index) {
+          return dest.push([index, fn]);
+        });
+        return dest;
+      }, []);
+      var sequanceLength = sequanceTaskEntries.length;
+      var sequanceComplete = 0;
+      var sequanceReseult = Array(sequanceTaskEntries.length);
+      var sequanceOperator = operate({
+        output: function () {
+          var _output = _asyncToGenerator(
+          /*#__PURE__*/
+          regeneratorRuntime.mark(function _callee(_ref) {
+            var entry;
+            return regeneratorRuntime.wrap(function _callee$(_context) {
+              while (1) {
+                switch (_context.prev = _context.next) {
+                  case 0:
+                    entry = _ref.entry;
+
+                    if (!(option.interval > -1)) {
+                      _context.next = 4;
+                      break;
+                    }
+
+                    _context.next = 4;
+                    return q.timeout(option.interval);
+
+                  case 4:
+                    return _context.abrupt("return", entry);
+
+                  case 5:
+                  case "end":
+                    return _context.stop();
+                }
+              }
+            }, _callee, this);
+          }));
+
+          return function output(_x) {
+            return _output.apply(this, arguments);
+          };
+        }(),
+        limitOutput: 1
+      }).operate({
+        concurrent: option.concurrent,
+        input: function () {
+          var _input = _asyncToGenerator(
+          /*#__PURE__*/
+          regeneratorRuntime.mark(function _callee2(_ref2) {
+            var entry, index, fn;
+            return regeneratorRuntime.wrap(function _callee2$(_context2) {
+              while (1) {
+                switch (_context2.prev = _context2.next) {
+                  case 0:
+                    entry = _ref2.entry;
+                    index = entry[0], fn = entry[1];
+                    _context2.t0 = entry;
+                    _context2.next = 5;
+                    return fn();
+
+                  case 5:
+                    _context2.t1 = _context2.sent;
+
+                    _context2.t0.push.call(_context2.t0, _context2.t1);
+
+                    return _context2.abrupt("return", entry);
+
+                  case 8:
+                  case "end":
+                    return _context2.stop();
+                }
+              }
+            }, _callee2, this);
+          }));
+
+          return function input(_x2) {
+            return _input.apply(this, arguments);
+          };
+        }(),
+        output: function output(_ref3) {
+          var entry = _ref3.entry;
+          var index = entry[0],
+              fn = entry[1],
+              result = entry[2];
+          sequanceReseult[index] = result;
+          sequanceComplete++;
+
+          if (sequanceComplete === sequanceLength) {
+            resolve(sequanceReseult);
+          }
+        }
+      }).concat(sequanceTaskEntries);
+    });
   };
 
   var awaitLeadOnly = function awaitLeadOnly(func) {
@@ -7845,309 +8281,6 @@
   paginateFactory.constructor = PaginateClass;
   var Paginate = PaginateClass;
   var paginate = paginateFactory;
-
-  // 7.1.13 ToObject(argument)
-
-
-  var _toObject = function (it) {
-    return Object(_defined(it));
-  };
-
-  var _arrayFill = function fill(value
-  /* , start = 0, end = @length */
-  ) {
-    var O = _toObject(this);
-    var length = _toLength(O.length);
-    var aLen = arguments.length;
-    var index = _toAbsoluteIndex(aLen > 1 ? arguments[1] : undefined, length);
-    var end = aLen > 2 ? arguments[2] : undefined;
-    var endPos = end === undefined ? length : _toAbsoluteIndex(end, length);
-
-    while (endPos > index) {
-      O[index++] = value;
-    }
-
-    return O;
-  };
-
-  // 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
-
-
-  $export$1($export$1.P, 'Array', {
-    fill: _arrayFill
-  });
-
-  _addToUnscopables('fill');
-
-  var operate = function () {
-    var PARENT_OUTPUT_UPDATED = "ParentOutputUpdated";
-
-    var operate = function operate(_ref) {
-      var _this = this;
-
-      var input = _ref.input,
-          output = _ref.output,
-          concurrent = _ref.concurrent,
-          rescue = _ref.rescue,
-          limitInput = _ref.limitInput,
-          limitOutput = _ref.limitOutput;
-      this.parent = undefined;
-      this.children = [];
-      this.inputs = [];
-      this.outputs = [];
-      this.limitInput = isNumber(limitInput) || limitInput > 0 ? limitInput : Number.POSITIVE_INFINITY;
-      this.limitOutput = isNumber(limitOutput) || limitOutput > 0 ? limitOutput : Number.POSITIVE_INFINITY; //
-
-      var current = 0;
-      concurrent = isNumber(concurrent) || concurrent > 0 ? concurrent : 1;
-      Object.defineProperty(this, "avaliablePullCount", {
-        get: function get() {
-          var limit = _this.limitInput - _this.inputs.length;
-          if (limit < 0) limit = 0;
-          return limit;
-        }
-      });
-      Object.defineProperty(this, "avaliableOutputCount", {
-        get: function get() {
-          return _this.limitOutput + current + _this.outputs.length;
-        }
-      });
-      var inputOutput = {
-        input: input,
-        output: output
-      };
-
-      var kickStart = function kickStart() {
-        var avaliableQueLength = concurrent - current; // 작동가능한 큐
-
-        if (avaliableQueLength < 1) {
-          return;
-        } // input의 길이로 확인하여 실행 가능한 큐
-
-
-        if (avaliableQueLength > _this.inputs.length) {
-          avaliableQueLength = _this.inputs.length;
-        } // output의 제한을 확인하여 사용 가능한 큐
-
-
-        if (avaliableQueLength > _this.avaliableOutputCount) {
-          avaliableQueLength = _this.avaliableOutputCount;
-        }
-
-        if (avaliableQueLength < 1) {
-          return;
-        }
-
-        Array(avaliableQueLength).fill(inputOutput).forEach(
-        /*#__PURE__*/
-        function () {
-          var _ref3 = _asyncToGenerator(
-          /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee2(_ref2) {
-            var input, output, entry, outputHandle;
-            return regeneratorRuntime.wrap(function _callee2$(_context2) {
-              while (1) {
-                switch (_context2.prev = _context2.next) {
-                  case 0:
-                    input = _ref2.input, output = _ref2.output;
-                    entry = _this.inputs.shift();
-                    current++;
-
-                    outputHandle =
-                    /*#__PURE__*/
-                    function () {
-                      var _ref4 = _asyncToGenerator(
-                      /*#__PURE__*/
-                      regeneratorRuntime.mark(function _callee(formInputDataum) {
-                        var out;
-                        return regeneratorRuntime.wrap(function _callee$(_context) {
-                          while (1) {
-                            switch (_context.prev = _context.next) {
-                              case 0:
-                                if (!(typeof output === "function")) {
-                                  _context.next = 4;
-                                  break;
-                                }
-
-                                _context.next = 3;
-                                return output({
-                                  entry: formInputDataum
-                                });
-
-                              case 3:
-                                out = _context.sent;
-
-                              case 4:
-                                _this.outputs.push(formInputDataum);
-
-                                current--;
-
-                                _this.children.forEach(function (child) {
-                                  return child.emit(PARENT_OUTPUT_UPDATED);
-                                });
-
-                                kickStart();
-
-                              case 8:
-                              case "end":
-                                return _context.stop();
-                            }
-                          }
-                        }, _callee, this);
-                      }));
-
-                      return function outputHandle(_x2) {
-                        return _ref4.apply(this, arguments);
-                      };
-                    }();
-
-                    if (!input) {
-                      _context2.next = 23;
-                      break;
-                    }
-
-                    _context2.prev = 5;
-                    _context2.t0 = outputHandle;
-                    _context2.next = 9;
-                    return input({
-                      entry: entry
-                    });
-
-                  case 9:
-                    _context2.t1 = _context2.sent;
-                    (0, _context2.t0)(_context2.t1);
-                    _context2.next = 21;
-                    break;
-
-                  case 13:
-                    _context2.prev = 13;
-                    _context2.t2 = _context2["catch"](5);
-
-                    if (!(typeof rescue === "function")) {
-                      _context2.next = 19;
-                      break;
-                    }
-
-                    rescue(_context2.t2);
-                    _context2.next = 20;
-                    break;
-
-                  case 19:
-                    throw _context2.t2;
-
-                  case 20:
-                    current--;
-
-                  case 21:
-                    _context2.next = 24;
-                    break;
-
-                  case 23:
-                    outputHandle(entry);
-
-                  case 24:
-                  case "end":
-                    return _context2.stop();
-                }
-              }
-            }, _callee2, this, [[5, 13]]);
-          }));
-
-          return function (_x) {
-            return _ref3.apply(this, arguments);
-          };
-        }());
-      };
-
-      Object.defineProperty(this, "push", {
-        value: function value(pushData) {
-          _this.inputs.push(pushData);
-
-          kickStart();
-          return _this;
-        }
-      });
-      Object.defineProperty(this, "concat", {
-        value: function value(pushData) {
-          asArray$1(pushData).forEach(function (d) {
-            return _this.inputs.push(d);
-          });
-          kickStart();
-          return _this;
-        }
-      });
-      Object.defineProperty(this, "emit", {
-        value: function value(eventName, payload) {
-          switch (eventName) {
-            case PARENT_OUTPUT_UPDATED:
-              if (_this.avaliablePullCount < 1) return;
-
-              var pullData = _this.parent.pull(_this.avaliablePullCount);
-
-              if (pullData.length < 1) return;
-              pullData.forEach(function (datum) {
-                return _this.inputs.push(datum);
-              });
-              kickStart();
-              break;
-          }
-        }
-      });
-      Object.defineProperty(this, "pull", {
-        value: function value(pullLength) {
-          if (!(isNumber(pullLength) || pullLength == Number.POSITIVE_INFINITY)) return [];
-
-          var pullData = _this.outputs.splice(0, pullLength); //pullData.length && kickStart();
-
-
-          return pullData;
-        }
-      });
-      Object.defineProperty(this, "clone", {
-        value: function value(deep, parentOperate) {
-          if (deep === void 0) {
-            deep = true;
-          }
-
-          var cloneOperate = operateFunction({
-            input: input,
-            output: output,
-            concurrent: concurrent,
-            rescue: rescue,
-            limitInput: limitInput,
-            limitOutput: limitOutput
-          });
-          deep === true && _this.children.forEach(function (child) {
-            child.clone(true, cloneOperate);
-          });
-          return cloneOperate;
-        }
-      });
-    };
-
-    operate.prototype = {
-      append: function append(child) {
-        child.parent = this;
-        this.children.push(child);
-        return this;
-      },
-      remove: function remove(child) {
-        var index = this.children.indexOf(child);
-        if (index < 0) return this;
-        child.parent = undefined;
-        this.children.splice(index, 1);
-      },
-      operate: function operate(option) {
-        return this.append(operateFunction(option));
-      }
-    };
-
-    var operateFunction = function operateFunction(option) {
-      return new operate(Object.assign({}, option));
-    };
-
-    return operateFunction;
-  }();
 
 
 

@@ -1,4 +1,5 @@
-import { asArray } from '../functions'
+import { asArray, asObject, isNumber } from '../functions';
+import { operate } from './operate';
 
 const PromiseClass = Promise;
 
@@ -158,3 +159,62 @@ export const wheel = PromiseFunction.wheel = function(tasks, option) {
 
   return defer;
 }
+
+export const sequance = PromiseFunction.sequance = function(funcArray, opts){
+  return q(function(resolve, reject){
+    const option = asObject(opts,"concurrent");
+      
+    if(option.concurrent === true){
+      option.concurrent = Number.POSITIVE_INFINITY;
+    } else if(!isNumber(option.concurrent) || option.concurrent < 1){
+      option.concurrent = 1;
+    }
+      
+    if(!isNumber(option.interval) || option.interval < -1){
+      option.interval = -1;
+    }
+      
+    if(!isNumber(option.repeat) || option.repeat < 1){
+      option.repeat = 1;
+    }
+      
+    //set task with repeat
+    const sequanceTaskEntries = Array(option.repeat)
+    .fill(asArray(funcArray))
+    .reduce((dest,tasks)=>{
+      tasks.forEach((fn,index)=>dest.push([index,fn]));
+      return dest;
+    },[]);
+      
+    const sequanceLength = sequanceTaskEntries.length;
+    let sequanceComplete = 0;
+    const sequanceReseult = Array(sequanceTaskEntries.length);
+      
+    const sequanceOperator = operate({
+      output:async ({ entry })=>{
+        if(option.interval > -1){
+          await q.timeout(option.interval);
+        }
+        return entry;
+      },
+      limitOutput:1
+    })
+    .operate({
+      concurrent:option.concurrent,
+      input:async ({ entry })=>{
+        const [index, fn] = entry;
+        entry.push(await fn());
+        return entry;
+      },
+      output:({ entry })=>{
+        const [index, fn, result] = entry;
+        sequanceReseult[index] = result;
+        sequanceComplete++;
+        if(sequanceComplete === sequanceLength){
+          resolve(sequanceReseult);
+        }
+      }
+    })
+    .concat(sequanceTaskEntries);
+  });
+};
