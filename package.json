@@ -32,12 +32,10 @@
   },
   "devDependencies": {
     "padoc": "sepalang/padoc",
-    "babel-jest": "^22.4.1",
-    "jest": "^22.4.2",
     "mkdirp": "^0.5.1",
     "rimraf": "^2.6.2"
   },
   "dependencies": {
-    "lodash": "^4.17.5"
+    "lodash": "^4.17.10"
   }
 }
