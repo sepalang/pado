@@ -1,19 +1,26 @@
-import { storiesOf, addParameters } from '@storybook/vue';
-
+import { storiesOf } from '@storybook/vue';
+import { withKnobs, text } from '@storybook/addon-knobs/vue';
+import FunctionIO from './FunctionIO.vue';
 const globalParameter = 'globalParameter';
 const chapterParameter = 'chapterParameter';
 const storyParameter = 'storyParameter';
 
-addParameters({ globalParameter });
 
-storiesOf('Function|asArray', module)
-.addParameters({ chapterParameter })
+storiesOf('Function|cast', module)
+.addDecorator(withKnobs)
 .add(
-  'passed to story',
-  ({ parameters: { fileName, ...parameters } }) => ({
-    template: `<div>Parameters are ${JSON.stringify(parameters)}</div>`,
-  }),
-  {
-    storyParameter,
+  'asArray',
+  () => {
+    const input = text('Name', `"Input value"`);
+    const { asArray } = require("../../../src/functions/cast");
+    return {
+      render:h=>h(FunctionIO,{
+        props:{
+          "inputText":input,
+          "function":asArray
+        }
+      }),
+      template: `<div>Parameters are </div>`
+    }
   }
 );
