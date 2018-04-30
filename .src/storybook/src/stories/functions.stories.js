@@ -1,6 +1,9 @@
 import { storiesOf } from '@storybook/vue';
 import { withKnobs, text } from '@storybook/addon-knobs/vue';
+
+import SelectKnobs from '/SelectKnobs.vue';
 import MethodIO from './MethodIO.vue';
+
 
 storiesOf('Function|cast', module)
 .addDecorator(withKnobs)
