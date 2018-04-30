@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.replace", "./isLike", "./transform"], factory);
+    define(["exports", "core-js/modules/es6.regexp.replace", "./isLike", "./cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.replace"), require("./isLike"), require("./transform"));
+    factory(exports, require("core-js/modules/es6.regexp.replace"), require("./isLike"), require("./cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.isLike, global.transform);
+    factory(mod.exports, global.es6Regexp, global.isLike, global.cast);
     global.datetime = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _isLike, _transform) {
+})(this, function (_exports, _es6Regexp, _isLike, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -31,7 +31,7 @@
     r.year = dt[1], r.month = dt[2], r.date = dt[3], r.hour = dt[4], r.minute = dt[5], r.second = dt[6], r.init = dt[7];
 
     r.format = function (s) {
-      return s.replace('YYYY', r.year).replace(/(MM|M)/, r.month).replace(/(DD|D)/, r.date).replace(/(hh|h)/, r.hour).replace(/(mm|m)/, r.minute).replace(/(ss|s)/, r.second).replace(/(A)/, (0, _transform.toNumber)(r.hour) > 12 ? 'PM' : 'AM');
+      return s.replace('YYYY', r.year).replace(/(MM|M)/, r.month).replace(/(DD|D)/, r.date).replace(/(hh|h)/, r.hour).replace(/(mm|m)/, r.minute).replace(/(ss|s)/, r.second).replace(/(A)/, (0, _cast.toNumber)(r.hour) > 12 ? 'PM' : 'AM');
     };
 
     if (typeof format === 'string') return r.format(format);

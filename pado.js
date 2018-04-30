@@ -2041,6 +2041,11 @@
   var isArray$2 = Array.isArray;
   var isArray_1 = isArray$2;
 
+  var isArray$3 = /*#__PURE__*/Object.freeze({
+    default: isArray_1,
+    __moduleExports: isArray_1
+  });
+
   /** `Object#toString` result references. */
 
 
@@ -2387,6 +2392,8 @@
 
   var isArguments$2 = ( isArguments$1 && isArguments_1 ) || isArguments$1;
 
+  var isArray$4 = ( isArray$3 && isArray_1 ) || isArray$3;
+
   var isArrayLike$2 = ( isArrayLike$1 && isArrayLike_1 ) || isArrayLike$1;
 
   var isBuffer$1 = ( isBuffer && isBuffer_1 ) || isBuffer;
@@ -2443,7 +2450,7 @@
       return true;
     }
 
-    if (isArrayLike$2(value) && (isArray_1(value) || typeof value == 'string' || typeof value.splice == 'function' || isBuffer$1(value) || isTypedArray$2(value) || isArguments$2(value))) {
+    if (isArrayLike$2(value) && (isArray$4(value) || typeof value == 'string' || typeof value.splice == 'function' || isBuffer$1(value) || isTypedArray$2(value) || isArguments$2(value))) {
       return !value.length;
     }
 
@@ -2518,7 +2525,7 @@
    */
 
   function isKey(value, object) {
-    if (isArray_1(value)) {
+    if (isArray$4(value)) {
       return false;
     }
 
@@ -2627,7 +2634,7 @@
       return value;
     }
 
-    if (isArray_1(value)) {
+    if (isArray$4(value)) {
       // Recursively convert values (susceptible to call stack limits).
       return arrayMap$1(value, baseToString) + '';
     }
@@ -2700,7 +2707,7 @@
 
 
   function castPath(value, object) {
-    if (isArray_1(value)) {
+    if (isArray$4(value)) {
       return value;
     }
 
@@ -5293,7 +5300,7 @@
 
   function baseGetAllKeys(object, keysFunc, symbolsFunc) {
     var result = keysFunc(object);
-    return isArray_1(object) ? result : arrayPush$1(result, symbolsFunc(object));
+    return isArray$4(object) ? result : arrayPush$1(result, symbolsFunc(object));
   }
 
   var _baseGetAllKeys = baseGetAllKeys;
@@ -5479,7 +5486,7 @@
    */
 
   function arrayLikeKeys(value, inherited) {
-    var isArr = isArray_1(value),
+    var isArr = isArray$4(value),
         isArg = !isArr && isArguments$2(value),
         isBuff = !isArr && !isArg && isBuffer$1(value),
         isType = !isArr && !isArg && !isBuff && isTypedArray$2(value),
@@ -5713,8 +5720,8 @@
    */
 
   function baseIsEqualDeep(object, other, bitmask, customizer, equalFunc, stack) {
-    var objIsArr = isArray_1(object),
-        othIsArr = isArray_1(other),
+    var objIsArr = isArray$4(object),
+        othIsArr = isArray$4(other),
         objTag = objIsArr ? arrayTag$1 : getTag$1(object),
         othTag = othIsArr ? arrayTag$1 : getTag$1(other);
     objTag = objTag == argsTag$2 ? objectTag$2 : objTag;

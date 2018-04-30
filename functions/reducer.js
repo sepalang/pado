@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./isLike", "./transform", "lodash/isObject", "lodash/isEmpty", "lodash/isArray", "lodash/get"], factory);
+    define(["exports", "./isLike", "./cast", "lodash/isObject", "lodash/isEmpty", "lodash/isArray", "lodash/get"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./isLike"), require("./transform"), require("lodash/isObject"), require("lodash/isEmpty"), require("lodash/isArray"), require("lodash/get"));
+    factory(exports, require("./isLike"), require("./cast"), require("lodash/isObject"), require("lodash/isEmpty"), require("lodash/isArray"), require("lodash/get"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.isLike, global.transform, global.isObject, global.isEmpty, global.isArray, global.get);
+    factory(mod.exports, global.isLike, global.cast, global.isObject, global.isEmpty, global.isArray, global.get);
     global.reducer = mod.exports;
   }
-})(this, function (_exports, _isLike, _transform, _isObject2, _isEmpty2, _isArray2, _get2) {
+})(this, function (_exports, _isLike, _cast, _isObject2, _isEmpty2, _isArray2, _get2) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -81,7 +81,7 @@
 
   var max = function max(numberList) {
     var result;
-    (0, _transform.asArray)(numberList).forEach(function (n) {
+    (0, _cast.asArray)(numberList).forEach(function (n) {
       if ((0, _isLike.isNumber)(n)) {
         if (typeof result !== "number") {
           result = n;

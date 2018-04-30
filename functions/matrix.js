@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./transform", "./isLike", "./reducer", "./enumerator"], factory);
+    define(["exports", "./cast", "./isLike", "./reducer", "./enumerator"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./transform"), require("./isLike"), require("./reducer"), require("./enumerator"));
+    factory(exports, require("./cast"), require("./isLike"), require("./reducer"), require("./enumerator"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.transform, global.isLike, global.reducer, global.enumerator);
+    factory(mod.exports, global.cast, global.isLike, global.reducer, global.enumerator);
     global.matrix = mod.exports;
   }
-})(this, function (_exports, _transform, _isLike, _reducer, _enumerator) {
+})(this, function (_exports, _cast, _isLike, _reducer, _enumerator) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -96,7 +96,7 @@
   _exports.range = range;
 
   var domainRangeValue = function domainRangeValue(domain, range, vs, nice) {
-    return forMap((0, _transform.cloneDeep)(vs), function (v, sel) {
+    return forMap((0, _cast.cloneDeep)(vs), function (v, sel) {
       var $range = sel ? range[sel] : range;
       var $domain = sel ? domain[sel] : domain;
 

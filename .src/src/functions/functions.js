@@ -16,7 +16,7 @@ import {
   toArray,
   asArray,
   instance
-} from './transform'
+} from './cast'
 
 import {
   get

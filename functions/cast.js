@@ -8,7 +8,7 @@
       exports: {}
     };
     factory(mod.exports, global.es6Array, global.es6Regexp, global.es6Regexp, global.isLike);
-    global.transform = mod.exports;
+    global.cast = mod.exports;
   }
 })(this, function (_exports, _es6Array, _es6Regexp, _es6Regexp2, _isLike) {
   "use strict";

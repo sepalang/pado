@@ -1,5 +1,5 @@
 import { isArray } from './isLike';
-import { toNumber } from './transform';
+import { toNumber } from './cast';
 
 export const dateExp = function(dv,format,pad){
   if(isArray(dv)) dv = dv.join(' ');

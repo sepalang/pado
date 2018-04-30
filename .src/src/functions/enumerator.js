@@ -1,6 +1,6 @@
 import {
   asArray
-} from './transform'
+} from './cast'
 
 export const all = function(data,fn){
   data = asArray(data);

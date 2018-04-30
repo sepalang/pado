@@ -1,6 +1,6 @@
 export * from './functions'
 export * from './isLike'
-export * from './transform'
+export * from './cast'
 export * from './enumerator'
 export * from './accurate'
 export * from './reducer'
