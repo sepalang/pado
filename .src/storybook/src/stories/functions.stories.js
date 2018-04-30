@@ -1,10 +1,6 @@
 import { storiesOf } from '@storybook/vue';
 import { withKnobs, text } from '@storybook/addon-knobs/vue';
-import FunctionIO from './FunctionIO.vue';
-const globalParameter = 'globalParameter';
-const chapterParameter = 'chapterParameter';
-const storyParameter = 'storyParameter';
-
+import MethodIO from './MethodIO.vue';
 
 storiesOf('Function|cast', module)
 .addDecorator(withKnobs)
@@ -14,13 +10,20 @@ storiesOf('Function|cast', module)
     const input = text('Name', `"Input value"`);
     const { asArray } = require("../../../src/functions/cast");
     return {
-      render:h=>h(FunctionIO,{
-        props:{
-          "inputText":input,
-          "function":asArray
-        }
-      }),
-      template: `<div>Parameters are </div>`
+      components:{
+        MethodIO
+      },
+      computed:{
+        inputText:()=>input,
+        method:()=>asArray
+      },
+      template:`
+        <div>
+          <p>root :{{ {inputText, method} }}</p>
+          
+          <MethodIO :input-text="inputText" :method="method"></MethodIO>
+        </div>
+      `
     }
   }
 );

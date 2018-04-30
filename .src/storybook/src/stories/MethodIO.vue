@@ -1,7 +1,6 @@
 <template>
   <div>
     <div>
-      
       <div v-if="inputError !== null">
         <b>Input</b>
         <label>Error : </label>
@@ -23,7 +22,7 @@
 
 <script>
   export default {
-    props: ["input", "inputText", "function"],
+    props: ["input", "inputText", "method"],
     data:()=>({
       inputError:null,
       inputType:null,
@@ -48,14 +47,14 @@
         if(this.inputError){
           return "Error";
         }
-        if(typeof this.function !== "function"){
+        if(typeof this.method !== "function"){
           return "Undefined function";
         }
         
         let result;
         
         try {
-          result = this.function(this.inputValue);
+          result = this.method(this.inputValue);
           this.outputType = typeof result;
         } catch(e) {
           this.outputType = null;
