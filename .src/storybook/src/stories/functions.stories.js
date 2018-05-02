@@ -1,7 +1,5 @@
 import { storiesOf } from '@storybook/vue';
 import { withKnobs, selectParam } from '../util/selectParam';
-
-import SelectKnobs from './SelectKnobs.vue';
 import MethodIO from './MethodIO.vue';
 
 storiesOf('Function|cast', module)
@@ -16,7 +14,8 @@ storiesOf('Function|cast', module)
       computed:{
         inputText:()=>selectParam("JSON",[
           `"Input value"`,
-          `"Output value"`
+          `undefined`,
+          `null`
         ]),
         method:()=>asArray
       },

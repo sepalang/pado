@@ -8,7 +8,7 @@ export const selectParam = function(prefix="",knobsOptions){
     prefix +=" ";
   }
   
-  const knobsSelect = select(`${prefix}opts`, knobsOptions.reduce((dest,value,index)=>{
+  const knobsSelect = select(`${prefix}select`, knobsOptions.reduce((dest,value,index)=>{
     const key = `${prefix}Param${index+1}`;
     dest[String(index)] = key;
     return dest;
