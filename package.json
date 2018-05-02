@@ -31,9 +31,11 @@
     }
   },
   "devDependencies": {
-    "padoc": "sepalang/padoc",
     "mkdirp": "^0.5.1",
-    "rimraf": "^2.6.2"
+    "node-sass": "^4.9.0",
+    "padoc": "sepalang/padoc",
+    "rimraf": "^2.6.2",
+    "sass-loader": "^7.0.1"
   },
   "dependencies": {
     "lodash": "^4.17.10"
