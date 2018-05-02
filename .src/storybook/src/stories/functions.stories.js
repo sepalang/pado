@@ -17,6 +17,8 @@ storiesOf('Function|cast', module)
         `.trim()),
         inputText:()=>selectParam("JSON",[
           `"Input value"`,
+          `123`,
+          `true`,
           `undefined`,
           `null`
         ]),
