@@ -5,6 +5,8 @@
       <b>Command</b>
       <pre class="data-display">{{ commandValue }}</pre>
     </div>
+  </div>
+  <div v-if="hasInput === true">
     <div v-if="inputError !== null">
       <b>Input</b>
       <label>Error : </label>
@@ -83,6 +85,9 @@ export default {
       const result = scopeFn.scoped();
       this.scopedFn = scopeFn;
       return result;
+    },
+    hasInput (){
+      return this.commandValue.indexOf("input") > -1;
     },
     inputValue (){
       const inputTextMode = typeof this.inputText === "string";
