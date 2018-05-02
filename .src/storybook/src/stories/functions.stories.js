@@ -1,23 +1,23 @@
 import { storiesOf } from '@storybook/vue';
-import { withKnobs, text } from '@storybook/addon-knobs/vue';
+import { withKnobs, selectParam } from '../util/selectParam';
 
-import SelectKnobs from '/SelectKnobs.vue';
+import SelectKnobs from './SelectKnobs.vue';
 import MethodIO from './MethodIO.vue';
-
 
 storiesOf('Function|cast', module)
 .addDecorator(withKnobs)
 .add(
-  'asArray',
-  () => {
-    const input = text('Name', `"Input value"`);
+  'asArray',() => {
     const { asArray } = require("../../../src/functions/cast");
     return {
       components:{
         MethodIO
       },
       computed:{
-        inputText:()=>input,
+        inputText:()=>selectParam("JSON",[
+          `"Input value"`,
+          `"Output value"`
+        ]),
         method:()=>asArray
       },
       template:`
