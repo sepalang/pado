@@ -1,5 +1,5 @@
 import { storiesOf } from '@storybook/vue';
-import { withKnobs, selectParam } from '../util/selectParam';
+import { withKnobs, text, selectParam } from '../util/selectParam';
 import MethodIO from './MethodIO.vue';
 
 storiesOf('Function|cast', module)
@@ -12,18 +12,19 @@ storiesOf('Function|cast', module)
         MethodIO
       },
       computed:{
+        inputCommand:()=>text('command',`
+          asArray(input);
+        `.trim()),
         inputText:()=>selectParam("JSON",[
           `"Input value"`,
           `undefined`,
           `null`
         ]),
-        method:()=>asArray
+        scope:()=>({ asArray })
       },
       template:`
         <div>
-          <p>root :{{ {inputText, method} }}</p>
-          
-          <MethodIO :input-text="inputText" :method="method"></MethodIO>
+          <MethodIO :command="inputCommand" :input-text="inputText" :scope="scope"></MethodIO>
         </div>
       `
     }

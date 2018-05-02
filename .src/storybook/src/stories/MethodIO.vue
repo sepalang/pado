@@ -1,6 +1,10 @@
 <template>
 <div>
   <div>
+    <div>
+      <b>Command</b>
+      <pre class="data-display">{{ commandValue }}</pre>
+    </div>
     <div v-if="inputError !== null">
       <b>Input</b>
       <label>Error : </label>
@@ -33,8 +37,38 @@ const altTextFilter = function(value){
   }
 };
 
+const scopeFunction = function(evalCommand){
+  if(evalCommand.indexOf("return") > -1){
+    evalCommand
+  } else {
+    evalCommand = `return ${evalCommand}`;
+  }
+
+  const command = evalCommand;
+  const scopeBeforeFn = function(scope){
+    const params = [];
+    const fnArgs = [];
+    
+    Object.keys(scope).forEach(key=>{
+      params.push(scope[key]);
+      fnArgs.push(key);
+    });
+    
+    fnArgs.push(command);
+    
+    const makeFn = Function.apply(Function,fnArgs);
+    return makeFn.apply(void 0,params);
+  };
+  
+  scopeBeforeFn.scoped = function(){
+    return command;
+  };
+  
+  return scopeBeforeFn;
+}
+
 export default {
-  props: ["input", "inputText", "method"],
+  props: ["command", "input", "inputText", "scope"],
   data:()=>({
     inputError:null,
     inputType:null,
@@ -44,6 +78,12 @@ export default {
     outputDisplay:null
   }),
   computed:{
+    commandValue (){
+      const scopeFn = scopeFunction(this.command);
+      const result = scopeFn.scoped();
+      this.scopedFn = scopeFn;
+      return result;
+    },
     inputValue (){
       const inputTextMode = typeof this.inputText === "string";
       let inputValue;
@@ -63,14 +103,22 @@ export default {
       if(this.inputError){
         return "Error";
       }
-      if(typeof this.method !== "function"){
-        return "Undefined function";
-      }
       
       let outputValue;
       
       try {
-        outputValue = this.method(this.inputValue);
+        const scope = Object.keys(this.scope||{}).reduce((dest,key)=>{
+          dest[key] = this.scope[key];
+          return dest;
+        },{ input: this.inputValue });
+        outputValue = this.scopedFn(scope);
+      } catch(e) {
+        this.outputType = null;
+        this.outputDisplay = null;
+        return e.message;
+      }
+      
+      try {
         this.outputType = typeof outputValue;
         this.outputDisplay = altTextFilter(outputValue);
       } catch(e) {
