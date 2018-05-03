@@ -2,30 +2,30 @@
 <div>
   <div>
     <h3>Command</h3>
-    <div class="data-display">
-      <div class="data-display">
-        <pre>{{ commandValue }}</pre>
-      </div>
+    <div class="data-display" @click="toggleOpen">
+      <pre>{{ commandValue }}</pre>
       <div class="data-display hidden-display">
         <pre v-if="commandDetail">{{commandDetail}}</pre>
       </div>
     </div>
   </div>
-  <div>
-    <h3>Input</h3>
-    <div v-for="(input,ikey) in inputEntries" :key="ikey">
-      <div class="data-display">
-        <label class="badge">{{ikey}}</label>
-        <label class="badge">{{input.inputType}}</label>
-        <pre>{{ input.inputDisplay || input.inputValue }}</pre>
+  <div class="div-column-2">
+    <div>
+      <h3>Input</h3>
+      <div v-for="(input,ikey) in inputEntries" :key="ikey">
+        <div class="data-display">
+          <label class="badge">{{ikey}}</label>
+          <label class="badge">{{input.inputType}}</label>
+          <pre>{{ input.inputDisplay || input.inputValue }}</pre>
+        </div>
       </div>
     </div>
-  </div>
-  <div>
-    <h3>Output</h3>
-    <div class="data-display">
-      <label v-if="outputType" class="badge">{{outputType}}</label>
-      <pre>{{ outputValue }}</pre>
+    <div>
+      <h3>Output</h3>
+      <div class="data-display">
+        <label v-if="outputType" class="badge">{{outputType}}</label>
+        <pre>{{ outputValue }}</pre>
+      </div>
     </div>
   </div>
 </div>
@@ -130,6 +130,15 @@ export default {
     outputType:null,
     outputDisplay:null
   }),
+  methods:{
+    toggleOpen(event){
+      if(typeof event.currentTarget.getAttribute("open") === "string"){
+        event.currentTarget.removeAttribute("open");
+      } else {
+        event.currentTarget.setAttribute("open","");
+      }
+    }
+  },
   computed:{
     commandValue (){
       const scopeFn = scopeFunction(this.command);
@@ -240,11 +249,22 @@ pre {
     display:none;
   }
   
-  &:hover {
+  &:hover, &[open] {
     background-color:#fafafa;
     .hidden-display {
       display:block;
     }
+  }
+}
+.div-column-2 {
+  > div {
+    float:left;
+    width:50%;
+  }
+  &:after {
+    content:"";
+    display:block;
+    clear:both;
   }
 }
 </style>
