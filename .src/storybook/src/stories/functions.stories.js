@@ -1,16 +1,16 @@
-import { storiesOf } from '@storybook/vue';
-import { withKnobs, text, selectParam, params } from '../util/selectParam';
-import MethodIO from '../util/MethodIO.vue';
+import { 
+  storiesOf, 
+  PresetComponents, 
+  text, 
+  params 
+} from '../util';
 
 storiesOf('Function|cast', module)
-.addDecorator(withKnobs)
 .add(
   'asArray',() => {
     const { asArray } = require("../../../src/functions/cast");
     return {
-      components:{
-        MethodIO
-      },
+      components:PresetComponents,
       computed:{
         defaultCommand:()=>text('command',`
           asArray(i0);
@@ -38,13 +38,7 @@ storiesOf('Function|cast', module)
               ])
             }
           ];
-        },
-        //single
-        inputText:()=>selectParam("JSON",[
-          `"Input value"`,
-          `123`,
-          `undefined`
-        ])
+        }
       },
       template:`
         <div>
