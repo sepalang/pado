@@ -92,7 +92,7 @@ story
 
 
 import { selectParam, params } from '../util/selectParam';
-import MethodIO from './MethodIO.vue';
+import MethodIO from '../util/MethodIO.vue';
 
 story
 .addDecorator(withKnobs)

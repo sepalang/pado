@@ -1,6 +1,6 @@
 import { storiesOf } from '@storybook/vue';
 import { withKnobs, text, selectParam, params } from '../util/selectParam';
-import MethodIO from './MethodIO.vue';
+import MethodIO from '../util/MethodIO.vue';
 
 storiesOf('Function|cast', module)
 .addDecorator(withKnobs)
@@ -50,13 +50,6 @@ storiesOf('Function|cast', module)
         <div>
           <p v-if="!defaultCommand">Undefined defaultCommand</p>
           <p v-if="!defaultScope">Undefined defaultScope</p>
-          <section>
-            <h2>SINGLE</h2>
-            <MethodIO :command="defaultCommand" :input-text="inputText" :scope="defaultScope"></MethodIO>
-          </section>
-          <section>
-            <h2>Multi</h2>
-          </section>
           <section v-for="param in inputParams">
             <h2 v-if="param.title">{{param.title}}</h2>
             <MethodIO :command="param.command || defaultCommand" :input-params="param.params" :scope="param.scope || defaultScope"></MethodIO>

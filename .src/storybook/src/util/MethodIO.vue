@@ -1,7 +1,7 @@
 <template>
 <div>
   <div>
-    <b>Command</b>
+    <h3>Command</h3>
     <div class="data-display">
       <div class="data-display">
         <pre>{{ commandValue }}</pre>
@@ -12,7 +12,7 @@
     </div>
   </div>
   <div>
-    <b>Input</b>
+    <h3>Input</h3>
     <div v-for="(input,ikey) in inputEntries" :key="ikey">
       <div class="data-display">
         <label class="badge">{{ikey}}</label>
@@ -22,7 +22,7 @@
     </div>
   </div>
   <div>
-    <b>Output</b>
+    <h3>Output</h3>
     <div class="data-display">
       <label v-if="outputType" class="badge">{{outputType}}</label>
       <pre>{{ outputValue }}</pre>
@@ -214,9 +214,12 @@ export default {
 </script>
   
 <style lang="scss" scoped>
-b {
+h3 {
   display:inline-block;
-  margin-top:5px;
+  margin:5px 0px;
+}
+pre {
+  margin:10px 0px;
 }
 .badge {
   display:inline-block;
@@ -230,8 +233,8 @@ b {
 }
 .data-display {
   margin:5px 0px;
-  padding:5px 10px;
-  border:1px solid silver;
+  padding:10px 10px;
+  border:1px solid #ddd;
   
   .hidden-display {
     display:none;

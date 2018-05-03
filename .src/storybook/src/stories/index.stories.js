@@ -3,7 +3,7 @@ import { storiesOf } from '@storybook/vue';
 import { action } from '@storybook/addon-actions';
 import { linkTo } from '@storybook/addon-links';
 
-import MyButton from './Button.vue';
+import MyButton from '../util/Button.vue';
 
 storiesOf('Welcome', module)
 .add('render', () => ({
