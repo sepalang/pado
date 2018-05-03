@@ -1,32 +1,31 @@
 <template>
 <div>
   <div>
-    <div>
-      <b>Command</b>
-      <pre class="data-display">{{ commandValue }}</pre>
+    <b>Command</b>
+    <div class="data-display">
+      <div class="data-display">
+        <pre>{{ commandValue }}</pre>
+      </div>
+      <div class="data-display hidden-display">
+        <pre v-if="commandDetail">{{commandDetail}}</pre>
+      </div>
     </div>
   </div>
-  <div v-if="hasInput === true">
-    <div v-if="inputError !== null">
-      <b>Input</b>
-      <label>Error : </label>
-      <pre>{{ inputError }}</pre>
-    </div>
-    <div v-else>
-      <b>Input</b>
-      <label class="badge">{{ inputType }}</label>
-      <pre class="data-display">{{ inputDisplay || inputValue }}</pre>
+  <div>
+    <b>Input</b>
+    <div v-for="(input,ikey) in inputEntries" :key="ikey">
+      <div class="data-display">
+        <label class="badge">{{ikey}}</label>
+        <label class="badge">{{input.inputType}}</label>
+        <pre>{{ input.inputDisplay || input.inputValue }}</pre>
+      </div>
     </div>
   </div>
   <div>
     <b>Output</b>
-    <label v-if="outputType" class="badge">{{outputType}}</label>
-    <pre class="data-display">{{ outputValue }}</pre>
-  </div>
-  <div>
-    <div>
-      <b>IO Reason</b>
-      <pre class="data-display" v-if="commandDetail">{{commandDetail}}</pre>
+    <div class="data-display">
+      <label v-if="outputType" class="badge">{{outputType}}</label>
+      <pre>{{ outputValue }}</pre>
     </div>
   </div>
 </div>
@@ -82,15 +81,51 @@ const scopeFunction = function(evalCommand){
   };
   
   return scopeBeforeFn;
+};
+
+const inputEvaluation = function(input, inputTextMode = false){
+  let evalResult = {
+    inputValue:undefined,
+    inputType:undefined,
+    inputError:undefined,
+    inputDisplay:undefined
+  };
+  
+  try {
+    evalResult.inputValue   = inputTextMode ? !input.trim() ? input : eval(`( ${ input } )`) : input;
+    evalResult.inputType    = typeof evalResult.inputValue;
+    if(typeof evalResult.inputValue === "object" && Array.isArray(evalResult.inputValue)){
+      evalResult.inputType = "Array";
+    }
+    evalResult.inputError   = null;
+    evalResult.inputDisplay = altTextFilter(evalResult.inputValue);
+  } catch(e) {
+    evalResult.inputType  = null;
+    evalResult.inputError = e.message;
+    evalResult.inputDisplay = null;
+  }
+  
+  return evalResult;
+};
+
+const dataEvaluation = function(data){
+  const evalResult = {
+    type:undefined
+  };
+  
+  evalResult.type = typeof data;
+  
+  if(evalResult.type === "object" && Array.isArray(data)){
+    evalResult.type = "Array";
+  }
+  return evalResult;
 }
 
 export default {
-  props: ["command", "input", "inputText", "scope"],
+  props: ["command", "input", "inputText", "inputParams", "scope"],
   data:()=>({
     commandDetail:null,
-    inputError:null,
-    inputType:null,
-    inputDisplay:null,
+    inputEvals:[],
     outputError:null,
     outputType:null,
     outputDisplay:null
@@ -101,42 +136,49 @@ export default {
       this.scopedFn = scopeFn;
       return this.command;
     },
-    hasInput (){
-      return this.commandValue.indexOf("input") > -1;
-    },
-    inputValue (){
-      const inputTextMode = typeof this.inputText === "string";
-      let inputValue;
-      try {
-        inputValue = inputTextMode ? !this.inputText.trim() ? this.inputText : eval(`( ${ this.inputText } )`) : this.input;
-        this.inputType    = typeof inputValue;
-        this.inputError   = null;
-        this.inputDisplay = altTextFilter(inputValue);
-      } catch(e) {
-        this.inputType  = null;
-        this.inputError = e.message;
-        this.inputDisplay = null;
-      }
-      return inputValue;
-    },
-    outputValue (){
-      if(this.inputError){
-        return "Error";
+    inputEntries (){
+      if(this.inputParams){
+        this.inputEvals = [];
+        this.inputParams.forEach(dataString=>{
+          this.inputEvals.push(inputEvaluation(dataString,true));
+        })
+      } else {
+        let evalResult;
+        
+        if(typeof this.inputText === "string"){
+          evalResult = inputEvaluation(this.inputText,true);
+        } else {
+          evalResult = inputEvaluation(this.input,false);
+        }
+        
+        this.inputEvals = [evalResult];
       }
       
+      return this.inputEvals;
+    },
+    outputValue (){
       let outputValue;
       
       try {
         const scope = Object.keys(this.scope||{}).reduce((dest,key)=>{
           dest[key] = this.scope[key];
           return dest;
-        },{ input: this.inputValue });
+        },{ inputs:this.inputEntries });
+        
+        scope.inputs && scope.inputs.forEach((meta,key)=>{
+          scope[`i${key}`] = meta.inputValue;
+        });
+        
         outputValue = this.scopedFn(scope,({ func, args, params })=>{
           const paramDetail  = params.reduce((dest,value,index)=>{
             let textValue;
             
             if(typeof value === "function"){
               textValue = "[Function]"
+            } else if(args[index] === "inputs"){
+              textValue = "[Arguments]";
+            } else if(typeof value === "object"){
+              textValue = JSON.stringify(value);
             } else {
               textValue = value+"";
             }
@@ -154,8 +196,10 @@ export default {
         return e.message;
       }
       
+      const { type } = dataEvaluation(outputValue);
+      
       try {
-        this.outputType = typeof outputValue;
+        this.outputType = type;
         this.outputDisplay = altTextFilter(outputValue);
       } catch(e) {
         this.outputType = null;
@@ -169,7 +213,11 @@ export default {
 }
 </script>
   
-<style lang="scss">
+<style lang="scss" scoped>
+b {
+  display:inline-block;
+  margin-top:5px;
+}
 .badge {
   display:inline-block;
   background-color:gray;
@@ -181,7 +229,19 @@ export default {
   color:white;
 }
 .data-display {
-  padding:10px 5px;
+  margin:5px 0px;
+  padding:5px 10px;
   border:1px solid silver;
+  
+  .hidden-display {
+    display:none;
+  }
+  
+  &:hover {
+    background-color:#fafafa;
+    .hidden-display {
+      display:block;
+    }
+  }
 }
 </style>
