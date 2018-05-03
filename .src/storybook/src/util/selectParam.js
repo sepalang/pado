@@ -2,11 +2,11 @@ import { text, select } from '@storybook/addon-knobs/vue';
 export { text, select } from '@storybook/addon-knobs/vue';
 export { withKnobs }  from '@storybook/addon-knobs/vue';
 
-export const params = function(prefix="",knobsOptions){
+export const params = function(prefix="",knobsOptions=[]){
   if(typeof prefix === "string" && prefix.length){
     prefix +=" ";
   }
-  
+
   return knobsOptions.map((argv,index)=>{
     const key = `${prefix}i${index}`
     return text(key, argv);

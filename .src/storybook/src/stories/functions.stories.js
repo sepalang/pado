@@ -1,55 +1,63 @@
 import { 
   storiesOf, 
-  PresetComponents, 
-  text, 
-  params 
+  FunctionGuide,
+  text,
+  methodIOInputParams
 } from '../util';
 
+
 storiesOf('Function|cast', module)
-.add(
-  'asArray',() => {
-    const { asArray } = require("../../../src/functions/cast");
-    return {
-      components:PresetComponents,
-      computed:{
-        defaultCommand:()=>text('command',`
-          asArray(i0);
-        `.trim()),
-        defaultScope:()=>({ asArray }),
-        //multi
-        inputParams (){
-          return [
-            {
-              title:"String",
-              params:params("String",[
-                `"Input value"`
-              ])
-            },
-            {
-              title:"Boolean",
-              params:params("Boolean",[
-                `true`
-              ])
-            },
-            {
-              title:"null",
-              params:params("Null",[
-                `null`
-              ])
-            }
-          ];
-        }
-      },
-      template:`
-        <div>
-          <p v-if="!defaultCommand">Undefined defaultCommand</p>
-          <p v-if="!defaultScope">Undefined defaultScope</p>
-          <section v-for="param in inputParams">
-            <h2 v-if="param.title">{{param.title}}</h2>
-            <MethodIO :command="param.command || defaultCommand" :input-params="param.params" :scope="param.scope || defaultScope"></MethodIO>
-          </section>
-        </div>
-      `
+.add('asArray',() => {
+  const { asArray } = require("../../../src/functions/cast");
+  return {
+    mixins:[FunctionGuide],
+    computed:{
+      defaultScope:()=>({ asArray }),
+      defaultCommand:()=>text('Command',`asArray(i0);`),
+      inputParams:()=>([
+        methodIOInputParams("String",[
+          `"Input value"`
+        ]),
+        methodIOInputParams("Number",[
+          `2018`
+        ]),
+        methodIOInputParams("Object",[
+          `{foo:'bar'}`
+        ]),
+        methodIOInputParams("Array",[
+          `[1,2,3,4]`
+        ]),
+        methodIOInputParams("null",[
+          `null`
+        ])
+      ])
     }
-  }
-);
+  };
+})
+.add('asObject',() => {
+  const { asObject } = require("../../../src/functions/cast");
+  return {
+    mixins:[FunctionGuide],
+    computed:{
+      defaultScope:()=>({ asObject }),
+      defaultCommand:()=>text('Command',`asObject(i0);`),
+      inputParams:()=>([
+        methodIOInputParams("String",[
+          `"Input value"`
+        ]),
+        methodIOInputParams("Number",[
+          `2018`
+        ]),
+        methodIOInputParams("Object",[
+          `{foo:'bar'}`
+        ]),
+        methodIOInputParams("Array",[
+          `[1,2,3,4]`
+        ]),
+        methodIOInputParams("null",[
+          `null`
+        ])
+      ])
+    }
+  };
+})
