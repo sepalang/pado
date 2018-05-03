@@ -23,6 +23,12 @@
     <label v-if="outputType" class="badge">{{outputType}}</label>
     <pre class="data-display">{{ outputValue }}</pre>
   </div>
+  <div>
+    <div>
+      <b>IO Reason</b>
+      <pre class="data-display" v-if="commandDetail">{{commandDetail}}</pre>
+    </div>
+  </div>
 </div>
 </template>
 
@@ -43,11 +49,11 @@ const scopeFunction = function(evalCommand){
   if(evalCommand.indexOf("return") > -1){
     evalCommand
   } else {
-    evalCommand = `return ${evalCommand}`;
+    evalCommand = `  return ${evalCommand}`;
   }
 
   const command = evalCommand;
-  const scopeBeforeFn = function(scope){
+  const scopeBeforeFn = function(scope,info){
     const params = [];
     const fnArgs = [];
     
@@ -59,6 +65,15 @@ const scopeFunction = function(evalCommand){
     fnArgs.push(command);
     
     const makeFn = Function.apply(Function,fnArgs);
+    
+    if(typeof info === "function"){
+      info({
+        func:makeFn,
+        args:fnArgs,
+        params:params
+      });
+    }
+    
     return makeFn.apply(void 0,params);
   };
   
@@ -72,6 +87,7 @@ const scopeFunction = function(evalCommand){
 export default {
   props: ["command", "input", "inputText", "scope"],
   data:()=>({
+    commandDetail:null,
     inputError:null,
     inputType:null,
     inputDisplay:null,
@@ -82,9 +98,8 @@ export default {
   computed:{
     commandValue (){
       const scopeFn = scopeFunction(this.command);
-      const result = scopeFn.scoped();
       this.scopedFn = scopeFn;
-      return result;
+      return this.command;
     },
     hasInput (){
       return this.commandValue.indexOf("input") > -1;
@@ -116,7 +131,23 @@ export default {
           dest[key] = this.scope[key];
           return dest;
         },{ input: this.inputValue });
-        outputValue = this.scopedFn(scope);
+        outputValue = this.scopedFn(scope,({ func, args, params })=>{
+          const paramDetail  = params.reduce((dest,value,index)=>{
+            let textValue;
+            
+            if(typeof value === "function"){
+              textValue = "[Function]"
+            } else {
+              textValue = value+"";
+            }
+            
+            dest[args[index]] = textValue;
+            return dest;
+          },{});
+          
+          this.commandDetail = JSON.stringify(paramDetail,2,2);
+          this.commandDetail += `\n\n${func}`;
+        });
       } catch(e) {
         this.outputType = null;
         this.outputDisplay = null;
