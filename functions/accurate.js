@@ -83,3 +83,4 @@
 
   _exports.accurateTimeout = accurateTimeout;
 });
+//# sourceMappingURL=accurate.js.map

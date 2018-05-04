@@ -10,8 +10,8 @@
   "scripts": {
     "start": "babel-node .src/test/src-test.js",
     "clear:dist": "rimraf ./*.js ./*.js.map ./functions ./modules",
-    "build:default": "padoc .src/src ./ -m umd",
-    "build:pack": "padoc --pack .src/src/pado.js ./pado.js -m umd",
+    "build:default": "padoc .src/src ./ -m umd -s",
+    "build:pack": "padoc --pack .src/src/pado.js ./pado.js -m umd -s",
     "build": "npm run clear:dist && npm run build:default && npm run build:pack",
     "t": "padoc --exec .src/sample/use/operate.use.js",
     "test": "jest ''"

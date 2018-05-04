@@ -329,3 +329,4 @@
 
   _exports.sequance = sequance;
 });
+//# sourceMappingURL=promise.js.map

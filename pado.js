@@ -416,7 +416,7 @@
 
   });
 
-  var require$$1$1 = ( _hide$1 && _hide ) || _hide$1;
+  var hide$1 = ( _hide$1 && _hide ) || _hide$1;
 
   var redefine = ( _redefine && undefined ) || _redefine;
 
@@ -440,7 +440,7 @@
       return ''[KEY](O) != 7;
     })) {
       redefine(String.prototype, KEY, strfn);
-      require$$1$1(RegExp.prototype, SYMBOL, length == 2 // 21.2.5.8 RegExp.prototype[@@replace](string, replaceValue)
+      hide$1(RegExp.prototype, SYMBOL, length == 2 // 21.2.5.8 RegExp.prototype[@@replace](string, replaceValue)
       // 21.2.5.11 RegExp.prototype[@@split](string, limit)
       ? function (string, arg) {
         return rxfn.call(string, this, arg);
@@ -484,7 +484,7 @@
 
   var core = require('./_core');
 
-  var hide$1 = require('./_hide');
+  var hide$2 = require('./_hide');
 
   var redefine$1 = require('./_redefine');
 
@@ -514,7 +514,7 @@
 
       if (target) redefine$1(target, key, out, type & $export.U); // export
 
-      if (exports[key] != out) hide$1(exports, key, exp);
+      if (exports[key] != out) hide$2(exports, key, exp);
       if (IS_PROTO && expProto[key] != out) expProto[key] = out;
     }
   };
@@ -2041,11 +2041,6 @@
   var isArray$2 = Array.isArray;
   var isArray_1 = isArray$2;
 
-  var isArray$3 = /*#__PURE__*/Object.freeze({
-    default: isArray_1,
-    __moduleExports: isArray_1
-  });
-
   /** `Object#toString` result references. */
 
 
@@ -2392,8 +2387,6 @@
 
   var isArguments$2 = ( isArguments$1 && isArguments_1 ) || isArguments$1;
 
-  var isArray$4 = ( isArray$3 && isArray_1 ) || isArray$3;
-
   var isArrayLike$2 = ( isArrayLike$1 && isArrayLike_1 ) || isArrayLike$1;
 
   var isBuffer$1 = ( isBuffer && isBuffer_1 ) || isBuffer;
@@ -2450,7 +2443,7 @@
       return true;
     }
 
-    if (isArrayLike$2(value) && (isArray$4(value) || typeof value == 'string' || typeof value.splice == 'function' || isBuffer$1(value) || isTypedArray$2(value) || isArguments$2(value))) {
+    if (isArrayLike$2(value) && (isArray_1(value) || typeof value == 'string' || typeof value.splice == 'function' || isBuffer$1(value) || isTypedArray$2(value) || isArguments$2(value))) {
       return !value.length;
     }
 
@@ -2525,7 +2518,7 @@
    */
 
   function isKey(value, object) {
-    if (isArray$4(value)) {
+    if (isArray_1(value)) {
       return false;
     }
 
@@ -2634,7 +2627,7 @@
       return value;
     }
 
-    if (isArray$4(value)) {
+    if (isArray_1(value)) {
       // Recursively convert values (susceptible to call stack limits).
       return arrayMap$1(value, baseToString) + '';
     }
@@ -2707,7 +2700,7 @@
 
 
   function castPath(value, object) {
-    if (isArray$4(value)) {
+    if (isArray_1(value)) {
       return value;
     }
 
@@ -5300,7 +5293,7 @@
 
   function baseGetAllKeys(object, keysFunc, symbolsFunc) {
     var result = keysFunc(object);
-    return isArray$4(object) ? result : arrayPush$1(result, symbolsFunc(object));
+    return isArray_1(object) ? result : arrayPush$1(result, symbolsFunc(object));
   }
 
   var _baseGetAllKeys = baseGetAllKeys;
@@ -5486,7 +5479,7 @@
    */
 
   function arrayLikeKeys(value, inherited) {
-    var isArr = isArray$4(value),
+    var isArr = isArray_1(value),
         isArg = !isArr && isArguments$2(value),
         isBuff = !isArr && !isArg && isBuffer$1(value),
         isType = !isArr && !isArg && !isBuff && isTypedArray$2(value),
@@ -5720,8 +5713,8 @@
    */
 
   function baseIsEqualDeep(object, other, bitmask, customizer, equalFunc, stack) {
-    var objIsArr = isArray$4(object),
-        othIsArr = isArray$4(other),
+    var objIsArr = isArray_1(object),
+        othIsArr = isArray_1(other),
         objTag = objIsArr ? arrayTag$1 : getTag$1(object),
         othTag = othIsArr ? arrayTag$1 : getTag$1(other);
     objTag = objTag == argsTag$2 ? objectTag$2 : objTag;
@@ -6084,7 +6077,7 @@
     __moduleExports: _cof
   });
 
-  var require$$1$2 = ( _cof$1 && _cof ) || _cof$1;
+  var require$$1$1 = ( _cof$1 && _cof ) || _cof$1;
 
   // getting tag from 19.1.3.6 Object.prototype.toString()
 
@@ -6092,7 +6085,7 @@
   var TAG = require$$0$3('toStringTag'); // ES3 wrong here
 
 
-  var ARG = require$$1$2(function () {
+  var ARG = require$$1$1(function () {
     return arguments;
   }()) == 'Arguments'; // fallback for IE11 Script Access Denied error
 
@@ -6108,8 +6101,8 @@
     var O, T, B;
     return it === undefined ? 'Undefined' : it === null ? 'Null' // @@toStringTag case
     : typeof (T = tryGet(O = Object(it), TAG)) == 'string' ? T // builtinTag case
-    : ARG ? require$$1$2(O) // ES3 arguments fallback
-    : (B = require$$1$2(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+    : ARG ? require$$1$1(O) // ES3 arguments fallback
+    : (B = require$$1$1(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
   };
 
   var _classof$1 = /*#__PURE__*/Object.freeze({
@@ -6366,7 +6359,7 @@
     }; // Node.js 0.8-
 
 
-    if (require$$1$2(process) == 'process') {
+    if (require$$1$1(process) == 'process') {
       defer = function defer(id) {
         process.nextTick(ctx$1(run, id, 1));
       }; // Sphere (JS game engine) Dispatch API
@@ -6424,7 +6417,7 @@
   var Observer = global$1.MutationObserver || global$1.WebKitMutationObserver;
   var process$1 = global$1.process;
   var Promise$3 = global$1.Promise;
-  var isNode$1 = require$$1$2(process$1) == 'process';
+  var isNode$1 = require$$1$1(process$1) == 'process';
 
   var _microtask = function () {
     var head, last, notify;
@@ -6726,7 +6719,7 @@
 
   var speciesConstructor = ( _speciesConstructor$1 && _speciesConstructor ) || _speciesConstructor$1;
 
-  var require$$1$3 = ( _microtask$1 && _microtask ) || _microtask$1;
+  var require$$1$2 = ( _microtask$1 && _microtask ) || _microtask$1;
 
   var perform = ( _perform$1 && _perform ) || _perform$1;
 
@@ -6742,7 +6735,7 @@
 
   var task = require$$0$6.set;
 
-  var microtask = require$$1$3();
+  var microtask = require$$1$2();
 
 
 
@@ -7879,7 +7872,7 @@
   var UNSCOPABLES = require$$0$3('unscopables');
 
   var ArrayProto$1 = Array.prototype;
-  if (ArrayProto$1[UNSCOPABLES] == undefined) require$$1$1(ArrayProto$1, UNSCOPABLES, {});
+  if (ArrayProto$1[UNSCOPABLES] == undefined) hide$1(ArrayProto$1, UNSCOPABLES, {});
 
   var _addToUnscopables = function (key) {
     ArrayProto$1[UNSCOPABLES][key] = true;
@@ -7974,7 +7967,7 @@
 
   var redefine$3 = require('./_redefine');
 
-  var hide$2 = require('./_hide');
+  var hide$3 = require('./_hide');
 
   var Iterators$1 = require('./_iterators');
 
@@ -8036,7 +8029,7 @@
         // Set @@toStringTag to native iterators
         setToStringTag$1(IteratorPrototype, TAG, true); // fix for some old engines
 
-        if (!LIBRARY$1 && typeof IteratorPrototype[ITERATOR$3] != 'function') hide$2(IteratorPrototype, ITERATOR$3, returnThis);
+        if (!LIBRARY$1 && typeof IteratorPrototype[ITERATOR$3] != 'function') hide$3(IteratorPrototype, ITERATOR$3, returnThis);
       }
     } // fix Array#{values, @@iterator}.name in V8 / FF
 
@@ -8051,7 +8044,7 @@
 
 
     if ((!LIBRARY$1 || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR$3])) {
-      hide$2(proto, ITERATOR$3, $default);
+      hide$3(proto, ITERATOR$3, $default);
     } // Plug for library
 
 
@@ -8197,11 +8190,11 @@
 
   var require$$0$12 = ( _arrayIncludes$1 && _arrayIncludes ) || _arrayIncludes$1;
 
-  var require$$1$4 = ( _sharedKey$1 && _sharedKey ) || _sharedKey$1;
+  var require$$1$3 = ( _sharedKey$1 && _sharedKey ) || _sharedKey$1;
 
   var arrayIndexOf = require$$0$12(false);
 
-  var IE_PROTO = require$$1$4('IE_PROTO');
+  var IE_PROTO = require$$1$3('IE_PROTO');
 
   var _objectKeysInternal = function (object, names) {
     var O = toIObject$1(object);
@@ -8305,8 +8298,8 @@
     var key;
 
     if (proto) {
-      if (!proto[ITERATOR$4]) require$$1$1(proto, ITERATOR$4, ArrayValues);
-      if (!proto[TO_STRING_TAG]) require$$1$1(proto, TO_STRING_TAG, NAME$1);
+      if (!proto[ITERATOR$4]) hide$1(proto, ITERATOR$4, ArrayValues);
+      if (!proto[TO_STRING_TAG]) hide$1(proto, TO_STRING_TAG, NAME$1);
       Iterators[NAME$1] = ArrayValues;
       if (explicit) for (key in $iterators) {
         if (!proto[key]) redefine(proto, key, $iterators[key], true);
