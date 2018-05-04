@@ -25,12 +25,14 @@ export const FunctionGuide = {
   `
 }
 
-export const methodIOInputParams = function(title="methodIO",paramArray,description=""){
+export const methodIOInputParams = function(title="methodIO",paramArray,option){
   const titleName = `${title}`;
   
-  return {
+  return Object.assign({
     title:titleName,
-    description:`${description}`,
     inputs:params(titleName,paramArray)
-  }
+  },option);
+  //option
+  // command
+  // description
 };
