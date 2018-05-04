@@ -1,30 +1,32 @@
 <template>
 <div>
   <div>
-    <h3>Command</h3>
     <div class="data-display" @click="toggleOpen">
-      <pre>{{ commandValue }}</pre>
-      <div class="data-display hidden-display">
-        <pre v-if="commandDetail">{{commandDetail}}</pre>
-      </div>
-    </div>
-  </div>
-  <div class="div-column-2">
-    <div>
-      <h3>Input</h3>
+      🏁
       <div class="data-display">
-        <div v-for="(input,ikey) in inputEntries" :key="ikey">
-          <label class="badge">{{ikey}}</label>
-          <label class="badge">{{input.inputType}}</label>
-          <pre>{{ input.inputDisplay || input.inputValue }}</pre>
+        <h3 class="hidden-display">Command</h3>
+        <pre>{{ commandDisplay || commandValue }}</pre>
+      </div>
+      <div>
+        <div class="data-display">
+          <h3 class="hidden-display">Output</h3>
+          <label v-if="outputType" class="badge">{{outputType}}</label>
+          <pre>{{ outputValue }}</pre>
+          <div class="hidden-display">
+            <div class="data-display">
+              <h3>Input</h3>
+              <div v-for="(input,ikey) in inputEntries" :key="ikey">
+                <label class="badge">{{ikey}}</label>
+                <label class="badge">{{input.inputType}}</label>
+                <pre>{{ input.inputDisplay || input.inputValue }}</pre>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <div>
-      <h3>Output</h3>
-      <div class="data-display">
-        <label v-if="outputType" class="badge">{{outputType}}</label>
-        <pre>{{ outputValue }}</pre>
+      <div class="data-display hidden-display">
+        <h3>Reason</h3>
+        <pre v-if="commandDetail">{{commandDetail}}</pre>
       </div>
     </div>
   </div>
@@ -132,6 +134,7 @@ const dataEvaluation = function(data){
 export default {
   props: ["command", "input", "inputText", "inputParams", "scope"],
   data:()=>({
+    commandDisplay:null,
     commandDetail:null,
     inputEvals:[],
     outputError:null,
@@ -159,7 +162,6 @@ export default {
         this.inputParams.forEach(dataString=>{
           this.inputEvals.push(inputEvaluation(dataString,true));
         });
-        console.log("this.inputEvals",this.inputEvals);
       } else {
         let evalResult;
         
@@ -187,6 +189,12 @@ export default {
           scope[`i${key}`] = meta.inputValue;
         });
         
+        let commandDisplayText = this.commandValue;
+        const commandDisplayTextUpdate = function(key,textValue){
+          if(!commandDisplayText) return;
+          commandDisplayText = commandDisplayText.replace(key, textValue);
+        };
+        
         outputValue = this.scopedFn(scope,({ func, args, params })=>{
           const paramDetail  = params.reduce((dest,value,index)=>{
             let textValue;
@@ -197,13 +205,23 @@ export default {
               textValue = "[Arguments]";
             } else if(typeof value === "object"){
               textValue = JSON.stringify(value);
+              commandDisplayTextUpdate(args[index],textValue);
             } else {
               textValue = value+"";
+              commandDisplayTextUpdate(args[index],typeof value === "string" ? `"${textValue}"` : textValue );
             }
-            
+
             dest[args[index]] = textValue;
             return dest;
           },{});
+          
+          
+          
+          if(commandDisplayText){
+            this.commandDisplay = commandDisplayText;
+          } else {
+            this.commandDisplay = null;
+          }
           
           this.commandDetail = JSON.stringify(paramDetail,2,2);
           this.commandDetail += `\n\n${func}`;
@@ -258,8 +276,11 @@ pre {
     display:none;
   }
   
-  &:hover, &[open] {
+  &:hover, &[open]{
     background-color:#fafafa;
+  }
+  
+  &[open] {
     .hidden-display {
       display:block;
     }
