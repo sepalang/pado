@@ -12,8 +12,8 @@
   <div class="div-column-2">
     <div>
       <h3>Input</h3>
-      <div v-for="(input,ikey) in inputEntries" :key="ikey">
-        <div class="data-display">
+      <div class="data-display">
+        <div v-for="(input,ikey) in inputEntries" :key="ikey">
           <label class="badge">{{ikey}}</label>
           <label class="badge">{{input.inputType}}</label>
           <pre>{{ input.inputDisplay || input.inputValue }}</pre>
@@ -92,17 +92,25 @@ const inputEvaluation = function(input, inputTextMode = false){
   };
   
   try {
-    evalResult.inputValue   = inputTextMode ? !input.trim() ? input : eval(`( ${ input } )`) : input;
+    if(inputTextMode){
+      const inputStringValue = input + "";
+      evalResult.inputValue = !inputStringValue.trim() ? inputStringValue : eval(`( ${ inputStringValue } )`);
+    } else {
+      evalResult.inputValue = input;
+    }
+
     evalResult.inputType    = typeof evalResult.inputValue;
+    
     if(typeof evalResult.inputValue === "object" && Array.isArray(evalResult.inputValue)){
       evalResult.inputType = "Array";
     }
+    
     evalResult.inputError   = null;
     evalResult.inputDisplay = altTextFilter(evalResult.inputValue);
   } catch(e) {
-    evalResult.inputType  = null;
+    evalResult.inputType  = "ERROR";
     evalResult.inputError = e.message;
-    evalResult.inputDisplay = null;
+    evalResult.inputDisplay = e.message;
   }
   
   return evalResult;
@@ -150,7 +158,8 @@ export default {
         this.inputEvals = [];
         this.inputParams.forEach(dataString=>{
           this.inputEvals.push(inputEvaluation(dataString,true));
-        })
+        });
+        console.log("this.inputEvals",this.inputEvals);
       } else {
         let evalResult;
         
