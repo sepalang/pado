@@ -3,9 +3,7 @@
   "version": "4.0.0-alpha.3",
   "private": true,
   "scripts": {
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "build-storybook": "build-storybook -s public",
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
+    "build": "build-storybook -s public -o ../../docs",
     "storybook": "start-storybook -p 9009 -s public",
     "start": "npm run storybook"
   },

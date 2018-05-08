@@ -1,27 +1,12 @@
 # PADO
 Yet another functional programming helper
 
+## What is this?
+It serves as a supplement to various programming patterns that are missing in our commonly known libraries.
+And prefer to human implement rather than performance and aim for a more human solution than mechanical solution.
 
+## Playground
+[https://sepalang.github.io/pado/](https://sepalang.github.io/pado/)
 
-# design goal
-I am still making. It is not stable.
-
-## function style
-```javascript
-
-let data = [1,2,3]
-pd.map([1,2,3],v=>b+1)
-
-data;
-//=> [2, 3, 4]
-```
-
-
-##  build style
-
-```javascript
-var plusOne = pd().map(v=>v+1}).build()
-
-plusOne([1,2,3]);
-//=> [2,3,4];
-```
+## Plan
+The target features are almost ready, but preparing the test and documentation for a sustainable future. That would be 1.0.
