@@ -1,6 +1,6 @@
 {
   "name": "pado",
-  "version": "0.2.9",
+  "version": "0.3.10",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -22,22 +22,10 @@
     "function",
     "functions"
   ],
-  "jest": {
-    "moduleFileExtensions": [
-      "js"
-    ],
-    "transform": {
-      "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
-    }
-  },
   "devDependencies": {
-    "mkdirp": "^0.5.1",
-    "node-sass": "^4.9.0",
-    "padoc": "sepalang/padoc",
+    "@sepalang/padoc": "^0.7.2",
     "rimraf": "^2.6.2",
-    "sass-loader": "^7.0.1"
-  },
-  "dependencies": {
     "lodash": "^4.17.10"
-  }
+  },
+  "dependencies": {}
 }
