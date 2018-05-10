@@ -1,6 +1,6 @@
 {
-  "name": "vue-example",
-  "version": "4.0.0-alpha.3",
+  "name": "Pado stroybook",
+  "version": "0.1",
   "private": true,
   "scripts": {
     "build": "build-storybook -s public -o ../../docs",
