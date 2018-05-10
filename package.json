@@ -1,6 +1,6 @@
 {
   "name": "pado",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -13,8 +13,8 @@
     "build:default": "padoc .src/src ./ -m umd -s",
     "build:pack": "padoc --pack .src/src/pado.js ./pado.js -m umd -s",
     "build": "npm run clear:dist && npm run build:default && npm run build:pack",
-    "t": "padoc --exec .src/sample/use/operate.use.js",
-    "test": "jest ''"
+    "test": "padoc --test .src/test",
+    "t": "padoc --exec .src/sample/use/operate.use.js"
   },
   "author": "AHN HO JUNG",
   "license": "MIT",
@@ -23,7 +23,7 @@
     "functions"
   ],
   "devDependencies": {
-    "@sepalang/padoc": "^0.7.2",
+    "@sepalang/padoc": "^0.7.6",
     "rimraf": "^2.6.2",
     "lodash": "^4.17.10"
   },
