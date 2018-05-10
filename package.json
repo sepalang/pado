@@ -1,6 +1,6 @@
 {
   "name": "pado",
-  "version": "0.3.12",
+  "version": "0.3.14",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -14,6 +14,9 @@
     "build:pack": "padoc --pack .src/src/pado.js ./pado.js -m umd -s",
     "build": "npm run clear:dist && npm run build:default && npm run build:pack",
     "test": "padoc --test .src/test",
+    "labp": "padoc --pack .src/sample/labs/entry.js .src/sample/labs/pack.sample.js",
+    "labe": "padoc --exec .src/sample/labs/entry.js -i",
+    "labn": "node .src/sample/labs/pack.sample.js --interactive",
     "t": "padoc --exec .src/sample/use/operate.use.js"
   },
   "author": "AHN HO JUNG",
@@ -23,7 +26,7 @@
     "functions"
   ],
   "devDependencies": {
-    "@sepalang/padoc": "^0.7.6",
+    "@sepalang/padoc": "^0.7.11",
     "rimraf": "^2.6.2",
     "lodash": "^4.17.10"
   },

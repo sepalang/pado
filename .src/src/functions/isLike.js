@@ -29,9 +29,9 @@ export const isArray = function(data) {
   return Array.isArray(data) || data instanceof Array;
 }
 
-export const isObject = object=>(object !== null && typeof object === "object") ? true : false
-
-export const isFunction = (f)=>typeof f === "function"
+export const isObject   = it=>(it !== null && typeof it === "object") ? true : false
+export const isFunction = (it)=>typeof it === "function"
+export const likeObject = (it)=>isObject(it) || isFunction(it)
 
 export const likeString = function(data) {
   if(typeof data === "string") return true
@@ -70,21 +70,24 @@ export const likeArray = (function(nodeFn,webFn){
 //TODO : native isPlainObject
 export const isNode = (a)=>isObject(a) && typeof a.nodeType === "number"
 
-export const isEmpty = function(){
-  if (typeof o === "undefined") return true;
-  if (typeof o === "string")return o.trim().length < 1 ? true : false;
-  if (typeof o === "object"){
-    if(o == null) return true;
-    if(o instanceof RegExp) return false;      
-    if(isArray(o)) {
-      return !o.length;
+export const isEmpty = function(it){
+  if (typeof it === "undefined") return true;
+  if (typeof it === "string")return it.trim().length < 1 ? true : false;
+  if (typeof it === "object"){
+    if(it == null) return true;
+    if(it instanceof RegExp) return false;      
+    if(isArray(it)) {
+      return !it.length;
     } else {
-      for (var prop in o) return false; return true;
+      for (var prop in it) return false; return true;
     }
   }
-  if (typeof o === "number")return false;
-  if (typeof o === "function")return false;
-  if (typeof o === "boolean")return false;
+  if (typeof it === "number"){
+    //NaN check || false
+    return it!==it || false;
+  }
+  if (typeof it === "function")return false;
+  if (typeof it === "boolean")return false;
   return true;
 }
 

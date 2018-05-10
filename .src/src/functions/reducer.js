@@ -1,13 +1,12 @@
 import { 
   isNumber,
+  likeObject
 } from './isLike'
 
 import {
   asArray
 } from './cast'
 
-
-import _isObject from 'lodash/isObject';
 import _isEmpty from 'lodash/isEmpty';
 import _isArray from 'lodash/isArray';
 import _get from 'lodash/get';
@@ -27,9 +26,9 @@ export const get = function(target,path){
 }
 
 export const hasProperty = function(obj,value,key){
-  if(arguments.length == 1 && _isObject(obj)) return _isEmpty(obj);
+  if(arguments.length == 1 && likeObject(obj)) return _isEmpty(obj);
   if(_isArray(obj)) for(var i=0,l=obj.length;i<l;i++) if(obj[i] === value) return true;
-  if(_isObject(obj)){
+  if(likeObject(obj)){
     if(key){
       return _get(obj,key) === value;
     } else {
