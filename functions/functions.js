@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "./isLike", "./cast", "./reducer"], factory);
+    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "./isLike", "./cast", "./reducer"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("./isLike"), require("./cast"), require("./reducer"));
+    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("./isLike"), require("./cast"), require("./reducer"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Regexp, global.es6Regexp, global.isLike, global.cast, global.reducer);
+    factory(global.es6Regexp, global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Regexp, global.isLike, global.cast, global.reducer);
     global.functions = mod.exports;
   }
-})(this, function (_es6Regexp, _es6Regexp2, _es6Object, _es6Regexp3, _es6Regexp4, _isLike, _cast, _reducer) {
+})(this, function (_es6Regexp, _es6Regexp2, _es6Regexp3, _es6Object, _es6Regexp4, _isLike, _cast, _reducer) {
   "use strict";
 
   function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
@@ -120,105 +120,6 @@
       }
     }
   };
-
-  var STRING_CAST = FUNCTION_EXPORTS.STRING_CAST = function () {
-    return function (text, defaultOrder, finder, at) {
-      if (typeof text === "string" || typeof text === "number") {
-        var idxs = [];
-        var hist = [];
-        var count = 0;
-        var pin = !at || !(0, _isLike.isNumber)(at) || at < 0 ? 0 : at;
-        var strlen = text.length;
-        var order = defaultOrder;
-        var next;
-
-        if (typeof finder !== "function") {
-          finder = void 0;
-        }
-
-        do {
-          var start = void 0;
-          var size = void 0;
-
-          if (typeof order === "string") {
-            var findedIndex = text.indexOf(order, pin);
-
-            if (findedIndex !== -1) {
-              start = findedIndex;
-              size = order.length;
-            }
-          } else if (order instanceof RegExp) {
-            var cs = text.substring(pin || 0);
-            var ma = cs.match(order);
-
-            if (ma) {
-              start = cs.indexOf(ma) + (ma.length - 1);
-              size = ma.length;
-            }
-          }
-
-          count++;
-
-          if (typeof start !== "undefined") {
-            var string = text.substring(start, start + size);
-            var struct = {
-              string: string,
-              start: start,
-              size: size,
-              end: start + size //before pin
-
-            };
-
-            if (pin < start) {
-              var noneCastStruct = {
-                string: text.substring(pin, start),
-                start: pin,
-                size: start - pin,
-                end: start
-              };
-              finder && finder(false, noneCastStruct, hist, count);
-            } //now pin
-
-
-            pin = start + size; //order
-
-            var nextOrder = finder && finder(true, struct, hist, count);
-
-            if ((0, _isLike.likeRegexp)(nextOrder)) {
-              order = nextOrder;
-            } else {
-              order = defaultOrder;
-            } //idx
-
-
-            idxs.push(start);
-            hist.push({
-              string: string,
-              start: start,
-              size: size
-            }); //to be countinue
-
-            if (pin >= strlen) {
-              next = false;
-            } else {
-              next = true;
-            }
-          } else {
-            var _struct = {
-              string: text.substring(pin, strlen),
-              start: pin,
-              size: start - pin,
-              end: strlen
-            };
-            finder && finder(false, _struct, hist, count);
-            next = false;
-          }
-        } while (count > 1000 ? false : next);
-
-        return idxs;
-      }
-    };
-  }();
   /*
     bow.findIndexes("hello world","l") [2,3,9]
     bow.findIndexes("hello world",/l/) [2,3,9]

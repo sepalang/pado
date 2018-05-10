@@ -107,7 +107,7 @@
             return inspectResult.push(true);
           });
 
-          if (inspectResult.length && !(0, _functions.hasProperty)(inspectResult, false)) {
+          if (inspectResult.length && !(0, _functions.hasValueProperty)(inspectResult, false)) {
             red.push(block);
           }
         }

@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.notExsist = _exports.isExsist = _exports.isPlainObject = _exports.likeRegexp = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
+  _exports.notExsist = _exports.isExsist = _exports.isPlainObject = _exports.likeRegexp = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
 
   var isAbsoluteNaN = function isAbsoluteNaN(number) {
     return number !== number && typeof number === "number";
@@ -59,17 +59,27 @@
 
   _exports.isArray = isArray;
 
-  var isObject = function isObject(object) {
-    return object !== null && typeof object === "object" ? true : false;
+  var isObject = function isObject(it) {
+    return it !== null && typeof it === "object" ? true : false;
   };
 
   _exports.isObject = isObject;
 
-  var isFunction = function isFunction(f) {
-    return typeof f === "function";
+  var isFunction = function isFunction(it) {
+    return typeof it === "function";
   };
+  /*
+    * likeObject is have hasOwnProperty
+  */
+
 
   _exports.isFunction = isFunction;
+
+  var likeObject = function likeObject(it) {
+    return isObject(it) || isFunction(it);
+  };
+
+  _exports.likeObject = likeObject;
 
   var likeString = function likeString(data) {
     if (typeof data === "string") return true;
@@ -115,18 +125,18 @@
 
   _exports.isNode = isNode;
 
-  var isEmpty = function isEmpty() {
-    if (typeof o === "undefined") return true;
-    if (typeof o === "string") return o.trim().length < 1 ? true : false;
+  var isEmpty = function isEmpty(it) {
+    if (typeof it === "undefined") return true;
+    if (typeof it === "string") return it.trim().length < 1 ? true : false;
 
-    if (typeof o === "object") {
-      if (o == null) return true;
-      if (o instanceof RegExp) return false;
+    if (typeof it === "object") {
+      if (it == null) return true;
+      if (it instanceof RegExp) return false;
 
-      if (isArray(o)) {
-        return !o.length;
+      if (isArray(it)) {
+        return !it.length;
       } else {
-        for (var prop in o) {
+        for (var prop in it) {
           return false;
         }
 
@@ -134,9 +144,13 @@
       }
     }
 
-    if (typeof o === "number") return false;
-    if (typeof o === "function") return false;
-    if (typeof o === "boolean") return false;
+    if (typeof it === "number") {
+      //NaN check || false
+      return it !== it || false;
+    }
+
+    if (typeof it === "function") return false;
+    if (typeof it === "boolean") return false;
     return true;
   };
 
