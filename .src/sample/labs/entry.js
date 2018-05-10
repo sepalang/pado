@@ -1,2 +1,2 @@
-import _noop from 'lodash/noop';
-console.log( _noop )
+import { castString } from '../../src/functions/reducer';
+export default castString;

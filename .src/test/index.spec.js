@@ -1,5 +1,19 @@
 import { isObject, likeObject, isEmpty } from '../src/functions/isLike';
 describe('Functions isLike', () => {
+  
+  it('select', () => {
+    var object = { 'a': [{ 'b': { 'c': 3 } }] };
+    
+    _.get(object, 'a[0].b.c');
+    // => 3
+    
+    _.get(object, ['a', '0', 'b', 'c']);
+    // => 3
+    
+    _.get(object, 'a.b.c', 'default');
+    // => 'default'
+  })
+  
   // isEmpty
   it('isEmpty', () => {
     expect(isEmpty(null)).toEqual(true);

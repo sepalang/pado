@@ -31,6 +31,10 @@ export const isArray = function(data) {
 
 export const isObject   = it=>(it !== null && typeof it === "object") ? true : false
 export const isFunction = (it)=>typeof it === "function"
+
+/*
+  * likeObject is have hasOwnProperty
+*/
 export const likeObject = (it)=>isObject(it) || isFunction(it)
 
 export const likeString = function(data) {
