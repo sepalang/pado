@@ -2,24 +2,33 @@
 <html>
 <head>
   <title>Welcome</title>
+  <style>
+    body {
+      color:#ccc;
+    }
+  </style>
   <script src="https://unpkg.com/vue"></script>
   <script src="/assets/pado.js"></script>
 </head>
 <body>
   <div id="app">
-    <h1>{{ greeting }}</h1>
-    <ul>
-      
-    </ul>
+    <pre>{{ body }}</pre>
+    <div>-------</div>
+    <pre>{{ result }}</pre>
   </div>
-
-  <script>
-    var app = new Vue({
-      el: '#app',
-      data: {
-        greeting: 'Welcome'
-      }
-    })
-  </script>
+<script>
+var script=()=>pado.asArray(13);
+var app = new Vue({
+  el: '#app',
+  computed:{
+    body (){
+      return script.toString().replace("()=>","");
+    },
+    result (){
+      return script();
+    }
+  }
+})
+</script>
 </body>
 </html>
