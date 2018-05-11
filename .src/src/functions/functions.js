@@ -22,9 +22,7 @@ import {
   get
 } from './reducer';
 
-const FUNCTION_EXPORTS = {};
-
-const UNIQUE = FUNCTION_EXPORTS.UNIQUE = function(array){
+export const unique = function(array){
   var value = [],result = [], array = toArray(array);
   for(var i=0,l=array.length;i<l;i++){
     var unique = true;
@@ -38,7 +36,7 @@ const UNIQUE = FUNCTION_EXPORTS.UNIQUE = function(array){
   return result;
 }
 
-const HAS_VALUE = FUNCTION_EXPORTS.HAS_VALUE = (function(){
+export const hasValue = (function(){
   var defaultObjectValueFunc = function(object,value){
     return object === value;
   };
@@ -99,7 +97,7 @@ const HAS_VALUE = FUNCTION_EXPORTS.HAS_VALUE = (function(){
   }
 }());
 
-const GET_KEY_BY = FUNCTION_EXPORTS.GET_KEY_BY = function(object,value){
+export const getKeyBy = function(object,value){
   if(isFunction(value)){
     if(isArray(object)) for(var i=0,l=object.length;i<l;i++) if(value(object[i],i)===true) return i;
     if(isObject(object)) for(var key in object) if(value(object[key],key)===true) return key;
@@ -114,7 +112,7 @@ const GET_KEY_BY = FUNCTION_EXPORTS.GET_KEY_BY = function(object,value){
   bow.findIndexes("hello world",/l/) [2,3,9]
   bow.findIndexes("hello world",/\s/) [5]
 */
-const FIND_INDEXES = FUNCTION_EXPORTS.FIND_INDEXES = (function(){
+export const findIndexes = (function(){
   var __find_string = (c,s,p)=>c.indexOf(s,p)
   var __find_regexp = (c,s,p)=>{
     let i = c.substring(p || 0).search(s);
@@ -138,7 +136,7 @@ const FIND_INDEXES = FUNCTION_EXPORTS.FIND_INDEXES = (function(){
     }
 }());
 
-const EACH_PROC = FUNCTION_EXPORTS.EACH_PROC = function(arr,proc){
+const EACH_PROC = function(arr,proc){
     if(arr.length > 1){
         for(var i=0,l=arr.length-1;i<l;proc(arr[i],i,false), i++);
         proc(arr[arr.length-1],arr.length-1,true);
@@ -148,19 +146,22 @@ const EACH_PROC = FUNCTION_EXPORTS.EACH_PROC = function(arr,proc){
     return arr;
 }
 
-const STATIC_FOR_EACH_PROC = FUNCTION_EXPORTS.STATIC_FOR_EACH_PROC = function(obj,proc){
+const STATIC_FOR_EACH_PROC = function(obj,proc){
     if(typeof obj === "object") for(var i=0,a=obj instanceof Array,al=a?obj.length:NaN,keys=Object.keys(obj),l=keys.length;i<l;proc(obj[keys[i]],keys[i],i,l,al),i++);
     return obj;
 }
 
-let EACH     = (value,proc)=>EACH_PROC(asArray(value),proc)
-let FOR_EACH = (value,proc)=>STATIC_FOR_EACH_PROC(value,proc)
-let REDUCE   = function(value,proc,meta){
+//TODO : deprecated
+export const each     = (value,proc)=>EACH_PROC(asArray(value),proc)
+//TODO : deprecated
+export const forEach = (value,proc)=>STATIC_FOR_EACH_PROC(value,proc)
+//TODO : deprecated
+export const reduce   = function(value,proc,meta){
   value = asArray(value);
   return EACH_PROC(value,function(v,i,l){ meta = proc(meta,v,i,l); }),meta;
 }
 
-const CLEAR_OF = FUNCTION_EXPORTS.CLEAR_OF = function(data,fillFn,sp){
+export const clearOf = function(data,fillFn,sp){
   if(data instanceof Array){
     sp = Array.prototype.splice.call(data,0,data.length);
   } else if(typeof data == "object") {
@@ -170,25 +171,25 @@ const CLEAR_OF = FUNCTION_EXPORTS.CLEAR_OF = function(data,fillFn,sp){
   return (fillFn && fillFn(data,sp)), data;
 }
 
-const INSERT_OF = FUNCTION_EXPORTS.INSERT_OF = function(data,v,a){
+export const insertOf = function(data,v,a){
   isArray(data) && data.splice(typeof a === "number"?a:0,0,v)
   return data;
 }
 
-const MOVE_OF = FUNCTION_EXPORTS.MOVE_OF = function(data,oldIndex,newIndex){
+export const moveOf = function(data,oldIndex,newIndex){
   if(oldIndex !== newIndex && isArray(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length){
     Array.prototype.splice.call(data,newIndex > data.length ? data.length : newIndex,0,Array.prototype.splice.call(data,oldIndex,1)[0]);
   }
   return data;
 }
 
-const CONCAT_OF = FUNCTION_EXPORTS.CONCAT_OF = function(data,appends){
+export const concatOf = function(data,appends){
   var data = asArray(data);
-  return EACH(appends,function(value){ data.push(value); }), data;
+  return each(appends,function(value){ data.push(value); }), data;
 }
 
 
-const FILTER_OF = FUNCTION_EXPORTS.FILTER_OF = function(data,func,exitFn){
+export const filterOf = function(data,func,exitFn){
   var data    = asArray(data);
   var exitCnt = 0;
 
@@ -207,7 +208,7 @@ const FILTER_OF = FUNCTION_EXPORTS.FILTER_OF = function(data,func,exitFn){
   return data;
 }
 
-const SORT_OF = FUNCTION_EXPORTS.SORT_OF = function(data,filter){
+export const sortOf = function(data,filter){
   if(data.length == 0){
     return data;
   }
@@ -230,7 +231,7 @@ const SORT_OF = FUNCTION_EXPORTS.SORT_OF = function(data,filter){
   for(var i=1,l=data.length;i<l;i++){
     for(var ri=0,rl=result.length;ri<rl;ri++){
       if(filter(data[i],result[ri]) === true){
-        INSERT_OF(result,data[i],ri);
+        insertOf(result,data[i],ri);
         break;
       }
       if((ri + 1) === result.length){
@@ -239,14 +240,14 @@ const SORT_OF = FUNCTION_EXPORTS.SORT_OF = function(data,filter){
     }
   }
 
-  CLEAR_OF(data);
+  clearOf(data);
 
   for(var i=0,l=result.length;i<l;data.push(result[i]),i++);
   
   return data;
 }
 
-const REBASE = FUNCTION_EXPORTS.REBASE = function(obj,ref){
+export const rebase = function(obj,ref){
   var result = {};
   for(var key in obj){
     if(key === ".*"){
@@ -264,7 +265,7 @@ const REBASE = FUNCTION_EXPORTS.REBASE = function(obj,ref){
         }
       }
     } else if(key.indexOf(",") > -1){
-      EACH(key.split(","),function(deepKey){
+      each(key.split(","),function(deepKey){
         deepKey = deepKey.trim();
         if(typeof obj[key] === "function"){
           result[deepKey] = obj[key];
@@ -294,8 +295,8 @@ const REBASE = FUNCTION_EXPORTS.REBASE = function(obj,ref){
 
 
 
-//TODO: Union HAS_VALUE
-const NESTED_HAS_PROC = FUNCTION_EXPORTS.NESTED_HAS_PROC = function(obj,key){
+//TODO: Union hasValue
+const NESTED_HAS_PROC = function(obj,key){
   var keys = key.split(".");
   if(!keys.length) return false;
 
@@ -312,7 +313,7 @@ const NESTED_HAS_PROC = FUNCTION_EXPORTS.NESTED_HAS_PROC = function(obj,key){
   return true;
 }
 
-const APART = FUNCTION_EXPORTS.APART = function(text,split,block,blockEnd){
+export const apart = function(text,split,block,blockEnd){
   if(typeof text !== "string") return [text];
   
   let result = text.split(split===true?/\s+/:split||/\s+/);
@@ -328,8 +329,8 @@ const APART = FUNCTION_EXPORTS.APART = function(text,split,block,blockEnd){
     for(let d=result,i=0,l=d.length;i<l;i++){
       let part = d[i]
       let greb = {
-        start:FIND_INDEXES(part,block), 
-        end  :FIND_INDEXES(part,blockEnd) 
+        start:findIndexes(part,block), 
+        end  :findIndexes(part,blockEnd) 
       }
       
       console.log("part, greb", part, greb);
@@ -345,7 +346,7 @@ const APART = FUNCTION_EXPORTS.APART = function(text,split,block,blockEnd){
   }
 }
 
-const DIFF_STRUCTURE = FUNCTION_EXPORTS.DIFF_STRUCTURE = function(before,after){
+export const diffStructure = function(before,after){
   var afterKeys = Object.keys(after);
   var beforeKeys;
   var canDiff = false;
@@ -363,7 +364,7 @@ const DIFF_STRUCTURE = FUNCTION_EXPORTS.DIFF_STRUCTURE = function(before,after){
   var analysis = {
     after:after,
     before:before,
-    keys:REDUCE(UNIQUE(afterKeys.concat(beforeKeys)),function(redu,key){ redu[key] = undefined;  return redu; },{}),
+    keys:reduce(unique(afterKeys.concat(beforeKeys)),function(redu,key){ redu[key] = undefined;  return redu; },{}),
     match:[],
     missing:[],
     surplus:[],
@@ -392,8 +393,8 @@ const DIFF_STRUCTURE = FUNCTION_EXPORTS.DIFF_STRUCTURE = function(before,after){
   }
 
   //surplus
-  EACH(afterKeys,function(key){
-    if(!HAS_VALUE(analysis.match,key)){
+  each(afterKeys,function(key){
+    if(!hasValue(analysis.match,key)){
       analysis.missing.push(key);
       analysis.keys[key] = "missing";
     }
@@ -406,7 +407,7 @@ const DIFF_STRUCTURE = FUNCTION_EXPORTS.DIFF_STRUCTURE = function(before,after){
 }
 
 //PINPONGPOOL INTERFACE
-const TOGGLE = FUNCTION_EXPORTS.TOGGLE = function(ta,cv,set){
+export const toggle = function(ta,cv,set){
   var index = -1;
   for(let d=asArray(ta),l=d.length,i=0;i<l;i++){
     if(d[i] == cv) { index = i+1; break; }
@@ -416,20 +417,8 @@ const TOGGLE = FUNCTION_EXPORTS.TOGGLE = function(ta,cv,set){
   return ta[index];
 }
 
-const TRUN = FUNCTION_EXPORTS.TRUN = function(i,p,ts){
+export const turn = function(i,p,ts){
   if(i < 0) { var abs = Math.abs(i/ts); i = p-(abs>p?abs%p:abs); }; 
   ts=ts?ts:1;i=Math.floor(i/ts);
   return (p > i)?i:i%p;
 }
-
-let FINALLY_EXPORTS = Object.keys(FUNCTION_EXPORTS).reduce((dest,key)=>{
-  let camelKey = key.toLowerCase().replace(/\_[\w]/g,s=>{
-    return s.substr(1).toUpperCase();
-  })
-  
-  dest[camelKey] = FUNCTION_EXPORTS[key]
-  
-  return dest
-},{})
-
-module.exports = { ...FINALLY_EXPORTS }
