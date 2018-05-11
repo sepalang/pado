@@ -17,8 +17,27 @@ import {
 
 import _get from 'lodash/get';
 
-export const castString = function(text,openFn,castFn){
+export const castString = function(text,matches,castFn,property){
+  let cursorStart = isNumber(property.start) && property.start > 0 ? property.start : 0;
+  let cursorEnd   = isNumber(property.end) ? property.end : text.length;
+  let cursor      = cursorStart;
   
+  const open = function({ cursorStart, cursorEnd, cursor, matches }){
+    matches.map(matchExp=>{
+      //matchExp()
+    })
+  };
+  
+  open({
+    cursorStart,
+    cursorEnd,
+    cursor,
+    matches
+  })
+  
+  
+  
+  return property;
 };
 
 export const castPath = function(pathParam){
@@ -30,11 +49,11 @@ export const castPath = function(pathParam){
       return [pathParam]
     }
     if(typeof pathParam === "string"){
-      return castString(pathParam,[".","["],({ property, matchType, match, casting, fork, nextIndex, next, skip })=>{
+      const { meta:{ result } } = castString(pathParam,[".","["],({ property:{ meta }, matchType, match, casting, fork, nextIndex, next, skip })=>{
         switch(matchType){
         // "."
         case 0:
-          property.push(casting);
+          meta.push(casting);
           next(nextIndex);
           break;
         // "]"
@@ -46,7 +65,7 @@ export const castPath = function(pathParam){
             matchType === 1 && feet++;
             
             if(lead === feet){
-              property.push(casting.substr(1))
+              meta.push(casting.substr(1))
               next(nextIndex);
             } else {
               skip();
@@ -55,14 +74,16 @@ export const castPath = function(pathParam){
           break;
         //end
         case -1:
-          property.push(casting);
+          meta.push(casting);
           break;
         default:
           skip();
           break;
         }
         skip();
-      },[]);
+      },{meta:[]});
+      
+      return result;
     }
   }
   return [];
