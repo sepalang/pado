@@ -17,92 +17,9 @@ import {
 
 import _get from 'lodash/get';
 
-export const castString = function(text,defaultOrder,finder,at){
-  if(typeof text === "string" || typeof text === "number"){
-    let idxs  = []
-    let hist  = []
-    let count = 0
-    let pin   = (!at || !isNumber(at) || at < 0)?0:at
-    let strlen= text.length
-    let order = defaultOrder
-    let next
-      
-    if(typeof finder !== "function"){ 
-      finder = void 0
-    }
-      
-    do {
-      let start = void 0;
-      let size  = void 0;
-        
-      if(typeof order === "string"){
-        let findedIndex = text.indexOf(order,pin)
-        if(findedIndex !== -1){
-          start = findedIndex
-          size  = order.length
-        }
-      } else if (order instanceof RegExp) {
-        let cs = text.substring(pin || 0);
-        let ma = cs.match(order);
-        if(ma){
-          start = cs.indexOf(ma) + (ma.length - 1)
-          size  = ma.length
-        } 
-      }
-        
-      count++;
-        
-      if(typeof start !== "undefined"){
-        let string = text.substring(start,start + size);
-        let struct = {string,start,size,end:start + size}
-          
-        //before pin
-        if(pin < start){
-          let noneCastStruct = {
-            string:text.substring(pin,start),
-            start:pin,
-            size:start-pin,
-            end:start
-          }
-          finder && finder(false,noneCastStruct,hist,count)
-        }
-          
-        //now pin
-        pin = start + size;
-
-        //order
-        let nextOrder = finder && finder(true,struct,hist,count);
-        if(likeRegexp(nextOrder)){
-          order = nextOrder
-        } else {
-          order = defaultOrder
-        }
-          
-        //idx
-        idxs.push(start)
-        hist.push({string,start,size})
-          
-        //to be countinue
-        if(pin >= strlen){
-          next = false
-        } else {
-          next = true;
-        }
-      } else {
-        let struct = {
-          string:text.substring(pin,strlen),
-          start:pin,
-          size:start-pin,
-          end:strlen
-        }
-        finder && finder(false,struct,hist,count);
-        next = false;
-      }
-        
-    } while((count > 1000) ? false : next)
-    return idxs;
-  }
-}
+export const castString = function(text,openFn,castFn){
+  
+};
 
 export const castPath = function(pathParam){
   if(isArray(pathParam)){
@@ -113,7 +30,39 @@ export const castPath = function(pathParam){
       return [pathParam]
     }
     if(typeof pathParam === "string"){
-      
+      return castString(pathParam,[".","["],({ property, matchType, match, casting, fork, nextIndex, next, skip })=>{
+        switch(matchType){
+        // "."
+        case 0:
+          property.push(casting);
+          next(nextIndex);
+          break;
+        // "]"
+        case 1:
+          let [lead, feet] = [1, 0];
+          
+          fork(["[","]"],({ matchType, match, casting, nextIndex , next, skip })=>{
+            matchType === 0 && lead++;
+            matchType === 1 && feet++;
+            
+            if(lead === feet){
+              property.push(casting.substr(1))
+              next(nextIndex);
+            } else {
+              skip();
+            }
+          });
+          break;
+        //end
+        case -1:
+          property.push(casting);
+          break;
+        default:
+          skip();
+          break;
+        }
+        skip();
+      },[]);
     }
   }
   return [];
