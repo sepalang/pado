@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.html",
   "scripts": {
-    "start": "live-server ./"
+    "start": "live-server ./ --mount=/assets:../../../"
   },
   "author": "AHN HO JUNG",
   "license": "MIT",
