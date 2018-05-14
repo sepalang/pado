@@ -74,14 +74,17 @@
     return target;
   }
 
-  var isAbsoluteNaN = function isAbsoluteNaN(number) {
-    return number !== number && typeof number === "number";
+  var isAbsoluteNaN = function isAbsoluteNaN(it) {
+    return it !== it && typeof it === "number";
   };
   var isNone = function isNone(data) {
     return isAbsoluteNaN(data) || data === undefined || data === null;
   };
-  var isNumber = function isNumber() {
-    return typeof num === "number" && !isAbsoluteNaN(num);
+  var isNumber = function isNumber(it) {
+    return typeof it === "number" && !isAbsoluteNaN(it);
+  };
+  var isInfinity = function isInfinity(it) {
+    return it === Number.POSITIVE_INFINITY || it === Number.NEGATIVE_INFINITY;
   };
   var isInteger = function isInteger(value) {
     //NaN, null, undefined
@@ -91,7 +94,7 @@
       value = value.trim();
     }
 
-    if (!/string|number/.test(typeof value) || value === Number.POSITIVE_INFINITY || value === Number.NEGATIVE_INFINITY || isNaN(value)) {
+    if (!/string|number/.test(typeof value) || isInfinity(value) || isNaN(value)) {
       return false;
     }
 
@@ -119,7 +122,7 @@
     return false;
   };
   var likeNumber = function likeNumber(data) {
-    if (isNumber(data)) return true;
+    if (isNumber(data) || isInfinity(data)) return true;
     if (typeof data === "string") return String(parseFloat(t)) === String(t);
     return false;
   };
@@ -1758,101 +1761,132 @@
 
   var get_1 = get;
 
-  var castString = function castString(text, defaultOrder, finder, at) {
-    if (typeof text === "string" || typeof text === "number") {
-      var idxs = [];
-      var hist = [];
-      var count = 0;
-      var pin = !at || !isNumber(at) || at < 0 ? 0 : at;
-      var strlen = text.length;
-      var order = defaultOrder;
-      var next;
+  var findIndex = function () {
+    var __find_string = function __find_string(it, search, at) {
+      return it.indexOf(search, at);
+    };
 
-      if (typeof finder !== "function") {
-        finder = void 0;
-      }
+    var __find_regexp = function __find_regexp(it, search, at) {
+      var i = it.substring(at || 0).search(search);
+      return i >= 0 ? i + (at || 0) : i;
+    };
 
-      do {
-        var start = void 0;
-        var size = void 0;
+    return function (it, search, at) {
+      return (search instanceof RegExp ? __find_regexp : __find_string)(it, search, at);
+    };
+  }(); //reducer.spec.js
 
-        if (typeof order === "string") {
-          var findedIndex = text.indexOf(order, pin);
+  var findIndexes$1 = function () {
+    return function (c, s, at) {
+      if (typeof c === "string" || typeof c === "number") {
+        var idxs = [],
+            s = likeRegexp(s) ? s : s + "",
+            at = !at || !isNumber(at) || at < 0 ? 0 : at,
+            next;
 
-          if (findedIndex !== -1) {
-            start = findedIndex;
-            size = order.length;
-          }
-        } else if (order instanceof RegExp) {
-          var cs = text.substring(pin || 0);
-          var ma = cs.match(order);
+        do {
+          var i = findIndex(c, s, at);
 
-          if (ma) {
-            start = cs.indexOf(ma) + (ma.length - 1);
-            size = ma.length;
-          }
-        }
-
-        count++;
-
-        if (typeof start !== "undefined") {
-          var string = text.substring(start, start + size);
-          var struct = {
-            string: string,
-            start: start,
-            size: size,
-            end: start + size //before pin
-
-          };
-
-          if (pin < start) {
-            var noneCastStruct = {
-              string: text.substring(pin, start),
-              start: pin,
-              size: start - pin,
-              end: start
-            };
-            finder && finder(false, noneCastStruct, hist, count);
-          } //now pin
-
-
-          pin = start + size; //order
-
-          var nextOrder = finder && finder(true, struct, hist, count);
-
-          if (likeRegexp(nextOrder)) {
-            order = nextOrder;
-          } else {
-            order = defaultOrder;
-          } //idx
-
-
-          idxs.push(start);
-          hist.push({
-            string: string,
-            start: start,
-            size: size
-          }); //to be countinue
-
-          if (pin >= strlen) {
-            next = false;
-          } else {
+          if (i > -1) {
+            at = (s.length || 1) + i;
+            idxs.push(i);
             next = true;
+          } else {
+            next = false;
           }
-        } else {
-          var _struct = {
-            string: text.substring(pin, strlen),
-            start: pin,
-            size: start - pin,
-            end: strlen
-          };
-          finder && finder(false, _struct, hist, count);
-          next = false;
-        }
-      } while (count > 1000 ? false : next);
+        } while (next);
 
-      return idxs;
+        return idxs;
+      }
+    };
+  }();
+  var cut = function cut(collection, cutLength, emptyDefault) {
+    if (cutLength === void 0) {
+      cutLength = 1;
     }
+
+    if (emptyDefault === void 0) {
+      emptyDefault = undefined;
+    }
+
+    var data = asArray$1(collection);
+    var fill = emptyDefault;
+
+    if (data.length > cutLength) {
+      data.splice(cutLength, Number.POSITIVE_INFINITY);
+      return data;
+    }
+
+    var dataLength = data.length;
+
+    if (typeof emptyDefault !== "function") {
+      fill = function fill() {
+        return emptyDefault;
+      };
+    }
+
+    for (var i = 0, l = cutLength - dataLength; i < l; i++) {
+      data.push(fill(dataLength++, i));
+    }
+
+    return data;
+  };
+  var top = function top(data, iteratee, topLength) {
+    if (typeof iteratee !== "function") {
+      iteratee = function iteratee(a, b) {
+        return a < b;
+      };
+    }
+
+    if (typeof topLength === "boolean") {
+      topLength = topLength ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+    }
+
+    return isNumber(topLength) || isInfinity(topLength) ? asArray$1(data).sort(function (a, b) {
+      return iteratee(a, b);
+    }).splice(0, topLength) : asArray$1(data).sort(function (a, b) {
+      return iteratee(a, b);
+    })[0];
+  };
+  var max = function max(numberList) {
+    var result;
+    asArray$1(numberList).forEach(function (n) {
+      if (isNumber(n)) {
+        if (typeof result !== "number") {
+          result = n;
+          return;
+        }
+
+        if (result < n) {
+          result = n;
+        }
+      }
+    });
+    return result;
+  }; //
+
+  var castString = function castString(text, matches, castFn, property) {
+    var cursorStart = isNumber(property.start) && property.start > 0 ? property.start : 0;
+    var cursorEnd = isNumber(property.end) ? property.end : text.length;
+    var cursor = cursorStart;
+
+    var open = function open(_ref) {
+      var cursorStart = _ref.cursorStart,
+          cursorEnd = _ref.cursorEnd,
+          cursor = _ref.cursor,
+          matches = _ref.matches;
+      max(matches.map(function (matchExp) {
+        findIndex();
+      }));
+    };
+
+    open({
+      cursorStart: cursorStart,
+      cursorEnd: cursorEnd,
+      cursor: cursor,
+      matches: matches
+    });
+    return property;
   };
   var castPath$1 = function castPath(pathParam) {
     if (isArray(pathParam)) {
@@ -1862,6 +1896,66 @@
     if (likeString(pathParam)) {
       if (isNumber(pathParam)) {
         return [pathParam];
+      }
+
+      if (typeof pathParam === "string") {
+        var _castString = castString(pathParam, [".", "["], function (_ref2) {
+          var meta = _ref2.property.meta,
+              matchType = _ref2.matchType,
+              match = _ref2.match,
+              casting = _ref2.casting,
+              fork = _ref2.fork,
+              nextIndex = _ref2.nextIndex,
+              next = _ref2.next,
+              skip = _ref2.skip;
+
+          switch (matchType) {
+            // "."
+            case 0:
+              meta.push(casting);
+              next(nextIndex);
+              break;
+            // "]"
+
+            case 1:
+              var lead = 1,
+                  feet = 0;
+              fork(["[", "]"], function (_ref3) {
+                var matchType = _ref3.matchType,
+                    match = _ref3.match,
+                    casting = _ref3.casting,
+                    nextIndex = _ref3.nextIndex,
+                    next = _ref3.next,
+                    skip = _ref3.skip;
+                matchType === 0 && lead++;
+                matchType === 1 && feet++;
+
+                if (lead === feet) {
+                  meta.push(casting.substr(1));
+                  next(nextIndex);
+                } else {
+                  skip();
+                }
+              });
+              break;
+            //end
+
+            case -1:
+              meta.push(casting);
+              break;
+
+            default:
+              skip();
+              break;
+          }
+
+          skip();
+        }, {
+          meta: []
+        }),
+            result = _castString.meta.result;
+
+        return result;
       }
     }
 
@@ -1922,22 +2016,6 @@
     ts = ts || 1;
     i = Math.floor(i / ts);
     return p > i ? i : i % p;
-  };
-  var max = function max(numberList) {
-    var result;
-    asArray$1(numberList).forEach(function (n) {
-      if (isNumber(n)) {
-        if (typeof result !== "number") {
-          result = n;
-          return;
-        }
-
-        if (result < n) {
-          result = n;
-        }
-      }
-    });
-    return result;
   };
 
   var unique = function unique(array) {
@@ -2038,46 +2116,6 @@
       }
     }
   };
-  /*
-    bow.findIndexes("hello world","l") [2,3,9]
-    bow.findIndexes("hello world",/l/) [2,3,9]
-    bow.findIndexes("hello world",/\s/) [5]
-  */
-
-  var findIndexes = function () {
-    var __find_string = function __find_string(c, s, p) {
-      return c.indexOf(s, p);
-    };
-
-    var __find_regexp = function __find_regexp(c, s, p) {
-      var i = c.substring(p || 0).search(s);
-      return i >= 0 ? i + (p || 0) : i;
-    };
-
-    return function (c, s, at) {
-      if (typeof c === "string" || typeof c === "number") {
-        var idxs = [],
-            s = likeRegexp(s) ? s : s + "",
-            at = !at || !isNumber(at) || at < 0 ? 0 : at,
-            __find = s instanceof RegExp ? __find_regexp : __find_string,
-            next;
-
-        do {
-          var i = __find(c, s, at);
-
-          if (i > -1) {
-            at = (s.length || 1) + i;
-            idxs.push(i);
-            next = true;
-          } else {
-            next = false;
-          }
-        } while (next);
-
-        return idxs;
-      }
-    };
-  }();
 
   var EACH_PROC = function EACH_PROC(arr, proc) {
     if (arr.length > 1) {
@@ -5668,7 +5706,6 @@
     unique: unique,
     hasValue: hasValue,
     getKeyBy: getKeyBy,
-    findIndexes: findIndexes,
     each: each$1,
     forEach: forEach,
     reduce: reduce$1,
@@ -5686,6 +5723,7 @@
     isAbsoluteNaN: isAbsoluteNaN,
     isNone: isNone,
     isNumber: isNumber,
+    isInfinity: isInfinity,
     isInteger: isInteger,
     isArray: isArray,
     isObject: isObject,
@@ -5715,12 +5753,16 @@
     times: times,
     forMap: forMap$1,
     accurateTimeout: accurateTimeout,
+    findIndex: findIndex,
+    findIndexes: findIndexes$1,
+    cut: cut,
+    top: top,
+    max: max,
     castString: castString,
     castPath: castPath$1,
     get: get$1,
     hasProperty: hasProperty,
     hasValueProperty: hasValueProperty,
-    max: max,
     rand64: rand64,
     tokenize: tokenize,
     randRange: randRange,

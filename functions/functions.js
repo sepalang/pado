@@ -1,25 +1,24 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.search", "./isLike", "./cast", "./reducer"], factory);
+    define(["exports", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "./isLike", "./cast", "./reducer"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.search"), require("./isLike"), require("./cast"), require("./reducer"));
+    factory(exports, require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("./isLike"), require("./cast"), require("./reducer"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(global.es6Regexp, global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Regexp, global.isLike, global.cast, global.reducer);
+    factory(mod.exports, global.es6Regexp, global.es6Regexp, global.es6Object, global.isLike, global.cast, global.reducer);
     global.functions = mod.exports;
   }
-})(this, function (_es6Regexp, _es6Regexp2, _es6Regexp3, _es6Object, _es6Regexp4, _isLike, _cast, _reducer) {
+})(this, function (_exports, _es6Regexp, _es6Regexp2, _es6Object, _isLike, _cast, _reducer) {
   "use strict";
 
-  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.turn = _exports.toggle = _exports.diffStructure = _exports.apart = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.reduce = _exports.forEach = _exports.each = _exports.getKeyBy = _exports.hasValue = _exports.unique = void 0;
 
-  function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-  var FUNCTION_EXPORTS = {};
-
-  var UNIQUE = FUNCTION_EXPORTS.UNIQUE = function (array) {
+  var unique = function unique(array) {
     var value = [],
         result = [],
         array = (0, _cast.toArray)(array);
@@ -40,7 +39,9 @@
     return result;
   };
 
-  var HAS_VALUE = FUNCTION_EXPORTS.HAS_VALUE = function () {
+  _exports.unique = unique;
+
+  var hasValue = function () {
     var defaultObjectValueFunc = function defaultObjectValueFunc(object, value) {
       return object === value;
     };
@@ -103,7 +104,9 @@
     };
   }();
 
-  var GET_KEY_BY = FUNCTION_EXPORTS.GET_KEY_BY = function (object, value) {
+  _exports.hasValue = hasValue;
+
+  var getKeyBy = function getKeyBy(object, value) {
     if ((0, _isLike.isFunction)(value)) {
       if ((0, _isLike.isArray)(object)) for (var i = 0, l = object.length; i < l; i++) {
         if (value(object[i], i) === true) return i;
@@ -120,50 +123,10 @@
       }
     }
   };
-  /*
-    bow.findIndexes("hello world","l") [2,3,9]
-    bow.findIndexes("hello world",/l/) [2,3,9]
-    bow.findIndexes("hello world",/\s/) [5]
-  */
 
+  _exports.getKeyBy = getKeyBy;
 
-  var FIND_INDEXES = FUNCTION_EXPORTS.FIND_INDEXES = function () {
-    var __find_string = function __find_string(c, s, p) {
-      return c.indexOf(s, p);
-    };
-
-    var __find_regexp = function __find_regexp(c, s, p) {
-      var i = c.substring(p || 0).search(s);
-      return i >= 0 ? i + (p || 0) : i;
-    };
-
-    return function (c, s, at) {
-      if (typeof c === "string" || typeof c === "number") {
-        var idxs = [],
-            mvc = c + "",
-            s = (0, _isLike.likeRegexp)(s) ? s : s + "",
-            at = !at || !(0, _isLike.isNumber)(at) || at < 0 ? 0 : at,
-            __find = s instanceof RegExp ? __find_regexp : __find_string,
-            next;
-
-        do {
-          var i = __find(c, s, at);
-
-          if (i > -1) {
-            at = (s.length || 1) + i;
-            idxs.push(i);
-            next = true;
-          } else {
-            next = false;
-          }
-        } while (next);
-
-        return idxs;
-      }
-    };
-  }();
-
-  var EACH_PROC = FUNCTION_EXPORTS.EACH_PROC = function (arr, proc) {
+  var EACH_PROC = function EACH_PROC(arr, proc) {
     if (arr.length > 1) {
       for (var i = 0, l = arr.length - 1; i < l; proc(arr[i], i, false), i++) {
         ;
@@ -177,29 +140,38 @@
     return arr;
   };
 
-  var STATIC_FOR_EACH_PROC = FUNCTION_EXPORTS.STATIC_FOR_EACH_PROC = function (obj, proc) {
+  var STATIC_FOR_EACH_PROC = function STATIC_FOR_EACH_PROC(obj, proc) {
     if (typeof obj === "object") for (var i = 0, a = obj instanceof Array, al = a ? obj.length : NaN, keys = Object.keys(obj), l = keys.length; i < l; proc(obj[keys[i]], keys[i], i, l, al), i++) {
       ;
     }
     return obj;
-  };
+  }; //TODO : deprecated
 
-  var EACH = function EACH(value, proc) {
+
+  var each = function each(value, proc) {
     return EACH_PROC((0, _cast.asArray)(value), proc);
-  };
+  }; //TODO : deprecated
 
-  var FOR_EACH = function FOR_EACH(value, proc) {
+
+  _exports.each = each;
+
+  var forEach = function forEach(value, proc) {
     return STATIC_FOR_EACH_PROC(value, proc);
-  };
+  }; //TODO : deprecated
 
-  var REDUCE = function REDUCE(value, proc, meta) {
+
+  _exports.forEach = forEach;
+
+  var reduce = function reduce(value, proc, meta) {
     value = (0, _cast.asArray)(value);
     return EACH_PROC(value, function (v, i, l) {
       meta = proc(meta, v, i, l);
     }), meta;
   };
 
-  var CLEAR_OF = FUNCTION_EXPORTS.CLEAR_OF = function (data, fillFn, sp) {
+  _exports.reduce = reduce;
+
+  var clearOf = function clearOf(data, fillFn, sp) {
     if (data instanceof Array) {
       sp = Array.prototype.splice.call(data, 0, data.length);
     } else if (typeof data == "object") {
@@ -214,12 +186,16 @@
     return fillFn && fillFn(data, sp), data;
   };
 
-  var INSERT_OF = FUNCTION_EXPORTS.INSERT_OF = function (data, v, a) {
+  _exports.clearOf = clearOf;
+
+  var insertOf = function insertOf(data, v, a) {
     (0, _isLike.isArray)(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
     return data;
   };
 
-  var MOVE_OF = FUNCTION_EXPORTS.MOVE_OF = function (data, oldIndex, newIndex) {
+  _exports.insertOf = insertOf;
+
+  var moveOf = function moveOf(data, oldIndex, newIndex) {
     if (oldIndex !== newIndex && (0, _isLike.isArray)(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
       Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
     }
@@ -227,14 +203,18 @@
     return data;
   };
 
-  var CONCAT_OF = FUNCTION_EXPORTS.CONCAT_OF = function (data, appends) {
+  _exports.moveOf = moveOf;
+
+  var concatOf = function concatOf(data, appends) {
     var data = (0, _cast.asArray)(data);
-    return EACH(appends, function (value) {
+    return each(appends, function (value) {
       data.push(value);
     }), data;
   };
 
-  var FILTER_OF = FUNCTION_EXPORTS.FILTER_OF = function (data, func, exitFn) {
+  _exports.concatOf = concatOf;
+
+  var filterOf = function filterOf(data, func, exitFn) {
     var data = (0, _cast.asArray)(data);
     var exitCnt = 0;
 
@@ -254,7 +234,9 @@
     return data;
   };
 
-  var SORT_OF = FUNCTION_EXPORTS.SORT_OF = function (data, filter) {
+  _exports.filterOf = filterOf;
+
+  var sortOf = function sortOf(data, filter) {
     if (data.length == 0) {
       return data;
     }
@@ -284,7 +266,7 @@
     for (var i = 1, l = data.length; i < l; i++) {
       for (var ri = 0, rl = result.length; ri < rl; ri++) {
         if (filter(data[i], result[ri]) === true) {
-          INSERT_OF(result, data[i], ri);
+          insertOf(result, data[i], ri);
           break;
         }
 
@@ -294,7 +276,7 @@
       }
     }
 
-    CLEAR_OF(data);
+    clearOf(data);
 
     for (var i = 0, l = result.length; i < l; data.push(result[i]), i++) {
       ;
@@ -303,7 +285,9 @@
     return data;
   };
 
-  var REBASE = FUNCTION_EXPORTS.REBASE = function (obj, ref) {
+  _exports.sortOf = sortOf;
+
+  var rebase = function rebase(obj, ref) {
     var result = {};
 
     for (var key in obj) {
@@ -324,7 +308,7 @@
           }
         }
       } else if (key.indexOf(",") > -1) {
-        EACH(key.split(","), function (deepKey) {
+        each(key.split(","), function (deepKey) {
           deepKey = deepKey.trim();
 
           if (typeof obj[key] === "function") {
@@ -351,10 +335,12 @@
     }
 
     return result;
-  }; //TODO: Union HAS_VALUE
+  }; //TODO: Union hasValue
 
 
-  var NESTED_HAS_PROC = FUNCTION_EXPORTS.NESTED_HAS_PROC = function (obj, key) {
+  _exports.rebase = rebase;
+
+  var NESTED_HAS_PROC = function NESTED_HAS_PROC(obj, key) {
     var keys = key.split(".");
     if (!keys.length) return false;
     var pointer = obj;
@@ -372,7 +358,7 @@
     return true;
   };
 
-  var APART = FUNCTION_EXPORTS.APART = function (text, split, block, blockEnd) {
+  var apart = function apart(text, split, block, blockEnd) {
     if (typeof text !== "string") return [text];
     var result = text.split(split === true ? /\s+/ : split || /\s+/);
 
@@ -390,8 +376,8 @@
       for (var d = result, i = 0, l = d.length; i < l; i++) {
         var part = d[i];
         var greb = {
-          start: FIND_INDEXES(part, block),
-          end: FIND_INDEXES(part, blockEnd)
+          start: findIndexes(part, block),
+          end: findIndexes(part, blockEnd)
         };
         console.log("part, greb", part, greb);
 
@@ -406,7 +392,9 @@
     }
   };
 
-  var DIFF_STRUCTURE = FUNCTION_EXPORTS.DIFF_STRUCTURE = function (before, after) {
+  _exports.apart = apart;
+
+  var diffStructure = function diffStructure(before, after) {
     var afterKeys = Object.keys(after);
     var beforeKeys;
     var canDiff = false;
@@ -425,7 +413,7 @@
     var analysis = {
       after: after,
       before: before,
-      keys: REDUCE(UNIQUE(afterKeys.concat(beforeKeys)), function (redu, key) {
+      keys: reduce(unique(afterKeys.concat(beforeKeys)), function (redu, key) {
         redu[key] = undefined;
         return redu;
       }, {}),
@@ -455,8 +443,8 @@
     } //surplus
 
 
-    EACH(afterKeys, function (key) {
-      if (!HAS_VALUE(analysis.match, key)) {
+    each(afterKeys, function (key) {
+      if (!hasValue(analysis.match, key)) {
         analysis.missing.push(key);
         analysis.keys[key] = "missing";
       }
@@ -467,7 +455,9 @@
   }; //PINPONGPOOL INTERFACE
 
 
-  var TOGGLE = FUNCTION_EXPORTS.TOGGLE = function (ta, cv, set) {
+  _exports.diffStructure = diffStructure;
+
+  var toggle = function toggle(ta, cv, set) {
     var index = -1;
 
     for (var d = (0, _cast.asArray)(ta), _l2 = d.length, _i2 = 0; _i2 < _l2; _i2++) {
@@ -484,7 +474,9 @@
     return ta[index];
   };
 
-  var TRUN = FUNCTION_EXPORTS.TRUN = function (i, p, ts) {
+  _exports.toggle = toggle;
+
+  var turn = function turn(i, p, ts) {
     if (i < 0) {
       var abs = Math.abs(i / ts);
       i = p - (abs > p ? abs % p : abs);
@@ -496,13 +488,6 @@
     return p > i ? i : i % p;
   };
 
-  var FINALLY_EXPORTS = Object.keys(FUNCTION_EXPORTS).reduce(function (dest, key) {
-    var camelKey = key.toLowerCase().replace(/\_[\w]/g, function (s) {
-      return s.substr(1).toUpperCase();
-    });
-    dest[camelKey] = FUNCTION_EXPORTS[key];
-    return dest;
-  }, {});
-  module.exports = _objectSpread({}, FINALLY_EXPORTS);
+  _exports.turn = turn;
 });
 //# sourceMappingURL=functions.js.map

@@ -1,13 +1,17 @@
-export const isAbsoluteNaN = function(number){
-  return number!==number && typeof number === "number"
+export const isAbsoluteNaN = function(it){
+  return it!==it && typeof it === "number"
 }
 
 export const isNone = function(data) {
   return isAbsoluteNaN(data) || data === undefined || data === null
 }
 
-export const isNumber = function(){
-  return (typeof num === "number" && !isAbsoluteNaN(num))
+export const isNumber = function(it){
+  return (typeof it === "number" && !isAbsoluteNaN(it))
+}
+
+export const isInfinity = function(it){
+  return it === Number.POSITIVE_INFINITY || it === Number.NEGATIVE_INFINITY
 }
 
 export const isInteger = function(value) {
@@ -18,7 +22,7 @@ export const isInteger = function(value) {
     value = value.trim()
   }
 
-  if(!(/string|number/.test(typeof value)) || value === Number.POSITIVE_INFINITY || value === Number.NEGATIVE_INFINITY || isNaN(value)) {
+  if(!(/string|number/.test(typeof value)) || isInfinity(value) || isNaN(value)) {
     return false
   }
 
@@ -44,7 +48,7 @@ export const likeString = function(data) {
 }
 
 export const likeNumber = function(data) {
-  if(isNumber(data)) return true
+  if(isNumber(data) || isInfinity(data)) return true
   if(typeof data === "string") return String(parseFloat(t)) === String(t)
   return false;
 }

@@ -1,121 +1,169 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.match", "./isLike", "./cast", "./enumerator", "lodash/get"], factory);
+    define(["exports", "core-js/modules/es6.regexp.match", "core-js/modules/es6.array.sort", "core-js/modules/es6.regexp.search", "./isLike", "./cast", "./enumerator", "lodash/get"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.match"), require("./isLike"), require("./cast"), require("./enumerator"), require("lodash/get"));
+    factory(exports, require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.regexp.search"), require("./isLike"), require("./cast"), require("./enumerator"), require("lodash/get"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.isLike, global.cast, global.enumerator, global.get);
+    factory(mod.exports, global.es6Regexp, global.es6Array, global.es6Regexp, global.isLike, global.cast, global.enumerator, global.get);
     global.reducer = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _isLike, _cast, _enumerator, _get2) {
+})(this, function (_exports, _es6Regexp, _es6Array, _es6Regexp2, _isLike, _cast, _enumerator, _get2) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.max = _exports.turn = _exports.hasValueProperty = _exports.hasProperty = _exports.get = _exports.castPath = _exports.castString = void 0;
+  _exports.turn = _exports.hasValueProperty = _exports.hasProperty = _exports.get = _exports.castPath = _exports.castString = _exports.max = _exports.top = _exports.cut = _exports.findIndexes = _exports.findIndex = void 0;
   _get2 = _interopRequireDefault(_get2);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  var castString = function castString(text, defaultOrder, finder, at) {
-    if (typeof text === "string" || typeof text === "number") {
-      var idxs = [];
-      var hist = [];
-      var count = 0;
-      var pin = !at || !(0, _isLike.isNumber)(at) || at < 0 ? 0 : at;
-      var strlen = text.length;
-      var order = defaultOrder;
-      var next;
+  //reducer.spec.js
+  var findIndex = function () {
+    var __find_string = function __find_string(it, search, at) {
+      return it.indexOf(search, at);
+    };
 
-      if (typeof finder !== "function") {
-        finder = void 0;
-      }
+    var __find_regexp = function __find_regexp(it, search, at) {
+      var i = it.substring(at || 0).search(search);
+      return i >= 0 ? i + (at || 0) : i;
+    };
 
-      do {
-        var start = void 0;
-        var size = void 0;
-
-        if (typeof order === "string") {
-          var findedIndex = text.indexOf(order, pin);
-
-          if (findedIndex !== -1) {
-            start = findedIndex;
-            size = order.length;
-          }
-        } else if (order instanceof RegExp) {
-          var cs = text.substring(pin || 0);
-          var ma = cs.match(order);
-
-          if (ma) {
-            start = cs.indexOf(ma) + (ma.length - 1);
-            size = ma.length;
-          }
-        }
-
-        count++;
-
-        if (typeof start !== "undefined") {
-          var string = text.substring(start, start + size);
-          var struct = {
-            string: string,
-            start: start,
-            size: size,
-            end: start + size //before pin
-
-          };
-
-          if (pin < start) {
-            var noneCastStruct = {
-              string: text.substring(pin, start),
-              start: pin,
-              size: start - pin,
-              end: start
-            };
-            finder && finder(false, noneCastStruct, hist, count);
-          } //now pin
+    return function (it, search, at) {
+      return (search instanceof RegExp ? __find_regexp : __find_string)(it, search, at);
+    };
+  }(); //reducer.spec.js
 
 
-          pin = start + size; //order
+  _exports.findIndex = findIndex;
 
-          var nextOrder = finder && finder(true, struct, hist, count);
+  var findIndexes = function () {
+    return function (c, s, at) {
+      if (typeof c === "string" || typeof c === "number") {
+        var idxs = [],
+            mvc = c + "",
+            s = (0, _isLike.likeRegexp)(s) ? s : s + "",
+            at = !at || !(0, _isLike.isNumber)(at) || at < 0 ? 0 : at,
+            next;
 
-          if ((0, _isLike.likeRegexp)(nextOrder)) {
-            order = nextOrder;
-          } else {
-            order = defaultOrder;
-          } //idx
+        do {
+          var i = findIndex(c, s, at);
 
-
-          idxs.push(start);
-          hist.push({
-            string: string,
-            start: start,
-            size: size
-          }); //to be countinue
-
-          if (pin >= strlen) {
-            next = false;
-          } else {
+          if (i > -1) {
+            at = (s.length || 1) + i;
+            idxs.push(i);
             next = true;
+          } else {
+            next = false;
           }
-        } else {
-          var _struct = {
-            string: text.substring(pin, strlen),
-            start: pin,
-            size: start - pin,
-            end: strlen
-          };
-          finder && finder(false, _struct, hist, count);
-          next = false;
-        }
-      } while (count > 1000 ? false : next);
+        } while (next);
 
-      return idxs;
+        return idxs;
+      }
+    };
+  }();
+
+  _exports.findIndexes = findIndexes;
+
+  var cut = function cut(collection, cutLength, emptyDefault) {
+    if (cutLength === void 0) {
+      cutLength = 1;
     }
+
+    if (emptyDefault === void 0) {
+      emptyDefault = undefined;
+    }
+
+    var data = (0, _cast.asArray)(collection);
+    var fill = emptyDefault;
+
+    if (data.length > cutLength) {
+      data.splice(cutLength, Number.POSITIVE_INFINITY);
+      return data;
+    }
+
+    var dataLength = data.length;
+
+    if (typeof emptyDefault !== "function") {
+      fill = function fill() {
+        return emptyDefault;
+      };
+    }
+
+    for (var i = 0, l = cutLength - dataLength; i < l; i++) {
+      data.push(fill(dataLength++, i));
+    }
+
+    return data;
+  };
+
+  _exports.cut = cut;
+
+  var top = function top(data, iteratee, topLength) {
+    if (typeof iteratee !== "function") {
+      iteratee = function iteratee(a, b) {
+        return a < b;
+      };
+    }
+
+    if (typeof topLength === "boolean") {
+      topLength = topLength ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+    }
+
+    return (0, _isLike.isNumber)(topLength) || (0, _isLike.isInfinity)(topLength) ? (0, _cast.asArray)(data).sort(function (a, b) {
+      return iteratee(a, b);
+    }).splice(0, topLength) : (0, _cast.asArray)(data).sort(function (a, b) {
+      return iteratee(a, b);
+    })[0];
+  };
+
+  _exports.top = top;
+
+  var max = function max(numberList) {
+    var result;
+    (0, _cast.asArray)(numberList).forEach(function (n) {
+      if ((0, _isLike.isNumber)(n)) {
+        if (typeof result !== "number") {
+          result = n;
+          return;
+        }
+
+        if (result < n) {
+          result = n;
+        }
+      }
+    });
+    return result;
+  }; //
+
+
+  _exports.max = max;
+
+  var castString = function castString(text, matches, castFn, property) {
+    var cursorStart = (0, _isLike.isNumber)(property.start) && property.start > 0 ? property.start : 0;
+    var cursorEnd = (0, _isLike.isNumber)(property.end) ? property.end : text.length;
+    var cursor = cursorStart;
+
+    var open = function open(_ref) {
+      var cursorStart = _ref.cursorStart,
+          cursorEnd = _ref.cursorEnd,
+          cursor = _ref.cursor,
+          matches = _ref.matches;
+      max(matches.map(function (matchExp) {
+        findIndex();
+      }));
+    };
+
+    open({
+      cursorStart: cursorStart,
+      cursorEnd: cursorEnd,
+      cursor: cursor,
+      matches: matches
+    });
+    return property;
   };
 
   _exports.castString = castString;
@@ -130,7 +178,65 @@
         return [pathParam];
       }
 
-      if (typeof pathParam === "string") {}
+      if (typeof pathParam === "string") {
+        var _castString = castString(pathParam, [".", "["], function (_ref2) {
+          var meta = _ref2.property.meta,
+              matchType = _ref2.matchType,
+              match = _ref2.match,
+              casting = _ref2.casting,
+              fork = _ref2.fork,
+              nextIndex = _ref2.nextIndex,
+              next = _ref2.next,
+              skip = _ref2.skip;
+
+          switch (matchType) {
+            // "."
+            case 0:
+              meta.push(casting);
+              next(nextIndex);
+              break;
+            // "]"
+
+            case 1:
+              var lead = 1,
+                  feet = 0;
+              fork(["[", "]"], function (_ref3) {
+                var matchType = _ref3.matchType,
+                    match = _ref3.match,
+                    casting = _ref3.casting,
+                    nextIndex = _ref3.nextIndex,
+                    next = _ref3.next,
+                    skip = _ref3.skip;
+                matchType === 0 && lead++;
+                matchType === 1 && feet++;
+
+                if (lead === feet) {
+                  meta.push(casting.substr(1));
+                  next(nextIndex);
+                } else {
+                  skip();
+                }
+              });
+              break;
+            //end
+
+            case -1:
+              meta.push(casting);
+              break;
+
+            default:
+              skip();
+              break;
+          }
+
+          skip();
+        }, {
+          meta: []
+        }),
+            result = _castString.meta.result;
+
+        return result;
+      }
     }
 
     return [];
@@ -205,24 +311,5 @@
   };
 
   _exports.turn = turn;
-
-  var max = function max(numberList) {
-    var result;
-    (0, _cast.asArray)(numberList).forEach(function (n) {
-      if ((0, _isLike.isNumber)(n)) {
-        if (typeof result !== "number") {
-          result = n;
-          return;
-        }
-
-        if (result < n) {
-          result = n;
-        }
-      }
-    });
-    return result;
-  };
-
-  _exports.max = max;
 });
 //# sourceMappingURL=reducer.js.map

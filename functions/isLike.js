@@ -16,10 +16,10 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.notExsist = _exports.isExsist = _exports.isPlainObject = _exports.likeRegexp = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
+  _exports.notExsist = _exports.isExsist = _exports.isPlainObject = _exports.likeRegexp = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isInfinity = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
 
-  var isAbsoluteNaN = function isAbsoluteNaN(number) {
-    return number !== number && typeof number === "number";
+  var isAbsoluteNaN = function isAbsoluteNaN(it) {
+    return it !== it && typeof it === "number";
   };
 
   _exports.isAbsoluteNaN = isAbsoluteNaN;
@@ -30,11 +30,17 @@
 
   _exports.isNone = isNone;
 
-  var isNumber = function isNumber() {
-    return typeof num === "number" && !isAbsoluteNaN(num);
+  var isNumber = function isNumber(it) {
+    return typeof it === "number" && !isAbsoluteNaN(it);
   };
 
   _exports.isNumber = isNumber;
+
+  var isInfinity = function isInfinity(it) {
+    return it === Number.POSITIVE_INFINITY || it === Number.NEGATIVE_INFINITY;
+  };
+
+  _exports.isInfinity = isInfinity;
 
   var isInteger = function isInteger(value) {
     //NaN, null, undefined
@@ -44,7 +50,7 @@
       value = value.trim();
     }
 
-    if (!/string|number/.test(typeof value) || value === Number.POSITIVE_INFINITY || value === Number.NEGATIVE_INFINITY || isNaN(value)) {
+    if (!/string|number/.test(typeof value) || isInfinity(value) || isNaN(value)) {
       return false;
     }
 
@@ -90,7 +96,7 @@
   _exports.likeString = likeString;
 
   var likeNumber = function likeNumber(data) {
-    if (isNumber(data)) return true;
+    if (isNumber(data) || isInfinity(data)) return true;
     if (typeof data === "string") return String(parseFloat(t)) === String(t);
     return false;
   };
