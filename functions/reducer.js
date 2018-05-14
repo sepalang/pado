@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.turn = _exports.hasValueProperty = _exports.hasProperty = _exports.get = _exports.castPath = _exports.castString = _exports.max = _exports.top = _exports.cut = _exports.findIndexes = _exports.findIndex = void 0;
+  _exports.turn = _exports.hasValueProperty = _exports.hasProperty = _exports.get = _exports.castPath = _exports.castString = _exports.top = _exports.cut = _exports.findIndexes = _exports.findIndex = void 0;
   _get2 = _interopRequireDefault(_get2);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -118,29 +118,10 @@
     }).splice(0, topLength) : (0, _cast.asArray)(data).sort(function (a, b) {
       return iteratee(a, b);
     })[0];
-  };
-
-  _exports.top = top;
-
-  var max = function max(numberList) {
-    var result;
-    (0, _cast.asArray)(numberList).forEach(function (n) {
-      if ((0, _isLike.isNumber)(n)) {
-        if (typeof result !== "number") {
-          result = n;
-          return;
-        }
-
-        if (result < n) {
-          result = n;
-        }
-      }
-    });
-    return result;
   }; //
 
 
-  _exports.max = max;
+  _exports.top = top;
 
   var castString = function castString(text, matches, castFn, property) {
     var cursorStart = (0, _isLike.isNumber)(property.start) && property.start > 0 ? property.start : 0;

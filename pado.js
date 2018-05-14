@@ -1847,22 +1847,6 @@
     }).splice(0, topLength) : asArray$1(data).sort(function (a, b) {
       return iteratee(a, b);
     })[0];
-  };
-  var max = function max(numberList) {
-    var result;
-    asArray$1(numberList).forEach(function (n) {
-      if (isNumber(n)) {
-        if (typeof result !== "number") {
-          result = n;
-          return;
-        }
-
-        if (result < n) {
-          result = n;
-        }
-      }
-    });
-    return result;
   }; //
 
   var castString = function castString(text, matches, castFn, property) {
@@ -2583,7 +2567,7 @@
 
   var matrixRange = function matrixRange(start, end, step, sizeBase) {
     var scales = [];
-    var maxLength = max([start.length, end.length]);
+    var maxLength = top([start.length, end.length]);
     var selectLengthes = times(maxLength, function (scaleIndex) {
       var range = range([start[scaleIndex], end[scaleIndex]], step, sizeBase);
       scales.push(range);
@@ -5757,7 +5741,6 @@
     findIndexes: findIndexes$1,
     cut: cut,
     top: top,
-    max: max,
     castString: castString,
     castPath: castPath$1,
     get: get$1,

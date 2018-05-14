@@ -118,7 +118,7 @@
 
   var matrixRange = function matrixRange(start, end, step, sizeBase) {
     var scales = [];
-    var maxLength = (0, _reducer.max)([start.length, end.length]);
+    var maxLength = (0, _reducer.top)([start.length, end.length]);
     var selectLengthes = (0, _enumerator.times)(maxLength, function (scaleIndex) {
       var range = range([start[scaleIndex], end[scaleIndex]], step, sizeBase);
       scales.push(range);

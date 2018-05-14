@@ -1,6 +1,6 @@
 import { cloneDeep } from './cast'
 import { isAbsoluteNaN } from './isLike'
-import { max, turn } from './reducer';
+import { top, turn } from './reducer';
 import { times } from './enumerator';
 
 export const rangeModel = function(value,step,sizeBase){
@@ -83,7 +83,7 @@ export const domainRangeValue = function(domain,range,vs,nice){
 
 export const matrixRange = function(start,end,step,sizeBase){
   var scales=[];
-  var maxLength = max([start.length,end.length]);
+  var maxLength = top([start.length,end.length]);
     
   var selectLengthes = times(maxLength,function(scaleIndex){
     var range = range([start[scaleIndex],end[scaleIndex]],step,sizeBase)

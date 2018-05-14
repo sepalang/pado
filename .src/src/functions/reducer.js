@@ -48,6 +48,7 @@ export const findIndexes = (function(){
     }
 }());
 
+//reducer.spec.js
 export const cut = function(collection,cutLength=1,emptyDefault=undefined){
   let data = asArray(collection);
   let fill = emptyDefault;
@@ -70,6 +71,7 @@ export const cut = function(collection,cutLength=1,emptyDefault=undefined){
   return data;
 }
 
+//reducer.spec.js
 export const top = function(data,iteratee,topLength){
   if(typeof iteratee !== "function"){
     iteratee=(a,b)=>a<b;
@@ -82,22 +84,6 @@ export const top = function(data,iteratee,topLength){
   return isNumber(topLength) || isInfinity(topLength) ?
   asArray(data).sort((a,b)=>iteratee(a,b)).splice(0,topLength):
   asArray(data).sort((a,b)=>iteratee(a,b))[0];
-};
-
-export const max = function(numberList){
-  let result;
-  asArray(numberList).forEach(n=>{
-    if(isNumber(n)){
-      if(typeof result !== "number"){
-        result = n;
-        return;
-      } 
-      if(result < n){
-        result = n;
-      }
-    }
-  })
-  return result;
 };
 
 //
