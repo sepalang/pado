@@ -107,35 +107,6 @@ export const getKeyBy = function(object,value){
   }
 }
 
-/*
-  bow.findIndexes("hello world","l") [2,3,9]
-  bow.findIndexes("hello world",/l/) [2,3,9]
-  bow.findIndexes("hello world",/\s/) [5]
-*/
-export const findIndexes = (function(){
-  var __find_string = (c,s,p)=>c.indexOf(s,p)
-  var __find_regexp = (c,s,p)=>{
-    let i = c.substring(p || 0).search(s);
-    return (i >= 0) ? (i + (p || 0)) : i;
-  }
-  return function(c,s,at){
-      if(typeof c === "string" || typeof c === "number"){
-        var idxs=[], mvc=c+"", s=likeRegexp(s)?s:s+"", at=(!at || !isNumber(at) || at < 0)?0:at, __find=((s instanceof RegExp)?__find_regexp:__find_string), next;
-        do {
-          let i = __find(c,s,at);
-          if(i > -1){
-            at = (s.length || 1) + i;
-            idxs.push(i); 
-            next = true;
-          } else {
-            next = false;
-          }
-        } while(next)
-        return idxs;
-      }
-    }
-}());
-
 const EACH_PROC = function(arr,proc){
     if(arr.length > 1){
         for(var i=0,l=arr.length-1;i<l;proc(arr[i],i,false), i++);
