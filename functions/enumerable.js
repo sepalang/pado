@@ -8,7 +8,7 @@
       exports: {}
     };
     factory(mod.exports, global.cast);
-    global.enumerator = mod.exports;
+    global.enumerable = mod.exports;
   }
 })(this, function (_exports, _cast) {
   "use strict";
@@ -58,4 +58,4 @@
 
   _exports.forMap = forMap;
 });
-//# sourceMappingURL=enumerator.js.map
+//# sourceMappingURL=enumerable.js.map

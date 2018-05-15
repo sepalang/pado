@@ -1,7 +1,7 @@
 import { cloneDeep } from './cast'
 import { isAbsoluteNaN } from './isLike'
 import { top, turn } from './reducer';
-import { times } from './enumerator';
+import { times } from './enumerable';
 
 export const rangeModel = function(value,step,sizeBase){
   var start,end,reverse;

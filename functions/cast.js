@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
+  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.castPath = _exports.castString = _exports.cloneDeep = _exports.clone = _exports.entries = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
 
   var asArray = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
@@ -106,6 +106,24 @@
 
   _exports.cleanObject = cleanObject;
 
+  var entries = function entries(it) {
+    var result = [];
+
+    switch (typeof it) {
+      case "object":
+        (0, _isLike.isNone)(it) ? 0 : (0, _isLike.likeArray)(it) ? asArray(it).forEach(function (v, k) {
+          result.push([k, v]);
+        }) : Object.keys(it).forEach(function (key) {
+          result.push([key, it[key]]);
+        });
+        break;
+    }
+
+    return result;
+  };
+
+  _exports.entries = entries;
+
   var clone = function clone(target) {
     switch (typeof target) {
       case "undefined":
@@ -183,9 +201,158 @@
     } else {
       clone(target);
     }
-  };
+  }; //reducer.spec.js
+
 
   _exports.cloneDeep = cloneDeep;
+
+  var castString = function castString(text, matches, castFn, property) {
+    var matchEntries = entries(asArray(matches));
+    var cursorState = {
+      cursorStart: undefined,
+      cursor: undefined
+    };
+    cursorState.start = isNumber(property.start) && property.start > 0 ? property.start : 0;
+    cursorStart.end = isNumber(property.end) ? property.end : text.length;
+    cursorStart.cursor = cursorState.start;
+
+    var open = function open(_ref2) {
+      var _ref2$cursorState = _ref2.cursorState,
+          cursorStart = _ref2$cursorState.cursorStart,
+          cursor = _ref2$cursorState.cursor,
+          matchEntries = _ref2.matchEntries;
+      var firstMatch = top(matchEntries.map(function (_ref3) {
+        var matchType = _ref3[0],
+            matchExp = _ref3[1];
+        return [findIndex(text, matchExp), matchType, matchExp];
+      }), function (_ref4, _ref5) {
+        var a = _ref4[0],
+            aPriority = _ref4[1];
+        var b = _ref5[0],
+            bPriority = _ref5[1];
+        return a == b ? aPriority < bPriority : a < b;
+      });
+
+      if (!firstMatch) {
+        return;
+      }
+
+      var matchIndex = firstMatch[0],
+          matchType = firstMatch[1],
+          matchExp = firstMatch[2],
+          matchLength = firstMatch[3];
+
+      if (matchIndex === -1) {
+        return;
+      }
+
+      var nextIndex = matchIndex + 1;
+      var endIndex = matchIndex + matchLength;
+      castFn({
+        matchType: matchType,
+        matchExp: matchExp,
+        casting: {
+          startIndex: cursorStart,
+          endIndex: matchIndex + matchLength,
+          matchIndex: matchIndex,
+          nextIndex: nextIndex
+        },
+        fork: function fork() {},
+        next: function next() {},
+        skip: function skip() {
+          open({
+            cursorState: {
+              cursorStart: startIndex,
+              cursor: endIndex
+            },
+            matchEntries: matchEntries
+          });
+        }
+      });
+    };
+
+    open({
+      cursorState: cursorState,
+      matchEntries: matchEntries
+    });
+  };
+
+  _exports.castString = castString;
+
+  var castPath = function castPath(pathParam) {
+    if ((0, _isLike.isArray)(pathParam)) {
+      return pathParam;
+    }
+
+    if (likeString(pathParam)) {
+      if (isNumber(pathParam)) {
+        return [pathParam];
+      }
+
+      if (typeof pathParam === "string") {
+        var _castString = castString(pathParam, [".", "["], function (_ref6) {
+          var matchType = _ref6.matchType,
+              meta = _ref6.property.meta,
+              nextIndex = _ref6.casting.nextIndex,
+              fork = _ref6.fork,
+              next = _ref6.next,
+              skip = _ref6.skip;
+
+          //dpre
+          //const casting;
+          switch (matchType) {
+            // "."
+            case 0:
+              meta.push(casting);
+              next(nextIndex);
+              break;
+            // "]"
+
+            case 1:
+              var lead = 1,
+                  feet = 0;
+              fork(["[", "]"], function (_ref7) {
+                var matchType = _ref7.matchType,
+                    casting = _ref7.casting,
+                    nextIndex = _ref7.nextIndex,
+                    next = _ref7.next,
+                    skip = _ref7.skip;
+                matchType === 0 && lead++;
+                matchType === 1 && feet++;
+
+                if (lead === feet) {
+                  meta.push(casting.substr(1));
+                  next(nextIndex);
+                } else {
+                  skip();
+                }
+              });
+              break;
+            //end
+
+            case -1:
+              meta.push(casting);
+              break;
+
+            default:
+              skip();
+              break;
+          }
+
+          skip();
+        }, {
+          meta: []
+        }),
+            result = _castString.meta.result;
+
+        return result;
+      }
+    }
+
+    return [];
+  };
+
+  _exports.castPath = castPath;
 
   var free = function free(datum) {
     var dest = {};

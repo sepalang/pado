@@ -1,5 +1,6 @@
 import {
   isArray,
+  likeArray,
   isNone,
   isAbsoluteNaN,
   isPlainObject,
@@ -51,6 +52,17 @@ export const cleanObject = function(data){
   return data
 }
 
+export const entries = function(it){
+  let result = [];
+  switch(typeof it){
+  case "object":
+    isNone(it) ? 0 :
+    likeArray(it) ? asArray(it).forEach((v,k)=>{ result.push([k,v]) }) :
+    Object.keys(it).forEach(key=>{ result.push([key, it[key]]) });
+    break;
+  }
+  return result;
+}
 
 export const clone = function(target){
   switch(typeof target){
@@ -103,6 +115,110 @@ export const cloneDeep = function(target){
   } else {
     clone(target);
   }
+};
+
+//reducer.spec.js
+export const castString = function(text,matches,castFn,property){
+
+  let matchEntries= entries(asArray(matches));
+  
+  let cursorState = {
+    cursorStart:undefined,
+    cursor:undefined
+  };
+  
+  cursorState.start = isNumber(property.start) && property.start > 0 ? property.start : 0;
+  cursorStart.end   = isNumber(property.end) ? property.end : text.length;
+  cursorStart.cursor= cursorState.start;
+  
+  const open = function({ cursorState:{ cursorStart, cursor }, matchEntries }){
+    const firstMatch = top(
+      matchEntries.map(([matchType, matchExp])=>[findIndex(text,matchExp), matchType, matchExp]),
+      ([a,aPriority],[b,bPriority])=>a==b?aPriority<bPriority:a<b
+    );
+    if(!firstMatch){ return }
+    
+    const [matchIndex, matchType, matchExp, matchLength] = firstMatch;
+    if(matchIndex===-1){ return }
+    
+    const nextIndex = matchIndex+1;
+    const endIndex  = matchIndex+matchLength;
+    
+    castFn({
+      matchType, 
+      matchExp,
+      casting:{
+        startIndex:cursorStart,
+        endIndex:matchIndex+matchLength,
+        matchIndex,
+        nextIndex
+      },
+      fork (){
+        
+      },
+      next (){
+        
+      },
+      skip (){
+        open({cursorState:{cursorStart:startIndex, cursor:endIndex}, matchEntries});
+      }
+    })
+  };
+  
+  open({ cursorState, matchEntries });
+  
+};
+
+export const castPath = function(pathParam){
+  if(isArray(pathParam)){
+    return pathParam;
+  }
+  if(likeString(pathParam)){
+    if(isNumber(pathParam)){
+      return [pathParam]
+    }
+    if(typeof pathParam === "string"){
+      const { meta:{ result } } = castString(pathParam,[".","["],({ matchType, property:{ meta }, casting:{ nextIndex }, fork, next, skip })=>{
+        //dpre
+        //const casting;
+        
+        switch(matchType){
+        // "."
+        case 0:
+          meta.push(casting);
+          next(nextIndex);
+          break;
+        // "]"
+        case 1:
+          let [lead, feet] = [1, 0];
+          
+          fork(["[","]"],({ matchType, casting, nextIndex , next, skip })=>{
+            matchType === 0 && lead++;
+            matchType === 1 && feet++;
+            
+            if(lead === feet){
+              meta.push(casting.substr(1))
+              next(nextIndex);
+            } else {
+              skip();
+            }
+          });
+          break;
+        //end
+        case -1:
+          meta.push(casting);
+          break;
+        default:
+          skip();
+          break;
+        }
+        skip();
+      },{meta:[]});
+      
+      return result;
+    }
+  }
+  return [];
 };
   
 

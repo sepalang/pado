@@ -27,8 +27,12 @@ describe('Functions reducer', () => {
     expect( top(13,null,1) ).toEqual([13]);
     
     //
-    expect( top([1,2,3],(a,b)=>a>b,true) ).toEqual([1,2,3]);
+    expect( top([1,2,3],true) ).toEqual(3);
+    expect( top([1,2,3],false) ).toEqual(1);
+    expect( top([1,2,3],true,true) ).toEqual([3,2,1]);
+    expect( top([1,2,3],false,true) ).toEqual([1,2,3]);    
     expect( top([1,2,3],(a,b)=>a<b,true) ).toEqual([3,2,1]);
+    expect( top([1,2,3],(a,b)=>a>b,true) ).toEqual([1,2,3]);
     
     //it's natural way
     expect( top([1,2,3],(a,b)=>a>b,false) ).toEqual([]);

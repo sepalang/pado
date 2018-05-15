@@ -80,7 +80,7 @@
   var isNone = function isNone(data) {
     return isAbsoluteNaN(data) || data === undefined || data === null;
   };
-  var isNumber = function isNumber(it) {
+  var isNumber$1 = function isNumber(it) {
     return typeof it === "number" && !isAbsoluteNaN(it);
   };
   var isInfinity = function isInfinity(it) {
@@ -116,13 +116,13 @@
   var likeObject = function likeObject(it) {
     return isObject(it) || isFunction(it);
   };
-  var likeString = function likeString(data) {
+  var likeString$1 = function likeString(data) {
     if (typeof data === "string") return true;
-    if (isNumber(data)) return true;
+    if (isNumber$1(data)) return true;
     return false;
   };
   var likeNumber = function likeNumber(data) {
-    if (isNumber(data) || isInfinity(data)) return true;
+    if (isNumber$1(data) || isInfinity(data)) return true;
     if (typeof data === "string") return String(parseFloat(t)) === String(t);
     return false;
   };
@@ -294,6 +294,21 @@
 
     return data;
   };
+  var entries = function entries(it) {
+    var result = [];
+
+    switch (typeof it) {
+      case "object":
+        isNone(it) ? 0 : likeArray(it) ? asArray$1(it).forEach(function (v, k) {
+          result.push([k, v]);
+        }) : Object.keys(it).forEach(function (key) {
+          result.push([key, it[key]]);
+        });
+        break;
+    }
+
+    return result;
+  };
   var clone = function clone(target) {
     switch (typeof target) {
       case "undefined":
@@ -366,6 +381,149 @@
     } else {
       clone(target);
     }
+  }; //reducer.spec.js
+
+  var castString = function castString(text, matches, castFn, property) {
+    var matchEntries = entries(asArray$1(matches));
+    var cursorState = {
+      cursorStart: undefined,
+      cursor: undefined
+    };
+    cursorState.start = isNumber(property.start) && property.start > 0 ? property.start : 0;
+    cursorStart.end = isNumber(property.end) ? property.end : text.length;
+    cursorStart.cursor = cursorState.start;
+
+    var open = function open(_ref2) {
+      var _ref2$cursorState = _ref2.cursorState,
+          cursorStart = _ref2$cursorState.cursorStart,
+          cursor = _ref2$cursorState.cursor,
+          matchEntries = _ref2.matchEntries;
+      var firstMatch = top(matchEntries.map(function (_ref3) {
+        var matchType = _ref3[0],
+            matchExp = _ref3[1];
+        return [findIndex(text, matchExp), matchType, matchExp];
+      }), function (_ref4, _ref5) {
+        var a = _ref4[0],
+            aPriority = _ref4[1];
+        var b = _ref5[0],
+            bPriority = _ref5[1];
+        return a == b ? aPriority < bPriority : a < b;
+      });
+
+      if (!firstMatch) {
+        return;
+      }
+
+      var matchIndex = firstMatch[0],
+          matchType = firstMatch[1],
+          matchExp = firstMatch[2],
+          matchLength = firstMatch[3];
+
+      if (matchIndex === -1) {
+        return;
+      }
+
+      var nextIndex = matchIndex + 1;
+      var endIndex = matchIndex + matchLength;
+      castFn({
+        matchType: matchType,
+        matchExp: matchExp,
+        casting: {
+          startIndex: cursorStart,
+          endIndex: matchIndex + matchLength,
+          matchIndex: matchIndex,
+          nextIndex: nextIndex
+        },
+        fork: function fork() {},
+        next: function next() {},
+        skip: function skip() {
+          open({
+            cursorState: {
+              cursorStart: startIndex,
+              cursor: endIndex
+            },
+            matchEntries: matchEntries
+          });
+        }
+      });
+    };
+
+    open({
+      cursorState: cursorState,
+      matchEntries: matchEntries
+    });
+  };
+  var castPath = function castPath(pathParam) {
+    if (isArray(pathParam)) {
+      return pathParam;
+    }
+
+    if (likeString(pathParam)) {
+      if (isNumber(pathParam)) {
+        return [pathParam];
+      }
+
+      if (typeof pathParam === "string") {
+        var _castString = castString(pathParam, [".", "["], function (_ref6) {
+          var matchType = _ref6.matchType,
+              meta = _ref6.property.meta,
+              nextIndex = _ref6.casting.nextIndex,
+              fork = _ref6.fork,
+              next = _ref6.next,
+              skip = _ref6.skip;
+
+          //dpre
+          //const casting;
+          switch (matchType) {
+            // "."
+            case 0:
+              meta.push(casting);
+              next(nextIndex);
+              break;
+            // "]"
+
+            case 1:
+              var lead = 1,
+                  feet = 0;
+              fork(["[", "]"], function (_ref7) {
+                var matchType = _ref7.matchType,
+                    casting = _ref7.casting,
+                    nextIndex = _ref7.nextIndex,
+                    next = _ref7.next,
+                    skip = _ref7.skip;
+                matchType === 0 && lead++;
+                matchType === 1 && feet++;
+
+                if (lead === feet) {
+                  meta.push(casting.substr(1));
+                  next(nextIndex);
+                } else {
+                  skip();
+                }
+              });
+              break;
+            //end
+
+            case -1:
+              meta.push(casting);
+              break;
+
+            default:
+              skip();
+              break;
+          }
+
+          skip();
+        }, {
+          meta: []
+        }),
+            result = _castString.meta.result;
+
+        return result;
+      }
+    }
+
+    return [];
   };
   var free = function free(datum) {
     var dest = {};
@@ -1670,7 +1828,7 @@
    */
 
 
-  function castPath(value, object) {
+  function castPath$1(value, object) {
     if (isArray_1(value)) {
       return value;
     }
@@ -1678,7 +1836,7 @@
     return _isKey(value, object) ? [value] : _stringToPath(toString_1(value));
   }
 
-  var _castPath = castPath;
+  var _castPath = castPath$1;
 
   /** Used as references for various `Number` constants. */
 
@@ -1761,7 +1919,7 @@
 
   var get_1 = get;
 
-  var findIndex = function () {
+  var findIndex$1 = function () {
     var __find_string = function __find_string(it, search, at) {
       return it.indexOf(search, at);
     };
@@ -1781,11 +1939,11 @@
       if (typeof c === "string" || typeof c === "number") {
         var idxs = [],
             s = likeRegexp(s) ? s : s + "",
-            at = !at || !isNumber(at) || at < 0 ? 0 : at,
+            at = !at || !isNumber$1(at) || at < 0 ? 0 : at,
             next;
 
         do {
-          var i = findIndex(c, s, at);
+          var i = findIndex$1(c, s, at);
 
           if (i > -1) {
             at = (s.length || 1) + i;
@@ -1799,7 +1957,8 @@
         return idxs;
       }
     };
-  }();
+  }(); //reducer.spec.js
+
   var cut = function cut(collection, cutLength, emptyDefault) {
     if (cutLength === void 0) {
       cutLength = 1;
@@ -1830,120 +1989,39 @@
     }
 
     return data;
-  };
-  var top = function top(data, iteratee, topLength) {
-    if (typeof iteratee !== "function") {
-      iteratee = function iteratee(a, b) {
-        return a < b;
-      };
+  }; //reducer.spec.js
+
+  var top$1 = function top(data, iteratee, topLength) {
+    switch (typeof iteratee) {
+      case "function":
+        //iteratee=iteratee;
+        break;
+
+      case "boolean":
+        iteratee = iteratee ? function (a, b) {
+          return a < b;
+        } : function (a, b) {
+          return a > b;
+        };
+        break;
+
+      default:
+        iteratee = function iteratee(a, b) {
+          return a < b;
+        };
+
+        break;
     }
 
     if (typeof topLength === "boolean") {
       topLength = topLength ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
     }
 
-    return isNumber(topLength) || isInfinity(topLength) ? asArray$1(data).sort(function (a, b) {
+    return isNumber$1(topLength) || isInfinity(topLength) ? asArray$1(data).sort(function (a, b) {
       return iteratee(a, b);
     }).splice(0, topLength) : asArray$1(data).sort(function (a, b) {
       return iteratee(a, b);
     })[0];
-  }; //
-
-  var castString = function castString(text, matches, castFn, property) {
-    var cursorStart = isNumber(property.start) && property.start > 0 ? property.start : 0;
-    var cursorEnd = isNumber(property.end) ? property.end : text.length;
-    var cursor = cursorStart;
-
-    var open = function open(_ref) {
-      var cursorStart = _ref.cursorStart,
-          cursorEnd = _ref.cursorEnd,
-          cursor = _ref.cursor,
-          matches = _ref.matches;
-      max(matches.map(function (matchExp) {
-        findIndex();
-      }));
-    };
-
-    open({
-      cursorStart: cursorStart,
-      cursorEnd: cursorEnd,
-      cursor: cursor,
-      matches: matches
-    });
-    return property;
-  };
-  var castPath$1 = function castPath(pathParam) {
-    if (isArray(pathParam)) {
-      return pathParam;
-    }
-
-    if (likeString(pathParam)) {
-      if (isNumber(pathParam)) {
-        return [pathParam];
-      }
-
-      if (typeof pathParam === "string") {
-        var _castString = castString(pathParam, [".", "["], function (_ref2) {
-          var meta = _ref2.property.meta,
-              matchType = _ref2.matchType,
-              match = _ref2.match,
-              casting = _ref2.casting,
-              fork = _ref2.fork,
-              nextIndex = _ref2.nextIndex,
-              next = _ref2.next,
-              skip = _ref2.skip;
-
-          switch (matchType) {
-            // "."
-            case 0:
-              meta.push(casting);
-              next(nextIndex);
-              break;
-            // "]"
-
-            case 1:
-              var lead = 1,
-                  feet = 0;
-              fork(["[", "]"], function (_ref3) {
-                var matchType = _ref3.matchType,
-                    match = _ref3.match,
-                    casting = _ref3.casting,
-                    nextIndex = _ref3.nextIndex,
-                    next = _ref3.next,
-                    skip = _ref3.skip;
-                matchType === 0 && lead++;
-                matchType === 1 && feet++;
-
-                if (lead === feet) {
-                  meta.push(casting.substr(1));
-                  next(nextIndex);
-                } else {
-                  skip();
-                }
-              });
-              break;
-            //end
-
-            case -1:
-              meta.push(casting);
-              break;
-
-            default:
-              skip();
-              break;
-          }
-
-          skip();
-        }, {
-          meta: []
-        }),
-            result = _castString.meta.result;
-
-        return result;
-      }
-    }
-
-    return [];
   };
   var get$1 = function get(target, path) {
     if (typeof target === "object") {
@@ -1964,8 +2042,8 @@
     return target;
   };
   var hasProperty = function hasProperty(target, pathParam) {
-    return all(castPath$1(pathParam), function (path) {
-      if (likeObject(target) && likeString(path) && target.hasOwnProperty(path)) {
+    return all(castPath(pathParam), function (path) {
+      if (likeObject(target) && likeString$1(path) && target.hasOwnProperty(path)) {
         target = target[path];
         return true;
       }
@@ -2431,15 +2509,15 @@
 
       var destTime = Date.now() + time;
 
-      if (!isNumber(time)) {
+      if (!isNumber$1(time)) {
         time = 0;
       }
 
-      if (!isNumber(resolutionRatio)) {
+      if (!isNumber$1(resolutionRatio)) {
         resolutionRatio = 0.75;
       }
 
-      if (!isNumber(coverage)) {
+      if (!isNumber$1(coverage)) {
         resolutionRatio = 25;
       }
 
@@ -2567,7 +2645,7 @@
 
   var matrixRange = function matrixRange(start, end, step, sizeBase) {
     var scales = [];
-    var maxLength = top([start.length, end.length]);
+    var maxLength = top$1([start.length, end.length]);
     var selectLengthes = times(maxLength, function (scaleIndex) {
       var range = range([start[scaleIndex], end[scaleIndex]], step, sizeBase);
       scales.push(range);
@@ -4610,11 +4688,11 @@
       this.children = [];
       this.inputs = [];
       this.outputs = [];
-      this.limitInput = isNumber(limitInput) || limitInput > 0 ? limitInput : Number.POSITIVE_INFINITY;
-      this.limitOutput = isNumber(limitOutput) || limitOutput > 0 ? limitOutput : Number.POSITIVE_INFINITY; //
+      this.limitInput = isNumber$1(limitInput) || limitInput > 0 ? limitInput : Number.POSITIVE_INFINITY;
+      this.limitOutput = isNumber$1(limitOutput) || limitOutput > 0 ? limitOutput : Number.POSITIVE_INFINITY; //
 
       var current = 0;
-      concurrent = isNumber(concurrent) || concurrent > 0 ? concurrent : 1;
+      concurrent = isNumber$1(concurrent) || concurrent > 0 ? concurrent : 1;
       Object.defineProperty(this, "avaliablePullCount", {
         get: function get() {
           var limit = _this.limitInput - _this.inputs.length;
@@ -4810,7 +4888,7 @@
       });
       Object.defineProperty(this, "pull", {
         value: function value(pullLength) {
-          if (!(isNumber(pullLength) || pullLength == Number.POSITIVE_INFINITY)) return [];
+          if (!(isNumber$1(pullLength) || pullLength == Number.POSITIVE_INFINITY)) return [];
 
           var pullData = _this.outputs.splice(0, pullLength); //pullData.length && kickStart();
 
@@ -5041,15 +5119,15 @@
 
       if (option.concurrent === true) {
         option.concurrent = Number.POSITIVE_INFINITY;
-      } else if (!isNumber(option.concurrent) || option.concurrent < 1) {
+      } else if (!isNumber$1(option.concurrent) || option.concurrent < 1) {
         option.concurrent = 1;
       }
 
-      if (!isNumber(option.interval) || option.interval < -1) {
+      if (!isNumber$1(option.interval) || option.interval < -1) {
         option.interval = -1;
       }
 
-      if (!isNumber(option.repeat) || option.repeat < 1) {
+      if (!isNumber$1(option.repeat) || option.repeat < 1) {
         option.repeat = 1;
       } //set task with repeat
 
@@ -5706,14 +5784,14 @@
     turn: turn$2,
     isAbsoluteNaN: isAbsoluteNaN,
     isNone: isNone,
-    isNumber: isNumber,
+    isNumber: isNumber$1,
     isInfinity: isInfinity,
     isInteger: isInteger,
     isArray: isArray,
     isObject: isObject,
     isFunction: isFunction,
     likeObject: likeObject,
-    likeString: likeString,
+    likeString: likeString$1,
     likeNumber: likeNumber,
     likeArray: likeArray,
     isNode: isNode,
@@ -5727,8 +5805,11 @@
     asObject: asObject,
     toNumber: toNumber,
     cleanObject: cleanObject,
+    entries: entries,
     clone: clone,
     cloneDeep: cloneDeep,
+    castString: castString,
+    castPath: castPath,
     free: free,
     removeValue: removeValue,
     instance: instance,
@@ -5737,12 +5818,10 @@
     times: times,
     forMap: forMap$1,
     accurateTimeout: accurateTimeout,
-    findIndex: findIndex,
+    findIndex: findIndex$1,
     findIndexes: findIndexes$1,
     cut: cut,
-    top: top,
-    castString: castString,
-    castPath: castPath$1,
+    top: top$1,
     get: get$1,
     hasProperty: hasProperty,
     hasValueProperty: hasValueProperty,

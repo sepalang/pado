@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./functions", "./isLike", "./cast", "./enumerator", "./accurate", "./reducer", "./random", "./matrix", "./datetime"], factory);
+    define(["exports", "./functions", "./isLike", "./cast", "./enumerable", "./accurate", "./reducer", "./random", "./matrix", "./datetime"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./functions"), require("./isLike"), require("./cast"), require("./enumerator"), require("./accurate"), require("./reducer"), require("./random"), require("./matrix"), require("./datetime"));
+    factory(exports, require("./functions"), require("./isLike"), require("./cast"), require("./enumerable"), require("./accurate"), require("./reducer"), require("./random"), require("./matrix"), require("./datetime"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.functions, global.isLike, global.cast, global.enumerator, global.accurate, global.reducer, global.random, global.matrix, global.datetime);
+    factory(mod.exports, global.functions, global.isLike, global.cast, global.enumerable, global.accurate, global.reducer, global.random, global.matrix, global.datetime);
     global.index = mod.exports;
   }
-})(this, function (_exports, _functions, _isLike, _cast, _enumerator, _accurate, _reducer, _random, _matrix, _datetime) {
+})(this, function (_exports, _functions, _isLike, _cast, _enumerable, _accurate, _reducer, _random, _matrix, _datetime) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -43,12 +43,12 @@
       }
     });
   });
-  Object.keys(_enumerator).forEach(function (key) {
+  Object.keys(_enumerable).forEach(function (key) {
     if (key === "default" || key === "__esModule") return;
     Object.defineProperty(_exports, key, {
       enumerable: true,
       get: function get() {
-        return _enumerator[key];
+        return _enumerable[key];
       }
     });
   });
