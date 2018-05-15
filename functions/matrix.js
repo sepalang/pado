@@ -130,7 +130,7 @@
       return new Array(maxLength);
     });
     var turnSize = 1;
-    each(scales, function (scaleCase, scaleIndex) {
+    (0, _cast.asArray)(scales).forEach(function (scaleCase, scaleIndex) {
       var scaleCaseLength = scaleCase.length;
       (0, _enumerable.times)(result.length, function (time) {
         result[time][scaleIndex] = scaleCase[(0, _reducer.turn)(time, scaleCaseLength, turnSize)];

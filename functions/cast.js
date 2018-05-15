@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.castPath = _exports.castString = _exports.cloneDeep = _exports.clone = _exports.entries = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
+  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.castPath = _exports.castString = _exports.cloneDeep = _exports.clone = _exports.deepEntries = _exports.keys = _exports.entries = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
 
   var asArray = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
@@ -123,6 +123,29 @@
   };
 
   _exports.entries = entries;
+
+  var keys = function keys(target, filterExp) {
+    var result = [];
+    var filter = typeof filterExp === "function" ? filterExp : function () {
+      return true;
+    };
+    (0, _isLike.likeArray)(target) && Object.keys(target).filter(function (key) {
+      !isNaN(key) && filter(key, target) && result.push(parseInt(key, 10));
+    }) || (0, _isLike.likeObject)(target) && Object.keys(target).forEach(function (key) {
+      filter(key, target) && result.push(key);
+    });
+    return result;
+  };
+
+  _exports.keys = keys;
+
+  var deepEntries = function deepEntries(target, filter) {
+    if ((0, _isLike.likeArray)(target)) {}
+
+    if ((0, _isLike.likeObject)(target)) {}
+  };
+
+  _exports.deepEntries = deepEntries;
 
   var clone = function clone(target) {
     switch (typeof target) {
@@ -489,7 +512,7 @@
         };
       });
 
-      _.each(newData, function (newDatum, i) {
+      asArray(newData).forEach(function (newDatum, i) {
         var newId = getId(newDatum);
 
         var oldDatum = _.get(oldDataMap[_.findIndex(oldDataMap, function (e) {
@@ -550,7 +573,6 @@
 
         result.push(genDatum);
       });
-
       return result;
     };
   }();

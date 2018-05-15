@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.turn = _exports.toggle = _exports.diffStructure = _exports.apart = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.reduce = _exports.forEach = _exports.each = _exports.getKeyBy = _exports.hasValue = _exports.unique = void 0;
+  _exports.turn = _exports.toggle = _exports.diffStructure = _exports.apart = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.hasValue = _exports.unique = void 0;
 
   var unique = function unique(array) {
     var value = [],
@@ -126,51 +126,6 @@
 
   _exports.getKeyBy = getKeyBy;
 
-  var EACH_PROC = function EACH_PROC(arr, proc) {
-    if (arr.length > 1) {
-      for (var i = 0, l = arr.length - 1; i < l; proc(arr[i], i, false), i++) {
-        ;
-      }
-
-      proc(arr[arr.length - 1], arr.length - 1, true);
-    } else if (arr.length == 1) {
-      proc(arr[0], 0, true);
-    }
-
-    return arr;
-  };
-
-  var STATIC_FOR_EACH_PROC = function STATIC_FOR_EACH_PROC(obj, proc) {
-    if (typeof obj === "object") for (var i = 0, a = obj instanceof Array, al = a ? obj.length : NaN, keys = Object.keys(obj), l = keys.length; i < l; proc(obj[keys[i]], keys[i], i, l, al), i++) {
-      ;
-    }
-    return obj;
-  }; //TODO : deprecated
-
-
-  var each = function each(value, proc) {
-    return EACH_PROC((0, _cast.asArray)(value), proc);
-  }; //TODO : deprecated
-
-
-  _exports.each = each;
-
-  var forEach = function forEach(value, proc) {
-    return STATIC_FOR_EACH_PROC(value, proc);
-  }; //TODO : deprecated
-
-
-  _exports.forEach = forEach;
-
-  var reduce = function reduce(value, proc, meta) {
-    value = (0, _cast.asArray)(value);
-    return EACH_PROC(value, function (v, i, l) {
-      meta = proc(meta, v, i, l);
-    }), meta;
-  };
-
-  _exports.reduce = reduce;
-
   var clearOf = function clearOf(data, fillFn, sp) {
     if (data instanceof Array) {
       sp = Array.prototype.splice.call(data, 0, data.length);
@@ -207,7 +162,7 @@
 
   var concatOf = function concatOf(data, appends) {
     var data = (0, _cast.asArray)(data);
-    return each(appends, function (value) {
+    return (0, _cast.asArray)(appends).forEach(function (value) {
       data.push(value);
     }), data;
   };
@@ -308,7 +263,7 @@
           }
         }
       } else if (key.indexOf(",") > -1) {
-        each(key.split(","), function (deepKey) {
+        key.split(",").forEach(function (deepKey) {
           deepKey = deepKey.trim();
 
           if (typeof obj[key] === "function") {
@@ -413,9 +368,9 @@
     var analysis = {
       after: after,
       before: before,
-      keys: reduce(unique(afterKeys.concat(beforeKeys)), function (redu, key) {
-        redu[key] = undefined;
-        return redu;
+      keys: unique(afterKeys.concat(beforeKeys)).reduce(function (dest, key) {
+        dest[key] = undefined;
+        return dest;
       }, {}),
       match: [],
       missing: [],
@@ -443,7 +398,7 @@
     } //surplus
 
 
-    each(afterKeys, function (key) {
+    (0, _cast.asArray)(afterKeys).forEach(function (key) {
       if (!hasValue(analysis.match, key)) {
         analysis.missing.push(key);
         analysis.keys[key] = "missing";

@@ -1,6 +1,7 @@
 import {
   isArray,
   likeArray,
+  likeObject,
   isNone,
   isAbsoluteNaN,
   isPlainObject,
@@ -62,6 +63,28 @@ export const entries = function(it){
     break;
   }
   return result;
+}
+
+export const keys = function(target,filterExp){
+  let result = [];
+  let filter = typeof filterExp === "function" ? filterExp : ()=>true;
+  
+  likeArray(target) && Object.keys(target).filter(key=>{
+    !isNaN(key) && filter(key,target) && result.push(parseInt(key,10));
+  }) || likeObject(target) && Object.keys(target).forEach(key=>{
+    filter(key,target) && result.push(key);
+  });
+  
+  return result;
+};
+
+export const deepEntries = function(target,filter){
+  if(likeArray(target)){
+    
+  }
+  if(likeObject(target)){
+    
+  }
 }
 
 export const clone = function(target){
@@ -314,8 +337,9 @@ const syncData = (function(){
     const oldDataMap = _.map(oldData, e=>{
       return { id: getId(e), ref: e };
     });
-
-    _.each(newData, (newDatum, i)=>{
+    
+    
+    asArray(newData).forEach((newDatum, i)=>{
       const newId = getId(newDatum);
       let oldDatum = _.get(oldDataMap[_.findIndex(oldDataMap, e=>e.id === newId)], "ref");
       let genDatum;

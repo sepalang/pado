@@ -180,28 +180,69 @@
     return typeof s === "string" || s instanceof RegExp;
   };
   var isPlainObject = function isPlainObject(data) {
-    if (typeof data !== "object") {
+    return typeof data === "object" && data.constructor === Object;
+  }; // none(undfinec, null, NaN), value(1,"1"), hash({}), array([]), node, object(new, Date), function, boolean
+
+  var eqof = function eqof(it) {
+    var typeIt = typeof it;
+
+    switch (typeIt) {
+      case "number":
+        if (isAbsoluteNaN(it)) return "none";
+
+      case "string":
+        return "value";
+        break;
+
+      case "object":
+        if (isNone(it)) return "none";
+        if (likeArray(it)) return "array";
+        if (isNode(it)) return "node";
+        if (!isPlainObject(it)) return "object";
+        return "hash";
+        break;
+
+      case "undefined":
+        return "none";
+        break;
+
+      case "function":
+      case "boolean":
+      default:
+        return typeIt;
+        break;
+    }
+  };
+  var eqeq = function eqeq(value, other) {
+    if (arguments.length < 2) {
       return false;
     }
 
-    if (isArray(data)) {
+    var rootType = eqof(value);
+
+    if (rootType !== eqof(other)) {
       return false;
     }
 
-    if (Object.prototype.toString.call(data) === '[object Object]') {
+    switch (rootType) {
+      case "none":
+        return true;
+
+      default:
+        return value == other;
+    }
+  };
+  var isEqual = function isEqual(value, other) {
+    if (value === other) {
       return true;
     }
 
-    if (typeof o.constructor === "function") {
-      return false;
+    if (isAbsoluteNaN(value) && isAbsoluteNaN(other)) {
+      return true;
     }
+  }; // ignore _ $
 
-    if (data.prototype.hasOwnProperty('isPrototypeOf') === false) {
-      return false;
-    }
-
-    return true;
-  };
+  var likeEqual = function likeEqual() {};
   var isExsist = function isExsist(value) {
     if (value === true) {
       return true;
@@ -308,6 +349,21 @@
     }
 
     return result;
+  };
+  var keys = function keys(target, filterExp) {
+    var result = [];
+    var filter = typeof filterExp === "function" ? filterExp : function () {
+      return true;
+    };
+    likeArray(target) && Object.keys(target).filter(function (key) {
+      !isNaN(key) && filter(key, target) && result.push(parseInt(key, 10));
+    }) || likeObject(target) && Object.keys(target).forEach(function (key) {
+      filter(key, target) && result.push(key);
+    });
+    return result;
+  };
+  var deepEntries = function deepEntries(target, filter) {
+    if (likeArray(target)) ;
   };
   var clone = function clone(target) {
     switch (typeof target) {
@@ -624,6 +680,7 @@
     }
     return true;
   };
+  var deep = function deep(data) {};
   var times = function times(length, fn) {
     var result = [];
 
@@ -2178,41 +2235,6 @@
       }
     }
   };
-
-  var EACH_PROC = function EACH_PROC(arr, proc) {
-    if (arr.length > 1) {
-      for (var i = 0, l = arr.length - 1; i < l; proc(arr[i], i, false), i++) {
-      }
-
-      proc(arr[arr.length - 1], arr.length - 1, true);
-    } else if (arr.length == 1) {
-      proc(arr[0], 0, true);
-    }
-
-    return arr;
-  };
-
-  var STATIC_FOR_EACH_PROC = function STATIC_FOR_EACH_PROC(obj, proc) {
-    if (typeof obj === "object") for (var i = 0, a = obj instanceof Array, al = a ? obj.length : NaN, keys = Object.keys(obj), l = keys.length; i < l; proc(obj[keys[i]], keys[i], i, l, al), i++) {
-    }
-    return obj;
-  }; //TODO : deprecated
-
-
-  var each$1 = function each(value, proc) {
-    return EACH_PROC(asArray$1(value), proc);
-  }; //TODO : deprecated
-
-  var forEach = function forEach(value, proc) {
-    return STATIC_FOR_EACH_PROC(value, proc);
-  }; //TODO : deprecated
-
-  var reduce$1 = function reduce(value, proc, meta) {
-    value = asArray$1(value);
-    return EACH_PROC(value, function (v, i, l) {
-      meta = proc(meta, v, i, l);
-    }), meta;
-  };
   var clearOf = function clearOf(data, fillFn, sp) {
     if (data instanceof Array) {
       sp = Array.prototype.splice.call(data, 0, data.length);
@@ -2240,7 +2262,7 @@
   };
   var concatOf = function concatOf(data, appends) {
     var data = asArray$1(data);
-    return each$1(appends, function (value) {
+    return asArray$1(appends).forEach(function (value) {
       data.push(value);
     }), data;
   };
@@ -2248,8 +2270,8 @@
     var data = asArray$1(data);
     var exitCnt = 0;
 
-    for (var i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++) {
-      var key = keys[i];
+    for (var i = 0, ri = 0, keys$$1 = Object.keys(data), l = keys$$1.length; i < l; i++, ri++) {
+      var key = keys$$1[i];
       var value = data[key];
       var result = func(value, key);
 
@@ -2331,7 +2353,7 @@
           }
         }
       } else if (key.indexOf(",") > -1) {
-        each$1(key.split(","), function (deepKey) {
+        key.split(",").forEach(function (deepKey) {
           deepKey = deepKey.trim();
 
           if (typeof obj[key] === "function") {
@@ -2361,12 +2383,12 @@
   }; //TODO: Union hasValue
 
   var NESTED_HAS_PROC = function NESTED_HAS_PROC(obj, key) {
-    var keys = key.split(".");
-    if (!keys.length) return false;
+    var keys$$1 = key.split(".");
+    if (!keys$$1.length) return false;
     var pointer = obj;
 
-    for (var ki in keys) {
-      var k = keys[ki];
+    for (var ki in keys$$1) {
+      var k = keys$$1[ki];
 
       if (!pointer.hasOwnProperty(k)) {
         return false;
@@ -2426,9 +2448,9 @@
     var analysis = {
       after: after,
       before: before,
-      keys: reduce$1(unique(afterKeys.concat(beforeKeys)), function (redu, key) {
-        redu[key] = undefined;
-        return redu;
+      keys: unique(afterKeys.concat(beforeKeys)).reduce(function (dest, key) {
+        dest[key] = undefined;
+        return dest;
       }, {}),
       match: [],
       missing: [],
@@ -2456,7 +2478,7 @@
     } //surplus
 
 
-    each$1(afterKeys, function (key) {
+    asArray$1(afterKeys).forEach(function (key) {
       if (!hasValue(analysis.match, key)) {
         analysis.missing.push(key);
         analysis.keys[key] = "missing";
@@ -2657,7 +2679,7 @@
       return new Array(maxLength);
     });
     var turnSize = 1;
-    each(scales, function (scaleCase, scaleIndex) {
+    asArray$1(scales).forEach(function (scaleCase, scaleIndex) {
       var scaleCaseLength = scaleCase.length;
       times(result.length, function (time) {
         result[time][scaleIndex] = scaleCase[turn$1(time, scaleCaseLength, turnSize)];
@@ -4157,11 +4179,11 @@
    */
 
 
-  function keys(object) {
+  function keys$1(object) {
     return isArrayLike_1(object) ? _arrayLikeKeys(object) : _baseKeys(object);
   }
 
-  var keys_1 = keys;
+  var keys_1 = keys$1;
 
   /**
    * Creates an array of own enumerable property names and symbols of `object`.
@@ -4487,11 +4509,11 @@
    */
 
 
-  function isEqual(value, other) {
+  function isEqual$1(value, other) {
     return _baseIsEqual(value, other);
   }
 
-  var isEqual_1 = isEqual;
+  var isEqual_1 = isEqual$1;
 
   var EDITABLE_DEFAULT_KEY = "$editable";
 
@@ -4897,9 +4919,9 @@
         }
       });
       Object.defineProperty(this, "clone", {
-        value: function value(deep, parentOperate) {
-          if (deep === void 0) {
-            deep = true;
+        value: function value(deep$$1, parentOperate) {
+          if (deep$$1 === void 0) {
+            deep$$1 = true;
           }
 
           var cloneOperate = operateFunction({
@@ -4910,7 +4932,7 @@
             limitInput: limitInput,
             limitOutput: limitOutput
           });
-          deep === true && _this.children.forEach(function (child) {
+          deep$$1 === true && _this.children.forEach(function (child) {
             child.clone(true, cloneOperate);
           });
           return cloneOperate;
@@ -5768,9 +5790,6 @@
     unique: unique,
     hasValue: hasValue,
     getKeyBy: getKeyBy,
-    each: each$1,
-    forEach: forEach,
-    reduce: reduce$1,
     clearOf: clearOf,
     insertOf: insertOf,
     moveOf: moveOf,
@@ -5798,6 +5817,10 @@
     isEmpty: isEmpty,
     likeRegexp: likeRegexp,
     isPlainObject: isPlainObject,
+    eqof: eqof,
+    eqeq: eqeq,
+    isEqual: isEqual,
+    likeEqual: likeEqual,
     isExsist: isExsist,
     notExsist: notExsist,
     asArray: asArray$1,
@@ -5806,6 +5829,8 @@
     toNumber: toNumber,
     cleanObject: cleanObject,
     entries: entries,
+    keys: keys,
+    deepEntries: deepEntries,
     clone: clone,
     cloneDeep: cloneDeep,
     castString: castString,
@@ -5815,6 +5840,7 @@
     instance: instance,
     alloc: alloc$1,
     all: all,
+    deep: deep,
     times: times,
     forMap: forMap$1,
     accurateTimeout: accurateTimeout,

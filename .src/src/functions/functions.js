@@ -1,15 +1,10 @@
 import { 
-  isNone, 
   isObject,
   isArray,
   isFunction,
-  isNumber,
-  likeNumber,
   isNode,
   isEmpty,
   likeRegexp,
-  isExsist,
-  notExsist
 } from './isLike'
 
 import {
@@ -107,31 +102,6 @@ export const getKeyBy = function(object,value){
   }
 }
 
-const EACH_PROC = function(arr,proc){
-    if(arr.length > 1){
-        for(var i=0,l=arr.length-1;i<l;proc(arr[i],i,false), i++);
-        proc(arr[arr.length-1],arr.length-1,true);
-    } else if(arr.length == 1) {
-        proc(arr[0],0,true);
-    }
-    return arr;
-}
-
-const STATIC_FOR_EACH_PROC = function(obj,proc){
-    if(typeof obj === "object") for(var i=0,a=obj instanceof Array,al=a?obj.length:NaN,keys=Object.keys(obj),l=keys.length;i<l;proc(obj[keys[i]],keys[i],i,l,al),i++);
-    return obj;
-}
-
-//TODO : deprecated
-export const each     = (value,proc)=>EACH_PROC(asArray(value),proc)
-//TODO : deprecated
-export const forEach = (value,proc)=>STATIC_FOR_EACH_PROC(value,proc)
-//TODO : deprecated
-export const reduce   = function(value,proc,meta){
-  value = asArray(value);
-  return EACH_PROC(value,function(v,i,l){ meta = proc(meta,v,i,l); }),meta;
-}
-
 export const clearOf = function(data,fillFn,sp){
   if(data instanceof Array){
     sp = Array.prototype.splice.call(data,0,data.length);
@@ -156,7 +126,7 @@ export const moveOf = function(data,oldIndex,newIndex){
 
 export const concatOf = function(data,appends){
   var data = asArray(data);
-  return each(appends,function(value){ data.push(value); }), data;
+  return asArray(appends).forEach(value=>{ data.push(value); }), data;
 }
 
 
@@ -236,7 +206,7 @@ export const rebase = function(obj,ref){
         }
       }
     } else if(key.indexOf(",") > -1){
-      each(key.split(","),function(deepKey){
+      key.split(",").forEach(deepKey=>{
         deepKey = deepKey.trim();
         if(typeof obj[key] === "function"){
           result[deepKey] = obj[key];
@@ -248,7 +218,7 @@ export const rebase = function(obj,ref){
           }
 
         }
-      });
+      })
     } else {
       if(typeof obj[key] === "function"){
         result[key] = obj[key];
@@ -335,7 +305,7 @@ export const diffStructure = function(before,after){
   var analysis = {
     after:after,
     before:before,
-    keys:reduce(unique(afterKeys.concat(beforeKeys)),function(redu,key){ redu[key] = undefined;  return redu; },{}),
+    keys:unique(afterKeys.concat(beforeKeys)).reduce((dest,key)=>{ dest[key] = undefined;  return dest; },{}),
     match:[],
     missing:[],
     surplus:[],
@@ -364,7 +334,7 @@ export const diffStructure = function(before,after){
   }
 
   //surplus
-  each(afterKeys,function(key){
+  asArray(afterKeys).forEach(key=>{
     if(!hasValue(analysis.match,key)){
       analysis.missing.push(key);
       analysis.keys[key] = "missing";

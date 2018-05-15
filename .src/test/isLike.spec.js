@@ -1,4 +1,4 @@
-import { isObject, likeObject, isEmpty } from '../src/functions/isLike';
+import { isObject, likeObject, isEmpty, isPlainObject, eqof, eqeq } from '../src/functions/isLike';
 describe('Functions isLike', () => {
   
   it('select', () => {
@@ -50,6 +50,48 @@ describe('Functions isLike', () => {
     expect(likeObject((function(){}))).toEqual(true);
     expect(likeObject(null)).toEqual(false);
     
+  });
+  
+  var DummyClass = function(){};
+  var dummyInstance = new DummyClass();
+  
+  it('isPlainObject', () => {
+    expect( isPlainObject({}) ).toEqual(true);
+    expect( isPlainObject([]) ).toEqual(false);
+    expect( isPlainObject(1) ).toEqual(false);
+    expect( isPlainObject("") ).toEqual(false);
+    expect( isPlainObject(new Date()) ).toEqual(false);
+    expect( isPlainObject(dummyInstance) ).toEqual(false);
+  });
+  
+  it('eqof', () => {
+    expect( eqof() ).toEqual("none");
+    expect( eqof(undefined) ).toEqual("none");
+    expect( eqof(null) ).toEqual("none");
+    expect( eqof(NaN) ).toEqual("none");
+    expect( eqof(1) ).toEqual("value");
+    expect( eqof(1.1) ).toEqual("value");
+    expect( eqof("1") ).toEqual("value");
+    expect( eqof([]) ).toEqual("array");
+    expect( eqof({}) ).toEqual("hash");
+    expect( eqof(true) ).toEqual("boolean");
+    expect( eqof(function(){}) ).toEqual("function");
+    expect( eqof(dummyInstance) ).toEqual("object");
+  });
+  
+  it('eqeq', () => {
+    expect( eqeq("1",1) ).toEqual(true);
+    expect( eqeq(undefined,null) ).toEqual(true);
+    expect( eqeq(NaN,null) ).toEqual(true);
+    expect( eqeq(47,47) ).toEqual(true);
+    expect( eqeq("47","47") ).toEqual(true);
+    expect( eqeq(47,"47") ).toEqual(true);
+    expect( eqeq(true,true) ).toEqual(true);
+    
+    //
+    expect( eqeq(false,true) ).toEqual(false);
+    expect( eqeq(1,2) ).toEqual(false);
+    expect( eqeq("3","4") ).toEqual(false);
   });
   
 });
