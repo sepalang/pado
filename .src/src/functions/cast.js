@@ -143,6 +143,12 @@ export const cloneDeep = function(target){
 //reducer.spec.js
 export const castString = function(text,matches,castFn,property){
 
+  const payload = {
+    contentOffset:0,
+    content:text,
+    property
+  };
+  
   let matchEntries= entries(asArray(matches));
   
   let cursorState = {
@@ -167,15 +173,19 @@ export const castString = function(text,matches,castFn,property){
     const nextIndex = matchIndex+1;
     const endIndex  = matchIndex+matchLength;
     
-    castFn({
-      matchType, 
-      matchExp,
-      casting:{
-        startIndex:cursorStart,
-        endIndex:matchIndex+matchLength,
-        matchIndex,
-        nextIndex
-      },
+    const matching = {
+      matchType,
+      matchExp
+    };
+    
+    const casting = {
+      startIndex :cursorStart,
+      endIndex   :matchIndex,
+      matchIndex,
+      nextIndex
+    };
+    
+    const scope = {
       fork (){
         
       },
@@ -185,11 +195,20 @@ export const castString = function(text,matches,castFn,property){
       skip (){
         open({cursorState:{cursorStart:startIndex, cursor:endIndex}, matchEntries});
       }
-    })
+    };
+    
+    castFn({
+      payload,
+      matching,
+      casting,
+      scope
+    });
+    
   };
   
   open({ cursorState, matchEntries });
   
+  return payload;
 };
 
 export const castPath = function(pathParam){
@@ -200,22 +219,28 @@ export const castPath = function(pathParam){
     if(isNumber(pathParam)){
       return [pathParam]
     }
+    
     if(typeof pathParam === "string"){
-      const { meta:{ result } } = castString(pathParam,[".","["],({ matchType, property:{ meta }, casting:{ nextIndex }, fork, next, skip })=>{
-        //dpre
-        //const casting;
-        
-        switch(matchType){
-        // "."
-        case 0:
-          meta.push(casting);
+      const { meta:{ result } } = castString(pathParam,[".","["],({ 
+        payload :{ content, contentOffset, property:path },
+        matching:{ matchType, nextIndex },
+        casting :{ startIndex, endIndex },
+        scope   :{ next, fork }
+      })=>{
+        if(matchType === 0){
+          path.push(content.substring(startIndex, endIndex));
           next(nextIndex);
-          break;
-        // "]"
-        case 1:
+        }
+        
+        if(matchType === 1){
           let [lead, feet] = [1, 0];
           
-          fork(["[","]"],({ matchType, casting, nextIndex , next, skip })=>{
+          fork(["[","]"],({
+            payload :{ contentOffset },
+            matching:{ matchType, nextIndex },
+            casting :{ startIndex, endIndex },
+            scope   :{ next, skip }
+          })=>{
             matchType === 0 && lead++;
             matchType === 1 && feet++;
             
@@ -226,17 +251,12 @@ export const castPath = function(pathParam){
               skip();
             }
           });
-          break;
-        //end
-        case -1:
-          meta.push(casting);
-          break;
-        default:
-          skip();
-          break;
         }
-        skip();
-      },{meta:[]});
+        
+        if(matchType === -1){
+          path.push(content.substring(startIndex, endIndex));
+        }
+      },[]);
       
       return result;
     }
