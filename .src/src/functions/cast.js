@@ -141,75 +141,81 @@ export const cloneDeep = function(target){
 };
 
 //reducer.spec.js
-export const castString = function(text,matches,castFn,property){
+export const castString = (function(){
+  
+  const rebaseMatches = matches=>entries(asArray(matches));
+  
+  return function(text,matches,castFn,property){
 
-  const payload = {
-    contentOffset:0,
-    content:text,
-    property
-  };
-  
-  let matchEntries= entries(asArray(matches));
-  
-  let cursorState = {
-    cursorStart:undefined,
-    cursor:undefined
-  };
-  
-  cursorState.start = isNumber(property.start) && property.start > 0 ? property.start : 0;
-  cursorStart.end   = isNumber(property.end) ? property.end : text.length;
-  cursorStart.cursor= cursorState.start;
-  
-  const open = function({ cursorState:{ cursorStart, cursor }, matchEntries }){
-    const firstMatch = top(
-      matchEntries.map(([matchType, matchExp])=>[findIndex(text,matchExp), matchType, matchExp]),
-      ([a,aPriority],[b,bPriority])=>a==b?aPriority<bPriority:a<b
-    );
-    if(!firstMatch){ return }
-    
-    const [matchIndex, matchType, matchExp, matchLength] = firstMatch;
-    if(matchIndex===-1){ return }
-    
-    const nextIndex = matchIndex+1;
-    const endIndex  = matchIndex+matchLength;
-    
-    const matching = {
-      matchType,
-      matchExp
+    const payload = {
+      contentOffset:0,
+      content:text,
+      property
     };
-    
-    const casting = {
-      startIndex :cursorStart,
-      endIndex   :matchIndex,
-      matchIndex,
-      nextIndex
+  
+    const newMatchEntries = rebaseMatches(matches);
+  
+    const cursorState = {
+      cursorStart:undefined,
+      cursor:undefined
     };
+
+    cursorState.start = isNumber(property.start) && property.start > 0 ? property.start : 0;
+    cursorStart.cursor= cursorState.start;
+  
+    const open = function({ cursorState:{ cursorStart, cursor }, matchEntries, castFn }){
+      //find match
+      const firstMatch = top(
+        matchEntries.map(([matchType, matchExp])=>[findIndex(text,matchExp), matchType, matchExp]),
+        ([a,aPriority],[b,bPriority])=>a==b?aPriority<bPriority:a<b
+      );
+      if(!firstMatch){ return }
     
-    const scope = {
-      fork (){
-        
-      },
-      next (){
-        
-      },
-      skip (){
-        open({cursorState:{cursorStart:startIndex, cursor:endIndex}, matchEntries});
-      }
+      const [matchIndex, matchType, matchExp, matchLength] = firstMatch;
+      if(matchIndex===-1){ return }
+    
+      const nextIndex = matchIndex+1;
+      const endIndex  = matchIndex+matchLength;
+    
+      const matching = {
+        matchType,
+        matchExp
+      };
+    
+      const casting = {
+        startIndex :cursorStart,
+        endIndex   :matchIndex,
+        matchIndex,
+        nextIndex
+      };
+    
+      const scope = {
+        fork (matchEntries,castFn){
+          const newMatchEntries = rebaseMatches(matches);
+          open({cursorState:{cursorStart:startIndex, cursor:endIndex}, newMatchEntries, castFn});
+        },
+        next (){
+          open({cursorState:{cursorStart:startIndex, cursor:endIndex}, matchEntries, castFn});
+        },
+        skip (){
+          open({cursorState:{cursorStart:startIndex, cursor:endIndex}, matchEntries, castFn});
+        }
+      };
+    
+      castFn({
+        payload,
+        matching,
+        casting,
+        scope
+      });
+    
     };
-    
-    castFn({
-      payload,
-      matching,
-      casting,
-      scope
-    });
-    
+  
+    open({ cursorState, matchEntries, castFn });
+  
+    return payload;
   };
-  
-  open({ cursorState, matchEntries });
-  
-  return payload;
-};
+}());
 
 export const castPath = function(pathParam){
   if(isArray(pathParam)){

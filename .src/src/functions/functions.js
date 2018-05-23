@@ -357,9 +357,3 @@ export const toggle = function(ta,cv,set){
   index = ta.length == index ? 0 : index;
   return ta[index];
 }
-
-export const turn = function(i,p,ts){
-  if(i < 0) { var abs = Math.abs(i/ts); i = p-(abs>p?abs%p:abs); }; 
-  ts=ts?ts:1;i=Math.floor(i/ts);
-  return (p > i)?i:i%p;
-}

@@ -17,7 +17,7 @@
     "labp": "padoc --pack .src/sample/labs/entry.js .src/sample/labs/pack.sample.js",
     "labe": "padoc --exec .src/sample/labs/entry.js -i",
     "labn": "node .src/sample/labs/pack.sample.js --interactive",
-    "t": "padoc --exec .src/sample/use/operate.use.js"
+    "t": "padoc --exec .src/sample/use/cast.use.js"
   },
   "author": "AHN HO JUNG",
   "license": "MIT",
