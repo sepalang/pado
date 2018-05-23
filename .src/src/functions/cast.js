@@ -10,6 +10,7 @@ import {
 } from './isLike'
 
 import {
+  findIndex,
   top
 } from './reducer'
 
@@ -161,8 +162,8 @@ export const castString = (function(){
     const newMatchEntries = rebaseMatches(matches);
   
     const castingState = {
-      castingStart:undefined,
-      cursor:undefined
+      castingStart:0,
+      cursor:0
     };
     
     if(typeof property === "object" && isNumber(property.start)){
@@ -183,12 +184,13 @@ export const castString = (function(){
     
       const nextIndex = matchIndex+1;
       const endIndex  = matchIndex+matchLength;
-    
+      
+      //
       const matching = {
         matchType,
         matchExp
       };
-    
+      
       const casting = {
         startIndex :castingStart,
         endIndex   :matchIndex,
@@ -199,13 +201,13 @@ export const castString = (function(){
       const scope = {
         fork (matchEntries,castFn){
           const newMatchEntries = rebaseMatches(matches);
-          open({castingState:{castingStart:startIndex, cursor:endIndex}, matchEntries:newMatchEntries, castFn});
+          open({castingState:{castingStart:casting.startIndex, cursor:casting.endIndex}, matchEntries:newMatchEntries, castFn});
         },
         next (){
-          open({castingState:{castingStart:startIndex, cursor:endIndex}, matchEntries, castFn});
+          open({castingState:{castingStart:casting.startIndex, cursor:casting.endIndex}, matchEntries, castFn});
         },
         skip (){
-          open({castingState:{castingStart:startIndex, cursor:endIndex}, matchEntries, castFn});
+          open({castingState:{castingStart:casting.startIndex, cursor:casting.endIndex}, matchEntries, castFn});
         }
       };
     
@@ -217,7 +219,9 @@ export const castString = (function(){
       });
     
     };
-  
+    
+    console.log("open castingState",castingState)
+    
     open({
       castingState,
       matchEntries:newMatchEntries,

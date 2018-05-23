@@ -262,452 +262,6 @@
     return !isExsist(value);
   };
 
-  var asArray$1 = function asArray(data, defaultArray) {
-    if (defaultArray === void 0) {
-      defaultArray = undefined;
-    }
-
-    if (isArray(data)) {
-      return data;
-    }
-
-    if (isNone(data)) {
-      return isArray(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
-    }
-
-    if (typeof data === "object" && typeof data.toArray === "function") {
-      return data.toArray();
-    }
-
-    return [data];
-  };
-  var toArray = function toArray(data, option) {
-    if (typeof data === "undefined" || data === null || data === NaN) return [];
-    if (isArray(data)) return Array.prototype.slice.call(data);
-    if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
-    if (typeof option === "string") return data.split(option);
-    return [data];
-  };
-  var asObject = function asObject(data, defaultKey) {
-    if (defaultKey === void 0) {
-      defaultKey = "default";
-    }
-
-    if (isPlainObject(data)) {
-      return data;
-    } else {
-      var _ref;
-
-      return _ref = {}, _ref[defaultKey] = data, _ref;
-    }
-  };
-  var toNumber = function toNumber(v, d) {
-    switch (typeof v) {
-      case "number":
-        return v;
-
-      case "string":
-        var r = v.replace(/[^.\d\-]/g, "") * 1;
-        return isAbsoluteNaN(r) ? 0 : r;
-        break;
-    }
-
-    switch (typeof d) {
-      case "number":
-        return d;
-
-      case "string":
-        var r = d * 1;
-        return isAbsoluteNaN(r) ? 0 : r;
-        break;
-    }
-
-    return 0;
-  };
-  var cleanObject = function cleanObject(data) {
-    if (data instanceof Array) {
-      Array.prototype.splice.call(data, 0, data.length);
-    } else if (typeof data == "object") {
-      Object.keys(data).forEach(function (key) {
-        delete data[key];
-      });
-    }
-
-    return data;
-  };
-  var entries = function entries(it) {
-    var result = [];
-
-    switch (typeof it) {
-      case "object":
-        isNone(it) ? 0 : likeArray(it) ? asArray$1(it).forEach(function (v, k) {
-          result.push([k, v]);
-        }) : Object.keys(it).forEach(function (key) {
-          result.push([key, it[key]]);
-        });
-        break;
-    }
-
-    return result;
-  };
-  var keys = function keys(target, filterExp) {
-    var result = [];
-    var filter = typeof filterExp === "function" ? filterExp : function () {
-      return true;
-    };
-    likeArray(target) && Object.keys(target).filter(function (key) {
-      !isNaN(key) && filter(key, target) && result.push(parseInt(key, 10));
-    }) || likeObject(target) && Object.keys(target).forEach(function (key) {
-      filter(key, target) && result.push(key);
-    });
-    return result;
-  };
-  var deepEntries = function deepEntries(target, filter) {
-    if (likeArray(target)) ;
-  };
-  var clone = function clone(target) {
-    switch (typeof target) {
-      case "undefined":
-      case "function":
-      case "boolean":
-      case "number":
-      case "string":
-        return target;
-        break;
-
-      case "object":
-        if (target === null) return target;
-
-        if (isArray(target)) {
-          var _r = [];
-
-          for (var i = 0, length = target.length; i < length; i++) {
-            _r.push(target[i]);
-          }
-
-          return _r;
-        }
-
-        if (!isPlainObject(target)) {
-          if (target instanceof Date) {
-            var _r2 = new Date();
-
-            _r2.setTime(target.getTime());
-
-            return _r2;
-          }
-
-          return target;
-        }
-
-        var r = {};
-        Object.keys(target).forEach(function (k) {
-          if (target.hasOwnProperty(k)) r[k] = target[k];
-        });
-        return r;
-        break;
-
-      default:
-        console.error("clone::copy failed : target => ", target);
-        return target;
-        break;
-    }
-  };
-  var cloneDeep = function cloneDeep(target) {
-    var d;
-
-    if (typeof target === "object") {
-      if (isArray(target)) {
-        if (!isArray(d)) {
-          d = [];
-        }
-
-        for (var i = 0, l = target.length; i < l; i++) {
-          d.push(typeof target[i] === "object" && target[i] !== null ? clone(target[i]) : target[i]);
-        }
-
-        return d;
-      } else {
-        d = {};
-        Object.keys(target).forEach(function (p) {
-          typeof target[p] === "object" && target[p] !== null && d[p] ? clone(target[p], d[p]) : d[p] = target[p];
-        });
-        return d;
-      }
-    } else {
-      clone(target);
-    }
-  }; //reducer.spec.js
-
-  var castString = function () {
-    var rebaseMatches = function rebaseMatches(matches) {
-      return entries(asArray$1(matches));
-    };
-
-    return function (text, matches, castFn, property) {
-      var payload = {
-        contentOffset: 0,
-        content: text,
-        property: property
-      };
-      var newMatchEntries = rebaseMatches(matches);
-      var castingState = {
-        castingStart: undefined,
-        cursor: undefined
-      };
-
-      if (typeof property === "object" && isNumber(property.start)) {
-        castingState.castingStart = property.start;
-        castingState.cursor = property.start;
-      }
-
-      var open = function open(_ref2) {
-        var _ref2$castingState = _ref2.castingState,
-            castingStart = _ref2$castingState.castingStart,
-            cursor = _ref2$castingState.cursor,
-            matchEntries = _ref2.matchEntries,
-            castFn = _ref2.castFn;
-        //find match
-        var firstMatch = top(matchEntries.map(function (_ref3) {
-          var matchType = _ref3[0],
-              matchExp = _ref3[1];
-          return [findIndex(text, matchExp), matchType, matchExp];
-        }), function (_ref4, _ref5) {
-          var a = _ref4[0],
-              aPriority = _ref4[1];
-          var b = _ref5[0],
-              bPriority = _ref5[1];
-          return a == b ? aPriority < bPriority : a < b;
-        });
-
-        if (!firstMatch) {
-          return;
-        }
-
-        var matchIndex = firstMatch[0],
-            matchType = firstMatch[1],
-            matchExp = firstMatch[2],
-            matchLength = firstMatch[3];
-
-        if (matchIndex === -1) {
-          return;
-        }
-
-        var nextIndex = matchIndex + 1;
-        var endIndex = matchIndex + matchLength;
-        var matching = {
-          matchType: matchType,
-          matchExp: matchExp
-        };
-        var casting = {
-          startIndex: castingStart,
-          endIndex: matchIndex,
-          matchIndex: matchIndex,
-          nextIndex: nextIndex
-        };
-        var scope = {
-          fork: function fork(matchEntries, castFn) {
-            var newMatchEntries = rebaseMatches(matches);
-            open({
-              castingState: {
-                castingStart: startIndex,
-                cursor: endIndex
-              },
-              newMatchEntries: newMatchEntries,
-              castFn: castFn
-            });
-          },
-          next: function next() {
-            open({
-              castingState: {
-                castingStart: startIndex,
-                cursor: endIndex
-              },
-              matchEntries: matchEntries,
-              castFn: castFn
-            });
-          },
-          skip: function skip() {
-            open({
-              castingState: {
-                castingStart: startIndex,
-                cursor: endIndex
-              },
-              matchEntries: matchEntries,
-              castFn: castFn
-            });
-          }
-        };
-        castFn({
-          payload: payload,
-          matching: matching,
-          casting: casting,
-          scope: scope
-        });
-      };
-
-      open({
-        castingState: castingState,
-        matchEntries: matchEntries,
-        castFn: castFn
-      });
-      return payload;
-    };
-  }();
-  var castPath = function castPath(pathParam) {
-    if (isArray(pathParam)) {
-      return pathParam;
-    }
-
-    if (likeString(pathParam)) {
-      if (isNumber(pathParam)) {
-        return [pathParam];
-      }
-
-      if (typeof pathParam === "string") {
-        var _castString = castString(pathParam, [".", "["], function (_ref6) {
-          var _ref6$payload = _ref6.payload,
-              content = _ref6$payload.content,
-              contentOffset = _ref6$payload.contentOffset,
-              path = _ref6$payload.property,
-              _ref6$matching = _ref6.matching,
-              matchType = _ref6$matching.matchType,
-              nextIndex = _ref6$matching.nextIndex,
-              _ref6$casting = _ref6.casting,
-              startIndex = _ref6$casting.startIndex,
-              endIndex = _ref6$casting.endIndex,
-              _ref6$scope = _ref6.scope,
-              next = _ref6$scope.next,
-              fork = _ref6$scope.fork;
-
-          if (matchType === 0) {
-            path.push(content.substring(startIndex, endIndex));
-            next(nextIndex);
-          }
-
-          if (matchType === 1) {
-            var lead = 1,
-                feet = 0;
-            fork(["[", "]"], function (_ref7) {
-              var contentOffset = _ref7.payload.contentOffset,
-                  _ref7$matching = _ref7.matching,
-                  matchType = _ref7$matching.matchType,
-                  nextIndex = _ref7$matching.nextIndex,
-                  _ref7$casting = _ref7.casting,
-                  startIndex = _ref7$casting.startIndex,
-                  endIndex = _ref7$casting.endIndex,
-                  _ref7$scope = _ref7.scope,
-                  next = _ref7$scope.next,
-                  skip = _ref7$scope.skip;
-              matchType === 0 && lead++;
-              matchType === 1 && feet++;
-
-              if (lead === feet) {
-                meta.push(casting.substr(1));
-                next(nextIndex);
-              } else {
-                skip();
-              }
-            });
-          }
-
-          if (matchType === -1) {
-            path.push(content.substring(startIndex, endIndex));
-          }
-        }, []),
-            result = _castString.meta.result;
-
-        return result;
-      }
-    }
-
-    return [];
-  };
-  var free = function free(datum) {
-    var dest = {};
-    Object.keys(datum).forEach(function (key) {
-      if (!/^\$/.test(key)) {
-        dest[key] = _cloneDeep(datum[key]);
-      }
-    });
-    return dest;
-  };
-
-  var getKeyWithValue = function getKeyWithValue(obj, value) {
-    if (isArray(obj)) {
-      for (var i = 0, l = obj.length; i < l; i++) {
-        if (obj[i] === value) return i;
-      }
-    }
-
-    if (isObject(obj)) {
-      for (var key in obj) {
-        if (obj[key] === value) return key;
-      }
-    }
-
-    return undefined;
-  };
-
-  var removeValue = function removeValue(obj, value) {
-    var detect = true;
-    var array = isArray(obj);
-
-    while (detect) {
-      var key = getKeyWithValue(obj, value);
-
-      if (typeof key === "undefined") {
-        detect = false;
-      } else {
-        if (array) {
-          obj.splice(key, 1);
-        } else {
-          delete obj[key];
-        }
-      }
-    }
-
-    return obj;
-  };
-  var instance = function instance(func, proto) {
-    var ins,
-        DummyInstance = function DummyInstance(param) {
-      if (typeof param === "object") for (var k in param) {
-        this[k] = param[k];
-      }
-    };
-
-    if (typeof func == "object") {
-      if (typeof proto === "object") DummyInstance.prototype = proto;
-      ins = new DummyInstance(func);
-    }
-
-    if (typeof func == "function") {
-      if (typeof proto === "object") func.prototype = proto;
-      ins = new func();
-    }
-
-    return ins;
-  };
-  var alloc$1 = function alloc(init) {
-    var fn = init();
-
-    var rn = function rn() {
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      return fn.apply(this, args);
-    };
-
-    rn['reset'] = function () {
-      fn = init(rn, rn);
-    };
-
-    rn['$constructor'] = fn;
-    return rn;
-  };
-
   var all = function all(data, fn) {
     data = asArray$1(data);
 
@@ -1927,7 +1481,7 @@
    */
 
 
-  function castPath$1(value, object) {
+  function castPath(value, object) {
     if (isArray_1(value)) {
       return value;
     }
@@ -1935,7 +1489,7 @@
     return _isKey(value, object) ? [value] : _stringToPath(toString_1(value));
   }
 
-  var _castPath = castPath$1;
+  var _castPath = castPath;
 
   /** Used as references for various `Number` constants. */
 
@@ -2018,7 +1572,15 @@
 
   var get_1 = get;
 
-  var findIndex$1 = function () {
+  var matchStringVector = function matchStringVector(it, search, at) {
+    if (typeof search === "string") {
+      search = search.replace(".", "\\.");
+    }
+
+    var result = it.match(search);
+    return result ? [result.index, result[0].length] : result;
+  };
+  var findIndex = function () {
     var __find_string = function __find_string(it, search, at) {
       return it.indexOf(search, at);
     };
@@ -2042,7 +1604,7 @@
             next;
 
         do {
-          var i = findIndex$1(c, s, at);
+          var i = findIndex(c, s, at);
 
           if (i > -1) {
             at = (s.length || 1) + i;
@@ -2090,7 +1652,7 @@
     return data;
   }; //reducer.spec.js
 
-  var top$1 = function top(data, iteratee, topLength) {
+  var top = function top(data, iteratee, topLength) {
     switch (typeof iteratee) {
       case "function":
         //iteratee=iteratee;
@@ -2141,7 +1703,7 @@
     return target;
   };
   var hasProperty = function hasProperty(target, pathParam) {
-    return all(castPath(pathParam), function (path) {
+    return all(castPath$1(pathParam), function (path) {
       if (likeObject(target) && likeString$1(path) && target.hasOwnProperty(path)) {
         target = target[path];
         return true;
@@ -2177,6 +1739,453 @@
     ts = ts || 1;
     i = Math.floor(i / ts);
     return p > i ? i : i % p;
+  };
+
+  var asArray$1 = function asArray(data, defaultArray) {
+    if (defaultArray === void 0) {
+      defaultArray = undefined;
+    }
+
+    if (isArray(data)) {
+      return data;
+    }
+
+    if (isNone(data)) {
+      return isArray(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
+    }
+
+    if (typeof data === "object" && typeof data.toArray === "function") {
+      return data.toArray();
+    }
+
+    return [data];
+  };
+  var toArray = function toArray(data, option) {
+    if (typeof data === "undefined" || data === null || data === NaN) return [];
+    if (isArray(data)) return Array.prototype.slice.call(data);
+    if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
+    if (typeof option === "string") return data.split(option);
+    return [data];
+  };
+  var asObject = function asObject(data, defaultKey) {
+    if (defaultKey === void 0) {
+      defaultKey = "default";
+    }
+
+    if (isPlainObject(data)) {
+      return data;
+    } else {
+      var _ref;
+
+      return _ref = {}, _ref[defaultKey] = data, _ref;
+    }
+  };
+  var toNumber = function toNumber(v, d) {
+    switch (typeof v) {
+      case "number":
+        return v;
+
+      case "string":
+        var r = v.replace(/[^.\d\-]/g, "") * 1;
+        return isAbsoluteNaN(r) ? 0 : r;
+        break;
+    }
+
+    switch (typeof d) {
+      case "number":
+        return d;
+
+      case "string":
+        var r = d * 1;
+        return isAbsoluteNaN(r) ? 0 : r;
+        break;
+    }
+
+    return 0;
+  };
+  var cleanObject = function cleanObject(data) {
+    if (data instanceof Array) {
+      Array.prototype.splice.call(data, 0, data.length);
+    } else if (typeof data == "object") {
+      Object.keys(data).forEach(function (key) {
+        delete data[key];
+      });
+    }
+
+    return data;
+  };
+  var entries = function entries(it) {
+    var result = [];
+
+    switch (typeof it) {
+      case "object":
+        isNone(it) ? 0 : likeArray(it) ? asArray$1(it).forEach(function (v, k) {
+          result.push([k, v]);
+        }) : Object.keys(it).forEach(function (key) {
+          result.push([key, it[key]]);
+        });
+        break;
+    }
+
+    return result;
+  };
+  var keys = function keys(target, filterExp) {
+    var result = [];
+    var filter = typeof filterExp === "function" ? filterExp : function () {
+      return true;
+    };
+    likeArray(target) && Object.keys(target).filter(function (key) {
+      !isNaN(key) && filter(key, target) && result.push(parseInt(key, 10));
+    }) || likeObject(target) && Object.keys(target).forEach(function (key) {
+      filter(key, target) && result.push(key);
+    });
+    return result;
+  };
+  var deepEntries = function deepEntries(target, filter) {
+    if (likeArray(target)) ;
+  };
+  var clone = function clone(target) {
+    switch (typeof target) {
+      case "undefined":
+      case "function":
+      case "boolean":
+      case "number":
+      case "string":
+        return target;
+        break;
+
+      case "object":
+        if (target === null) return target;
+
+        if (isArray(target)) {
+          var _r = [];
+
+          for (var i = 0, length = target.length; i < length; i++) {
+            _r.push(target[i]);
+          }
+
+          return _r;
+        }
+
+        if (!isPlainObject(target)) {
+          if (target instanceof Date) {
+            var _r2 = new Date();
+
+            _r2.setTime(target.getTime());
+
+            return _r2;
+          }
+
+          return target;
+        }
+
+        var r = {};
+        Object.keys(target).forEach(function (k) {
+          if (target.hasOwnProperty(k)) r[k] = target[k];
+        });
+        return r;
+        break;
+
+      default:
+        console.error("clone::copy failed : target => ", target);
+        return target;
+        break;
+    }
+  };
+  var cloneDeep = function cloneDeep(target) {
+    var d;
+
+    if (typeof target === "object") {
+      if (isArray(target)) {
+        if (!isArray(d)) {
+          d = [];
+        }
+
+        for (var i = 0, l = target.length; i < l; i++) {
+          d.push(typeof target[i] === "object" && target[i] !== null ? clone(target[i]) : target[i]);
+        }
+
+        return d;
+      } else {
+        d = {};
+        Object.keys(target).forEach(function (p) {
+          typeof target[p] === "object" && target[p] !== null && d[p] ? clone(target[p], d[p]) : d[p] = target[p];
+        });
+        return d;
+      }
+    } else {
+      clone(target);
+    }
+  }; //reducer.spec.js
+
+  var castString = function () {
+    var rebaseMatches = function rebaseMatches(matches) {
+      return entries(asArray$1(matches));
+    };
+
+    return function (text, matches, castFn, property) {
+      var payload = {
+        contentOffset: 0,
+        content: text,
+        property: property
+      };
+      var newMatchEntries = rebaseMatches(matches);
+      var castingState = {
+        castingStart: 0,
+        cursor: 0
+      };
+
+      if (typeof property === "object" && isNumber(property.start)) {
+        castingState.castingStart = property.start;
+        castingState.cursor = property.start;
+      }
+
+      var open = function open(_ref2) {
+        var _ref2$castingState = _ref2.castingState,
+            castingStart = _ref2$castingState.castingStart,
+            cursor = _ref2$castingState.cursor,
+            matchEntries = _ref2.matchEntries,
+            castFn = _ref2.castFn;
+        //find match
+        var firstMatch = top(matchEntries.map(function (_ref3) {
+          var matchType = _ref3[0],
+              matchExp = _ref3[1];
+          return [findIndex(text, matchExp), matchType, matchExp];
+        }), function (_ref4, _ref5) {
+          var a = _ref4[0],
+              aPriority = _ref4[1];
+          var b = _ref5[0],
+              bPriority = _ref5[1];
+          return a == b ? aPriority < bPriority : a < b;
+        });
+
+        if (!firstMatch) {
+          return;
+        }
+
+        var matchIndex = firstMatch[0],
+            matchType = firstMatch[1],
+            matchExp = firstMatch[2],
+            matchLength = firstMatch[3];
+
+        if (matchIndex === -1) {
+          return;
+        }
+
+        var nextIndex = matchIndex + 1;
+
+        var matching = {
+          matchType: matchType,
+          matchExp: matchExp
+        };
+        var casting = {
+          startIndex: castingStart,
+          endIndex: matchIndex,
+          matchIndex: matchIndex,
+          nextIndex: nextIndex
+        };
+        var scope = {
+          fork: function fork(matchEntries, castFn) {
+            var newMatchEntries = rebaseMatches(matches);
+            open({
+              castingState: {
+                castingStart: casting.startIndex,
+                cursor: casting.endIndex
+              },
+              matchEntries: newMatchEntries,
+              castFn: castFn
+            });
+          },
+          next: function next() {
+            open({
+              castingState: {
+                castingStart: casting.startIndex,
+                cursor: casting.endIndex
+              },
+              matchEntries: matchEntries,
+              castFn: castFn
+            });
+          },
+          skip: function skip() {
+            open({
+              castingState: {
+                castingStart: casting.startIndex,
+                cursor: casting.endIndex
+              },
+              matchEntries: matchEntries,
+              castFn: castFn
+            });
+          }
+        };
+        castFn({
+          payload: payload,
+          matching: matching,
+          casting: casting,
+          scope: scope
+        });
+      };
+
+      console.log("open castingState", castingState);
+      open({
+        castingState: castingState,
+        matchEntries: newMatchEntries,
+        castFn: castFn
+      });
+      return payload;
+    };
+  }();
+  var castPath$1 = function castPath(pathParam) {
+    if (isArray(pathParam)) {
+      return pathParam;
+    }
+
+    if (likeString(pathParam)) {
+      if (isNumber(pathParam)) {
+        return [pathParam];
+      }
+
+      if (typeof pathParam === "string") {
+        var _castString = castString(pathParam, [".", "["], function (_ref6) {
+          var _ref6$payload = _ref6.payload,
+              content = _ref6$payload.content,
+              contentOffset = _ref6$payload.contentOffset,
+              path = _ref6$payload.property,
+              _ref6$matching = _ref6.matching,
+              matchType = _ref6$matching.matchType,
+              nextIndex = _ref6$matching.nextIndex,
+              _ref6$casting = _ref6.casting,
+              startIndex = _ref6$casting.startIndex,
+              endIndex = _ref6$casting.endIndex,
+              _ref6$scope = _ref6.scope,
+              next = _ref6$scope.next,
+              fork = _ref6$scope.fork;
+
+          if (matchType === 0) {
+            path.push(content.substring(startIndex, endIndex));
+            next(nextIndex);
+          }
+
+          if (matchType === 1) {
+            var lead = 1,
+                feet = 0;
+            fork(["[", "]"], function (_ref7) {
+              var contentOffset = _ref7.payload.contentOffset,
+                  _ref7$matching = _ref7.matching,
+                  matchType = _ref7$matching.matchType,
+                  nextIndex = _ref7$matching.nextIndex,
+                  _ref7$casting = _ref7.casting,
+                  startIndex = _ref7$casting.startIndex,
+                  endIndex = _ref7$casting.endIndex,
+                  _ref7$scope = _ref7.scope,
+                  next = _ref7$scope.next,
+                  skip = _ref7$scope.skip;
+              matchType === 0 && lead++;
+              matchType === 1 && feet++;
+
+              if (lead === feet) {
+                meta.push(casting.substr(1));
+                next(nextIndex);
+              } else {
+                skip();
+              }
+            });
+          }
+
+          if (matchType === -1) {
+            path.push(content.substring(startIndex, endIndex));
+          }
+        }, []),
+            result = _castString.meta.result;
+
+        return result;
+      }
+    }
+
+    return [];
+  };
+  var free = function free(datum) {
+    var dest = {};
+    Object.keys(datum).forEach(function (key) {
+      if (!/^\$/.test(key)) {
+        dest[key] = _cloneDeep(datum[key]);
+      }
+    });
+    return dest;
+  };
+
+  var getKeyWithValue = function getKeyWithValue(obj, value) {
+    if (isArray(obj)) {
+      for (var i = 0, l = obj.length; i < l; i++) {
+        if (obj[i] === value) return i;
+      }
+    }
+
+    if (isObject(obj)) {
+      for (var key in obj) {
+        if (obj[key] === value) return key;
+      }
+    }
+
+    return undefined;
+  };
+
+  var removeValue = function removeValue(obj, value) {
+    var detect = true;
+    var array = isArray(obj);
+
+    while (detect) {
+      var key = getKeyWithValue(obj, value);
+
+      if (typeof key === "undefined") {
+        detect = false;
+      } else {
+        if (array) {
+          obj.splice(key, 1);
+        } else {
+          delete obj[key];
+        }
+      }
+    }
+
+    return obj;
+  };
+  var instance = function instance(func, proto) {
+    var ins,
+        DummyInstance = function DummyInstance(param) {
+      if (typeof param === "object") for (var k in param) {
+        this[k] = param[k];
+      }
+    };
+
+    if (typeof func == "object") {
+      if (typeof proto === "object") DummyInstance.prototype = proto;
+      ins = new DummyInstance(func);
+    }
+
+    if (typeof func == "function") {
+      if (typeof proto === "object") func.prototype = proto;
+      ins = new func();
+    }
+
+    return ins;
+  };
+  var alloc$1 = function alloc(init) {
+    var fn = init();
+
+    var rn = function rn() {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return fn.apply(this, args);
+    };
+
+    rn['reset'] = function () {
+      fn = init(rn, rn);
+    };
+
+    rn['$constructor'] = fn;
+    return rn;
   };
 
   var unique = function unique(array) {
@@ -2700,7 +2709,7 @@
 
   var matrixRange = function matrixRange(start, end, step, sizeBase) {
     var scales = [];
-    var maxLength = top$1([start.length, end.length]);
+    var maxLength = top([start.length, end.length]);
     var selectLengthes = times(maxLength, function (scaleIndex) {
       var range = range([start[scaleIndex], end[scaleIndex]], step, sizeBase);
       scales.push(range);
@@ -5866,7 +5875,7 @@
     clone: clone,
     cloneDeep: cloneDeep,
     castString: castString,
-    castPath: castPath,
+    castPath: castPath$1,
     free: free,
     removeValue: removeValue,
     instance: instance,
@@ -5876,10 +5885,11 @@
     times: times,
     forMap: forMap$1,
     accurateTimeout: accurateTimeout,
-    findIndex: findIndex$1,
+    matchStringVector: matchStringVector,
+    findIndex: findIndex,
     findIndexes: findIndexes$1,
     cut: cut,
-    top: top$1,
+    top: top,
     get: get$1,
     hasProperty: hasProperty,
     hasValueProperty: hasValueProperty,

@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike"], factory);
+    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike", "./reducer"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"));
+    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"), require("./reducer"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Regexp, global.es6Regexp, global.isLike);
+    factory(mod.exports, global.es6Array, global.es6Regexp, global.es6Regexp, global.isLike, global.reducer);
     global.cast = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Regexp, _es6Regexp2, _isLike) {
+})(this, function (_exports, _es6Array, _es6Regexp, _es6Regexp2, _isLike, _reducer) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -242,8 +242,8 @@
       };
       var newMatchEntries = rebaseMatches(matches);
       var castingState = {
-        castingStart: undefined,
-        cursor: undefined
+        castingStart: 0,
+        cursor: 0
       };
 
       if (typeof property === "object" && (0, _isLike.isNumber)(property.start)) {
@@ -258,10 +258,10 @@
             matchEntries = _ref2.matchEntries,
             castFn = _ref2.castFn;
         //find match
-        var firstMatch = top(matchEntries.map(function (_ref3) {
+        var firstMatch = (0, _reducer.top)(matchEntries.map(function (_ref3) {
           var matchType = _ref3[0],
               matchExp = _ref3[1];
-          return [findIndex(text, matchExp), matchType, matchExp];
+          return [(0, _reducer.findIndex)(text, matchExp), matchType, matchExp];
         }), function (_ref4, _ref5) {
           var a = _ref4[0],
               aPriority = _ref4[1];
@@ -284,7 +284,8 @@
         }
 
         var nextIndex = matchIndex + 1;
-        var endIndex = matchIndex + matchLength;
+        var endIndex = matchIndex + matchLength; //
+
         var matching = {
           matchType: matchType,
           matchExp: matchExp
@@ -300,18 +301,18 @@
             var newMatchEntries = rebaseMatches(matches);
             open({
               castingState: {
-                castingStart: startIndex,
-                cursor: endIndex
+                castingStart: casting.startIndex,
+                cursor: casting.endIndex
               },
-              newMatchEntries: newMatchEntries,
+              matchEntries: newMatchEntries,
               castFn: castFn
             });
           },
           next: function next() {
             open({
               castingState: {
-                castingStart: startIndex,
-                cursor: endIndex
+                castingStart: casting.startIndex,
+                cursor: casting.endIndex
               },
               matchEntries: matchEntries,
               castFn: castFn
@@ -320,8 +321,8 @@
           skip: function skip() {
             open({
               castingState: {
-                castingStart: startIndex,
-                cursor: endIndex
+                castingStart: casting.startIndex,
+                cursor: casting.endIndex
               },
               matchEntries: matchEntries,
               castFn: castFn
@@ -336,9 +337,10 @@
         });
       };
 
+      console.log("open castingState", castingState);
       open({
         castingState: castingState,
-        matchEntries: matchEntries,
+        matchEntries: newMatchEntries,
         castFn: castFn
       });
       return payload;

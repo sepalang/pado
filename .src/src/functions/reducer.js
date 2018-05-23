@@ -20,6 +20,14 @@ import {
 import _get from 'lodash/get';
 
 //reducer.spec.js
+export const matchStringVector = (it,search,at)=>{
+  if(typeof search === "string"){
+    search = search.replace(".","\\.")
+  }
+  const result = it.match(search);
+  return result ? [result.index, result[0].length] : result;
+};
+
 export const findIndex = (function(){
   const __find_string = (it,search,at)=>it.indexOf(search,at);
   const __find_regexp = (it,search,at)=>{
