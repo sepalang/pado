@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.turn = _exports.toggle = _exports.diffStructure = _exports.apart = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.hasValue = _exports.unique = void 0;
+  _exports.toggle = _exports.diffStructure = _exports.apart = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.hasValue = _exports.unique = void 0;
 
   var unique = function unique(array) {
     var value = [],
@@ -430,19 +430,5 @@
   };
 
   _exports.toggle = toggle;
-
-  var turn = function turn(i, p, ts) {
-    if (i < 0) {
-      var abs = Math.abs(i / ts);
-      i = p - (abs > p ? abs % p : abs);
-    }
-
-    ;
-    ts = ts ? ts : 1;
-    i = Math.floor(i / ts);
-    return p > i ? i : i % p;
-  };
-
-  _exports.turn = turn;
 });
 //# sourceMappingURL=functions.js.map

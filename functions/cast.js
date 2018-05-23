@@ -229,76 +229,121 @@
 
   _exports.cloneDeep = cloneDeep;
 
-  var castString = function castString(text, matches, castFn, property) {
-    var matchEntries = entries(asArray(matches));
-    var cursorState = {
-      cursorStart: undefined,
-      cursor: undefined
+  var castString = function () {
+    var rebaseMatches = function rebaseMatches(matches) {
+      return entries(asArray(matches));
     };
-    cursorState.start = isNumber(property.start) && property.start > 0 ? property.start : 0;
-    cursorStart.end = isNumber(property.end) ? property.end : text.length;
-    cursorStart.cursor = cursorState.start;
 
-    var open = function open(_ref2) {
-      var _ref2$cursorState = _ref2.cursorState,
-          cursorStart = _ref2$cursorState.cursorStart,
-          cursor = _ref2$cursorState.cursor,
-          matchEntries = _ref2.matchEntries;
-      var firstMatch = top(matchEntries.map(function (_ref3) {
-        var matchType = _ref3[0],
-            matchExp = _ref3[1];
-        return [findIndex(text, matchExp), matchType, matchExp];
-      }), function (_ref4, _ref5) {
-        var a = _ref4[0],
-            aPriority = _ref4[1];
-        var b = _ref5[0],
-            bPriority = _ref5[1];
-        return a == b ? aPriority < bPriority : a < b;
-      });
+    return function (text, matches, castFn, property) {
+      var payload = {
+        contentOffset: 0,
+        content: text,
+        property: property
+      };
+      var newMatchEntries = rebaseMatches(matches);
+      var castingState = {
+        castingStart: undefined,
+        cursor: undefined
+      };
 
-      if (!firstMatch) {
-        return;
+      if (typeof property === "object" && (0, _isLike.isNumber)(property.start)) {
+        castingState.castingStart = property.start;
+        castingState.cursor = property.start;
       }
 
-      var matchIndex = firstMatch[0],
-          matchType = firstMatch[1],
-          matchExp = firstMatch[2],
-          matchLength = firstMatch[3];
+      var open = function open(_ref2) {
+        var _ref2$castingState = _ref2.castingState,
+            castingStart = _ref2$castingState.castingStart,
+            cursor = _ref2$castingState.cursor,
+            matchEntries = _ref2.matchEntries,
+            castFn = _ref2.castFn;
+        //find match
+        var firstMatch = top(matchEntries.map(function (_ref3) {
+          var matchType = _ref3[0],
+              matchExp = _ref3[1];
+          return [findIndex(text, matchExp), matchType, matchExp];
+        }), function (_ref4, _ref5) {
+          var a = _ref4[0],
+              aPriority = _ref4[1];
+          var b = _ref5[0],
+              bPriority = _ref5[1];
+          return a == b ? aPriority < bPriority : a < b;
+        });
 
-      if (matchIndex === -1) {
-        return;
-      }
+        if (!firstMatch) {
+          return;
+        }
 
-      var nextIndex = matchIndex + 1;
-      var endIndex = matchIndex + matchLength;
-      castFn({
-        matchType: matchType,
-        matchExp: matchExp,
-        casting: {
-          startIndex: cursorStart,
-          endIndex: matchIndex + matchLength,
+        var matchIndex = firstMatch[0],
+            matchType = firstMatch[1],
+            matchExp = firstMatch[2],
+            matchLength = firstMatch[3];
+
+        if (matchIndex === -1) {
+          return;
+        }
+
+        var nextIndex = matchIndex + 1;
+        var endIndex = matchIndex + matchLength;
+        var matching = {
+          matchType: matchType,
+          matchExp: matchExp
+        };
+        var casting = {
+          startIndex: castingStart,
+          endIndex: matchIndex,
           matchIndex: matchIndex,
           nextIndex: nextIndex
-        },
-        fork: function fork() {},
-        next: function next() {},
-        skip: function skip() {
-          open({
-            cursorState: {
-              cursorStart: startIndex,
-              cursor: endIndex
-            },
-            matchEntries: matchEntries
-          });
-        }
-      });
-    };
+        };
+        var scope = {
+          fork: function fork(matchEntries, castFn) {
+            var newMatchEntries = rebaseMatches(matches);
+            open({
+              castingState: {
+                castingStart: startIndex,
+                cursor: endIndex
+              },
+              newMatchEntries: newMatchEntries,
+              castFn: castFn
+            });
+          },
+          next: function next() {
+            open({
+              castingState: {
+                castingStart: startIndex,
+                cursor: endIndex
+              },
+              matchEntries: matchEntries,
+              castFn: castFn
+            });
+          },
+          skip: function skip() {
+            open({
+              castingState: {
+                castingStart: startIndex,
+                cursor: endIndex
+              },
+              matchEntries: matchEntries,
+              castFn: castFn
+            });
+          }
+        };
+        castFn({
+          payload: payload,
+          matching: matching,
+          casting: casting,
+          scope: scope
+        });
+      };
 
-    open({
-      cursorState: cursorState,
-      matchEntries: matchEntries
-    });
-  };
+      open({
+        castingState: castingState,
+        matchEntries: matchEntries,
+        castFn: castFn
+      });
+      return payload;
+    };
+  }();
 
   _exports.castString = castString;
 
@@ -308,64 +353,61 @@
     }
 
     if (likeString(pathParam)) {
-      if (isNumber(pathParam)) {
+      if ((0, _isLike.isNumber)(pathParam)) {
         return [pathParam];
       }
 
       if (typeof pathParam === "string") {
         var _castString = castString(pathParam, [".", "["], function (_ref6) {
-          var matchType = _ref6.matchType,
-              meta = _ref6.property.meta,
-              nextIndex = _ref6.casting.nextIndex,
-              fork = _ref6.fork,
-              next = _ref6.next,
-              skip = _ref6.skip;
+          var _ref6$payload = _ref6.payload,
+              content = _ref6$payload.content,
+              contentOffset = _ref6$payload.contentOffset,
+              path = _ref6$payload.property,
+              _ref6$matching = _ref6.matching,
+              matchType = _ref6$matching.matchType,
+              nextIndex = _ref6$matching.nextIndex,
+              _ref6$casting = _ref6.casting,
+              startIndex = _ref6$casting.startIndex,
+              endIndex = _ref6$casting.endIndex,
+              _ref6$scope = _ref6.scope,
+              next = _ref6$scope.next,
+              fork = _ref6$scope.fork;
 
-          //dpre
-          //const casting;
-          switch (matchType) {
-            // "."
-            case 0:
-              meta.push(casting);
-              next(nextIndex);
-              break;
-            // "]"
-
-            case 1:
-              var lead = 1,
-                  feet = 0;
-              fork(["[", "]"], function (_ref7) {
-                var matchType = _ref7.matchType,
-                    casting = _ref7.casting,
-                    nextIndex = _ref7.nextIndex,
-                    next = _ref7.next,
-                    skip = _ref7.skip;
-                matchType === 0 && lead++;
-                matchType === 1 && feet++;
-
-                if (lead === feet) {
-                  meta.push(casting.substr(1));
-                  next(nextIndex);
-                } else {
-                  skip();
-                }
-              });
-              break;
-            //end
-
-            case -1:
-              meta.push(casting);
-              break;
-
-            default:
-              skip();
-              break;
+          if (matchType === 0) {
+            path.push(content.substring(startIndex, endIndex));
+            next(nextIndex);
           }
 
-          skip();
-        }, {
-          meta: []
-        }),
+          if (matchType === 1) {
+            var lead = 1,
+                feet = 0;
+            fork(["[", "]"], function (_ref7) {
+              var contentOffset = _ref7.payload.contentOffset,
+                  _ref7$matching = _ref7.matching,
+                  matchType = _ref7$matching.matchType,
+                  nextIndex = _ref7$matching.nextIndex,
+                  _ref7$casting = _ref7.casting,
+                  startIndex = _ref7$casting.startIndex,
+                  endIndex = _ref7$casting.endIndex,
+                  _ref7$scope = _ref7.scope,
+                  next = _ref7$scope.next,
+                  skip = _ref7$scope.skip;
+              matchType === 0 && lead++;
+              matchType === 1 && feet++;
+
+              if (lead === feet) {
+                meta.push(casting.substr(1));
+                next(nextIndex);
+              } else {
+                skip();
+              }
+            });
+          }
+
+          if (matchType === -1) {
+            path.push(content.substring(startIndex, endIndex));
+          }
+        }, []),
             result = _castString.meta.result;
 
         return result;

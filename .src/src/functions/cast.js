@@ -4,9 +4,14 @@ import {
   likeObject,
   isNone,
   isAbsoluteNaN,
+  isNumber,
   isPlainObject,
   isObject
 } from './isLike'
+
+import {
+  top
+} from './reducer'
 
 export const asArray = function(data, defaultArray = undefined) {
   if(isArray(data)) {
@@ -155,15 +160,17 @@ export const castString = (function(){
   
     const newMatchEntries = rebaseMatches(matches);
   
-    const cursorState = {
-      cursorStart:undefined,
+    const castingState = {
+      castingStart:undefined,
       cursor:undefined
     };
+    
+    if(typeof property === "object" && isNumber(property.start)){
+      castingState.castingStart = property.start;
+      castingState.cursor       = property.start;
+    }
 
-    cursorState.start = isNumber(property.start) && property.start > 0 ? property.start : 0;
-    cursorStart.cursor= cursorState.start;
-  
-    const open = function({ cursorState:{ cursorStart, cursor }, matchEntries, castFn }){
+    const open = function({ castingState:{ castingStart, cursor }, matchEntries, castFn }){
       //find match
       const firstMatch = top(
         matchEntries.map(([matchType, matchExp])=>[findIndex(text,matchExp), matchType, matchExp]),
@@ -183,7 +190,7 @@ export const castString = (function(){
       };
     
       const casting = {
-        startIndex :cursorStart,
+        startIndex :castingStart,
         endIndex   :matchIndex,
         matchIndex,
         nextIndex
@@ -192,13 +199,13 @@ export const castString = (function(){
       const scope = {
         fork (matchEntries,castFn){
           const newMatchEntries = rebaseMatches(matches);
-          open({cursorState:{cursorStart:startIndex, cursor:endIndex}, newMatchEntries, castFn});
+          open({castingState:{castingStart:startIndex, cursor:endIndex}, matchEntries:newMatchEntries, castFn});
         },
         next (){
-          open({cursorState:{cursorStart:startIndex, cursor:endIndex}, matchEntries, castFn});
+          open({castingState:{castingStart:startIndex, cursor:endIndex}, matchEntries, castFn});
         },
         skip (){
-          open({cursorState:{cursorStart:startIndex, cursor:endIndex}, matchEntries, castFn});
+          open({castingState:{castingStart:startIndex, cursor:endIndex}, matchEntries, castFn});
         }
       };
     
@@ -211,7 +218,11 @@ export const castString = (function(){
     
     };
   
-    open({ cursorState, matchEntries, castFn });
+    open({
+      castingState,
+      matchEntries:newMatchEntries,
+      castFn
+    });
   
     return payload;
   };
