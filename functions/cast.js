@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike", "./reducer"], factory);
+    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike", "./reducer"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"), require("./reducer"));
+    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"), require("./reducer"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Regexp, global.es6Regexp, global.isLike, global.reducer);
+    factory(mod.exports, global.es6Array, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike, global.reducer);
     global.cast = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Regexp, _es6Regexp2, _isLike, _reducer) {
+})(this, function (_exports, _es6Array, _es6Array2, _es6Object, _webDom, _es6Regexp, _es6Regexp2, _isLike, _reducer) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

@@ -1,37 +1,41 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.sort", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.replace", "./isLike", "./cast", "./enumerable", "lodash/get"], factory);
+    define(["exports", "core-js/modules/es6.array.sort", "core-js/modules/es6.number.constructor", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.constructor", "core-js/modules/es6.regexp.replace", "./isLike", "./cast", "./enumerable", "lodash/get"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.replace"), require("./isLike"), require("./cast"), require("./enumerable"), require("lodash/get"));
+    factory(exports, require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.constructor"), require("core-js/modules/es6.regexp.replace"), require("./isLike"), require("./cast"), require("./enumerable"), require("lodash/get"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.isLike, global.cast, global.enumerable, global.get);
+    factory(mod.exports, global.es6Array, global.es6Number, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.isLike, global.cast, global.enumerable, global.get);
     global.reducer = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Regexp, _es6Regexp2, _es6Regexp3, _isLike, _cast, _enumerable, _get2) {
+})(this, function (_exports, _es6Array, _es6Number, _es6Regexp, _es6Regexp2, _es6Regexp3, _es6Regexp4, _isLike, _cast, _enumerable, _get2) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.turn = _exports.hasValueProperty = _exports.hasProperty = _exports.get = _exports.top = _exports.cut = _exports.findIndexes = _exports.findIndex = _exports.matchStringVector = void 0;
+  _exports.turn = _exports.hasValueProperty = _exports.hasProperty = _exports.get = _exports.top = _exports.cut = _exports.findIndexes = _exports.findIndex = _exports.matchString = void 0;
   _get2 = _interopRequireDefault(_get2);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
   //reducer.spec.js
-  var matchStringVector = function matchStringVector(it, search, at) {
-    if (typeof search === "string") {
-      search = search.replace(".", "\\.");
+  var matchString = function matchString(it, search, at) {
+    if (at === void 0) {
+      at = 0;
     }
 
-    var result = it.match(search);
-    return result ? [result.index, result[0].length] : result;
+    if (typeof search === "string") {
+      search = search.replace(new RegExp("\\.", "g"), "\\.");
+    }
+
+    var result = it.substr(at).match(search);
+    return result ? [result.index + at, result[0].length] : [-1, 0];
   };
 
-  _exports.matchStringVector = matchStringVector;
+  _exports.matchString = matchString;
 
   var findIndex = function () {
     var __find_string = function __find_string(it, search, at) {

@@ -375,12 +375,11 @@
 
     try {
       value[symToStringTag] = undefined;
-      var unmasked = true;
     } catch (e) {}
 
     var result = nativeObjectToString.call(value);
 
-    if (unmasked) {
+    {
       if (isOwn) {
         value[symToStringTag] = tag;
       } else {
@@ -1572,13 +1571,17 @@
 
   var get_1 = get;
 
-  var matchStringVector = function matchStringVector(it, search, at) {
-    if (typeof search === "string") {
-      search = search.replace(".", "\\.");
+  var matchString = function matchString(it, search, at) {
+    if (at === void 0) {
+      at = 0;
     }
 
-    var result = it.match(search);
-    return result ? [result.index, result[0].length] : result;
+    if (typeof search === "string") {
+      search = search.replace(new RegExp("\\.", "g"), "\\.");
+    }
+
+    var result = it.substr(at).match(search);
+    return result ? [result.index + at, result[0].length] : [-1, 0];
   };
   var findIndex = function () {
     var __find_string = function __find_string(it, search, at) {
@@ -4248,10 +4251,10 @@
   var COMPARE_PARTIAL_FLAG$2 = 1;
   /** Used for built-in method references. */
 
-  var objectProto$10 = Object.prototype;
+  var objectProto$a = Object.prototype;
   /** Used to check objects for own properties. */
 
-  var hasOwnProperty$7 = objectProto$10.hasOwnProperty;
+  var hasOwnProperty$7 = objectProto$a.hasOwnProperty;
   /**
    * A specialized version of `baseIsEqualDeep` for objects with support for
    * partial deep comparisons.
@@ -4425,10 +4428,10 @@
       objectTag$2 = '[object Object]';
   /** Used for built-in method references. */
 
-  var objectProto$11 = Object.prototype;
+  var objectProto$b = Object.prototype;
   /** Used to check objects for own properties. */
 
-  var hasOwnProperty$8 = objectProto$11.hasOwnProperty;
+  var hasOwnProperty$8 = objectProto$b.hasOwnProperty;
   /**
    * A specialized version of `baseIsEqual` for arrays and objects which performs
    * deep comparisons and tracks traversed objects enabling objects with circular
@@ -5885,7 +5888,7 @@
     times: times,
     forMap: forMap$1,
     accurateTimeout: accurateTimeout,
-    matchStringVector: matchStringVector,
+    matchString: matchString,
     findIndex: findIndex,
     findIndexes: findIndexes$1,
     cut: cut,

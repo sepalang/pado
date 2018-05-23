@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/es6.string.repeat", "core-js/modules/web.dom.iterable", "core-js/modules/es6.promise", "../functions", "./operate"], factory);
+    define(["exports", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/es6.string.repeat", "core-js/modules/es6.number.constructor", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.promise", "../functions", "./operate"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.string.repeat"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.promise"), require("../functions"), require("./operate"));
+    factory(exports, require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.string.repeat"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.promise"), require("../functions"), require("./operate"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.runtime, global.es6Array, global.es6String, global.webDom, global.es6, global.functions, global.operate);
+    factory(mod.exports, global.runtime, global.es6Array, global.es6String, global.es6Number, global.webDom, global.es6Array, global.es6, global.functions, global.operate);
     global.promise = mod.exports;
   }
-})(this, function (_exports, _runtime, _es6Array, _es6String, _webDom, _es, _functions, _operate) {
+})(this, function (_exports, _runtime, _es6Array, _es6String, _es6Number, _webDom, _es6Array2, _es, _functions, _operate) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

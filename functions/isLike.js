@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
+    define(["exports", "core-js/modules/es6.regexp.constructor", "core-js/modules/es6.number.constructor"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports);
+    factory(exports, require("core-js/modules/es6.regexp.constructor"), require("core-js/modules/es6.number.constructor"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports);
+    factory(mod.exports, global.es6Regexp, global.es6Number);
     global.isLike = mod.exports;
   }
-})(this, function (_exports) {
+})(this, function (_exports, _es6Regexp, _es6Number) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

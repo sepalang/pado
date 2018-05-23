@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "regenerator-runtime/runtime", "./promise"], factory);
+    define(["exports", "regenerator-runtime/runtime", "core-js/modules/web.dom.iterable", "./promise"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("regenerator-runtime/runtime"), require("./promise"));
+    factory(exports, require("regenerator-runtime/runtime"), require("core-js/modules/web.dom.iterable"), require("./promise"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.runtime, global.promise);
+    factory(mod.exports, global.runtime, global.webDom, global.promise);
     global.makeup = mod.exports;
   }
-})(this, function (_exports, _runtime, _promise) {
+})(this, function (_exports, _runtime, _webDom, _promise) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

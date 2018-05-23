@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.promise", "core-js/modules/es6.object.assign", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "../functions"], factory);
+    define(["exports", "core-js/modules/es6.promise", "core-js/modules/es6.object.assign", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/web.dom.iterable", "core-js/modules/es6.number.constructor", "../functions"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.promise"), require("core-js/modules/es6.object.assign"), require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("../functions"));
+    factory(exports, require("core-js/modules/es6.promise"), require("core-js/modules/es6.object.assign"), require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.number.constructor"), require("../functions"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6, global.es6Object, global.runtime, global.es6Array, global.functions);
+    factory(mod.exports, global.es6, global.es6Object, global.runtime, global.es6Array, global.webDom, global.es6Number, global.functions);
     global.operate = mod.exports;
   }
-})(this, function (_exports, _es, _es6Object, _runtime, _es6Array, _functions) {
+})(this, function (_exports, _es, _es6Object, _runtime, _es6Array, _webDom, _es6Number, _functions) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
