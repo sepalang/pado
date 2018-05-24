@@ -1363,69 +1363,6 @@
     return ta[index];
   };
 
-  var accurateTimeout = function (originalTimeout) {
-    return function (trigger, time, resolutionRatio, coverage) {
-      if (time === void 0) {
-        time = 0;
-      }
-
-      if (resolutionRatio === void 0) {
-        resolutionRatio = 0.75;
-      }
-
-      if (coverage === void 0) {
-        coverage = 25;
-      }
-
-      var destTime = Date.now() + time;
-
-      if (!isNumber(time)) {
-        time = 0;
-      }
-
-      if (!isNumber(resolutionRatio)) {
-        resolutionRatio = 0.75;
-      }
-
-      if (!isNumber(coverage)) {
-        resolutionRatio = 25;
-      }
-
-      if (resolutionRatio > 1) {
-        resolutionRatio = 1;
-      }
-
-      if (resolutionRatio < 0.1) {
-        resolutionRatio = 0.1;
-      }
-
-      if (coverage < 5) {
-        coverage = 5;
-      }
-
-      function preparation(restTime) {
-        var preparaTime = Math.floor(restTime * resolutionRatio);
-        originalTimeout(execution, preparaTime);
-      }
-
-      function execution() {
-        var restTime = destTime - Date.now();
-
-        if (restTime < coverage) {
-          if (restTime < 1) {
-            originalTimeout(trigger, 0);
-          } else {
-            originalTimeout(trigger, restTime);
-          }
-        } else {
-          preparation(restTime);
-        }
-      }
-
-      execution();
-    };
-  }(setTimeout);
-
   var rangeModel = function rangeModel(value, step, sizeBase) {
     var start, end, reverse;
 
@@ -1709,6 +1646,68 @@
 
     return limitOf;
   }();
+  var accurateTimeout = function (originalTimeout) {
+    return function (trigger, time, resolutionRatio, coverage) {
+      if (time === void 0) {
+        time = 0;
+      }
+
+      if (resolutionRatio === void 0) {
+        resolutionRatio = 0.75;
+      }
+
+      if (coverage === void 0) {
+        coverage = 25;
+      }
+
+      var destTime = Date.now() + time;
+
+      if (!isNumber(time)) {
+        time = 0;
+      }
+
+      if (!isNumber(resolutionRatio)) {
+        resolutionRatio = 0.75;
+      }
+
+      if (!isNumber(coverage)) {
+        resolutionRatio = 25;
+      }
+
+      if (resolutionRatio > 1) {
+        resolutionRatio = 1;
+      }
+
+      if (resolutionRatio < 0.1) {
+        resolutionRatio = 0.1;
+      }
+
+      if (coverage < 5) {
+        coverage = 5;
+      }
+
+      function preparation(restTime) {
+        var preparaTime = Math.floor(restTime * resolutionRatio);
+        originalTimeout(execution, preparaTime);
+      }
+
+      function execution() {
+        var restTime = destTime - Date.now();
+
+        if (restTime < coverage) {
+          if (restTime < 1) {
+            originalTimeout(trigger, 0);
+          } else {
+            originalTimeout(trigger, restTime);
+          }
+        } else {
+          preparation(restTime);
+        }
+      }
+
+      execution();
+    };
+  }(setTimeout);
 
   //정의역과 치역을 계산하여 결과값을 리턴함, 속성별로 정의하여 다중 차원 지원
 
@@ -5679,7 +5678,6 @@
     deep: deep,
     times: times,
     forMap: forMap$1,
-    accurateTimeout: accurateTimeout,
     matchString: matchString,
     findIndex: findIndex,
     findIndexes: findIndexes$1,
@@ -5700,6 +5698,7 @@
     timestampExp: timestampExp,
     timescaleExp: timescaleExp,
     limitOf: limitOf,
+    accurateTimeout: accurateTimeout,
     entries: entries,
     keys: keys,
     deepEntries: deepEntries,
