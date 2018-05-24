@@ -17,8 +17,6 @@ import {
   all
 } from './enumerable'
 
-import _get from 'lodash/get';
-
 //reducer.spec.js
 export const matchString = (it,search,at=0)=>{
   if(typeof it !== "string") throw new Error(`matchString :: worng argument ${it}`);
@@ -146,9 +144,9 @@ export const hasValueProperty = function(obj,value,key){
   if(isArray(obj)) for(var i=0,l=obj.length;i<l;i++) if(obj[i] === value) return true;
   if(likeObject(obj)){
     if(key){
-      return _get(obj,key) === value;
+      return get(obj,key) === value;
     } else {
-      for(var key in obj) if(_get(obj,key) === value) return true;
+      for(var key in obj) if(get(obj,key) === value) return true;
     }
   }
   return false;

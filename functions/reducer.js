@@ -1,25 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.function.name", "core-js/modules/es6.array.sort", "core-js/modules/es6.number.constructor", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.constructor", "core-js/modules/es6.regexp.replace", "./isLike", "./cast", "./enumerable", "lodash/get"], factory);
+    define(["exports", "core-js/modules/es6.function.name", "core-js/modules/es6.array.sort", "core-js/modules/es6.number.constructor", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.constructor", "core-js/modules/es6.regexp.replace", "./isLike", "./cast", "./enumerable"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.function.name"), require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.constructor"), require("core-js/modules/es6.regexp.replace"), require("./isLike"), require("./cast"), require("./enumerable"), require("lodash/get"));
+    factory(exports, require("core-js/modules/es6.function.name"), require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.constructor"), require("core-js/modules/es6.regexp.replace"), require("./isLike"), require("./cast"), require("./enumerable"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Function, global.es6Array, global.es6Number, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.isLike, global.cast, global.enumerable, global.get);
+    factory(mod.exports, global.es6Function, global.es6Array, global.es6Number, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.isLike, global.cast, global.enumerable);
     global.reducer = mod.exports;
   }
-})(this, function (_exports, _es6Function, _es6Array, _es6Number, _es6Regexp, _es6Regexp2, _es6Regexp3, _es6Regexp4, _isLike, _cast, _enumerable, _get2) {
+})(this, function (_exports, _es6Function, _es6Array, _es6Number, _es6Regexp, _es6Regexp2, _es6Regexp3, _es6Regexp4, _isLike, _cast, _enumerable) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
   _exports.turn = _exports.hasValueProperty = _exports.hasProperty = _exports.get = _exports.top = _exports.cut = _exports.findIndexes = _exports.findIndex = _exports.matchString = void 0;
-  _get2 = _interopRequireDefault(_get2);
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
   //reducer.spec.js
   var matchString = function matchString(it, search, at) {
@@ -213,10 +210,10 @@
 
     if ((0, _isLike.likeObject)(obj)) {
       if (key) {
-        return (0, _get2.default)(obj, key) === value;
+        return get(obj, key) === value;
       } else {
         for (var key in obj) {
-          if ((0, _get2.default)(obj, key) === value) return true;
+          if (get(obj, key) === value) return true;
         }
       }
     }
