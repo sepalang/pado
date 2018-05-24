@@ -233,20 +233,21 @@
   /*
   //// keywords ////
   firstIndex                                           lastIndex
-  startIndex                   endIndex                    |
+   castStart                    castEnd                    |
       |                           |                        |
       |--- casting & castSize ----|                        |
       |     matchIndex            |                        |
       |         |                 |                        |
       |         |--- matchSize ---|                        |
   ____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
-      |-------- fork scope -------|                        |
-      |                           |------ next scope ------|
-      |-------------------- more scope --------------------|
+      |         |-- fork scope ---|
+      |                           |-------- next scope -->>|
+      |         |-- begin scope -->> | after scope --->>   |
+      |--------------------- more scope -->>               |
   
   //// more scope (internal) ////
-   startIndex
-  castingStart                   cursor >> matchString()
+   castStart
+  castingStart                   cursor -->>
       |                            |
   ____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
   
@@ -306,9 +307,9 @@
 
         if (firstMatch[0][0] === -1) {
           firstMatch = [[-1, 0], -1, null];
-        }
+        } //console.log("firstMatch",firstMatch)
+        //next variant
 
-        console.log("firstMatch", firstMatch); //next variant
 
         var _firstMatch = firstMatch,
             _firstMatch$ = _firstMatch[0],
@@ -316,9 +317,9 @@
             matchSize = _firstMatch$[1],
             matchType = _firstMatch[1],
             matchExp = _firstMatch[2];
-        var startIndex = castingStart;
-        var endIndex = matchType === -1 ? lastIndex : matchIndex + matchSize;
-        var castSize = endIndex - startIndex; //next params
+        var castStart = castingStart;
+        var castEnd = matchType === -1 ? lastIndex : matchIndex + matchSize;
+        var castSize = castEnd - castStart; //next params
 
         var matching = {
           matchType: matchType,
@@ -329,20 +330,19 @@
         var casting = {
           firstIndex: firstIndex,
           lastIndex: lastIndex,
-          startIndex: startIndex,
-          endIndex: endIndex,
+          castStart: castStart,
+          castEnd: castEnd,
           castSize: castSize
         };
         var scope = {
-          //inside
           fork: function fork(matchEntries, castFn) {
             var newMatchEntries = rebaseMatches(matches);
             open({
               castingState: {
-                firstIndex: casting.startIndex,
-                lastIndex: casting.endIndex,
-                castingStart: casting.startIndex,
-                cursor: casting.startIndex
+                firstIndex: matching.matchIndex,
+                lastIndex: matching.matchIndex + matchSize,
+                castingStart: matching.matchIndex,
+                cursor: matching.matchIndex
               },
               matchEntries: newMatchEntries,
               castFn: castFn
@@ -353,8 +353,20 @@
               castingState: {
                 firstIndex: firstIndex,
                 lastIndex: lastIndex,
-                castingStart: casting.endIndex,
-                cursor: casting.endIndex
+                castingStart: casting.castEnd,
+                cursor: casting.castEnd
+              },
+              matchEntries: matchEntries,
+              castFn: castFn
+            });
+          },
+          begin: function begin() {
+            open({
+              castingState: {
+                firstIndex: firstIndex,
+                lastIndex: lastIndex,
+                castingStart: casting.matchIndex,
+                cursor: casting.matchIndex
               },
               matchEntries: matchEntries,
               castFn: castFn
@@ -365,8 +377,8 @@
               castingState: {
                 firstIndex: firstIndex,
                 lastIndex: lastIndex,
-                castingStart: startIndex,
-                cursor: casting.endIndex
+                castingStart: castStart,
+                cursor: casting.castEnd
               },
               matchEntries: matchEntries,
               castFn: castFn

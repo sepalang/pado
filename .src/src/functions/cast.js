@@ -150,20 +150,21 @@ export const cloneDeep = function(target){
 /*
 //// keywords ////
 firstIndex                                           lastIndex
-startIndex                   endIndex                    |
+ castStart                    castEnd                    |
     |                           |                        |
     |--- casting & castSize ----|                        |
     |     matchIndex            |                        |
     |         |                 |                        |
     |         |--- matchSize ---|                        |
 ____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
-    |-------- fork scope -------|                        |
-    |                           |------ next scope ------|
-    |-------------------- more scope --------------------|
+    |         |-- fork scope ---|
+    |                           |-------- next scope -->>|
+    |         |-- begin scope -->> | after scope --->>   |
+    |--------------------- more scope -->>               |
 
 //// more scope (internal) ////
- startIndex
-castingStart                   cursor >> matchString()
+ castStart
+castingStart                   cursor -->>
     |                            |
 ____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
 
@@ -208,13 +209,13 @@ export const castString = (function(){
       if(firstMatch[0][0] === -1){
         firstMatch = [[-1, 0], -1, null];
       }
-      console.log("firstMatch",firstMatch)
+      //console.log("firstMatch",firstMatch)
       
       //next variant
       const [[ matchIndex, matchSize ], matchType, matchExp] = firstMatch;
-      const startIndex = castingStart;
-      const endIndex   = matchType === -1 ? lastIndex : (matchIndex + matchSize);
-      const castSize   = endIndex - startIndex;
+      const castStart = castingStart;
+      const castEnd   = matchType === -1 ? lastIndex : (matchIndex + matchSize);
+      const castSize  = castEnd - castStart;
       
       //next params
       const matching = { 
@@ -226,20 +227,19 @@ export const castString = (function(){
       const casting = {
         firstIndex,
         lastIndex,
-        startIndex,
-        endIndex,
+        castStart,
+        castEnd,
         castSize
       };
       const scope = {
-        //inside
         fork (matchEntries,castFn){
           const newMatchEntries = rebaseMatches(matches);
           open({
             castingState:{
-              firstIndex  :casting.startIndex,
-              lastIndex   :casting.endIndex,
-              castingStart:casting.startIndex,
-              cursor      :casting.startIndex
+              firstIndex  :matching.matchIndex,
+              lastIndex   :matching.matchIndex + matchSize,
+              castingStart:matching.matchIndex,
+              cursor      :matching.matchIndex
             }, 
             matchEntries:newMatchEntries,
             castFn
@@ -250,8 +250,20 @@ export const castString = (function(){
             castingState:{
               firstIndex  ,
               lastIndex   ,
-              castingStart:casting.endIndex,
-              cursor      :casting.endIndex
+              castingStart:casting.castEnd,
+              cursor      :casting.castEnd
+            },
+            matchEntries,
+            castFn
+          });
+        },
+        begin (){
+          open({
+            castingState:{
+              firstIndex  ,
+              lastIndex   ,
+              castingStart:casting.matchIndex,
+              cursor      :casting.matchIndex
             },
             matchEntries,
             castFn
@@ -262,8 +274,8 @@ export const castString = (function(){
             castingState:{
               firstIndex  ,
               lastIndex   ,
-              castingStart:startIndex,
-              cursor      :casting.endIndex
+              castingStart:castStart,
+              cursor      :casting.castEnd
             },
             matchEntries,
             castFn

@@ -1,18 +1,18 @@
 import { castString } from '../../src';
 
 const testResult = castString(`hello.world`,["."],({
-  content, props:{ path }, 
-  startIndex, endIndex, 
-  matchType, matchIndex, 
+  content, props:{ path }, matchExp,
+  castStart, castEnd, matchIndex, 
   next
 })=>{
-  if(matchType === 0){
-    path.push( content.substring(startIndex, matchIndex) )
+  switch(matchExp){
+  case ".":
+    path.push( content.substring(castStart, matchIndex) )
     next();
-  }
-  
-  if(matchType === -1){
-    path.push( content.substring(startIndex, endIndex) )
+    break;
+  case null:
+    path.push( content.substring(castStart, castEnd) );
+    break;
   }
 },{ path:[] });
 
