@@ -14,9 +14,7 @@
     "build:pack": "padoc --pack .src/src/pado.js ./pado.js -m umd -n pado -s",
     "build": "npm run clear:dist && npm run build:default && npm run build:pack",
     "test": "padoc --test .src/test --verbose",
-    "labp": "padoc --pack .src/sample/labs/entry.js .src/sample/labs/pack.sample.js",
-    "labe": "padoc --exec .src/sample/labs/entry.js -i",
-    "labn": "node .src/sample/labs/pack.sample.js --interactive",
+    "labp": "padoc --pack .src/sample/labs/entry.a.js .src/sample/labs/pack.a.sample.js && padoc --pack .src/sample/labs/entry.b.js .src/sample/labs/pack.b.sample.js",
     "t": "padoc --exec .src/sample/use/cast.use.js"
   },
   "author": "AHN HO JUNG",
