@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike", "./reducer"], factory);
+    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike", "./reducer", "./shadow"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"), require("./reducer"));
+    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"), require("./reducer"), require("./shadow"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike, global.reducer);
+    factory(mod.exports, global.es6Array, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike, global.reducer, global.shadow);
     global.cast = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Array2, _es6Object, _webDom, _es6Regexp, _es6Regexp2, _isLike, _reducer) {
+})(this, function (_exports, _es6Array, _es6Array2, _es6Object, _webDom, _es6Regexp, _es6Regexp2, _isLike, _reducer, _shadow) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.castPath = _exports.castString = _exports.cloneDeep = _exports.clone = _exports.deepEntries = _exports.keys = _exports.entries = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
+  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.castPath = _exports.castString = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
 
   function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
@@ -110,47 +110,6 @@
 
   _exports.cleanObject = cleanObject;
 
-  var entries = function entries(it) {
-    var result = [];
-
-    switch (typeof it) {
-      case "object":
-        (0, _isLike.isNone)(it) ? 0 : (0, _isLike.likeArray)(it) ? asArray(it).forEach(function (v, k) {
-          result.push([k, v]);
-        }) : Object.keys(it).forEach(function (key) {
-          result.push([key, it[key]]);
-        });
-        break;
-    }
-
-    return result;
-  };
-
-  _exports.entries = entries;
-
-  var keys = function keys(target, filterExp) {
-    var result = [];
-    var filter = typeof filterExp === "function" ? filterExp : function () {
-      return true;
-    };
-    (0, _isLike.likeArray)(target) && Object.keys(target).filter(function (key) {
-      !isNaN(key) && filter(key, target) && result.push(parseInt(key, 10));
-    }) || (0, _isLike.likeObject)(target) && Object.keys(target).forEach(function (key) {
-      filter(key, target) && result.push(key);
-    });
-    return result;
-  };
-
-  _exports.keys = keys;
-
-  var deepEntries = function deepEntries(target, filter) {
-    if ((0, _isLike.likeArray)(target)) {}
-
-    if ((0, _isLike.likeObject)(target)) {}
-  };
-
-  _exports.deepEntries = deepEntries;
-
   var clone = function clone(target) {
     switch (typeof target) {
       case "undefined":
@@ -235,7 +194,7 @@
 
   var castString = function () {
     var rebaseMatches = function rebaseMatches(matches) {
-      return entries(asArray(matches));
+      return (0, _shadow.entries)(asArray(matches));
     };
 
     return function (text, matches, castFn, props) {
