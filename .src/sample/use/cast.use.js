@@ -1,12 +1,17 @@
 import { castString } from '../../src';
 
-const testResult = castString(`hello.world`,["."],({
+const testResult = castString(`hello[world]`,["["],({
   content, props:{ path }, matchExp,
   castStart, castEnd, matchIndex, 
   next
 })=>{
   switch(matchExp){
-  case ".":
+  case "[":
+    begin(["[","]"],({
+      matchExp, castStart, castEnd
+    })=>{
+      
+    });
     path.push( content.substring(castStart, matchIndex) )
     next();
     break;

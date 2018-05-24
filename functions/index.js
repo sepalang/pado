@@ -6,17 +6,17 @@ require("core-js/modules/web.dom.iterable");
 
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./functions", "./isLike", "./cast", "./enumerable", "./accurate", "./reducer", "./random", "./matrix", "./datetime"], factory);
+    define(["exports", "./functions", "./isLike", "./cast", "./enumerable", "./accurate", "./reducer", "./random", "./matrix", "./datetime", "./nice"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./functions"), require("./isLike"), require("./cast"), require("./enumerable"), require("./accurate"), require("./reducer"), require("./random"), require("./matrix"), require("./datetime"));
+    factory(exports, require("./functions"), require("./isLike"), require("./cast"), require("./enumerable"), require("./accurate"), require("./reducer"), require("./random"), require("./matrix"), require("./datetime"), require("./nice"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.functions, global.isLike, global.cast, global.enumerable, global.accurate, global.reducer, global.random, global.matrix, global.datetime);
+    factory(mod.exports, global.functions, global.isLike, global.cast, global.enumerable, global.accurate, global.reducer, global.random, global.matrix, global.datetime, global.nice);
     global.index = mod.exports;
   }
-})(this, function (_exports, _functions, _isLike, _cast, _enumerable, _accurate, _reducer, _random, _matrix, _datetime) {
+})(this, function (_exports, _functions, _isLike, _cast, _enumerable, _accurate, _reducer, _random, _matrix, _datetime, _nice) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -100,6 +100,15 @@ require("core-js/modules/web.dom.iterable");
       enumerable: true,
       get: function get() {
         return _datetime[key];
+      }
+    });
+  });
+  Object.keys(_nice).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(_exports, key, {
+      enumerable: true,
+      get: function get() {
+        return _nice[key];
       }
     });
   });

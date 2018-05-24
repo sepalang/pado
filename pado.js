@@ -2904,6 +2904,52 @@
     return scale;
   };
 
+  var limitOf = function () {
+    var limitNumber = function limitNumber(number, max, min) {
+      if (typeof number == "number") {
+        if (isAbsoluteNaN(number) || number === Infinity) {
+          return min;
+        }
+
+        if (isNumber(min) && number < min) {
+          return min;
+        }
+
+        if (isNumber(max) && number > max) {
+          return max;
+        }
+      }
+
+      return number;
+    };
+
+    var limitOf = function limitOf(numbers, max, min) {
+      if (typeof max !== "number") {
+        max = Number.POSITIVE_INFINITY;
+      }
+
+      if (typeof min !== "number") {
+        if (min === null || isAbsoluteNaN(min)) {
+          min = Number.NEGATIVE_INFINITY;
+        } else {
+          min = 0;
+        }
+      }
+
+      if (isArray(numbers)) {
+        for (var d = numbers, i = 0, l = d.length; i < l; i++) {
+          d[i] = limitNumber(d[i], max, min);
+        }
+
+        return numbers;
+      } else {
+        return limitNumber(numbers, max, min);
+      }
+    };
+
+    return limitOf;
+  }();
+
   //정의역과 치역을 계산하여 결과값을 리턴함, 속성별로 정의하여 다중 차원 지원
 
   var Block = function Block(posSize, syncOpt) {
@@ -5872,6 +5918,56 @@
     return inst;
   };
 
+  var Limitter = function Limitter(max, min) {
+    this.value = 0;
+
+    if (typeof max !== "number" || isAbsoluteNaN(min)) {
+      this.maximum = Number.POSITIVE_INFINITY;
+    } else {
+      this.maximum = max;
+    }
+
+    if (typeof min !== "number" || isAbsoluteNaN(min)) {
+      this.minimum = 0;
+    } else {
+      this.minimum = min;
+    }
+  };
+  var LimitterPrototype = {
+    expectIn: function expectIn(setValue) {
+      return setValue === limitOf(setValue, this.maximum, this.minimum);
+    },
+    expectOut: function expectOut(setValue) {
+      return setValue !== limitOf(setValue, this.maximum, this.minimum);
+    },
+    addExpectIn: function addExpectIn(addValue) {
+      var destValue = this.value + addValue;
+      return destValue === limitOf(destValue, this.maximum, this.minimum);
+    },
+    addExpectOut: function addExpectOut(addValue) {
+      var destValue = this.value + addValue;
+      return destValue !== limitOf(destValue, this.maximum, this.minimum);
+    },
+    set: function set(setValue) {
+      this.value = setValue;
+    },
+    add: function add(addValue) {
+      this.value = this.value + addValue;
+      return this;
+    }
+  };
+  Object.defineProperties(LimitterPrototype, {
+    done: {
+      get: function get() {
+        return this.value === limitOf(this.value, this.maximum, this.minimum);
+      }
+    }
+  });
+  Limitter.prototype = LimitterPrototype;
+  var ranger = function ranger(max, min) {
+    return new Limitter(max, min);
+  };
+
 
 
   var functions = /*#__PURE__*/Object.freeze({
@@ -5950,6 +6046,7 @@
     dateExp: dateExp,
     timestampExp: timestampExp,
     timescaleExp: timescaleExp,
+    limitOf: limitOf,
     promise: promise,
     space: space,
     block: block,
@@ -5968,7 +6065,9 @@
     Paginate: Paginate,
     paginate: paginate,
     operate: operate,
-    session: session
+    session: session,
+    Limitter: Limitter,
+    ranger: ranger
   });
 
   var Bow = function Bow() {};
