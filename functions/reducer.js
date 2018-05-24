@@ -27,10 +27,7 @@
       at = 0;
     }
 
-    if (typeof search === "string") {
-      search = search.replace(new RegExp("\\.", "g"), "\\.");
-    }
-
+    if (typeof search === "string") search = search.replace(new RegExp("\\.", "g"), "\\.");
     var result = it.substr(at).match(search);
     return result ? [result.index + at, result[0].length] : [-1, 0];
   };

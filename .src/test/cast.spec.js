@@ -1,5 +1,25 @@
-import { entries, keys } from '../src/functions/cast';
+import { castString, entries, keys } from '../src/functions/cast';
 describe('Functions cast', () => {
+  
+  it('castString', () => {
+    const { props:{ path:castPath } } = castString(`hello.world`,["."],({ 
+      content, props:{ path }, 
+      startIndex, endIndex, 
+      matchType, matchIndex, 
+      next
+    })=>{
+      if(matchType === 0){
+        path.push( content.substring(startIndex, matchIndex) )
+        next();
+      }
+      if(matchType === -1){
+        path.push( content.substring(startIndex, endIndex) )
+      }
+    },{ path:[] });
+    
+    expect( castPath ).toEqual(['hello','world']);
+    
+  });
   
   const dummyInstance = getInstance();
   

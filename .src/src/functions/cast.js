@@ -10,7 +10,7 @@ import {
 } from './isLike'
 
 import {
-  findIndex,
+  matchString,
   top
 } from './reducer'
 
@@ -147,80 +147,136 @@ export const cloneDeep = function(target){
 };
 
 //reducer.spec.js
+/*
+//// keywords ////
+firstIndex                                           lastIndex
+startIndex                   endIndex                    |
+    |                           |                        |
+    |--- casting & castSize ----|                        |
+    |     matchIndex            |                        |
+    |         |                 |                        |
+    |         |--- matchSize ---|                        |
+____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
+    |-------- fork scope -------|                        |
+    |                           |------ next scope ------|
+    |-------------------- more scope --------------------|
+
+//// more scope (internal) ////
+ startIndex
+castingStart                   cursor >> matchString()
+    |                            |
+____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
+
+*/
 export const castString = (function(){
   
   const rebaseMatches = matches=>entries(asArray(matches));
   
-  return function(text,matches,castFn,property){
+  return function(text,matches,castFn,props){
 
     const payload = {
-      contentOffset:0,
       content:text,
-      property
+      props
     };
   
     const newMatchEntries = rebaseMatches(matches);
   
     const castingState = {
+      firstIndex:0,
+      lastIndex:text.length,
       castingStart:0,
       cursor:0
     };
     
-    if(typeof property === "object" && isNumber(property.start)){
-      castingState.castingStart = property.start;
-      castingState.cursor       = property.start;
+    if(typeof props === "object" && isNumber(props.start)){
+      castingState.castingStart = props.start;
+      castingState.cursor       = props.start;
     }
 
-    const open = function({ castingState:{ castingStart, cursor }, matchEntries, castFn }){
+    const open = function({ castingState:{ firstIndex, lastIndex, castingStart, cursor }, matchEntries, castFn }){
+      
       //find match
-      const firstMatch = top(
-        matchEntries.map(([matchType, matchExp])=>[findIndex(text,matchExp), matchType, matchExp]),
-        ([a,aPriority],[b,bPriority])=>a==b?aPriority<bPriority:a<b
+      let firstMatch = top(
+        matchEntries.map(([matchType, matchExp])=>([matchString(text,matchExp,cursor), matchType, matchExp])),
+        ([a,aPriority],[b,bPriority])=>(a[0]==b[0]?aPriority<bPriority:a[0]<b[0])
       );
-      if(!firstMatch){ return }
-    
-      const [matchIndex, matchType, matchExp, matchLength] = firstMatch;
-      if(matchIndex===-1){ return }
-    
-      const nextIndex = matchIndex+1;
-      const endIndex  = matchIndex+matchLength;
       
-      //
-      const matching = {
-        matchType,
-        matchExp
-      };
+      // top match is not exsist
+      if(!firstMatch){ return; }
       
-      const casting = {
-        startIndex :castingStart,
-        endIndex   :matchIndex,
+      // unmatched
+      if(firstMatch[0][0] === -1){
+        firstMatch = [[-1, 0], -1, null];
+      }
+      console.log("firstMatch",firstMatch)
+      
+      //next variant
+      const [[ matchIndex, matchSize ], matchType, matchExp] = firstMatch;
+      const startIndex = castingStart;
+      const endIndex   = matchType === -1 ? lastIndex : (matchIndex + matchSize);
+      const castSize   = endIndex - startIndex;
+      
+      //next params
+      const matching = { 
+        matchType, 
+        matchExp,
         matchIndex,
-        nextIndex
+        matchSize
       };
-    
+      const casting = {
+        firstIndex,
+        lastIndex,
+        startIndex,
+        endIndex,
+        castSize
+      };
       const scope = {
+        //inside
         fork (matchEntries,castFn){
           const newMatchEntries = rebaseMatches(matches);
-          open({castingState:{castingStart:casting.startIndex, cursor:casting.endIndex}, matchEntries:newMatchEntries, castFn});
+          open({
+            castingState:{
+              firstIndex  :casting.startIndex,
+              lastIndex   :casting.endIndex,
+              castingStart:casting.startIndex,
+              cursor      :casting.startIndex
+            }, 
+            matchEntries:newMatchEntries,
+            castFn
+          });
         },
         next (){
-          open({castingState:{castingStart:casting.startIndex, cursor:casting.endIndex}, matchEntries, castFn});
+          open({
+            castingState:{
+              firstIndex  ,
+              lastIndex   ,
+              castingStart:casting.endIndex,
+              cursor      :casting.endIndex
+            },
+            matchEntries,
+            castFn
+          });
         },
-        skip (){
-          open({castingState:{castingStart:casting.startIndex, cursor:casting.endIndex}, matchEntries, castFn});
+        more (){
+          open({
+            castingState:{
+              firstIndex  ,
+              lastIndex   ,
+              castingStart:startIndex,
+              cursor      :casting.endIndex
+            },
+            matchEntries,
+            castFn
+          });
         }
       };
-    
       castFn({
-        payload,
-        matching,
-        casting,
-        scope
+        ...payload,
+        ...matching,
+        ...casting,
+        ...scope
       });
-    
     };
-    
-    console.log("open castingState",castingState)
     
     open({
       castingState,
@@ -243,7 +299,7 @@ export const castPath = function(pathParam){
     
     if(typeof pathParam === "string"){
       const { meta:{ result } } = castString(pathParam,[".","["],({ 
-        payload :{ content, contentOffset, property:path },
+        payload :{ content, property:path },
         matching:{ matchType, nextIndex },
         casting :{ startIndex, endIndex },
         scope   :{ next, fork }

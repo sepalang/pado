@@ -1,17 +1,21 @@
 import { castString } from '../../src';
 
+const testResult = castString(`hello.world`,["."],({
+  content, props:{ path }, 
+  startIndex, endIndex, 
+  matchType, matchIndex, 
+  next
+})=>{
+  if(matchType === 0){
+    path.push( content.substring(startIndex, matchIndex) )
+    next();
+  }
+  
+  if(matchType === -1){
+    path.push( content.substring(startIndex, endIndex) )
+  }
+},{ path:[] });
 
+const { props:{path:pathResult} } = testResult;
 
-//const testResult = castString("hello.world",["."],({ 
-//  payload :{ content, contentOffset, property:{ path } },
-//  matching:{ matchType, nextIndex },
-//  casting :{ startIndex, endIndex },
-//  scope   :{ next, fork }
-//})=>{
-//  if(matchType === 0){
-//    path.push(content.substring(startIndex, endIndex));
-//    next(nextIndex);
-//  }
-//},{ path:[] });
-//
-//console.log("testResult",testResult);
+console.log("testResult",pathResult);

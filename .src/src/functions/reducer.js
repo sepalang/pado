@@ -21,10 +21,7 @@ import _get from 'lodash/get';
 
 //reducer.spec.js
 export const matchString = (it,search,at=0)=>{
-  if(typeof search === "string"){
-    search = search.replace(new RegExp("\\.","g"),"\\.");
-  }
-  
+  if(typeof search === "string") search = search.replace(new RegExp("\\.","g"),"\\.");
   const result = it.substr(at).match(search);
   return result ? [result.index+at, result[0].length] : [-1, 0];
 };
