@@ -159,7 +159,7 @@ firstIndex                                           lastIndex
 ____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
     |         |-- fork scope ---|
     |                           |-------- next scope -->>|
-    |         |-- begin scope -->> | after scope --->>   |
+    |         |-- begin scope -->> | after scope -->>-->>|
     |--------------------- more scope -->>               |
 
 //// more scope (internal) ////
