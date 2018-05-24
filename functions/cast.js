@@ -228,30 +228,7 @@
     } else {
       clone(target);
     }
-  }; //reducer.spec.js
-
-  /*
-  //// keywords ////
-  firstIndex                                           lastIndex
-   castStart                    castEnd                    |
-      |                           |                        |
-      |--- casting & castSize ----|                        |
-      |     matchIndex            |                        |
-      |         |                 |                        |
-      |         |--- matchSize ---|                        |
-  ____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
-      |         |-- fork scope ---|
-      |                           |-------- next scope -->>|
-      |         |-- begin scope -->> | after scope --->>   |
-      |--------------------- more scope -->>               |
-  
-  //// more scope (internal) ////
-   castStart
-  castingStart                   cursor -->>
-      |                            |
-  ____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
-  
-  */
+  }; //cast.castString.spec.js
 
 
   _exports.cloneDeep = cloneDeep;
@@ -286,29 +263,35 @@
             castingStart = _ref2$castingState.castingStart,
             cursor = _ref2$castingState.cursor,
             matchEntries = _ref2.matchEntries,
-            castFn = _ref2.castFn;
-        //find match
-        var firstMatch = (0, _reducer.top)(matchEntries.map(function (_ref3) {
+            castFn = _ref2.castFn,
+            parentScope = _ref2.parentScope;
+
+        if (cursor >= lastIndex) {
+          return false;
+        } //find match
+
+
+        var matchesMap = matchEntries.map(function (_ref3) {
           var matchType = _ref3[0],
               matchExp = _ref3[1];
           return [(0, _reducer.matchString)(text, matchExp, cursor), matchType, matchExp];
-        }), function (_ref4, _ref5) {
+        });
+        var firstMatch = (0, _reducer.top)(matchesMap, function (_ref4, _ref5) {
           var a = _ref4[0],
               aPriority = _ref4[1];
           var b = _ref5[0],
               bPriority = _ref5[1];
-          return a[0] == b[0] ? aPriority < bPriority : a[0] < b[0];
+          return a[0] < 0 ? true : b[0] < 0 ? false : a[0] == b[0] ? aPriority < bPriority : a[0] > b[0];
         }); // top match is not exsist
 
         if (!firstMatch) {
-          return;
+          return false;
         } // unmatched
 
 
         if (firstMatch[0][0] === -1) {
           firstMatch = [[-1, 0], -1, null];
-        } //console.log("firstMatch",firstMatch)
-        //next variant
+        } //next variant
 
 
         var _firstMatch = firstMatch,
@@ -319,13 +302,15 @@
             matchExp = _firstMatch[2];
         var castStart = castingStart;
         var castEnd = matchType === -1 ? lastIndex : matchIndex + matchSize;
-        var castSize = castEnd - castStart; //next params
+        var castSize = castEnd - castStart;
+        var skipSize = castSize - matchSize; //next params
 
         var matching = {
           matchType: matchType,
           matchExp: matchExp,
           matchIndex: matchIndex,
-          matchSize: matchSize
+          matchSize: matchSize,
+          skipSize: skipSize
         };
         var casting = {
           firstIndex: firstIndex,
@@ -345,32 +330,41 @@
                 cursor: matching.matchIndex
               },
               matchEntries: newMatchEntries,
-              castFn: castFn
+              castFn: castFn,
+              parentScope: parentScope
             });
           },
-          next: function next() {
+          next: function next(needCursor) {
+            var cursorTo = (0, _isLike.isNumber)(needCursor) ? needCursor : casting.castEnd;
             open({
               castingState: {
                 firstIndex: firstIndex,
                 lastIndex: lastIndex,
-                castingStart: casting.castEnd,
-                cursor: casting.castEnd
+                castingStart: cursorTo,
+                cursor: cursorTo
               },
               matchEntries: matchEntries,
-              castFn: castFn
+              castFn: castFn,
+              parentScope: parentScope
             });
           },
-          begin: function begin() {
+          enter: function enter(enterMatches, enterCastFn) {
             open({
               castingState: {
                 firstIndex: firstIndex,
                 lastIndex: lastIndex,
-                castingStart: casting.matchIndex,
-                cursor: casting.matchIndex
+                castingStart: matching.matchIndex,
+                cursor: matching.matchIndex
               },
-              matchEntries: matchEntries,
-              castFn: castFn
+              matchEntries: rebaseMatches(enterMatches),
+              castFn: enterCastFn,
+              parentScope: {
+                next: scope.next
+              }
             });
+          },
+          exit: function exit(needCursor) {
+            parentScope && parentScope.next((0, _isLike.isNumber)(needCursor) ? needCursor : casting.castEnd);
           },
           more: function more() {
             open({
@@ -381,11 +375,13 @@
                 cursor: casting.castEnd
               },
               matchEntries: matchEntries,
-              castFn: castFn
+              castFn: castFn,
+              parentScope: parentScope
             });
           }
         };
         castFn(_objectSpread({}, payload, matching, casting, scope));
+        return true;
       };
 
       open({

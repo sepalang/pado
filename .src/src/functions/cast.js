@@ -146,29 +146,7 @@ export const cloneDeep = function(target){
   }
 };
 
-//reducer.spec.js
-/*
-//// keywords ////
-firstIndex                                           lastIndex
- castStart                    castEnd                    |
-    |                           |                        |
-    |--- casting & castSize ----|                        |
-    |     matchIndex            |                        |
-    |         |                 |                        |
-    |         |--- matchSize ---|                        |
-____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
-    |         |-- fork scope ---|
-    |                           |-------- next scope -->>|
-    |         |-- begin scope -->> | after scope -->>-->>|
-    |--------------------- more scope -->>               |
-
-//// more scope (internal) ////
- castStart
-castingStart                   cursor -->>
-    |                            |
-____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
-
-*/
+//cast.castString.spec.js
 export const castString = (function(){
   
   const rebaseMatches = matches=>entries(asArray(matches));
@@ -194,35 +172,42 @@ export const castString = (function(){
       castingState.cursor       = props.start;
     }
 
-    const open = function({ castingState:{ firstIndex, lastIndex, castingStart, cursor }, matchEntries, castFn }){
+    const open = function({ castingState:{ firstIndex, lastIndex, castingStart, cursor }, matchEntries, castFn, parentScope }){
+      
+      if(cursor>=lastIndex){
+        return false;
+      }
       
       //find match
-      let firstMatch = top(
-        matchEntries.map(([matchType, matchExp])=>([matchString(text,matchExp,cursor), matchType, matchExp])),
-        ([a,aPriority],[b,bPriority])=>(a[0]==b[0]?aPriority<bPriority:a[0]<b[0])
-      );
+      const matchesMap = matchEntries.map(([matchType, matchExp])=>([matchString(text,matchExp,cursor), matchType, matchExp]));
+      let firstMatch   = top(matchesMap,([a,aPriority],[b,bPriority])=>(
+        a[0]<0?true:
+        b[0]<0?false:
+        a[0]==b[0]?aPriority<bPriority:a[0]>b[0]
+      ));
       
       // top match is not exsist
-      if(!firstMatch){ return; }
+      if(!firstMatch){ return false; }
       
       // unmatched
       if(firstMatch[0][0] === -1){
         firstMatch = [[-1, 0], -1, null];
       }
-      //console.log("firstMatch",firstMatch)
-      
+
       //next variant
       const [[ matchIndex, matchSize ], matchType, matchExp] = firstMatch;
       const castStart = castingStart;
       const castEnd   = matchType === -1 ? lastIndex : (matchIndex + matchSize);
       const castSize  = castEnd - castStart;
+      const skipSize  = castSize - matchSize;
       
       //next params
       const matching = { 
         matchType, 
         matchExp,
         matchIndex,
-        matchSize
+        matchSize,
+        skipSize
       };
       const casting = {
         firstIndex,
@@ -242,32 +227,41 @@ export const castString = (function(){
               cursor      :matching.matchIndex
             }, 
             matchEntries:newMatchEntries,
-            castFn
+            castFn,
+            parentScope
           });
         },
-        next (){
+        next (needCursor){
+          const cursorTo = isNumber(needCursor) ? needCursor : casting.castEnd;
           open({
             castingState:{
               firstIndex  ,
               lastIndex   ,
-              castingStart:casting.castEnd,
-              cursor      :casting.castEnd
+              castingStart:cursorTo,
+              cursor      :cursorTo
             },
             matchEntries,
-            castFn
+            castFn,
+            parentScope
           });
         },
-        begin (){
+        enter (enterMatches,enterCastFn){
           open({
             castingState:{
               firstIndex  ,
               lastIndex   ,
-              castingStart:casting.matchIndex,
-              cursor      :casting.matchIndex
+              castingStart:matching.matchIndex,
+              cursor      :matching.matchIndex
             },
-            matchEntries,
-            castFn
+            matchEntries:rebaseMatches(enterMatches),
+            castFn:enterCastFn,
+            parentScope:{
+              next:scope.next
+            }
           });
+        },
+        exit (needCursor){
+          parentScope && parentScope.next(isNumber(needCursor) ? needCursor : casting.castEnd);
         },
         more (){
           open({
@@ -278,16 +272,20 @@ export const castString = (function(){
               cursor      :casting.castEnd
             },
             matchEntries,
-            castFn
+            castFn,
+            parentScope
           });
         }
       };
+      
       castFn({
         ...payload,
         ...matching,
         ...casting,
         ...scope
       });
+      
+      return true;
     };
     
     open({

@@ -1,40 +1,6 @@
-import { castString, entries, keys } from '../src/functions/cast';
+import { entries, keys } from '../src/functions/cast';
+
 describe('Functions cast', () => {
-  
-  it('castString matchIndex', () => {
-    const { props:{ path:castPath } } = castString(`hello.world.!!.abc`,["."],({ 
-      content, props:{ path }, matchType, castStart, castEnd, matchIndex, next
-    })=>{
-      if(matchType === 0){
-        path.push( content.substring(castStart, matchIndex) );
-        next();
-      }
-      if(matchType === -1){
-        path.push( content.substring(castStart, castEnd) );
-      }
-    },{ path:[] });
-    
-    expect( castPath ).toEqual(['hello','world','!!','abc']);
-  });
-  
-  it('castString matchExp', () => {
-    const { props:{ path:castPath } } = castString(`hello.world.!!.abc`,["."],({
-      content, props:{ path }, matchExp, castStart, castEnd, matchIndex, next
-    })=>{
-      switch(matchExp){
-      case ".":
-        path.push( content.substring(castStart, matchIndex) )
-        next();
-        break;
-      case null:
-        path.push( content.substring(castStart, castEnd) );
-        break;
-      }
-    },{ path:[] });
-    
-    expect( castPath ).toEqual(['hello','world','!!','abc']);
-  });
-  
   const dummyInstance = getInstance();
   
   it('entries', () => {

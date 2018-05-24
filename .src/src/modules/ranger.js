@@ -32,6 +32,7 @@ const LimitterPrototype = {
   },
   set:function(setValue){
     this.value = setValue;
+    return this;
   },
   add:function(addValue){
     this.value = this.value + addValue;

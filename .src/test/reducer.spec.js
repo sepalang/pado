@@ -10,6 +10,9 @@ describe('Functions reducer', () => {
     expect( matchString("hello.world",/l.o/) ).toEqual([2,3])
     expect( matchString("hello.world",/o.w/) ).toEqual([4,3])
     
+    expect( matchString("abcd","c") ).toEqual([2,1]);
+    expect( matchString("abcd","c",2) ).toEqual([2,1]);
+    
     expect( matchString("hello.world",/l./,5) ).toEqual([9,2])
     expect( matchString("hello.world",/l.o/,5) ).toEqual([-1,0])
     

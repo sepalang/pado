@@ -52,6 +52,7 @@
     },
     set: function set(setValue) {
       this.value = setValue;
+      return this;
     },
     add: function add(addValue) {
       this.value = this.value + addValue;

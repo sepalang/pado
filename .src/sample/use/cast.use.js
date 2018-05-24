@@ -1,23 +1,27 @@
-import { castString } from '../../src';
+import { castString, ranger } from '../../src';
 
-const testResult = castString(`hello[world]`,["["],({
+const testResult = castString(`hello[world][inner][world].props`,["["],({
   content, props:{ path }, matchExp,
-  castStart, castEnd, matchIndex, 
-  next
+  castStart, castEnd, castSize, skipSize,
+  enter, next
 })=>{
-  switch(matchExp){
-  case "[":
-    begin(["[","]"],({
-      matchExp, castStart, castEnd
-    })=>{
-      
+  if(matchExp === "["){
+    const stack = ranger(0);
+    skipSize && path.push( content.substr(castStart, skipSize) );
+    enter(["[","]"],({ matchExp, castStart, castEnd, more, exit })=>{
+      if(matchExp === "[") stack.add(1);
+      if(matchExp === "]") stack.add(-1);
+      if(matchExp === null) return;
+      if(stack.done){
+        path.push( content.substring(castStart, castEnd) );
+        exit();
+      } else {
+        more();
+      }
     });
-    path.push( content.substring(castStart, matchIndex) )
-    next();
-    break;
-  case null:
+  }
+  if(matchExp === null){
     path.push( content.substring(castStart, castEnd) );
-    break;
   }
 },{ path:[] });
 
