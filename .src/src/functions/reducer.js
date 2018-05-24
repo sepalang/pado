@@ -9,16 +9,24 @@ import {
 } from './isLike'
 
 import {
-  asArray
+  asArray,
+  castPath
 } from './cast'
 
 import {
   all
-} from './enumerator'
+} from './enumerable'
 
 import _get from 'lodash/get';
 
 //reducer.spec.js
+export const matchString = (it,search,at=0)=>{
+  if(typeof it !== "string") throw new Error(`matchString :: worng argument ${it}`);
+  if(typeof search === "string") search = search.replace(new RegExp("(\\.|\\[|\\])","g"),s=>`\\${s}`);
+  const result = it.substr(at).match(search);
+  return result ? [result.index+at, result[0].length] : [-1, 0];
+};
+
 export const findIndex = (function(){
   const __find_string = (it,search,at)=>it.indexOf(search,at);
   const __find_regexp = (it,search,at)=>{
@@ -73,8 +81,16 @@ export const cut = function(collection,cutLength=1,emptyDefault=undefined){
 
 //reducer.spec.js
 export const top = function(data,iteratee,topLength){
-  if(typeof iteratee !== "function"){
+  switch(typeof iteratee){
+  case "function":
+    //iteratee=iteratee;
+    break;
+  case "boolean":
+    iteratee=iteratee?(a,b)=>a<b:(a,b)=>a>b;
+    break;
+  default:
     iteratee=(a,b)=>a<b;
+    break;
   }
   
   if(typeof topLength === "boolean"){
@@ -84,77 +100,6 @@ export const top = function(data,iteratee,topLength){
   return isNumber(topLength) || isInfinity(topLength) ?
   asArray(data).sort((a,b)=>iteratee(a,b)).splice(0,topLength):
   asArray(data).sort((a,b)=>iteratee(a,b))[0];
-};
-
-//
-export const castString = function(text,matches,castFn,property){
-  let cursorStart = isNumber(property.start) && property.start > 0 ? property.start : 0;
-  let cursorEnd   = isNumber(property.end) ? property.end : text.length;
-  let cursor      = cursorStart;
-  
-  const open = function({ cursorStart, cursorEnd, cursor, matches }){
-    max(matches.map(matchExp=>{
-      findIndex()
-    }));
-  };
-  
-  open({
-    cursorStart,
-    cursorEnd,
-    cursor,
-    matches
-  })
-  
-  return property;
-};
-
-export const castPath = function(pathParam){
-  if(isArray(pathParam)){
-    return pathParam;
-  }
-  if(likeString(pathParam)){
-    if(isNumber(pathParam)){
-      return [pathParam]
-    }
-    if(typeof pathParam === "string"){
-      const { meta:{ result } } = castString(pathParam,[".","["],({ property:{ meta }, matchType, match, casting, fork, nextIndex, next, skip })=>{
-        switch(matchType){
-        // "."
-        case 0:
-          meta.push(casting);
-          next(nextIndex);
-          break;
-        // "]"
-        case 1:
-          let [lead, feet] = [1, 0];
-          
-          fork(["[","]"],({ matchType, match, casting, nextIndex , next, skip })=>{
-            matchType === 0 && lead++;
-            matchType === 1 && feet++;
-            
-            if(lead === feet){
-              meta.push(casting.substr(1))
-              next(nextIndex);
-            } else {
-              skip();
-            }
-          });
-          break;
-        //end
-        case -1:
-          meta.push(casting);
-          break;
-        default:
-          skip();
-          break;
-        }
-        skip();
-      },{meta:[]});
-      
-      return result;
-    }
-  }
-  return [];
 };
 
 export const get = function(target,path){

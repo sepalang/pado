@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.function.name", "core-js/modules/es6.object.assign", "./promise"], factory);
+    define(["exports", "core-js/modules/es6.function.name", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.number.constructor", "core-js/modules/es6.object.assign", "./promise"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.function.name"), require("core-js/modules/es6.object.assign"), require("./promise"));
+    factory(exports, require("core-js/modules/es6.function.name"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/es6.object.assign"), require("./promise"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Function, global.es6Object, global.promise);
+    factory(mod.exports, global.es6Function, global.webDom, global.es6Array, global.es6Object, global.es6Number, global.es6Object, global.promise);
     global.paginate = mod.exports;
   }
-})(this, function (_exports, _es6Function, _es6Object, _promise) {
+})(this, function (_exports, _es6Function, _webDom, _es6Array, _es6Object, _es6Number, _es6Object2, _promise) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

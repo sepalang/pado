@@ -101,28 +101,69 @@ export const isEmpty = function(it){
 
 export const likeRegexp = (s)=> (typeof s === "string") || (s instanceof RegExp)
 
-export const isPlainObject = data => {
-  if(typeof data !== "object"){
+export const isPlainObject = data => typeof data === "object" && data.constructor === Object
+
+// none(undfinec, null, NaN), value(1,"1"), hash({}), array([]), node, object(new, Date), function, boolean
+export const eqof = function(it){
+  const typeIt = typeof it;
+  switch(typeIt){
+  case "number":
+    if(isAbsoluteNaN(it)) return "none";
+  case "string":
+    return "value";
+    break;
+  case "object":
+    if(isNone(it)) return "none";
+    if(likeArray(it)) return "array";
+    if(isNode(it)) return "node";
+    if(!isPlainObject(it)) return "object";
+    return "hash";
+    break;
+  case "undefined":
+    return "none";
+    break;
+  case "function":
+  case "boolean":
+  default:
+    return typeIt;
+    break;
+  }
+}
+
+export const eqeq = function(value, other){
+  if(arguments.length < 2){
     return false;
   }
   
-  if(isArray(data)){
+  const rootType = eqof(value);
+  
+  if(rootType !== eqof(other)){
     return false;
   }
   
-  if(Object.prototype.toString.call(data) === '[object Object]'){
+  switch(rootType){
+  case "none":
+    return true;
+  default:
+    return value == other
+  }
+}
+
+export const isEqual = function(value, other){
+  if (value === other) {
     return true;
   }
   
-  if(typeof o.constructor === "function"){
-    return false;
+  if(isAbsoluteNaN(value) && isAbsoluteNaN(other)){
+    return true;
   }
   
-  if(data.prototype.hasOwnProperty('isPrototypeOf') === false) {
-    return false;
-  }
   
-  return true;
+}
+
+// ignore _ $
+export const likeEqual = function(){
+  
 }
 
 export const isExsist = function(value){

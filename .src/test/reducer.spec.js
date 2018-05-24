@@ -1,5 +1,24 @@
-import { cut, top, findIndex, findIndexes } from '../src/functions/reducer';
+import { matchString, cut, top, findIndex, findIndexes } from '../src/functions/reducer';
 describe('Functions reducer', () => {
+  
+  it('matchString', () => {
+    expect( matchString("hello.world",".") ).toEqual([5,1])
+    expect( matchString("hello-world.hello",".") ).toEqual([11,1])
+    expect( matchString("hello.world.hello",".",6) ).toEqual([11,1])
+    expect( matchString("hello..world","..") ).toEqual([5,2])
+    expect( matchString("hello.world",/l./) ).toEqual([2,2])
+    expect( matchString("hello.world",/l.o/) ).toEqual([2,3])
+    expect( matchString("hello.world",/o.w/) ).toEqual([4,3])
+    
+    expect( matchString("abcd","c") ).toEqual([2,1]);
+    expect( matchString("abcd","c",2) ).toEqual([2,1]);
+    
+    expect( matchString("hello.world",/l./,5) ).toEqual([9,2])
+    expect( matchString("hello.world",/l.o/,5) ).toEqual([-1,0])
+    
+    expect( matchString("hello.world","") ).toEqual([0,0])
+    expect( matchString("hello.world","z") ).toEqual([-1,0])
+  });
   
   it('cut', () => {
     expect( cut([1,2,3]) ).toEqual([1]);
@@ -27,8 +46,12 @@ describe('Functions reducer', () => {
     expect( top(13,null,1) ).toEqual([13]);
     
     //
-    expect( top([1,2,3],(a,b)=>a>b,true) ).toEqual([1,2,3]);
+    expect( top([1,2,3],true) ).toEqual(3);
+    expect( top([1,2,3],false) ).toEqual(1);
+    expect( top([1,2,3],true,true) ).toEqual([3,2,1]);
+    expect( top([1,2,3],false,true) ).toEqual([1,2,3]);    
     expect( top([1,2,3],(a,b)=>a<b,true) ).toEqual([3,2,1]);
+    expect( top([1,2,3],(a,b)=>a>b,true) ).toEqual([1,2,3]);
     
     //it's natural way
     expect( top([1,2,3],(a,b)=>a>b,false) ).toEqual([]);

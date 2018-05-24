@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.replace", "./isLike", "./matrix"], factory);
+    define(["exports", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.number.constructor", "core-js/modules/es6.regexp.to-string", "./isLike", "./matrix"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.replace"), require("./isLike"), require("./matrix"));
+    factory(exports, require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/es6.regexp.to-string"), require("./isLike"), require("./matrix"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.isLike, global.matrix);
+    factory(mod.exports, global.es6Regexp, global.es6Number, global.es6Regexp, global.isLike, global.matrix);
     global.random = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _isLike, _matrix) {
+})(this, function (_exports, _es6Regexp, _es6Number, _es6Regexp2, _isLike, _matrix) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

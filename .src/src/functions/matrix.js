@@ -1,7 +1,7 @@
-import { cloneDeep } from './cast'
+import { asArray, cloneDeep } from './cast'
 import { isAbsoluteNaN } from './isLike'
 import { top, turn } from './reducer';
-import { times } from './enumerator';
+import { times } from './enumerable';
 
 export const rangeModel = function(value,step,sizeBase){
   var start,end,reverse;
@@ -97,7 +97,8 @@ export const matrixRange = function(start,end,step,sizeBase){
     
   var turnSize = 1;
   
-  each(scales,function(scaleCase,scaleIndex){
+  
+  asArray(scales).forEach((scaleCase,scaleIndex)=>{
     var scaleCaseLength = scaleCase.length;
     times(result.length,function(time){
       result[time][scaleIndex] = scaleCase[turn(time,scaleCaseLength,turnSize)];

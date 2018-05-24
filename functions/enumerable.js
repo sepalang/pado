@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./cast"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "./cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./cast"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("./cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.cast);
-    global.enumerator = mod.exports;
+    factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.cast);
+    global.enumerable = mod.exports;
   }
-})(this, function (_exports, _cast) {
+})(this, function (_exports, _webDom, _es6Array, _es6Object, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.forMap = _exports.times = _exports.all = void 0;
+  _exports.forMap = _exports.times = _exports.deep = _exports.all = void 0;
 
   var all = function all(data, fn) {
     data = (0, _cast.asArray)(data);
@@ -36,6 +36,10 @@
   };
 
   _exports.all = all;
+
+  var deep = function deep(data) {};
+
+  _exports.deep = deep;
 
   var times = function times(length, fn) {
     var result = [];
@@ -58,4 +62,4 @@
 
   _exports.forMap = forMap;
 });
-//# sourceMappingURL=enumerator.js.map
+//# sourceMappingURL=enumerable.js.map

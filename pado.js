@@ -180,28 +180,69 @@
     return typeof s === "string" || s instanceof RegExp;
   };
   var isPlainObject = function isPlainObject(data) {
-    if (typeof data !== "object") {
+    return typeof data === "object" && data.constructor === Object;
+  }; // none(undfinec, null, NaN), value(1,"1"), hash({}), array([]), node, object(new, Date), function, boolean
+
+  var eqof = function eqof(it) {
+    var typeIt = typeof it;
+
+    switch (typeIt) {
+      case "number":
+        if (isAbsoluteNaN(it)) return "none";
+
+      case "string":
+        return "value";
+        break;
+
+      case "object":
+        if (isNone(it)) return "none";
+        if (likeArray(it)) return "array";
+        if (isNode(it)) return "node";
+        if (!isPlainObject(it)) return "object";
+        return "hash";
+        break;
+
+      case "undefined":
+        return "none";
+        break;
+
+      case "function":
+      case "boolean":
+      default:
+        return typeIt;
+        break;
+    }
+  };
+  var eqeq = function eqeq(value, other) {
+    if (arguments.length < 2) {
       return false;
     }
 
-    if (isArray(data)) {
+    var rootType = eqof(value);
+
+    if (rootType !== eqof(other)) {
       return false;
     }
 
-    if (Object.prototype.toString.call(data) === '[object Object]') {
+    switch (rootType) {
+      case "none":
+        return true;
+
+      default:
+        return value == other;
+    }
+  };
+  var isEqual = function isEqual(value, other) {
+    if (value === other) {
       return true;
     }
 
-    if (typeof o.constructor === "function") {
-      return false;
+    if (isAbsoluteNaN(value) && isAbsoluteNaN(other)) {
+      return true;
     }
+  }; // ignore _ $
 
-    if (data.prototype.hasOwnProperty('isPrototypeOf') === false) {
-      return false;
-    }
-
-    return true;
-  };
+  var likeEqual = function likeEqual() {};
   var isExsist = function isExsist(value) {
     if (value === true) {
       return true;
@@ -221,237 +262,6 @@
     return !isExsist(value);
   };
 
-  var asArray$1 = function asArray(data, defaultArray) {
-    if (defaultArray === void 0) {
-      defaultArray = undefined;
-    }
-
-    if (isArray(data)) {
-      return data;
-    }
-
-    if (isNone(data)) {
-      return isArray(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
-    }
-
-    if (typeof data === "object" && typeof data.toArray === "function") {
-      return data.toArray();
-    }
-
-    return [data];
-  };
-  var toArray = function toArray(data, option) {
-    if (typeof data === "undefined" || data === null || data === NaN) return [];
-    if (isArray(data)) return Array.prototype.slice.call(data);
-    if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
-    if (typeof option === "string") return data.split(option);
-    return [data];
-  };
-  var asObject = function asObject(data, defaultKey) {
-    if (defaultKey === void 0) {
-      defaultKey = "default";
-    }
-
-    if (isPlainObject(data)) {
-      return data;
-    } else {
-      var _ref;
-
-      return _ref = {}, _ref[defaultKey] = data, _ref;
-    }
-  };
-  var toNumber = function toNumber(v, d) {
-    switch (typeof v) {
-      case "number":
-        return v;
-
-      case "string":
-        var r = v.replace(/[^.\d\-]/g, "") * 1;
-        return isAbsoluteNaN(r) ? 0 : r;
-        break;
-    }
-
-    switch (typeof d) {
-      case "number":
-        return d;
-
-      case "string":
-        var r = d * 1;
-        return isAbsoluteNaN(r) ? 0 : r;
-        break;
-    }
-
-    return 0;
-  };
-  var cleanObject = function cleanObject(data) {
-    if (data instanceof Array) {
-      Array.prototype.splice.call(data, 0, data.length);
-    } else if (typeof data == "object") {
-      Object.keys(data).forEach(function (key) {
-        delete data[key];
-      });
-    }
-
-    return data;
-  };
-  var clone = function clone(target) {
-    switch (typeof target) {
-      case "undefined":
-      case "function":
-      case "boolean":
-      case "number":
-      case "string":
-        return target;
-        break;
-
-      case "object":
-        if (target === null) return target;
-
-        if (isArray(target)) {
-          var _r = [];
-
-          for (var i = 0, length = target.length; i < length; i++) {
-            _r.push(target[i]);
-          }
-
-          return _r;
-        }
-
-        if (!isPlainObject(target)) {
-          if (target instanceof Date) {
-            var _r2 = new Date();
-
-            _r2.setTime(target.getTime());
-
-            return _r2;
-          }
-
-          return target;
-        }
-
-        var r = {};
-        Object.keys(target).forEach(function (k) {
-          if (target.hasOwnProperty(k)) r[k] = target[k];
-        });
-        return r;
-        break;
-
-      default:
-        console.error("clone::copy failed : target => ", target);
-        return target;
-        break;
-    }
-  };
-  var cloneDeep = function cloneDeep(target) {
-    var d;
-
-    if (typeof target === "object") {
-      if (isArray(target)) {
-        if (!isArray(d)) {
-          d = [];
-        }
-
-        for (var i = 0, l = target.length; i < l; i++) {
-          d.push(typeof target[i] === "object" && target[i] !== null ? clone(target[i]) : target[i]);
-        }
-
-        return d;
-      } else {
-        d = {};
-        Object.keys(target).forEach(function (p) {
-          typeof target[p] === "object" && target[p] !== null && d[p] ? clone(target[p], d[p]) : d[p] = target[p];
-        });
-        return d;
-      }
-    } else {
-      clone(target);
-    }
-  };
-  var free = function free(datum) {
-    var dest = {};
-    Object.keys(datum).forEach(function (key) {
-      if (!/^\$/.test(key)) {
-        dest[key] = _cloneDeep(datum[key]);
-      }
-    });
-    return dest;
-  };
-
-  var getKeyWithValue = function getKeyWithValue(obj, value) {
-    if (isArray(obj)) {
-      for (var i = 0, l = obj.length; i < l; i++) {
-        if (obj[i] === value) return i;
-      }
-    }
-
-    if (isObject(obj)) {
-      for (var key in obj) {
-        if (obj[key] === value) return key;
-      }
-    }
-
-    return undefined;
-  };
-
-  var removeValue = function removeValue(obj, value) {
-    var detect = true;
-    var array = isArray(obj);
-
-    while (detect) {
-      var key = getKeyWithValue(obj, value);
-
-      if (typeof key === "undefined") {
-        detect = false;
-      } else {
-        if (array) {
-          obj.splice(key, 1);
-        } else {
-          delete obj[key];
-        }
-      }
-    }
-
-    return obj;
-  };
-  var instance = function instance(func, proto) {
-    var ins,
-        DummyInstance = function DummyInstance(param) {
-      if (typeof param === "object") for (var k in param) {
-        this[k] = param[k];
-      }
-    };
-
-    if (typeof func == "object") {
-      if (typeof proto === "object") DummyInstance.prototype = proto;
-      ins = new DummyInstance(func);
-    }
-
-    if (typeof func == "function") {
-      if (typeof proto === "object") func.prototype = proto;
-      ins = new func();
-    }
-
-    return ins;
-  };
-  var alloc$1 = function alloc(init) {
-    var fn = init();
-
-    var rn = function rn() {
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      return fn.apply(this, args);
-    };
-
-    rn['reset'] = function () {
-      fn = init(rn, rn);
-    };
-
-    rn['$constructor'] = fn;
-    return rn;
-  };
-
   var all = function all(data, fn) {
     data = asArray$1(data);
 
@@ -466,6 +276,7 @@
     }
     return true;
   };
+  var deep = function deep(data) {};
   var times = function times(length, fn) {
     var result = [];
 
@@ -564,12 +375,11 @@
 
     try {
       value[symToStringTag] = undefined;
-      var unmasked = true;
     } catch (e) {}
 
     var result = nativeObjectToString.call(value);
 
-    if (unmasked) {
+    {
       if (isOwn) {
         value[symToStringTag] = tag;
       } else {
@@ -1761,6 +1571,18 @@
 
   var get_1 = get;
 
+  var matchString = function matchString(it, search, at) {
+    if (at === void 0) {
+      at = 0;
+    }
+
+    if (typeof it !== "string") throw new Error("matchString :: worng argument " + it);
+    if (typeof search === "string") search = search.replace(new RegExp("(\\.|\\[|\\])", "g"), function (s) {
+      return "\\" + s;
+    });
+    var result = it.substr(at).match(search);
+    return result ? [result.index + at, result[0].length] : [-1, 0];
+  };
   var findIndex = function () {
     var __find_string = function __find_string(it, search, at) {
       return it.indexOf(search, at);
@@ -1799,7 +1621,8 @@
         return idxs;
       }
     };
-  }();
+  }(); //reducer.spec.js
+
   var cut = function cut(collection, cutLength, emptyDefault) {
     if (cutLength === void 0) {
       cutLength = 1;
@@ -1830,12 +1653,28 @@
     }
 
     return data;
-  };
+  }; //reducer.spec.js
+
   var top = function top(data, iteratee, topLength) {
-    if (typeof iteratee !== "function") {
-      iteratee = function iteratee(a, b) {
-        return a < b;
-      };
+    switch (typeof iteratee) {
+      case "function":
+        //iteratee=iteratee;
+        break;
+
+      case "boolean":
+        iteratee = iteratee ? function (a, b) {
+          return a < b;
+        } : function (a, b) {
+          return a > b;
+        };
+        break;
+
+      default:
+        iteratee = function iteratee(a, b) {
+          return a < b;
+        };
+
+        break;
     }
 
     if (typeof topLength === "boolean") {
@@ -1847,103 +1686,6 @@
     }).splice(0, topLength) : asArray$1(data).sort(function (a, b) {
       return iteratee(a, b);
     })[0];
-  }; //
-
-  var castString = function castString(text, matches, castFn, property) {
-    var cursorStart = isNumber(property.start) && property.start > 0 ? property.start : 0;
-    var cursorEnd = isNumber(property.end) ? property.end : text.length;
-    var cursor = cursorStart;
-
-    var open = function open(_ref) {
-      var cursorStart = _ref.cursorStart,
-          cursorEnd = _ref.cursorEnd,
-          cursor = _ref.cursor,
-          matches = _ref.matches;
-      max(matches.map(function (matchExp) {
-        findIndex();
-      }));
-    };
-
-    open({
-      cursorStart: cursorStart,
-      cursorEnd: cursorEnd,
-      cursor: cursor,
-      matches: matches
-    });
-    return property;
-  };
-  var castPath$1 = function castPath(pathParam) {
-    if (isArray(pathParam)) {
-      return pathParam;
-    }
-
-    if (likeString(pathParam)) {
-      if (isNumber(pathParam)) {
-        return [pathParam];
-      }
-
-      if (typeof pathParam === "string") {
-        var _castString = castString(pathParam, [".", "["], function (_ref2) {
-          var meta = _ref2.property.meta,
-              matchType = _ref2.matchType,
-              match = _ref2.match,
-              casting = _ref2.casting,
-              fork = _ref2.fork,
-              nextIndex = _ref2.nextIndex,
-              next = _ref2.next,
-              skip = _ref2.skip;
-
-          switch (matchType) {
-            // "."
-            case 0:
-              meta.push(casting);
-              next(nextIndex);
-              break;
-            // "]"
-
-            case 1:
-              var lead = 1,
-                  feet = 0;
-              fork(["[", "]"], function (_ref3) {
-                var matchType = _ref3.matchType,
-                    match = _ref3.match,
-                    casting = _ref3.casting,
-                    nextIndex = _ref3.nextIndex,
-                    next = _ref3.next,
-                    skip = _ref3.skip;
-                matchType === 0 && lead++;
-                matchType === 1 && feet++;
-
-                if (lead === feet) {
-                  meta.push(casting.substr(1));
-                  next(nextIndex);
-                } else {
-                  skip();
-                }
-              });
-              break;
-            //end
-
-            case -1:
-              meta.push(casting);
-              break;
-
-            default:
-              skip();
-              break;
-          }
-
-          skip();
-        }, {
-          meta: []
-        }),
-            result = _castString.meta.result;
-
-        return result;
-      }
-    }
-
-    return [];
   };
   var get$1 = function get(target, path) {
     if (typeof target === "object") {
@@ -2000,6 +1742,516 @@
     ts = ts || 1;
     i = Math.floor(i / ts);
     return p > i ? i : i % p;
+  };
+
+  var asArray$1 = function asArray(data, defaultArray) {
+    if (defaultArray === void 0) {
+      defaultArray = undefined;
+    }
+
+    if (isArray(data)) {
+      return data;
+    }
+
+    if (isNone(data)) {
+      return isArray(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
+    }
+
+    if (typeof data === "object" && typeof data.toArray === "function") {
+      return data.toArray();
+    }
+
+    return [data];
+  };
+  var toArray = function toArray(data, option) {
+    if (typeof data === "undefined" || data === null || data === NaN) return [];
+    if (isArray(data)) return Array.prototype.slice.call(data);
+    if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
+    if (typeof option === "string") return data.split(option);
+    return [data];
+  };
+  var asObject = function asObject(data, defaultKey) {
+    if (defaultKey === void 0) {
+      defaultKey = "default";
+    }
+
+    if (isPlainObject(data)) {
+      return data;
+    } else {
+      var _ref;
+
+      return _ref = {}, _ref[defaultKey] = data, _ref;
+    }
+  };
+  var toNumber = function toNumber(v, d) {
+    switch (typeof v) {
+      case "number":
+        return v;
+
+      case "string":
+        var r = v.replace(/[^.\d\-]/g, "") * 1;
+        return isAbsoluteNaN(r) ? 0 : r;
+        break;
+    }
+
+    switch (typeof d) {
+      case "number":
+        return d;
+
+      case "string":
+        var r = d * 1;
+        return isAbsoluteNaN(r) ? 0 : r;
+        break;
+    }
+
+    return 0;
+  };
+  var cleanObject = function cleanObject(data) {
+    if (data instanceof Array) {
+      Array.prototype.splice.call(data, 0, data.length);
+    } else if (typeof data == "object") {
+      Object.keys(data).forEach(function (key) {
+        delete data[key];
+      });
+    }
+
+    return data;
+  };
+  var entries = function entries(it) {
+    var result = [];
+
+    switch (typeof it) {
+      case "object":
+        isNone(it) ? 0 : likeArray(it) ? asArray$1(it).forEach(function (v, k) {
+          result.push([k, v]);
+        }) : Object.keys(it).forEach(function (key) {
+          result.push([key, it[key]]);
+        });
+        break;
+    }
+
+    return result;
+  };
+  var keys = function keys(target, filterExp) {
+    var result = [];
+    var filter = typeof filterExp === "function" ? filterExp : function () {
+      return true;
+    };
+    likeArray(target) && Object.keys(target).filter(function (key) {
+      !isNaN(key) && filter(key, target) && result.push(parseInt(key, 10));
+    }) || likeObject(target) && Object.keys(target).forEach(function (key) {
+      filter(key, target) && result.push(key);
+    });
+    return result;
+  };
+  var deepEntries = function deepEntries(target, filter) {
+    if (likeArray(target)) ;
+  };
+  var clone = function clone(target) {
+    switch (typeof target) {
+      case "undefined":
+      case "function":
+      case "boolean":
+      case "number":
+      case "string":
+        return target;
+        break;
+
+      case "object":
+        if (target === null) return target;
+
+        if (isArray(target)) {
+          var _r = [];
+
+          for (var i = 0, length = target.length; i < length; i++) {
+            _r.push(target[i]);
+          }
+
+          return _r;
+        }
+
+        if (!isPlainObject(target)) {
+          if (target instanceof Date) {
+            var _r2 = new Date();
+
+            _r2.setTime(target.getTime());
+
+            return _r2;
+          }
+
+          return target;
+        }
+
+        var r = {};
+        Object.keys(target).forEach(function (k) {
+          if (target.hasOwnProperty(k)) r[k] = target[k];
+        });
+        return r;
+        break;
+
+      default:
+        console.error("clone::copy failed : target => ", target);
+        return target;
+        break;
+    }
+  };
+  var cloneDeep = function cloneDeep(target) {
+    var d;
+
+    if (typeof target === "object") {
+      if (isArray(target)) {
+        if (!isArray(d)) {
+          d = [];
+        }
+
+        for (var i = 0, l = target.length; i < l; i++) {
+          d.push(typeof target[i] === "object" && target[i] !== null ? clone(target[i]) : target[i]);
+        }
+
+        return d;
+      } else {
+        d = {};
+        Object.keys(target).forEach(function (p) {
+          typeof target[p] === "object" && target[p] !== null && d[p] ? clone(target[p], d[p]) : d[p] = target[p];
+        });
+        return d;
+      }
+    } else {
+      clone(target);
+    }
+  }; //cast.castString.spec.js
+
+  var castString = function () {
+    var rebaseMatches = function rebaseMatches(matches) {
+      return entries(asArray$1(matches));
+    };
+
+    return function (text, matches, castFn, props) {
+      var payload = {
+        content: text,
+        props: props
+      };
+      var newMatchEntries = rebaseMatches(matches);
+      var castingState = {
+        firstIndex: 0,
+        lastIndex: text.length,
+        castingStart: 0,
+        cursor: 0
+      };
+
+      if (typeof props === "object" && isNumber(props.start)) {
+        castingState.castingStart = props.start;
+        castingState.cursor = props.start;
+      }
+
+      var open = function open(_ref2) {
+        var _ref2$castingState = _ref2.castingState,
+            firstIndex = _ref2$castingState.firstIndex,
+            lastIndex = _ref2$castingState.lastIndex,
+            castingStart = _ref2$castingState.castingStart,
+            cursor = _ref2$castingState.cursor,
+            matchEntries = _ref2.matchEntries,
+            castFn = _ref2.castFn,
+            parentScope = _ref2.parentScope;
+
+        if (cursor >= lastIndex) {
+          return false;
+        } //find match
+
+
+        var matchesMap = matchEntries.map(function (_ref3) {
+          var matchType = _ref3[0],
+              matchExp = _ref3[1];
+          return [matchString(text, matchExp, cursor), matchType, matchExp];
+        });
+        var firstMatch = top(matchesMap, function (_ref4, _ref5) {
+          var a = _ref4[0],
+              aPriority = _ref4[1];
+          var b = _ref5[0],
+              bPriority = _ref5[1];
+          return a[0] < 0 ? true : b[0] < 0 ? false : a[0] == b[0] ? aPriority < bPriority : a[0] > b[0];
+        }); // top match is not exsist
+
+        if (!firstMatch) {
+          return false;
+        } // unmatched
+
+
+        if (firstMatch[0][0] === -1) {
+          firstMatch = [[-1, 0], -1, null];
+        } //next variant
+
+
+        var _firstMatch = firstMatch,
+            _firstMatch$ = _firstMatch[0],
+            matchIndex = _firstMatch$[0],
+            matchSize = _firstMatch$[1],
+            matchType = _firstMatch[1],
+            matchExp = _firstMatch[2];
+        var castStart = castingStart;
+        var castEnd = matchType === -1 ? lastIndex : matchIndex + matchSize;
+        var castSize = castEnd - castStart;
+        var skipSize = castSize - matchSize; //next params
+
+        var matching = {
+          matchType: matchType,
+          matchExp: matchExp,
+          matchIndex: matchIndex,
+          matchSize: matchSize,
+          skipSize: skipSize
+        };
+        var casting = {
+          firstIndex: firstIndex,
+          lastIndex: lastIndex,
+          castStart: castStart,
+          castEnd: castEnd,
+          castSize: castSize
+        };
+        var scope = {
+          fork: function fork(matchEntries, castFn) {
+            var newMatchEntries = rebaseMatches(matches);
+            open({
+              castingState: {
+                firstIndex: matching.matchIndex,
+                lastIndex: matching.matchIndex + matchSize,
+                castingStart: matching.matchIndex,
+                cursor: matching.matchIndex
+              },
+              matchEntries: newMatchEntries,
+              castFn: castFn,
+              parentScope: parentScope
+            });
+          },
+          next: function next(needCursor) {
+            var cursorTo = isNumber(needCursor) ? needCursor : casting.castEnd;
+            open({
+              castingState: {
+                firstIndex: firstIndex,
+                lastIndex: lastIndex,
+                castingStart: cursorTo,
+                cursor: cursorTo
+              },
+              matchEntries: matchEntries,
+              castFn: castFn,
+              parentScope: parentScope
+            });
+          },
+          enter: function enter(enterMatches, enterCastFn) {
+            open({
+              castingState: {
+                firstIndex: firstIndex,
+                lastIndex: lastIndex,
+                castingStart: matching.matchIndex,
+                cursor: matching.matchIndex
+              },
+              matchEntries: rebaseMatches(enterMatches),
+              castFn: enterCastFn,
+              parentScope: {
+                next: scope.next
+              }
+            });
+          },
+          exit: function exit(needCursor) {
+            parentScope && parentScope.next(isNumber(needCursor) ? needCursor : casting.castEnd);
+          },
+          more: function more() {
+            open({
+              castingState: {
+                firstIndex: firstIndex,
+                lastIndex: lastIndex,
+                castingStart: castStart,
+                cursor: casting.castEnd
+              },
+              matchEntries: matchEntries,
+              castFn: castFn,
+              parentScope: parentScope
+            });
+          }
+        };
+        castFn(_objectSpread({}, payload, matching, casting, scope));
+        return true;
+      };
+
+      open({
+        castingState: castingState,
+        matchEntries: newMatchEntries,
+        castFn: castFn
+      });
+      return payload;
+    };
+  }();
+  var castPath$1 = function () {
+    var __filterDotPath = function __filterDotPath(dotPath, removeFirstDot) {
+      return removeFirstDot && dotPath.indexOf(".") === 0 ? dotPath.substr(1) : dotPath;
+    };
+
+    var __filterBlockPath = function __filterBlockPath(blockPath) {
+      //remove []
+      blockPath = blockPath.substring(1, blockPath.length - 1); //interger
+
+      if (/^[0-9]+$/.test(blockPath)) {
+        return parseInt(blockPath, 10);
+      } //remove ''
+
+
+      if (/^\'.*\'$/.test(blockPath) || /^\".*\"$/.test(blockPath)) {
+        blockPath = blockPath.substring(1, blockPath.length - 1);
+      }
+
+      return blockPath;
+    };
+
+    return function (pathParam) {
+      if (isArray(pathParam)) {
+        return pathParam;
+      }
+
+      if (likeString(pathParam)) {
+        if (isNumber(pathParam)) {
+          return [pathParam];
+        }
+
+        if (typeof pathParam === "string") {
+          var _castString = castString(pathParam, [".", "["], function (_ref6) {
+            var content = _ref6.content,
+                path = _ref6.props.path,
+                matchExp = _ref6.matchExp,
+                castStart = _ref6.castStart,
+                castEnd = _ref6.castEnd,
+                castSize = _ref6.castSize,
+                skipSize = _ref6.skipSize,
+                enter = _ref6.enter,
+                next = _ref6.next;
+
+            if (matchExp === ".") {
+              skipSize && path.push(content.substr(castStart, skipSize));
+              next();
+            }
+
+            if (matchExp === "[") {
+              var stackCount = 0;
+
+              if (skipSize) {
+                path.push(__filterDotPath(content.substr(castStart, skipSize), castStart !== 0));
+              }
+
+              enter(["[", "]"], function (_ref7) {
+                var matchExp = _ref7.matchExp,
+                    castStart = _ref7.castStart,
+                    castEnd = _ref7.castEnd,
+                    more = _ref7.more,
+                    exit = _ref7.exit;
+                if (matchExp === "[") stackCount++;
+                if (matchExp === "]") stackCount--;
+                if (matchExp === null) return;
+
+                if (stackCount === 0) {
+                  path.push(__filterBlockPath(content.substring(castStart, castEnd)));
+                  exit();
+                } else {
+                  more();
+                }
+              });
+            }
+
+            if (matchExp === null) {
+              path.push(__filterDotPath(content.substr(castStart, castEnd), castStart !== 0));
+            }
+          }, {
+            path: []
+          }),
+              result = _castString.props.path;
+
+          return result;
+        }
+      }
+
+      return [];
+    };
+  }();
+  var free = function free(datum) {
+    var dest = {};
+    Object.keys(datum).forEach(function (key) {
+      if (!/^\$/.test(key)) {
+        dest[key] = _cloneDeep(datum[key]);
+      }
+    });
+    return dest;
+  };
+
+  var getKeyWithValue = function getKeyWithValue(obj, value) {
+    if (isArray(obj)) {
+      for (var i = 0, l = obj.length; i < l; i++) {
+        if (obj[i] === value) return i;
+      }
+    }
+
+    if (isObject(obj)) {
+      for (var key in obj) {
+        if (obj[key] === value) return key;
+      }
+    }
+
+    return undefined;
+  };
+
+  var removeValue = function removeValue(obj, value) {
+    var detect = true;
+    var array = isArray(obj);
+
+    while (detect) {
+      var key = getKeyWithValue(obj, value);
+
+      if (typeof key === "undefined") {
+        detect = false;
+      } else {
+        if (array) {
+          obj.splice(key, 1);
+        } else {
+          delete obj[key];
+        }
+      }
+    }
+
+    return obj;
+  };
+  var instance = function instance(func, proto) {
+    var ins,
+        DummyInstance = function DummyInstance(param) {
+      if (typeof param === "object") for (var k in param) {
+        this[k] = param[k];
+      }
+    };
+
+    if (typeof func == "object") {
+      if (typeof proto === "object") DummyInstance.prototype = proto;
+      ins = new DummyInstance(func);
+    }
+
+    if (typeof func == "function") {
+      if (typeof proto === "object") func.prototype = proto;
+      ins = new func();
+    }
+
+    return ins;
+  };
+  var alloc$1 = function alloc(init) {
+    var fn = init();
+
+    var rn = function rn() {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return fn.apply(this, args);
+    };
+
+    rn['reset'] = function () {
+      fn = init(rn, rn);
+    };
+
+    rn['$constructor'] = fn;
+    return rn;
   };
 
   var unique = function unique(array) {
@@ -2100,41 +2352,6 @@
       }
     }
   };
-
-  var EACH_PROC = function EACH_PROC(arr, proc) {
-    if (arr.length > 1) {
-      for (var i = 0, l = arr.length - 1; i < l; proc(arr[i], i, false), i++) {
-      }
-
-      proc(arr[arr.length - 1], arr.length - 1, true);
-    } else if (arr.length == 1) {
-      proc(arr[0], 0, true);
-    }
-
-    return arr;
-  };
-
-  var STATIC_FOR_EACH_PROC = function STATIC_FOR_EACH_PROC(obj, proc) {
-    if (typeof obj === "object") for (var i = 0, a = obj instanceof Array, al = a ? obj.length : NaN, keys = Object.keys(obj), l = keys.length; i < l; proc(obj[keys[i]], keys[i], i, l, al), i++) {
-    }
-    return obj;
-  }; //TODO : deprecated
-
-
-  var each$1 = function each(value, proc) {
-    return EACH_PROC(asArray$1(value), proc);
-  }; //TODO : deprecated
-
-  var forEach = function forEach(value, proc) {
-    return STATIC_FOR_EACH_PROC(value, proc);
-  }; //TODO : deprecated
-
-  var reduce$1 = function reduce(value, proc, meta) {
-    value = asArray$1(value);
-    return EACH_PROC(value, function (v, i, l) {
-      meta = proc(meta, v, i, l);
-    }), meta;
-  };
   var clearOf = function clearOf(data, fillFn, sp) {
     if (data instanceof Array) {
       sp = Array.prototype.splice.call(data, 0, data.length);
@@ -2162,7 +2379,7 @@
   };
   var concatOf = function concatOf(data, appends) {
     var data = asArray$1(data);
-    return each$1(appends, function (value) {
+    return asArray$1(appends).forEach(function (value) {
       data.push(value);
     }), data;
   };
@@ -2170,8 +2387,8 @@
     var data = asArray$1(data);
     var exitCnt = 0;
 
-    for (var i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++) {
-      var key = keys[i];
+    for (var i = 0, ri = 0, keys$$1 = Object.keys(data), l = keys$$1.length; i < l; i++, ri++) {
+      var key = keys$$1[i];
       var value = data[key];
       var result = func(value, key);
 
@@ -2253,7 +2470,7 @@
           }
         }
       } else if (key.indexOf(",") > -1) {
-        each$1(key.split(","), function (deepKey) {
+        key.split(",").forEach(function (deepKey) {
           deepKey = deepKey.trim();
 
           if (typeof obj[key] === "function") {
@@ -2283,12 +2500,12 @@
   }; //TODO: Union hasValue
 
   var NESTED_HAS_PROC = function NESTED_HAS_PROC(obj, key) {
-    var keys = key.split(".");
-    if (!keys.length) return false;
+    var keys$$1 = key.split(".");
+    if (!keys$$1.length) return false;
     var pointer = obj;
 
-    for (var ki in keys) {
-      var k = keys[ki];
+    for (var ki in keys$$1) {
+      var k = keys$$1[ki];
 
       if (!pointer.hasOwnProperty(k)) {
         return false;
@@ -2348,9 +2565,9 @@
     var analysis = {
       after: after,
       before: before,
-      keys: reduce$1(unique(afterKeys.concat(beforeKeys)), function (redu, key) {
-        redu[key] = undefined;
-        return redu;
+      keys: unique(afterKeys.concat(beforeKeys)).reduce(function (dest, key) {
+        dest[key] = undefined;
+        return dest;
       }, {}),
       match: [],
       missing: [],
@@ -2378,7 +2595,7 @@
     } //surplus
 
 
-    each$1(afterKeys, function (key) {
+    asArray$1(afterKeys).forEach(function (key) {
       if (!hasValue(analysis.match, key)) {
         analysis.missing.push(key);
         analysis.keys[key] = "missing";
@@ -2404,15 +2621,6 @@
     }
     index = ta.length == index ? 0 : index;
     return ta[index];
-  };
-  var turn$2 = function turn(i, p, ts) {
-    if (i < 0) {
-      var abs = Math.abs(i / ts);
-      i = p - (abs > p ? abs % p : abs);
-    }
-    ts = ts ? ts : 1;
-    i = Math.floor(i / ts);
-    return p > i ? i : i % p;
   };
 
   var accurateTimeout = function (originalTimeout) {
@@ -2579,7 +2787,7 @@
       return new Array(maxLength);
     });
     var turnSize = 1;
-    each(scales, function (scaleCase, scaleIndex) {
+    asArray$1(scales).forEach(function (scaleCase, scaleIndex) {
       var scaleCaseLength = scaleCase.length;
       times(result.length, function (time) {
         result[time][scaleIndex] = scaleCase[turn$1(time, scaleCaseLength, turnSize)];
@@ -2715,6 +2923,52 @@
 
     return scale;
   };
+
+  var limitOf = function () {
+    var limitNumber = function limitNumber(number, max, min) {
+      if (typeof number == "number") {
+        if (isAbsoluteNaN(number) || number === Infinity) {
+          return min;
+        }
+
+        if (isNumber(min) && number < min) {
+          return min;
+        }
+
+        if (isNumber(max) && number > max) {
+          return max;
+        }
+      }
+
+      return number;
+    };
+
+    var limitOf = function limitOf(numbers, max, min) {
+      if (typeof max !== "number") {
+        max = Number.POSITIVE_INFINITY;
+      }
+
+      if (typeof min !== "number") {
+        if (min === null || isAbsoluteNaN(min)) {
+          min = Number.NEGATIVE_INFINITY;
+        } else {
+          min = 0;
+        }
+      }
+
+      if (isArray(numbers)) {
+        for (var d = numbers, i = 0, l = d.length; i < l; i++) {
+          d[i] = limitNumber(d[i], max, min);
+        }
+
+        return numbers;
+      } else {
+        return limitNumber(numbers, max, min);
+      }
+    };
+
+    return limitOf;
+  }();
 
   //정의역과 치역을 계산하여 결과값을 리턴함, 속성별로 정의하여 다중 차원 지원
 
@@ -4079,11 +4333,11 @@
    */
 
 
-  function keys(object) {
+  function keys$1(object) {
     return isArrayLike_1(object) ? _arrayLikeKeys(object) : _baseKeys(object);
   }
 
-  var keys_1 = keys;
+  var keys_1 = keys$1;
 
   /**
    * Creates an array of own enumerable property names and symbols of `object`.
@@ -4106,10 +4360,10 @@
   var COMPARE_PARTIAL_FLAG$2 = 1;
   /** Used for built-in method references. */
 
-  var objectProto$10 = Object.prototype;
+  var objectProto$a = Object.prototype;
   /** Used to check objects for own properties. */
 
-  var hasOwnProperty$7 = objectProto$10.hasOwnProperty;
+  var hasOwnProperty$7 = objectProto$a.hasOwnProperty;
   /**
    * A specialized version of `baseIsEqualDeep` for objects with support for
    * partial deep comparisons.
@@ -4283,10 +4537,10 @@
       objectTag$2 = '[object Object]';
   /** Used for built-in method references. */
 
-  var objectProto$11 = Object.prototype;
+  var objectProto$b = Object.prototype;
   /** Used to check objects for own properties. */
 
-  var hasOwnProperty$8 = objectProto$11.hasOwnProperty;
+  var hasOwnProperty$8 = objectProto$b.hasOwnProperty;
   /**
    * A specialized version of `baseIsEqual` for arrays and objects which performs
    * deep comparisons and tracks traversed objects enabling objects with circular
@@ -4409,11 +4663,11 @@
    */
 
 
-  function isEqual(value, other) {
+  function isEqual$1(value, other) {
     return _baseIsEqual(value, other);
   }
 
-  var isEqual_1 = isEqual;
+  var isEqual_1 = isEqual$1;
 
   var EDITABLE_DEFAULT_KEY = "$editable";
 
@@ -4819,9 +5073,9 @@
         }
       });
       Object.defineProperty(this, "clone", {
-        value: function value(deep, parentOperate) {
-          if (deep === void 0) {
-            deep = true;
+        value: function value(deep$$1, parentOperate) {
+          if (deep$$1 === void 0) {
+            deep$$1 = true;
           }
 
           var cloneOperate = operateFunction({
@@ -4832,7 +5086,7 @@
             limitInput: limitInput,
             limitOutput: limitOutput
           });
-          deep === true && _this.children.forEach(function (child) {
+          deep$$1 === true && _this.children.forEach(function (child) {
             child.clone(true, cloneOperate);
           });
           return cloneOperate;
@@ -5684,15 +5938,63 @@
     return inst;
   };
 
+  var Limitter = function Limitter(max, min) {
+    this.value = 0;
+
+    if (typeof max !== "number" || isAbsoluteNaN(min)) {
+      this.maximum = Number.POSITIVE_INFINITY;
+    } else {
+      this.maximum = max;
+    }
+
+    if (typeof min !== "number" || isAbsoluteNaN(min)) {
+      this.minimum = 0;
+    } else {
+      this.minimum = min;
+    }
+  };
+  var LimitterPrototype = {
+    expectIn: function expectIn(setValue) {
+      return setValue === limitOf(setValue, this.maximum, this.minimum);
+    },
+    expectOut: function expectOut(setValue) {
+      return setValue !== limitOf(setValue, this.maximum, this.minimum);
+    },
+    addExpectIn: function addExpectIn(addValue) {
+      var destValue = this.value + addValue;
+      return destValue === limitOf(destValue, this.maximum, this.minimum);
+    },
+    addExpectOut: function addExpectOut(addValue) {
+      var destValue = this.value + addValue;
+      return destValue !== limitOf(destValue, this.maximum, this.minimum);
+    },
+    set: function set(setValue) {
+      this.value = setValue;
+      return this;
+    },
+    add: function add(addValue) {
+      this.value = this.value + addValue;
+      return this;
+    }
+  };
+  Object.defineProperties(LimitterPrototype, {
+    done: {
+      get: function get() {
+        return this.value === limitOf(this.value, this.maximum, this.minimum);
+      }
+    }
+  });
+  Limitter.prototype = LimitterPrototype;
+  var ranger = function ranger(max, min) {
+    return new Limitter(max, min);
+  };
+
 
 
   var functions = /*#__PURE__*/Object.freeze({
     unique: unique,
     hasValue: hasValue,
     getKeyBy: getKeyBy,
-    each: each$1,
-    forEach: forEach,
-    reduce: reduce$1,
     clearOf: clearOf,
     insertOf: insertOf,
     moveOf: moveOf,
@@ -5703,7 +6005,6 @@
     apart: apart,
     diffStructure: diffStructure,
     toggle: toggle,
-    turn: turn$2,
     isAbsoluteNaN: isAbsoluteNaN,
     isNone: isNone,
     isNumber: isNumber,
@@ -5720,6 +6021,10 @@
     isEmpty: isEmpty,
     likeRegexp: likeRegexp,
     isPlainObject: isPlainObject,
+    eqof: eqof,
+    eqeq: eqeq,
+    isEqual: isEqual,
+    likeEqual: likeEqual,
     isExsist: isExsist,
     notExsist: notExsist,
     asArray: asArray$1,
@@ -5727,25 +6032,31 @@
     asObject: asObject,
     toNumber: toNumber,
     cleanObject: cleanObject,
+    entries: entries,
+    keys: keys,
+    deepEntries: deepEntries,
     clone: clone,
     cloneDeep: cloneDeep,
+    castString: castString,
+    castPath: castPath$1,
     free: free,
     removeValue: removeValue,
     instance: instance,
     alloc: alloc$1,
     all: all,
+    deep: deep,
     times: times,
     forMap: forMap$1,
     accurateTimeout: accurateTimeout,
+    matchString: matchString,
     findIndex: findIndex,
     findIndexes: findIndexes$1,
     cut: cut,
     top: top,
-    castString: castString,
-    castPath: castPath$1,
     get: get$1,
     hasProperty: hasProperty,
     hasValueProperty: hasValueProperty,
+    turn: turn$1,
     rand64: rand64,
     tokenize: tokenize,
     randRange: randRange,
@@ -5756,6 +6067,7 @@
     dateExp: dateExp,
     timestampExp: timestampExp,
     timescaleExp: timescaleExp,
+    limitOf: limitOf,
     promise: promise,
     space: space,
     block: block,
@@ -5774,7 +6086,9 @@
     Paginate: Paginate,
     paginate: paginate,
     operate: operate,
-    session: session
+    session: session,
+    Limitter: Limitter,
+    ranger: ranger
   });
 
   var Bow = function Bow() {};

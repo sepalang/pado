@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./cast", "./isLike", "./reducer", "./enumerator"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "./cast", "./isLike", "./reducer", "./enumerable"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./cast"), require("./isLike"), require("./reducer"), require("./enumerator"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("./cast"), require("./isLike"), require("./reducer"), require("./enumerable"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.cast, global.isLike, global.reducer, global.enumerator);
+    factory(mod.exports, global.webDom, global.cast, global.isLike, global.reducer, global.enumerable);
     global.matrix = mod.exports;
   }
-})(this, function (_exports, _cast, _isLike, _reducer, _enumerator) {
+})(this, function (_exports, _webDom, _cast, _isLike, _reducer, _enumerable) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -119,20 +119,20 @@
   var matrixRange = function matrixRange(start, end, step, sizeBase) {
     var scales = [];
     var maxLength = (0, _reducer.top)([start.length, end.length]);
-    var selectLengthes = (0, _enumerator.times)(maxLength, function (scaleIndex) {
+    var selectLengthes = (0, _enumerable.times)(maxLength, function (scaleIndex) {
       var range = range([start[scaleIndex], end[scaleIndex]], step, sizeBase);
       scales.push(range);
       return range.length;
     });
-    var result = (0, _enumerator.times)(reduce(selectLengthes, function (redu, value) {
+    var result = (0, _enumerable.times)(reduce(selectLengthes, function (redu, value) {
       return redu * value;
     }, 1), function () {
       return new Array(maxLength);
     });
     var turnSize = 1;
-    each(scales, function (scaleCase, scaleIndex) {
+    (0, _cast.asArray)(scales).forEach(function (scaleCase, scaleIndex) {
       var scaleCaseLength = scaleCase.length;
-      (0, _enumerator.times)(result.length, function (time) {
+      (0, _enumerable.times)(result.length, function (time) {
         result[time][scaleIndex] = scaleCase[(0, _reducer.turn)(time, scaleCaseLength, turnSize)];
       });
       turnSize = turnSize * scaleCaseLength;
