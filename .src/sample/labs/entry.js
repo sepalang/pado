@@ -2,5 +2,5 @@
 //export default castString;
 
 
-import * as lo from 'lodash/isEqual';
+import * as lo from 'lodash/get';
 console.log("lo",lo);

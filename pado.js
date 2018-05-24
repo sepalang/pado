@@ -1687,14 +1687,31 @@
       return iteratee(a, b);
     })[0];
   };
-  var get$1 = function get(target, path) {
+  var get$1 = function get(target, path, defaultValue) {
     if (typeof target === "object") {
       switch (typeof path) {
         case "number":
           path += "";
 
         case "string":
-          return path.indexOf("[") == 0 ? eval("target" + path) : eval("target." + path);
+          path = castPath$1(path);
+
+        case "object":
+          if (isArray(path)) {
+            var allget = all(path, function (name) {
+              if (likeObject(target) && (target.hasOwnProperty(name) || target[name])) {
+                target = target[name];
+                return true;
+              } else {
+                return false;
+              }
+            });
+            return allget ? target : defaultValue;
+          } else {
+            return;
+          }
+
+          break;
 
         case "function":
           return path.call(this, target);

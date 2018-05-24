@@ -102,11 +102,27 @@ export const top = function(data,iteratee,topLength){
   asArray(data).sort((a,b)=>iteratee(a,b))[0];
 };
 
-export const get = function(target,path){
+export const get = function(target,path,defaultValue){
   if(typeof target === "object"){
     switch(typeof path){
       case "number": path += "";
-      case "string": return path.indexOf("[") == 0 ? eval("target"+path) : eval("target."+path);
+      case "string":
+        path = castPath(path);
+      case "object":
+        if(isArray(path)){
+          const allget = all(path,(name)=>{
+            if(likeObject(target) && (target.hasOwnProperty(name) || target[name])){
+              target = target[name];
+              return true;
+            } else {
+              return false;
+            }
+          });
+          return allget ? target : defaultValue;
+        } else {
+          return;
+        }
+        break;
       case "function": return path.call(this,target);
     }
   } else if(typeof target === "function"){
