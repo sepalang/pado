@@ -2,6 +2,7 @@ import {
   isArray,
   likeArray,
   likeObject,
+  likeString,
   isNone,
   isAbsoluteNaN,
   isNumber,
@@ -298,58 +299,74 @@ export const castString = (function(){
   };
 }());
 
-export const castPath = function(pathParam){
-  if(isArray(pathParam)){
-    return pathParam;
-  }
-  if(likeString(pathParam)){
-    if(isNumber(pathParam)){
-      return [pathParam]
+export const castPath = (function(){
+  
+  const __filterDotPath = (dotPath,removeFirstDot)=>removeFirstDot && dotPath.indexOf(".") === 0 ? dotPath.substr(1) : dotPath;
+  const __filterBlockPath = (blockPath)=>{
+    //remove []
+    blockPath = blockPath.substring(1,blockPath.length-1);
+    
+    //interger
+    if(/^[0-9]+$/.test(blockPath)){
+      return parseInt(blockPath,10);
     }
     
-    if(typeof pathParam === "string"){
-      const { meta:{ result } } = castString(pathParam,[".","["],({ 
-        payload :{ content, property:path },
-        matching:{ matchType, nextIndex },
-        casting :{ startIndex, endIndex },
-        scope   :{ next, fork }
-      })=>{
-        if(matchType === 0){
-          path.push(content.substring(startIndex, endIndex));
-          next(nextIndex);
-        }
-        
-        if(matchType === 1){
-          let [lead, feet] = [1, 0];
-          
-          fork(["[","]"],({
-            payload :{ contentOffset },
-            matching:{ matchType, nextIndex },
-            casting :{ startIndex, endIndex },
-            scope   :{ next, skip }
-          })=>{
-            matchType === 0 && lead++;
-            matchType === 1 && feet++;
-            
-            if(lead === feet){
-              meta.push(casting.substr(1))
-              next(nextIndex);
-            } else {
-              skip();
-            }
-          });
-        }
-        
-        if(matchType === -1){
-          path.push(content.substring(startIndex, endIndex));
-        }
-      },[]);
-      
-      return result;
+    //remove ''
+    if(/^\'.*\'$/.test(blockPath) || /^\".*\"$/.test(blockPath)){
+      blockPath = blockPath.substring(1,blockPath.length-1);
     }
+    return blockPath;
   }
-  return [];
-};
+
+  return function(pathParam){
+    if(isArray(pathParam)){
+      return pathParam;
+    }
+  
+    if(likeString(pathParam)){
+    
+      if(isNumber(pathParam)){
+        return [pathParam]
+      }
+    
+      if(typeof pathParam === "string"){
+        const { props:{ path:result } } = castString(pathParam,[".","["],({
+          content, props:{ path }, matchExp, castStart, castEnd, castSize, skipSize, enter, next
+        })=>{
+          if(matchExp === "."){
+            skipSize && path.push( content.substr(castStart, skipSize) )
+            next();
+          }
+          if(matchExp === "["){
+            let stackCount = 0;
+          
+            if(skipSize){
+              path.push( __filterDotPath(content.substr(castStart, skipSize),castStart !== 0) );
+            }
+          
+            enter(["[","]"],({ matchExp, castStart, castEnd, more, exit })=>{
+              if(matchExp === "[") stackCount++;
+              if(matchExp === "]") stackCount--;
+              if(matchExp === null) return;
+              if(stackCount === 0){
+                path.push( __filterBlockPath( content.substring(castStart, castEnd) ) );
+                exit();
+              } else {
+                more();
+              }
+            });
+          }
+          if(matchExp === null){
+            path.push( __filterDotPath(content.substr(castStart, castEnd),castStart !== 0) );
+          }
+        },{ path:[] })
+      
+        return result;
+      }
+    }
+    return [];
+  };
+}())
   
 
 export const free = function(datum){

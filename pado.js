@@ -116,7 +116,7 @@
   var likeObject = function likeObject(it) {
     return isObject(it) || isFunction(it);
   };
-  var likeString$1 = function likeString(data) {
+  var likeString = function likeString(data) {
     if (typeof data === "string") return true;
     if (isNumber(data)) return true;
     return false;
@@ -1707,7 +1707,7 @@
   };
   var hasProperty = function hasProperty(target, pathParam) {
     return all(castPath$1(pathParam), function (path) {
-      if (likeObject(target) && likeString$1(path) && target.hasOwnProperty(path)) {
+      if (likeObject(target) && likeString(path) && target.hasOwnProperty(path)) {
         target = target[path];
         return true;
       }
@@ -2080,74 +2080,95 @@
       return payload;
     };
   }();
-  var castPath$1 = function castPath(pathParam) {
-    if (isArray(pathParam)) {
-      return pathParam;
-    }
+  var castPath$1 = function () {
+    var __filterDotPath = function __filterDotPath(dotPath, removeFirstDot) {
+      return removeFirstDot && dotPath.indexOf(".") === 0 ? dotPath.substr(1) : dotPath;
+    };
 
-    if (likeString(pathParam)) {
-      if (isNumber(pathParam)) {
-        return [pathParam];
+    var __filterBlockPath = function __filterBlockPath(blockPath) {
+      //remove []
+      blockPath = blockPath.substring(1, blockPath.length - 1); //interger
+
+      if (/^[0-9]+$/.test(blockPath)) {
+        return parseInt(blockPath, 10);
+      } //remove ''
+
+
+      if (/^\'.*\'$/.test(blockPath) || /^\".*\"$/.test(blockPath)) {
+        blockPath = blockPath.substring(1, blockPath.length - 1);
       }
 
-      if (typeof pathParam === "string") {
-        var _castString = castString(pathParam, [".", "["], function (_ref6) {
-          var _ref6$payload = _ref6.payload,
-              content = _ref6$payload.content,
-              path = _ref6$payload.property,
-              _ref6$matching = _ref6.matching,
-              matchType = _ref6$matching.matchType,
-              nextIndex = _ref6$matching.nextIndex,
-              _ref6$casting = _ref6.casting,
-              startIndex = _ref6$casting.startIndex,
-              endIndex = _ref6$casting.endIndex,
-              _ref6$scope = _ref6.scope,
-              next = _ref6$scope.next,
-              fork = _ref6$scope.fork;
+      return blockPath;
+    };
 
-          if (matchType === 0) {
-            path.push(content.substring(startIndex, endIndex));
-            next(nextIndex);
-          }
+    return function (pathParam) {
+      if (isArray(pathParam)) {
+        return pathParam;
+      }
 
-          if (matchType === 1) {
-            var lead = 1,
-                feet = 0;
-            fork(["[", "]"], function (_ref7) {
-              var contentOffset = _ref7.payload.contentOffset,
-                  _ref7$matching = _ref7.matching,
-                  matchType = _ref7$matching.matchType,
-                  nextIndex = _ref7$matching.nextIndex,
-                  _ref7$casting = _ref7.casting,
-                  startIndex = _ref7$casting.startIndex,
-                  endIndex = _ref7$casting.endIndex,
-                  _ref7$scope = _ref7.scope,
-                  next = _ref7$scope.next,
-                  skip = _ref7$scope.skip;
-              matchType === 0 && lead++;
-              matchType === 1 && feet++;
+      if (likeString(pathParam)) {
+        if (isNumber(pathParam)) {
+          return [pathParam];
+        }
 
-              if (lead === feet) {
-                meta.push(casting.substr(1));
-                next(nextIndex);
-              } else {
-                skip();
+        if (typeof pathParam === "string") {
+          var _castString = castString(pathParam, [".", "["], function (_ref6) {
+            var content = _ref6.content,
+                path = _ref6.props.path,
+                matchExp = _ref6.matchExp,
+                castStart = _ref6.castStart,
+                castEnd = _ref6.castEnd,
+                castSize = _ref6.castSize,
+                skipSize = _ref6.skipSize,
+                enter = _ref6.enter,
+                next = _ref6.next;
+
+            if (matchExp === ".") {
+              skipSize && path.push(content.substr(castStart, skipSize));
+              next();
+            }
+
+            if (matchExp === "[") {
+              var stackCount = 0;
+
+              if (skipSize) {
+                path.push(__filterDotPath(content.substr(castStart, skipSize), castStart !== 0));
               }
-            });
-          }
 
-          if (matchType === -1) {
-            path.push(content.substring(startIndex, endIndex));
-          }
-        }, []),
-            result = _castString.meta.result;
+              enter(["[", "]"], function (_ref7) {
+                var matchExp = _ref7.matchExp,
+                    castStart = _ref7.castStart,
+                    castEnd = _ref7.castEnd,
+                    more = _ref7.more,
+                    exit = _ref7.exit;
+                if (matchExp === "[") stackCount++;
+                if (matchExp === "]") stackCount--;
+                if (matchExp === null) return;
 
-        return result;
+                if (stackCount === 0) {
+                  path.push(__filterBlockPath(content.substring(castStart, castEnd)));
+                  exit();
+                } else {
+                  more();
+                }
+              });
+            }
+
+            if (matchExp === null) {
+              path.push(__filterDotPath(content.substr(castStart, castEnd), castStart !== 0));
+            }
+          }, {
+            path: []
+          }),
+              result = _castString.props.path;
+
+          return result;
+        }
       }
-    }
 
-    return [];
-  };
+      return [];
+    };
+  }();
   var free = function free(datum) {
     var dest = {};
     Object.keys(datum).forEach(function (key) {
@@ -5993,7 +6014,7 @@
     isObject: isObject,
     isFunction: isFunction,
     likeObject: likeObject,
-    likeString: likeString$1,
+    likeString: likeString,
     likeNumber: likeNumber,
     likeArray: likeArray,
     isNode: isNode,
