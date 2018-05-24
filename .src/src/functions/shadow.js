@@ -1,16 +1,34 @@
 import { 
   isNone,
+  isObject,
+  isArray,
   likeArray,
   likeObject,
-  isAbsoluteNaN
+  isPlainObject,
+  isEnumerableObject
 } from './isLike'
 
-import { 
+import {
+  clone,
   asArray
 } from './cast'
 
+export const keys = function(target,filterExp,strict){
+  const result = [];
+  if(!likeObject(target)) return result;
+  
+  const filter = typeof filterExp === "function" ? filterExp : ()=>true;
+  
+  (strict === true ? isArray(target) : likeArray(target)) && 
+  Object.keys(target).filter(key=>{ if(isNaN(key)) return; const numberKey = parseInt(key,10); filter(numberKey,target) && result.push( parseInt(numberKey,10) ); }) || 
+  (strict === true ? isPlainObject(target) : likeObject(target)) && 
+  Object.keys(target).forEach(key=>{ filter(key,target) && result.push(key); });
+  
+  return result;
+};
+
 export const entries = function(it){
-  let result = [];
+  const result = [];
   switch(typeof it){
   case "object":
     isNone(it) ? 0 :
@@ -21,23 +39,27 @@ export const entries = function(it){
   return result;
 }
 
-export const keys = function(target,filterExp){
-  let result = [];
-  let filter = typeof filterExp === "function" ? filterExp : ()=>true;
+export const deepKeys = (function(){
   
-  likeArray(target) && 
-  Object.keys(target).filter(key=>{ !isAbsoluteNaN(key) && filter(key,target) && result.push(parseInt(key,10)); }) || 
-  likeObject(target) && 
-  Object.keys(target).forEach(key=>{ filter(key,target) && result.push(key); });
+  const nestedDeepKeys = function(target,filter,scope,total){
+    if(typeof target === "object"){
+      keys(target,(key,target)=>{
+        const child  = target[key];
+        const useKey = filter(child,key,scope.length);
+        if(!useKey){
+          return;
+        }
+        const currentScope = clone(scope);
+        currentScope.push(key);
+        total.push(currentScope);
+        nestedDeepKeys(child,filter,currentScope,total);
+      },true);
+    }
+  };
   
-  return result;
-};
-
-export const deepEntries = function(target,filter){
-  if(likeArray(target)){
-    
+  return function(target,filter){
+    const result = [];
+    nestedDeepKeys(target,filter ? filter(child,key) : ()=>true,[],result);
+    return result;
   }
-  if(likeObject(target)){
-    
-  }
-}
+}());

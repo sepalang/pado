@@ -1,4 +1,4 @@
-import { entries, keys } from '../src/functions/shadow';
+import { entries, keys, deepKeys } from '../src/functions/shadow';
 
 describe('Functions shadow', () => {
   
@@ -50,5 +50,35 @@ describe('Functions shadow', () => {
       dummyInstance.plus();
       return dummyInstance;
     }
+  });
+  
+  it('deepKeys', () => {
+    expect( deepKeys({a:1,b:{d:1,e:2},c:[1,2,3]}) ).toEqual([ 
+      ['a'],
+      ['b'],
+      ['b','d'],
+      ['b','e'],
+      ['c'],
+      ['c',0],
+      ['c',1],
+      ['c',2] 
+    ]);
+    
+    expect( deepKeys([null,{},{a:1,b:2,arr:[3,4,[5,null]]},123,{the:"end"}]) ).toEqual([ 
+      [0],
+      [1],
+      [2],
+      [2,'a'],
+      [2,'b'],
+      [2,'arr'],
+      [2,'arr',0],
+      [2,'arr',1],
+      [2,'arr',2],
+      [2,'arr',2,0],
+      [2,'arr',2,1],
+      [3],
+      [4],
+      [4,'the']
+    ]);
   });
 });

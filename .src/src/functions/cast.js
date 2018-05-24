@@ -84,9 +84,10 @@ export const clone = function(target){
     }
     
     let r={};
+    
     Object.keys(target).forEach(k=>{
       if(target.hasOwnProperty(k)) r[k]=target[k];
-    })
+    });
     return r;
     break;
   default : 

@@ -103,6 +103,8 @@ export const likeRegexp = (s)=> (typeof s === "string") || (s instanceof RegExp)
 
 export const isPlainObject = data => typeof data === "object" && data.constructor === Object
 
+export const isEnumerableObject = data => isPlainObject(data) || isArray(data)
+
 // none(undfinec, null, NaN), value(1,"1"), hash({}), array([]), node, object(new, Date), function, boolean
 export const eqof = function(it){
   const typeIt = typeof it;
@@ -157,8 +159,6 @@ export const isEqual = function(value, other){
   if(isAbsoluteNaN(value) && isAbsoluteNaN(other)){
     return true;
   }
-  
-  
 }
 
 // ignore _ $

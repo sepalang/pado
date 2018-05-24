@@ -181,6 +181,9 @@
   };
   var isPlainObject = function isPlainObject(data) {
     return typeof data === "object" && data.constructor === Object;
+  };
+  var isEnumerableObject = function isEnumerableObject(data) {
+    return isPlainObject(data) || isArray(data);
   }; // none(undfinec, null, NaN), value(1,"1"), hash({}), array([]), node, object(new, Date), function, boolean
 
   var eqof = function eqof(it) {
@@ -483,6 +486,21 @@
     return p > i ? i : i % p;
   };
 
+  var keys = function keys(target, filterExp, strict) {
+    var result = [];
+    if (!likeObject(target)) return result;
+    var filter = typeof filterExp === "function" ? filterExp : function () {
+      return true;
+    };
+    (strict === true ? isArray(target) : likeArray(target)) && Object.keys(target).filter(function (key) {
+      if (isNaN(key)) return;
+      var numberKey = parseInt(key, 10);
+      filter(numberKey, target) && result.push(parseInt(numberKey, 10));
+    }) || (strict === true ? isPlainObject(target) : likeObject(target)) && Object.keys(target).forEach(function (key) {
+      filter(key, target) && result.push(key);
+    });
+    return result;
+  };
   var entries = function entries(it) {
     var result = [];
 
@@ -498,21 +516,33 @@
 
     return result;
   };
-  var keys = function keys(target, filterExp) {
-    var result = [];
-    var filter = typeof filterExp === "function" ? filterExp : function () {
-      return true;
+  var deepKeys = function () {
+    var nestedDeepKeys = function nestedDeepKeys(target, filter, scope, total) {
+      if (typeof target === "object") {
+        keys(target, function (key, target) {
+          var child = target[key];
+          var useKey = filter(child, key, scope.length);
+
+          if (!useKey) {
+            return;
+          }
+
+          var currentScope = clone(scope);
+          currentScope.push(key);
+          total.push(currentScope);
+          nestedDeepKeys(child, filter, currentScope, total);
+        }, true);
+      }
     };
-    likeArray(target) && Object.keys(target).filter(function (key) {
-      !isAbsoluteNaN(key) && filter(key, target) && result.push(parseInt(key, 10));
-    }) || likeObject(target) && Object.keys(target).forEach(function (key) {
-      filter(key, target) && result.push(key);
-    });
-    return result;
-  };
-  var deepEntries = function deepEntries(target, filter) {
-    if (likeArray(target)) ;
-  };
+
+    return function (target, filter) {
+      var result = [];
+      nestedDeepKeys(target, filter ? filter(child, key) : function () {
+        return true;
+      }, [], result);
+      return result;
+    };
+  }();
 
   var asArray$1 = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
@@ -5655,6 +5685,7 @@
     isEmpty: isEmpty,
     likeRegexp: likeRegexp,
     isPlainObject: isPlainObject,
+    isEnumerableObject: isEnumerableObject,
     eqof: eqof,
     eqeq: eqeq,
     isEqual: isEqual,
@@ -5699,9 +5730,9 @@
     timescaleExp: timescaleExp,
     limitOf: limitOf,
     accurateTimeout: accurateTimeout,
-    entries: entries,
     keys: keys,
-    deepEntries: deepEntries,
+    entries: entries,
+    deepKeys: deepKeys,
     promise: promise,
     space: space,
     block: block,
