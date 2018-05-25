@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.function.name", "./isLike", "./reducer", "./shadow", "./enumerable", "./cast"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.function.name", "./isLike", "./remark", "./enumerable", "./cast", "./reducer"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.function.name"), require("./isLike"), require("./reducer"), require("./shadow"), require("./enumerable"), require("./cast"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.function.name"), require("./isLike"), require("./remark"), require("./enumerable"), require("./cast"), require("./reducer"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.es6Function, global.isLike, global.reducer, global.shadow, global.enumerable, global.cast);
+    factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.es6Function, global.isLike, global.remark, global.enumerable, global.cast, global.reducer);
     global.read = mod.exports;
   }
-})(this, function (_exports, _webDom, _es6Array, _es6Object, _es6Function, _isLike, _reducer, _shadow, _enumerable, _cast) {
+})(this, function (_exports, _webDom, _es6Array, _es6Object, _es6Function, _isLike, _remark, _enumerable, _cast, _reducer) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -25,7 +25,7 @@
   //read.readString.spec.js
   var readString = function () {
     var rebaseMatches = function rebaseMatches(matches) {
-      return (0, _shadow.entries)((0, _cast.asArray)(matches));
+      return (0, _remark.entries)((0, _cast.asArray)(matches));
     };
 
     return function (text, matches, castFn, props) {
@@ -64,7 +64,7 @@
         var matchesMap = matchEntries.map(function (_ref2) {
           var matchType = _ref2[0],
               matchExp = _ref2[1];
-          return [(0, _reducer.matchString)(text, matchExp, cursor), matchType, matchExp];
+          return [(0, _remark.matchString)(text, matchExp, cursor), matchType, matchExp];
         });
         var firstMatch = (0, _reducer.top)(matchesMap, function (_ref3, _ref4) {
           var a = _ref3[0],

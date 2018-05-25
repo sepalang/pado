@@ -1,6 +1,6 @@
-import { entries, keys, deepKeys } from '../src/functions/shadow';
+import { entries, keys, deepKeys, matchString, findIndex, findIndexes } from '../src/functions/remark';
 
-describe('Functions shadow', () => {
+describe('Functions remark', () => {
   
   it('entries', () => {
     expect( entries([1,2,3]) ).toEqual([[0,1],[1,2],[2,3]]);
@@ -80,5 +80,38 @@ describe('Functions shadow', () => {
       [4],
       [4,'the']
     ]);
+  });
+  
+  
+  it('matchString', () => {
+    expect( matchString("hello.world",".") ).toEqual([5,1])
+    expect( matchString("hello-world.hello",".") ).toEqual([11,1])
+    expect( matchString("hello.world.hello",".",6) ).toEqual([11,1])
+    expect( matchString("hello..world","..") ).toEqual([5,2])
+    expect( matchString("hello.world",/l./) ).toEqual([2,2])
+    expect( matchString("hello.world",/l.o/) ).toEqual([2,3])
+    expect( matchString("hello.world",/o.w/) ).toEqual([4,3])
+    
+    expect( matchString("abcd","c") ).toEqual([2,1]);
+    expect( matchString("abcd","c",2) ).toEqual([2,1]);
+    
+    expect( matchString("hello.world",/l./,5) ).toEqual([9,2])
+    expect( matchString("hello.world",/l.o/,5) ).toEqual([-1,0])
+    
+    expect( matchString("hello.world","") ).toEqual([0,0])
+    expect( matchString("hello.world","z") ).toEqual([-1,0])
+  });
+  
+  // isEmpty
+  it('findIndex', () => {
+    expect( findIndex("hello world","l") ).toEqual(2);
+    expect( findIndex("hello world",/l/) ).toEqual(2);
+    expect( findIndex("hello world",/\s/) ).toEqual(5);
+  });
+  
+  it('findIndexes', () => {
+    expect( findIndexes("hello world","l") ).toEqual([2,3,9]);
+    expect( findIndexes("hello world",/l/) ).toEqual([2,3,9]);
+    expect( findIndexes("hello world",/\s/) ).toEqual([5]);
   });
 });

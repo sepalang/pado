@@ -524,6 +524,64 @@
     return rn;
   };
 
+  var keys = function keys(target, filterExp, strict) {
+    var result = [];
+    if (!likeObject$1(target)) return result;
+    var filter = typeof filterExp === "function" ? filterExp : function () {
+      return true;
+    };
+    (strict === true ? isArray$1(target) : likeArray(target)) && Object.keys(target).filter(function (key) {
+      if (isNaN(key)) return;
+      var numberKey = parseInt(key, 10);
+      filter(numberKey, target) && result.push(parseInt(numberKey, 10));
+    }) || (strict === true ? isPlainObject(target) : likeObject$1(target)) && Object.keys(target).forEach(function (key) {
+      filter(key, target) && result.push(key);
+    });
+    return result;
+  };
+  var entries = function entries(it) {
+    var result = [];
+
+    switch (typeof it) {
+      case "object":
+        isNone(it) ? 0 : likeArray(it) ? asArray$1(it).forEach(function (v, k) {
+          result.push([k, v]);
+        }) : Object.keys(it).forEach(function (key) {
+          result.push([key, it[key]]);
+        });
+        break;
+    }
+
+    return result;
+  };
+  var deepKeys = function () {
+    var nestedDeepKeys = function nestedDeepKeys(target, filter, scope, total) {
+      if (typeof target === "object") {
+        keys(target, function (key, target) {
+          var child = target[key];
+          var useKey = filter(child, key, scope.length);
+
+          if (!useKey) {
+            return;
+          }
+
+          var currentScope = clone(scope);
+          currentScope.push(key);
+          total.push(currentScope);
+          nestedDeepKeys(child, filter, currentScope, total);
+        }, true);
+      }
+    };
+
+    return function (target, filter) {
+      var result = [];
+      nestedDeepKeys(target, filter ? filter(child, key) : function () {
+        return true;
+      }, [], result);
+      return result;
+    };
+  }(); //remark.spec.js
+
   var matchString = function matchString(it, search, at) {
     if (at === void 0) {
       at = 0;
@@ -549,7 +607,7 @@
     return function (it, search, at) {
       return (search instanceof RegExp ? __find_regexp : __find_string)(it, search, at);
     };
-  }(); //reducer.spec.js
+  }(); //remark.spec.js
 
   var findIndexes$1 = function () {
     return function (c, s, at) {
@@ -574,7 +632,38 @@
         return idxs;
       }
     };
-  }(); //reducer.spec.js
+  }();
+
+  var all = function all(data, fn) {
+    data = asArray$1(data);
+
+    if (data.length === 0) {
+      return false;
+    }
+
+    for (var i = 0, l = data.length; i < l; i++) {
+      if (!fn(data[i], i)) {
+        return false;
+      }
+    }
+    return true;
+  };
+  var deep = function deep(data) {};
+  var times = function times(length, fn) {
+    var result = [];
+
+    for (var i = 0, l = length; i < l; i++) {
+      result.push(fn(i));
+    }
+
+    return result;
+  };
+  var forMap$1 = function forMap(object, fn) {
+    return Object.keys(object).reduce(function (dest, key) {
+      dest[key] = fn(object[key], key);
+      return dest;
+    }, object);
+  };
 
   var cut = function cut(collection, cutLength, emptyDefault) {
     if (cutLength === void 0) {
@@ -639,95 +728,6 @@
     }).splice(0, topLength) : asArray$1(data).sort(function (a, b) {
       return iteratee(a, b);
     })[0];
-  };
-
-  var keys = function keys(target, filterExp, strict) {
-    var result = [];
-    if (!likeObject$1(target)) return result;
-    var filter = typeof filterExp === "function" ? filterExp : function () {
-      return true;
-    };
-    (strict === true ? isArray$1(target) : likeArray(target)) && Object.keys(target).filter(function (key) {
-      if (isNaN(key)) return;
-      var numberKey = parseInt(key, 10);
-      filter(numberKey, target) && result.push(parseInt(numberKey, 10));
-    }) || (strict === true ? isPlainObject(target) : likeObject$1(target)) && Object.keys(target).forEach(function (key) {
-      filter(key, target) && result.push(key);
-    });
-    return result;
-  };
-  var entries = function entries(it) {
-    var result = [];
-
-    switch (typeof it) {
-      case "object":
-        isNone(it) ? 0 : likeArray(it) ? asArray$1(it).forEach(function (v, k) {
-          result.push([k, v]);
-        }) : Object.keys(it).forEach(function (key) {
-          result.push([key, it[key]]);
-        });
-        break;
-    }
-
-    return result;
-  };
-  var deepKeys = function () {
-    var nestedDeepKeys = function nestedDeepKeys(target, filter, scope, total) {
-      if (typeof target === "object") {
-        keys(target, function (key, target) {
-          var child = target[key];
-          var useKey = filter(child, key, scope.length);
-
-          if (!useKey) {
-            return;
-          }
-
-          var currentScope = clone(scope);
-          currentScope.push(key);
-          total.push(currentScope);
-          nestedDeepKeys(child, filter, currentScope, total);
-        }, true);
-      }
-    };
-
-    return function (target, filter) {
-      var result = [];
-      nestedDeepKeys(target, filter ? filter(child, key) : function () {
-        return true;
-      }, [], result);
-      return result;
-    };
-  }();
-
-  var all = function all(data, fn) {
-    data = asArray$1(data);
-
-    if (data.length === 0) {
-      return false;
-    }
-
-    for (var i = 0, l = data.length; i < l; i++) {
-      if (!fn(data[i], i)) {
-        return false;
-      }
-    }
-    return true;
-  };
-  var deep = function deep(data) {};
-  var times = function times(length, fn) {
-    var result = [];
-
-    for (var i = 0, l = length; i < l; i++) {
-      result.push(fn(i));
-    }
-
-    return result;
-  };
-  var forMap$1 = function forMap(object, fn) {
-    return Object.keys(object).reduce(function (dest, key) {
-      dest[key] = fn(object[key], key);
-      return dest;
-    }, object);
   };
 
   var readString = function () {
@@ -3374,7 +3374,7 @@
   };
   Object.defineProperties(LimitterPrototype, {
     done: {
-      get: function get() {
+      get: function get$$1() {
         return this.value === limitOf(this.value, this.maximum, this.minimum);
       }
     }
@@ -3437,9 +3437,6 @@
     deep: deep,
     times: times,
     forMap: forMap$1,
-    matchString: matchString,
-    findIndex: findIndex,
-    findIndexes: findIndexes$1,
     cut: cut,
     top: top,
     rand64: rand64,
@@ -3458,6 +3455,9 @@
     keys: keys,
     entries: entries,
     deepKeys: deepKeys,
+    matchString: matchString,
+    findIndex: findIndex,
+    findIndexes: findIndexes$1,
     readString: readString,
     readPath: readPath,
     get: get,

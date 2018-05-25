@@ -1,5 +1,4 @@
-import { limitOf } from "../functions/nice";
-import { isNumber, isAbsoluteNaN } from "../functions/isLike";
+import { isNumber, limitOf, isAbsoluteNaN } from "../functions";
 
 export const Limitter = function(max,min){
   this.value = 0;

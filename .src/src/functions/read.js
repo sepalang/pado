@@ -6,13 +6,9 @@ import {
 } from './isLike'
 
 import {
-  matchString,
-  top
-} from './reducer'
-
-import {
-  entries
-} from './shadow'
+  entries,
+  matchString
+} from './remark'
 
 import {
   all
@@ -21,6 +17,10 @@ import {
 import {
   asArray
 } from './cast'
+
+import {
+  top
+} from './reducer'
 
 
 //read.readString.spec.js
