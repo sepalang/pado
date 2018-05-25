@@ -1,0 +1,1 @@
+This directory is report of pado build
