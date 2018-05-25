@@ -84,7 +84,7 @@ export const wheel = PromiseFunction.wheel = function(tasks, option) {
   }
 
   let finished = false;
-  const defer = PromiseFunction.defer();
+  let defer;
   const limit = (typeof option.limit === "number" && option.limit > 0) ? parseInt(option.limit, 10) : 10000;
   const taskLength = tasks.length;
   let wheelTick = 0;
@@ -124,44 +124,70 @@ export const wheel = PromiseFunction.wheel = function(tasks, option) {
       setTimeout(()=>{ nextTickFn(value); }, nowAction);
     }
   };
-
-  defer.promise
-  .then(e=>{
-    if(finished === null) return PromiseFunction.abort();
-    finished = true;
-    return e;
-  })
-  .catch(e=>{
-    if(finished === null) return PromiseFunction.abort();
-    finished = true;
-    return e;
-  });
-
-  defer.stop = (resetTick)=>{
-    finished = null;
-    resetScope += 1;
-  };
-
-  defer.start = (resetTick)=>{
-    if(finished === null) {
-      finished = false;
-      wheelTick = typeof resetTick === "number" ? resetTick : 0;
-      nextWheelTick(wheelTick++, option.value, resetScope);
+  
+  const thenStack  = [
+    e=>{
+      if(finished === null) return PromiseFunction.abort();
+      finished = true;
+      return e;
     }
-  };
-
-  defer.reset = (resetTick)=>{
-    defer.stop();
+  ];
+  const catchStack = [
+    e=>{
+      if(finished === null) return PromiseFunction.abort();
+      finished = true;
+      return PromiseFunction.reject(e);
+    }
+  ];
+  
+  const deferReset = (resetTick)=>{
+    defer && defer.stop();
+    //
+    defer = PromiseFunction.defer();
+    thenStack.forEach(fn=>defer.promise.then(fn));
+    catchStack.forEach(fn=>defer.promise.catch(fn));
+    
+    //
+    defer.stop = (resetTick)=>{
+      finished = null;
+      resetScope += 1;
+    };
+    
+    defer.start = (resetTick)=>{
+      if(finished === null) {
+        finished = false;
+        wheelTick = typeof resetTick === "number" ? resetTick : 0;
+        nextWheelTick(wheelTick++, option.value, resetScope);
+      }
+    };
+    //
+    defer.reset = deferReset;
+    //
+    finished = null;
     defer.start(resetTick);
   };
-
-  defer.reset(0);
-
-  return defer;
+  
+  deferReset(0);
+  
+  const wheelControls = {
+    ...defer,
+    then (fn){
+      defer.promise.then(fn);
+      thenStack.push(fn);
+      return wheelControls;
+    },
+    catch (fn){
+      defer.promise.catch(fn);
+      catchStack.push(fn);
+      return wheelControls;
+    }
+  };
+  
+  return wheelControls;
 }
 
 export const sequance = PromiseFunction.sequance = function(funcArray, opts){
-  return q(function(resolve, reject){
+  return PromiseFunction(function(resolve, reject){
     const option = asObject(opts,"concurrent");
       
     if(option.concurrent === true){
@@ -193,7 +219,7 @@ export const sequance = PromiseFunction.sequance = function(funcArray, opts){
     const sequanceOperator = operate({
       output:async ({ entry })=>{
         if(option.interval > -1){
-          await q.timeout(option.interval);
+          await PromiseFunction.timeout(option.interval);
         }
         return entry;
       },
