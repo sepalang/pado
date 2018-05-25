@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "./cast", "./isLike", "./reducer", "./nice", "./enumerable"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "./cast", "./isLike", "./reduce", "./nice", "./enumerable"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("./cast"), require("./isLike"), require("./reducer"), require("./nice"), require("./enumerable"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("./cast"), require("./isLike"), require("./reduce"), require("./nice"), require("./enumerable"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.cast, global.isLike, global.reducer, global.nice, global.enumerable);
+    factory(mod.exports, global.webDom, global.cast, global.isLike, global.reduce, global.nice, global.enumerable);
     global.matrix = mod.exports;
   }
-})(this, function (_exports, _webDom, _cast, _isLike, _reducer, _nice, _enumerable) {
+})(this, function (_exports, _webDom, _cast, _isLike, _reduce, _nice, _enumerable) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -118,7 +118,7 @@
 
   var matrixRange = function matrixRange(start, end, step, sizeBase) {
     var scales = [];
-    var maxLength = (0, _reducer.top)([start.length, end.length]);
+    var maxLength = (0, _reduce.top)([start.length, end.length]);
     var selectLengthes = (0, _enumerable.times)(maxLength, function (scaleIndex) {
       var range = range([start[scaleIndex], end[scaleIndex]], step, sizeBase);
       scales.push(range);

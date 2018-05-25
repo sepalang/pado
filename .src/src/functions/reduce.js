@@ -7,7 +7,7 @@ import {
   asArray
 } from './cast'
 
-//reducer.spec.js
+//reduce.spec.js
 export const cut = function(collection,cutLength=1,emptyDefault=undefined){
   let data = asArray(collection);
   let fill = emptyDefault;
@@ -30,7 +30,7 @@ export const cut = function(collection,cutLength=1,emptyDefault=undefined){
   return data;
 }
 
-//reducer.spec.js
+//reduce.spec.js
 export const top = function(data,iteratee,topLength){
   switch(typeof iteratee){
   case "function":

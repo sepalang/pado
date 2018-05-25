@@ -20,7 +20,7 @@ import {
 
 import {
   top
-} from './reducer'
+} from './reduce'
 
 
 //read.readString.spec.js

@@ -8,7 +8,7 @@
       exports: {}
     };
     factory(mod.exports, global.es6Array, global.es6Number, global.isLike, global.cast);
-    global.reducer = mod.exports;
+    global.reduce = mod.exports;
   }
 })(this, function (_exports, _es6Array, _es6Number, _isLike, _cast) {
   "use strict";
@@ -18,7 +18,7 @@
   });
   _exports.top = _exports.cut = void 0;
 
-  //reducer.spec.js
+  //reduce.spec.js
   var cut = function cut(collection, cutLength, emptyDefault) {
     if (cutLength === void 0) {
       cutLength = 1;
@@ -49,7 +49,7 @@
     }
 
     return data;
-  }; //reducer.spec.js
+  }; //reduce.spec.js
 
 
   _exports.cut = cut;
@@ -89,4 +89,4 @@
 
   _exports.top = top;
 });
-//# sourceMappingURL=reducer.js.map
+//# sourceMappingURL=reduce.js.map

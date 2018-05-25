@@ -695,7 +695,7 @@
     }
 
     return data;
-  }; //reducer.spec.js
+  }; //reduce.spec.js
 
   var top = function top(data, iteratee, topLength) {
     switch (typeof iteratee) {

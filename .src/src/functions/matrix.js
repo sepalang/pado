@@ -1,6 +1,6 @@
 import { asArray, cloneDeep } from './cast'
 import { isAbsoluteNaN } from './isLike'
-import { top } from './reducer';
+import { top } from './reduce';
 import { turn } from './nice';
 import { times } from './enumerable';
 

@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.function.name", "./isLike", "./remark", "./enumerable", "./cast", "./reducer"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.function.name", "./isLike", "./remark", "./enumerable", "./cast", "./reduce"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.function.name"), require("./isLike"), require("./remark"), require("./enumerable"), require("./cast"), require("./reducer"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.function.name"), require("./isLike"), require("./remark"), require("./enumerable"), require("./cast"), require("./reduce"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.es6Function, global.isLike, global.remark, global.enumerable, global.cast, global.reducer);
+    factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.es6Function, global.isLike, global.remark, global.enumerable, global.cast, global.reduce);
     global.read = mod.exports;
   }
-})(this, function (_exports, _webDom, _es6Array, _es6Object, _es6Function, _isLike, _remark, _enumerable, _cast, _reducer) {
+})(this, function (_exports, _webDom, _es6Array, _es6Object, _es6Function, _isLike, _remark, _enumerable, _cast, _reduce) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -66,7 +66,7 @@
               matchExp = _ref2[1];
           return [(0, _remark.matchString)(text, matchExp, cursor), matchType, matchExp];
         });
-        var firstMatch = (0, _reducer.top)(matchesMap, function (_ref3, _ref4) {
+        var firstMatch = (0, _reduce.top)(matchesMap, function (_ref3, _ref4) {
           var a = _ref3[0],
               aPriority = _ref3[1];
           var b = _ref4[0],
