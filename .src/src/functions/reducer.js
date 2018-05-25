@@ -17,8 +17,6 @@ import {
   all
 } from './enumerable'
 
-import _get from 'lodash/get';
-
 //reducer.spec.js
 export const matchString = (it,search,at=0)=>{
   if(typeof it !== "string") throw new Error(`matchString :: worng argument ${it}`);
@@ -102,11 +100,27 @@ export const top = function(data,iteratee,topLength){
   asArray(data).sort((a,b)=>iteratee(a,b))[0];
 };
 
-export const get = function(target,path){
+export const get = function(target,path,defaultValue){
   if(typeof target === "object"){
     switch(typeof path){
       case "number": path += "";
-      case "string": return path.indexOf("[") == 0 ? eval("target"+path) : eval("target."+path);
+      case "string":
+        path = castPath(path);
+      case "object":
+        if(isArray(path)){
+          const allget = all(path,(name)=>{
+            if(likeObject(target) && (target.hasOwnProperty(name) || target[name])){
+              target = target[name];
+              return true;
+            } else {
+              return false;
+            }
+          });
+          return allget ? target : defaultValue;
+        } else {
+          return;
+        }
+        break;
       case "function": return path.call(this,target);
     }
   } else if(typeof target === "function"){
@@ -130,9 +144,9 @@ export const hasValueProperty = function(obj,value,key){
   if(isArray(obj)) for(var i=0,l=obj.length;i<l;i++) if(obj[i] === value) return true;
   if(likeObject(obj)){
     if(key){
-      return _get(obj,key) === value;
+      return get(obj,key) === value;
     } else {
-      for(var key in obj) if(_get(obj,key) === value) return true;
+      for(var key in obj) if(get(obj,key) === value) return true;
     }
   }
   return false;

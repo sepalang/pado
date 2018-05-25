@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.notExsist = _exports.isExsist = _exports.likeEqual = _exports.isEqual = _exports.eqeq = _exports.eqof = _exports.isPlainObject = _exports.likeRegexp = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isInfinity = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
+  _exports.notExsist = _exports.isExsist = _exports.likeEqual = _exports.isEqual = _exports.eqeq = _exports.eqof = _exports.isEnumerableObject = _exports.isPlainObject = _exports.likeRegexp = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isInfinity = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
 
   var isAbsoluteNaN = function isAbsoluteNaN(it) {
     return it !== it && typeof it === "number";
@@ -170,10 +170,16 @@
 
   var isPlainObject = function isPlainObject(data) {
     return typeof data === "object" && data.constructor === Object;
+  };
+
+  _exports.isPlainObject = isPlainObject;
+
+  var isEnumerableObject = function isEnumerableObject(data) {
+    return isPlainObject(data) || isArray(data);
   }; // none(undfinec, null, NaN), value(1,"1"), hash({}), array([]), node, object(new, Date), function, boolean
 
 
-  _exports.isPlainObject = isPlainObject;
+  _exports.isEnumerableObject = isEnumerableObject;
 
   var eqof = function eqof(it) {
     var typeIt = typeof it;

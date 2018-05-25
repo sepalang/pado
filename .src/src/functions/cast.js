@@ -1,7 +1,5 @@
 import {
   isArray,
-  likeArray,
-  likeObject,
   likeString,
   isNone,
   isAbsoluteNaN,
@@ -14,6 +12,10 @@ import {
   matchString,
   top
 } from './reducer'
+
+import {
+  entries
+} from './shadow'
 
 export const asArray = function(data, defaultArray = undefined) {
   if(isArray(data)) {
@@ -60,40 +62,6 @@ export const cleanObject = function(data){
   return data
 }
 
-export const entries = function(it){
-  let result = [];
-  switch(typeof it){
-  case "object":
-    isNone(it) ? 0 :
-    likeArray(it) ? asArray(it).forEach((v,k)=>{ result.push([k,v]) }) :
-    Object.keys(it).forEach(key=>{ result.push([key, it[key]]) });
-    break;
-  }
-  return result;
-}
-
-export const keys = function(target,filterExp){
-  let result = [];
-  let filter = typeof filterExp === "function" ? filterExp : ()=>true;
-  
-  likeArray(target) && Object.keys(target).filter(key=>{
-    !isNaN(key) && filter(key,target) && result.push(parseInt(key,10));
-  }) || likeObject(target) && Object.keys(target).forEach(key=>{
-    filter(key,target) && result.push(key);
-  });
-  
-  return result;
-};
-
-export const deepEntries = function(target,filter){
-  if(likeArray(target)){
-    
-  }
-  if(likeObject(target)){
-    
-  }
-}
-
 export const clone = function(target){
   switch(typeof target){
   case "undefined": case "function": case "boolean": case "number": case "string": return target; break;
@@ -116,9 +84,10 @@ export const clone = function(target){
     }
     
     let r={};
+    
     Object.keys(target).forEach(k=>{
       if(target.hasOwnProperty(k)) r[k]=target[k];
-    })
+    });
     return r;
     break;
   default : 
@@ -149,11 +118,8 @@ export const cloneDeep = function(target){
 
 //cast.castString.spec.js
 export const castString = (function(){
-  
   const rebaseMatches = matches=>entries(asArray(matches));
-  
   return function(text,matches,castFn,props){
-
     const payload = {
       content:text,
       props
