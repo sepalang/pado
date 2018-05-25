@@ -4,18 +4,16 @@ import {
   isNumber,
   isEmpty,
   likeRegexp,
-  likeString,
-  likeObject
+  likeString
 } from './isLike'
 
 import {
-  asArray,
-  castPath
+  asArray
 } from './cast'
 
 import {
-  all
-} from './enumerable'
+  get
+} from './read'
 
 //reducer.spec.js
 export const matchString = (it,search,at=0)=>{
@@ -98,62 +96,4 @@ export const top = function(data,iteratee,topLength){
   return isNumber(topLength) || isInfinity(topLength) ?
   asArray(data).sort((a,b)=>iteratee(a,b)).splice(0,topLength):
   asArray(data).sort((a,b)=>iteratee(a,b))[0];
-};
-
-export const get = function(target,path,defaultValue){
-  if(typeof target === "object"){
-    switch(typeof path){
-      case "number": path += "";
-      case "string":
-        path = castPath(path);
-      case "object":
-        if(isArray(path)){
-          const allget = all(path,(name)=>{
-            if(likeObject(target) && (target.hasOwnProperty(name) || target[name])){
-              target = target[name];
-              return true;
-            } else {
-              return false;
-            }
-          });
-          return allget ? target : defaultValue;
-        } else {
-          return;
-        }
-        break;
-      case "function": return path.call(this,target);
-    }
-  } else if(typeof target === "function"){
-    return target.apply(this,Array.prototype.slice.call(arguments,1));
-  }
-  return target;
-}
-
-export const hasProperty = function(target,pathParam){
-  return all(castPath(pathParam),path=>{
-    if(likeObject(target) && likeString(path) && target.hasOwnProperty(path)){
-      target = target[path];
-      return true;
-    }
-    return false;
-  });
-}
-
-export const hasValueProperty = function(obj,value,key){
-  if(arguments.length == 1 && likeObject(obj)) return isEmpty(obj);
-  if(isArray(obj)) for(var i=0,l=obj.length;i<l;i++) if(obj[i] === value) return true;
-  if(likeObject(obj)){
-    if(key){
-      return get(obj,key) === value;
-    } else {
-      for(var key in obj) if(get(obj,key) === value) return true;
-    }
-  }
-  return false;
-};
-
-export const turn = function(i, p, ts) {
-  if(i < 0) { var abs = Math.abs(i / ts); i = p - (abs > p ? abs % p : abs); }
-  ts = ts || 1; i = Math.floor(i / ts);
-  return (p > i) ? i : i % p;
 };

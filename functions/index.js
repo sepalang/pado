@@ -6,17 +6,17 @@ require("core-js/modules/web.dom.iterable");
 
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./functions", "./isLike", "./cast", "./enumerable", "./reducer", "./random", "./matrix", "./datetime", "./nice", "./shadow"], factory);
+    define(["exports", "./functions", "./isLike", "./cast", "./enumerable", "./reducer", "./random", "./matrix", "./datetime", "./nice", "./shadow", "./read"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./functions"), require("./isLike"), require("./cast"), require("./enumerable"), require("./reducer"), require("./random"), require("./matrix"), require("./datetime"), require("./nice"), require("./shadow"));
+    factory(exports, require("./functions"), require("./isLike"), require("./cast"), require("./enumerable"), require("./reducer"), require("./random"), require("./matrix"), require("./datetime"), require("./nice"), require("./shadow"), require("./read"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.functions, global.isLike, global.cast, global.enumerable, global.reducer, global.random, global.matrix, global.datetime, global.nice, global.shadow);
+    factory(mod.exports, global.functions, global.isLike, global.cast, global.enumerable, global.reducer, global.random, global.matrix, global.datetime, global.nice, global.shadow, global.read);
     global.index = mod.exports;
   }
-})(this, function (_exports, _functions, _isLike, _cast, _enumerable, _reducer, _random, _matrix, _datetime, _nice, _shadow) {
+})(this, function (_exports, _functions, _isLike, _cast, _enumerable, _reducer, _random, _matrix, _datetime, _nice, _shadow, _read) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -109,6 +109,15 @@ require("core-js/modules/web.dom.iterable");
       enumerable: true,
       get: function get() {
         return _shadow[key];
+      }
+    });
+  });
+  Object.keys(_read).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(_exports, key, {
+      enumerable: true,
+      get: function get() {
+        return _read[key];
       }
     });
   });

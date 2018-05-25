@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "./isLike", "./cast", "./reducer"], factory);
+    define(["exports", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "./isLike", "./cast", "./read"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("./isLike"), require("./cast"), require("./reducer"));
+    factory(exports, require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("./isLike"), require("./cast"), require("./read"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Array, global.es6Object, global.webDom, global.isLike, global.cast, global.reducer);
+    factory(mod.exports, global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Array, global.es6Object, global.webDom, global.isLike, global.cast, global.read);
     global.functions = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _es6Regexp2, _es6Object, _es6Array, _es6Object2, _webDom, _isLike, _cast, _reducer) {
+})(this, function (_exports, _es6Regexp, _es6Regexp2, _es6Object, _es6Array, _es6Object2, _webDom, _isLike, _cast, _read) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.toggle = _exports.diffStructure = _exports.apart = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.hasValue = _exports.unique = void 0;
+  _exports.toggle = _exports.diffStructure = _exports.apart = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.unique = void 0;
 
   var unique = function unique(array) {
     var value = [],
@@ -40,71 +40,6 @@
   };
 
   _exports.unique = unique;
-
-  var hasValue = function () {
-    var defaultObjectValueFunc = function defaultObjectValueFunc(object, value) {
-      return object === value;
-    };
-
-    var functionKeyObjectValueProc = function functionKeyObjectValueProc(functionKey) {
-      return function (object, value) {
-        return Boolean(functionKey(object, value));
-      };
-    };
-
-    var selectKeyObjectValueProc = function selectKeyObjectValueProc(leftSelect, rightSelect) {
-      var useLeftSelector = typeof leftSelect === "string" || typeof leftSelect === "number";
-      var useRightSelector = leftSelect === rightSelect ? useLeftSelector : typeof rightSelect === "string" || typeof rightSelect === "number";
-      return function (object, value) {
-        if (useLeftSelector && !object.hasOwnProperty(leftSelect)) return false;
-        if (useRightSelector && !value.hasOwnProperty(rightSelect)) return false;
-        return (useLeftSelector ? (0, _reducer.get)(object, leftSelect) : object) === (useRightSelector ? (0, _reducer.get)(value, rightSelect) : value);
-      };
-    };
-
-    return function (obj, value, key, getKey) {
-      if (typeof key === "boolean") {
-        if (typeof getKey !== "boolean") {
-          getKey = key;
-        }
-
-        key = void 0;
-      }
-
-      if (obj === value) {
-        return true;
-      } else if ((0, _isLike.isObject)(obj)) {
-        if (value === void 0 && key === void 0) return !(0, _isLike.isEmpty)(obj);
-        var proc;
-
-        if (key) {
-          if (typeof key === "function") {
-            proc = functionKeyObjectValueProc(key);
-          } else if ((0, _isLike.isArray)(key) && key.length > 1) {
-            proc = selectKeyObjectValueProc(key[0], key[1]);
-          } else if (typeof key === "string" || typeof key === "number") {
-            proc = selectKeyObjectValueProc(key, key);
-          }
-        } else {
-          proc = defaultObjectValueFunc;
-        }
-
-        if ((0, _isLike.isArray)(obj)) {
-          for (var i = 0, l = obj.length; i < l; i++) {
-            if (proc(obj[i], value)) return getKey ? i : true;
-          }
-        } else {
-          for (var objKey in obj) {
-            if (obj.hasOwnProperty(objKey) && proc(obj[objKey], value)) return getKey ? objKey : true;
-          }
-        }
-      }
-
-      return getKey ? void 0 : false;
-    };
-  }();
-
-  _exports.hasValue = hasValue;
 
   var getKeyBy = function getKeyBy(object, value) {
     if ((0, _isLike.isFunction)(value)) {
@@ -387,7 +322,7 @@
         analysis.match.push(key);
         analysis.keys[key] = "match";
 
-        if (canDiff && !angular.equals((0, _reducer.get)(after, key), (0, _reducer.get)(before, key))) {
+        if (canDiff && !angular.equals((0, _read.get)(after, key), (0, _read.get)(before, key))) {
           analysis.diff.push(key);
           analysis.keys[key] = "diff";
         }

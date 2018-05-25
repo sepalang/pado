@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "./cast", "./isLike", "./reducer", "./enumerable"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "./cast", "./isLike", "./reducer", "./nice", "./enumerable"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("./cast"), require("./isLike"), require("./reducer"), require("./enumerable"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("./cast"), require("./isLike"), require("./reducer"), require("./nice"), require("./enumerable"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.cast, global.isLike, global.reducer, global.enumerable);
+    factory(mod.exports, global.webDom, global.cast, global.isLike, global.reducer, global.nice, global.enumerable);
     global.matrix = mod.exports;
   }
-})(this, function (_exports, _webDom, _cast, _isLike, _reducer, _enumerable) {
+})(this, function (_exports, _webDom, _cast, _isLike, _reducer, _nice, _enumerable) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -133,7 +133,7 @@
     (0, _cast.asArray)(scales).forEach(function (scaleCase, scaleIndex) {
       var scaleCaseLength = scaleCase.length;
       (0, _enumerable.times)(result.length, function (time) {
-        result[time][scaleIndex] = scaleCase[(0, _reducer.turn)(time, scaleCaseLength, turnSize)];
+        result[time][scaleIndex] = scaleCase[(0, _nice.turn)(time, scaleCaseLength, turnSize)];
       });
       turnSize = turnSize * scaleCaseLength;
     });

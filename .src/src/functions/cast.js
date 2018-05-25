@@ -1,21 +1,10 @@
 import {
   isArray,
-  likeString,
   isNone,
   isAbsoluteNaN,
-  isNumber,
   isPlainObject,
   isObject
 } from './isLike'
-
-import {
-  matchString,
-  top
-} from './reducer'
-
-import {
-  entries
-} from './shadow'
 
 export const asArray = function(data, defaultArray = undefined) {
   if(isArray(data)) {
@@ -98,248 +87,29 @@ export const clone = function(target){
 }
 
 export const cloneDeep = function(target){
-  var d;
   if(typeof target === "object"){
-  	if(isArray(target)) {
-  		if(!isArray(d)) { d = [] };
-  		for (var i=0,l=target.length;i<l;i++) d.push( ((typeof target[i] === "object" && target[i] !== null ) ? clone(target[i]) : target[i]) )
-  		return d;
-  	} else {
-  		d = {}
+    let d;
+    if(isArray(target)) {
+      if(!isArray(d)) { d = [] };
+      for (var i=0,l=target.length;i<l;i++) d.push( ((typeof target[i] === "object" && target[i] !== null ) ? clone(target[i]) : target[i]) )
+        return d;
+    } else {
+      d = {}
       Object.keys(target).forEach(p=>{
         (typeof target[p] === "object" && target[p] !== null && d[p]) ? clone(target[p],d[p]) : d[p] = target[p];
-      })
-  		return d;
-  	}
+      });
+      return d;
+    }
   } else {
-    clone(target);
+    return clone(target);
   }
 };
-
-//cast.castString.spec.js
-export const castString = (function(){
-  const rebaseMatches = matches=>entries(asArray(matches));
-  return function(text,matches,castFn,props){
-    const payload = {
-      content:text,
-      props
-    };
-  
-    const newMatchEntries = rebaseMatches(matches);
-  
-    const castingState = {
-      firstIndex:0,
-      lastIndex:text.length,
-      castingStart:0,
-      cursor:0
-    };
-    
-    if(typeof props === "object" && isNumber(props.start)){
-      castingState.castingStart = props.start;
-      castingState.cursor       = props.start;
-    }
-
-    const open = function({ castingState:{ firstIndex, lastIndex, castingStart, cursor }, matchEntries, castFn, parentScope }){
-      
-      if(cursor>=lastIndex){
-        return false;
-      }
-      
-      //find match
-      const matchesMap = matchEntries.map(([matchType, matchExp])=>([matchString(text,matchExp,cursor), matchType, matchExp]));
-      let firstMatch   = top(matchesMap,([a,aPriority],[b,bPriority])=>(
-        a[0]<0?true:
-        b[0]<0?false:
-        a[0]==b[0]?aPriority<bPriority:a[0]>b[0]
-      ));
-      
-      // top match is not exsist
-      if(!firstMatch){ return false; }
-      
-      // unmatched
-      if(firstMatch[0][0] === -1){
-        firstMatch = [[-1, 0], -1, null];
-      }
-
-      //next variant
-      const [[ matchIndex, matchSize ], matchType, matchExp] = firstMatch;
-      const castStart = castingStart;
-      const castEnd   = matchType === -1 ? lastIndex : (matchIndex + matchSize);
-      const castSize  = castEnd - castStart;
-      const skipSize  = castSize - matchSize;
-      
-      //next params
-      const matching = { 
-        matchType, 
-        matchExp,
-        matchIndex,
-        matchSize,
-        skipSize
-      };
-      const casting = {
-        firstIndex,
-        lastIndex,
-        castStart,
-        castEnd,
-        castSize
-      };
-      const scope = {
-        fork (matchEntries,castFn){
-          const newMatchEntries = rebaseMatches(matches);
-          open({
-            castingState:{
-              firstIndex  :matching.matchIndex,
-              lastIndex   :matching.matchIndex + matchSize,
-              castingStart:matching.matchIndex,
-              cursor      :matching.matchIndex
-            }, 
-            matchEntries:newMatchEntries,
-            castFn,
-            parentScope
-          });
-        },
-        next (needCursor){
-          const cursorTo = isNumber(needCursor) ? needCursor : casting.castEnd;
-          open({
-            castingState:{
-              firstIndex  ,
-              lastIndex   ,
-              castingStart:cursorTo,
-              cursor      :cursorTo
-            },
-            matchEntries,
-            castFn,
-            parentScope
-          });
-        },
-        enter (enterMatches,enterCastFn){
-          open({
-            castingState:{
-              firstIndex  ,
-              lastIndex   ,
-              castingStart:matching.matchIndex,
-              cursor      :matching.matchIndex
-            },
-            matchEntries:rebaseMatches(enterMatches),
-            castFn:enterCastFn,
-            parentScope:{
-              next:scope.next
-            }
-          });
-        },
-        exit (needCursor){
-          parentScope && parentScope.next(isNumber(needCursor) ? needCursor : casting.castEnd);
-        },
-        more (){
-          open({
-            castingState:{
-              firstIndex  ,
-              lastIndex   ,
-              castingStart:castStart,
-              cursor      :casting.castEnd
-            },
-            matchEntries,
-            castFn,
-            parentScope
-          });
-        }
-      };
-      
-      castFn({
-        ...payload,
-        ...matching,
-        ...casting,
-        ...scope
-      });
-      
-      return true;
-    };
-    
-    open({
-      castingState,
-      matchEntries:newMatchEntries,
-      castFn
-    });
-  
-    return payload;
-  };
-}());
-
-export const castPath = (function(){
-  
-  const __filterDotPath = (dotPath,removeFirstDot)=>removeFirstDot && dotPath.indexOf(".") === 0 ? dotPath.substr(1) : dotPath;
-  const __filterBlockPath = (blockPath)=>{
-    //remove []
-    blockPath = blockPath.substring(1,blockPath.length-1);
-    
-    //interger
-    if(/^[0-9]+$/.test(blockPath)){
-      return parseInt(blockPath,10);
-    }
-    
-    //remove ''
-    if(/^\'.*\'$/.test(blockPath) || /^\".*\"$/.test(blockPath)){
-      blockPath = blockPath.substring(1,blockPath.length-1);
-    }
-    return blockPath;
-  }
-
-  return function(pathParam){
-    if(isArray(pathParam)){
-      return pathParam;
-    }
-  
-    if(likeString(pathParam)){
-    
-      if(isNumber(pathParam)){
-        return [pathParam]
-      }
-    
-      if(typeof pathParam === "string"){
-        const { props:{ path:result } } = castString(pathParam,[".","["],({
-          content, props:{ path }, matchExp, castStart, castEnd, castSize, skipSize, enter, next
-        })=>{
-          if(matchExp === "."){
-            skipSize && path.push( content.substr(castStart, skipSize) )
-            next();
-          }
-          if(matchExp === "["){
-            let stackCount = 0;
-          
-            if(skipSize){
-              path.push( __filterDotPath(content.substr(castStart, skipSize),castStart !== 0) );
-            }
-          
-            enter(["[","]"],({ matchExp, castStart, castEnd, more, exit })=>{
-              if(matchExp === "[") stackCount++;
-              if(matchExp === "]") stackCount--;
-              if(matchExp === null) return;
-              if(stackCount === 0){
-                path.push( __filterBlockPath( content.substring(castStart, castEnd) ) );
-                exit();
-              } else {
-                more();
-              }
-            });
-          }
-          if(matchExp === null){
-            path.push( __filterDotPath(content.substr(castStart, castEnd),castStart !== 0) );
-          }
-        },{ path:[] })
-      
-        return result;
-      }
-    }
-    return [];
-  };
-}())
-  
 
 export const free = function(datum){
   const dest = {}
   Object.keys(datum).forEach(key=>{
     if(!/^\$/.test(key)){
-      dest[key] = _cloneDeep(datum[key])
+      dest[key] = cloneDeep(datum[key])
     }
   });
   return dest;

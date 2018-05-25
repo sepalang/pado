@@ -1,4 +1,4 @@
-import { matchString, cut, top, get, findIndex, findIndexes } from '../src/functions/reducer';
+import { matchString, cut, top, findIndex, findIndexes } from '../src/functions/reducer';
 describe('Functions reducer', () => {
   
   it('matchString', () => {
@@ -55,17 +55,6 @@ describe('Functions reducer', () => {
     
     //it's natural way
     expect( top([1,2,3],(a,b)=>a>b,false) ).toEqual([]);
-  });
-  
-  it('get', ()=>{
-    const object = { 'a': [{ 'b': { 'c': 3 } }] };
-
-    expect( get(object, 'a[0].b.c') ).toEqual(3);
-    expect( get(object, 'a[0][b][c]') ).toEqual(3);
-    expect( get(object, 'a[0]["b"]["c"]') ).toEqual(3);
-    expect( get(object, ['a', '0', 'b', 'c']) ).toEqual(3);
-    expect( get(object, 'a.b.c', 'default') ).toEqual('default');
-
   });
   
   // isEmpty

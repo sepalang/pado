@@ -26,16 +26,16 @@ ____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
 castingStart                   cursor -->>
     |                            |
 ____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
-
+re
 */
-import { castString } from '../src/functions/cast';
+import { readString } from '../src/functions/read';
 import { ranger } from '../src/modules/ranger';
 
-describe('Functions cast::castString', () => {
-  it('castString matchIndex', () => {
+describe('Functions read::readString', () => {
+  it('readString matchIndex', () => {
     
     const text = `hello.world.!!.abc`;
-    const { props:{ path:castPath } } = castString(text,["."],({ 
+    const { props:{ path:castPath } } = readString(text,["."],({ 
       content, props:{ path }, matchType, castStart, castEnd, matchIndex, next
     })=>{
       if(matchType === 0){
@@ -50,10 +50,10 @@ describe('Functions cast::castString', () => {
     expect( castPath ).toEqual(['hello','world','!!','abc']);
   });
 
-  it('castString matchExp', () => {
+  it('readString matchExp', () => {
     
     const text = `hello.world.!!.abc`;
-    const { props:{ path:castPath } } = castString(text,["."],({
+    const { props:{ path:castPath } } = readString(text,["."],({
       content, props:{ path }, matchExp, castStart, castEnd, matchIndex, next
     })=>{
       switch(matchExp){
@@ -70,9 +70,9 @@ describe('Functions cast::castString', () => {
     expect( castPath ).toEqual(['hello','world','!!','abc']);
   });
 
-  it('castString - matchBlock - enter, exit, more', () => {
+  it('readString - matchBlock - enter, exit, more', () => {
     const text = `hello[world][inner][world].props`;
-    const { props:{ path:castPath } } = castString(text,["["],({
+    const { props:{ path:castPath } } = readString(text,["["],({
       content, props:{ path }, matchExp, castStart, castEnd, castSize, skipSize, enter, next
     })=>{
       if(matchExp === "["){

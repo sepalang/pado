@@ -86,3 +86,10 @@ export const accurateTimeout = (function(originalTimeout){
     execution();
   }
 }(setTimeout));
+
+
+export const turn = function(i, p, ts) {
+  if(i < 0) { var abs = Math.abs(i / ts); i = p - (abs > p ? abs % p : abs); }
+  ts = ts || 1; i = Math.floor(i / ts);
+  return (p > i) ? i : i % p;
+};

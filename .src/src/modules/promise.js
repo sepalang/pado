@@ -1,4 +1,4 @@
-import { asArray, asObject, isNumber } from '../functions';
+import { asArray, asObject, isNumber, turn } from '../functions';
 import { operate } from './operate';
 
 const PromiseClass = Promise;

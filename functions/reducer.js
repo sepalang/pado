@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.function.name", "core-js/modules/es6.array.sort", "core-js/modules/es6.number.constructor", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.constructor", "core-js/modules/es6.regexp.replace", "./isLike", "./cast", "./enumerable"], factory);
+    define(["exports", "core-js/modules/es6.array.sort", "core-js/modules/es6.number.constructor", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.constructor", "core-js/modules/es6.regexp.replace", "./isLike", "./cast", "./read"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.function.name"), require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.constructor"), require("core-js/modules/es6.regexp.replace"), require("./isLike"), require("./cast"), require("./enumerable"));
+    factory(exports, require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.constructor"), require("core-js/modules/es6.regexp.replace"), require("./isLike"), require("./cast"), require("./read"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Function, global.es6Array, global.es6Number, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.isLike, global.cast, global.enumerable);
+    factory(mod.exports, global.es6Array, global.es6Number, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.isLike, global.cast, global.read);
     global.reducer = mod.exports;
   }
-})(this, function (_exports, _es6Function, _es6Array, _es6Number, _es6Regexp, _es6Regexp2, _es6Regexp3, _es6Regexp4, _isLike, _cast, _enumerable) {
+})(this, function (_exports, _es6Array, _es6Number, _es6Regexp, _es6Regexp2, _es6Regexp3, _es6Regexp4, _isLike, _cast, _read) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.turn = _exports.hasValueProperty = _exports.hasProperty = _exports.get = _exports.top = _exports.cut = _exports.findIndexes = _exports.findIndex = _exports.matchString = void 0;
+  _exports.top = _exports.cut = _exports.findIndexes = _exports.findIndex = _exports.matchString = void 0;
 
   //reducer.spec.js
   var matchString = function matchString(it, search, at) {
@@ -150,90 +150,5 @@
   };
 
   _exports.top = top;
-
-  var get = function get(target, path, defaultValue) {
-    if (typeof target === "object") {
-      switch (typeof path) {
-        case "number":
-          path += "";
-
-        case "string":
-          path = (0, _cast.castPath)(path);
-
-        case "object":
-          if ((0, _isLike.isArray)(path)) {
-            var allget = (0, _enumerable.all)(path, function (name) {
-              if ((0, _isLike.likeObject)(target) && (target.hasOwnProperty(name) || target[name])) {
-                target = target[name];
-                return true;
-              } else {
-                return false;
-              }
-            });
-            return allget ? target : defaultValue;
-          } else {
-            return;
-          }
-
-          break;
-
-        case "function":
-          return path.call(this, target);
-      }
-    } else if (typeof target === "function") {
-      return target.apply(this, Array.prototype.slice.call(arguments, 1));
-    }
-
-    return target;
-  };
-
-  _exports.get = get;
-
-  var hasProperty = function hasProperty(target, pathParam) {
-    return (0, _enumerable.all)((0, _cast.castPath)(pathParam), function (path) {
-      if ((0, _isLike.likeObject)(target) && (0, _isLike.likeString)(path) && target.hasOwnProperty(path)) {
-        target = target[path];
-        return true;
-      }
-
-      return false;
-    });
-  };
-
-  _exports.hasProperty = hasProperty;
-
-  var hasValueProperty = function hasValueProperty(obj, value, key) {
-    if (arguments.length == 1 && (0, _isLike.likeObject)(obj)) return (0, _isLike.isEmpty)(obj);
-    if ((0, _isLike.isArray)(obj)) for (var i = 0, l = obj.length; i < l; i++) {
-      if (obj[i] === value) return true;
-    }
-
-    if ((0, _isLike.likeObject)(obj)) {
-      if (key) {
-        return get(obj, key) === value;
-      } else {
-        for (var key in obj) {
-          if (get(obj, key) === value) return true;
-        }
-      }
-    }
-
-    return false;
-  };
-
-  _exports.hasValueProperty = hasValueProperty;
-
-  var turn = function turn(i, p, ts) {
-    if (i < 0) {
-      var abs = Math.abs(i / ts);
-      i = p - (abs > p ? abs % p : abs);
-    }
-
-    ts = ts || 1;
-    i = Math.floor(i / ts);
-    return p > i ? i : i % p;
-  };
-
-  _exports.turn = turn;
 });
 //# sourceMappingURL=reducer.js.map

@@ -18,8 +18,28 @@
   });
   _exports.block = _exports.space = void 0;
 
-  //Scale foundation
+  // ?
+  var hasValueProperty = function hasValueProperty(obj, value, key) {
+    if (arguments.length == 1 && likeObject(obj)) return isEmpty(obj);
+    if (isArray(obj)) for (var i = 0, l = obj.length; i < l; i++) {
+      if (obj[i] === value) return true;
+    }
+
+    if (likeObject(obj)) {
+      if (key) {
+        return (0, _functions.get)(obj, key) === value;
+      } else {
+        for (var key in obj) {
+          if ((0, _functions.get)(obj, key) === value) return true;
+        }
+      }
+    }
+
+    return false;
+  }; //Scale foundation
   //정의역과 치역을 계산하여 결과값을 리턴함, 속성별로 정의하여 다중 차원 지원
+
+
   var Block = function Block(posSize, syncOpt) {
     this.$space = void 0;
     this.$posSize;
@@ -107,7 +127,7 @@
             return inspectResult.push(true);
           });
 
-          if (inspectResult.length && !(0, _functions.hasValueProperty)(inspectResult, false)) {
+          if (inspectResult.length && !hasValueProperty(inspectResult, false)) {
             red.push(block);
           }
         }

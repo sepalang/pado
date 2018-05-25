@@ -1,26 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike", "./reducer", "./shadow"], factory);
+    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"), require("./reducer"), require("./shadow"));
+    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike, global.reducer, global.shadow);
+    factory(mod.exports, global.es6Array, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike);
     global.cast = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Array2, _es6Object, _webDom, _es6Regexp, _es6Regexp2, _isLike, _reducer, _shadow) {
+})(this, function (_exports, _es6Array, _es6Array2, _es6Object, _webDom, _es6Regexp, _es6Regexp2, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.castPath = _exports.castString = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
-
-  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
-
-  function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
 
   var asArray = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
@@ -162,9 +158,9 @@
   _exports.clone = clone;
 
   var cloneDeep = function cloneDeep(target) {
-    var d;
-
     if (typeof target === "object") {
+      var d;
+
       if ((0, _isLike.isArray)(target)) {
         if (!(0, _isLike.isArray)(d)) {
           d = [];
@@ -185,272 +181,17 @@
         return d;
       }
     } else {
-      clone(target);
+      return clone(target);
     }
-  }; //cast.castString.spec.js
-
+  };
 
   _exports.cloneDeep = cloneDeep;
-
-  var castString = function () {
-    var rebaseMatches = function rebaseMatches(matches) {
-      return (0, _shadow.entries)(asArray(matches));
-    };
-
-    return function (text, matches, castFn, props) {
-      var payload = {
-        content: text,
-        props: props
-      };
-      var newMatchEntries = rebaseMatches(matches);
-      var castingState = {
-        firstIndex: 0,
-        lastIndex: text.length,
-        castingStart: 0,
-        cursor: 0
-      };
-
-      if (typeof props === "object" && (0, _isLike.isNumber)(props.start)) {
-        castingState.castingStart = props.start;
-        castingState.cursor = props.start;
-      }
-
-      var open = function open(_ref2) {
-        var _ref2$castingState = _ref2.castingState,
-            firstIndex = _ref2$castingState.firstIndex,
-            lastIndex = _ref2$castingState.lastIndex,
-            castingStart = _ref2$castingState.castingStart,
-            cursor = _ref2$castingState.cursor,
-            matchEntries = _ref2.matchEntries,
-            castFn = _ref2.castFn,
-            parentScope = _ref2.parentScope;
-
-        if (cursor >= lastIndex) {
-          return false;
-        } //find match
-
-
-        var matchesMap = matchEntries.map(function (_ref3) {
-          var matchType = _ref3[0],
-              matchExp = _ref3[1];
-          return [(0, _reducer.matchString)(text, matchExp, cursor), matchType, matchExp];
-        });
-        var firstMatch = (0, _reducer.top)(matchesMap, function (_ref4, _ref5) {
-          var a = _ref4[0],
-              aPriority = _ref4[1];
-          var b = _ref5[0],
-              bPriority = _ref5[1];
-          return a[0] < 0 ? true : b[0] < 0 ? false : a[0] == b[0] ? aPriority < bPriority : a[0] > b[0];
-        }); // top match is not exsist
-
-        if (!firstMatch) {
-          return false;
-        } // unmatched
-
-
-        if (firstMatch[0][0] === -1) {
-          firstMatch = [[-1, 0], -1, null];
-        } //next variant
-
-
-        var _firstMatch = firstMatch,
-            _firstMatch$ = _firstMatch[0],
-            matchIndex = _firstMatch$[0],
-            matchSize = _firstMatch$[1],
-            matchType = _firstMatch[1],
-            matchExp = _firstMatch[2];
-        var castStart = castingStart;
-        var castEnd = matchType === -1 ? lastIndex : matchIndex + matchSize;
-        var castSize = castEnd - castStart;
-        var skipSize = castSize - matchSize; //next params
-
-        var matching = {
-          matchType: matchType,
-          matchExp: matchExp,
-          matchIndex: matchIndex,
-          matchSize: matchSize,
-          skipSize: skipSize
-        };
-        var casting = {
-          firstIndex: firstIndex,
-          lastIndex: lastIndex,
-          castStart: castStart,
-          castEnd: castEnd,
-          castSize: castSize
-        };
-        var scope = {
-          fork: function fork(matchEntries, castFn) {
-            var newMatchEntries = rebaseMatches(matches);
-            open({
-              castingState: {
-                firstIndex: matching.matchIndex,
-                lastIndex: matching.matchIndex + matchSize,
-                castingStart: matching.matchIndex,
-                cursor: matching.matchIndex
-              },
-              matchEntries: newMatchEntries,
-              castFn: castFn,
-              parentScope: parentScope
-            });
-          },
-          next: function next(needCursor) {
-            var cursorTo = (0, _isLike.isNumber)(needCursor) ? needCursor : casting.castEnd;
-            open({
-              castingState: {
-                firstIndex: firstIndex,
-                lastIndex: lastIndex,
-                castingStart: cursorTo,
-                cursor: cursorTo
-              },
-              matchEntries: matchEntries,
-              castFn: castFn,
-              parentScope: parentScope
-            });
-          },
-          enter: function enter(enterMatches, enterCastFn) {
-            open({
-              castingState: {
-                firstIndex: firstIndex,
-                lastIndex: lastIndex,
-                castingStart: matching.matchIndex,
-                cursor: matching.matchIndex
-              },
-              matchEntries: rebaseMatches(enterMatches),
-              castFn: enterCastFn,
-              parentScope: {
-                next: scope.next
-              }
-            });
-          },
-          exit: function exit(needCursor) {
-            parentScope && parentScope.next((0, _isLike.isNumber)(needCursor) ? needCursor : casting.castEnd);
-          },
-          more: function more() {
-            open({
-              castingState: {
-                firstIndex: firstIndex,
-                lastIndex: lastIndex,
-                castingStart: castStart,
-                cursor: casting.castEnd
-              },
-              matchEntries: matchEntries,
-              castFn: castFn,
-              parentScope: parentScope
-            });
-          }
-        };
-        castFn(_objectSpread({}, payload, matching, casting, scope));
-        return true;
-      };
-
-      open({
-        castingState: castingState,
-        matchEntries: newMatchEntries,
-        castFn: castFn
-      });
-      return payload;
-    };
-  }();
-
-  _exports.castString = castString;
-
-  var castPath = function () {
-    var __filterDotPath = function __filterDotPath(dotPath, removeFirstDot) {
-      return removeFirstDot && dotPath.indexOf(".") === 0 ? dotPath.substr(1) : dotPath;
-    };
-
-    var __filterBlockPath = function __filterBlockPath(blockPath) {
-      //remove []
-      blockPath = blockPath.substring(1, blockPath.length - 1); //interger
-
-      if (/^[0-9]+$/.test(blockPath)) {
-        return parseInt(blockPath, 10);
-      } //remove ''
-
-
-      if (/^\'.*\'$/.test(blockPath) || /^\".*\"$/.test(blockPath)) {
-        blockPath = blockPath.substring(1, blockPath.length - 1);
-      }
-
-      return blockPath;
-    };
-
-    return function (pathParam) {
-      if ((0, _isLike.isArray)(pathParam)) {
-        return pathParam;
-      }
-
-      if ((0, _isLike.likeString)(pathParam)) {
-        if ((0, _isLike.isNumber)(pathParam)) {
-          return [pathParam];
-        }
-
-        if (typeof pathParam === "string") {
-          var _castString = castString(pathParam, [".", "["], function (_ref6) {
-            var content = _ref6.content,
-                path = _ref6.props.path,
-                matchExp = _ref6.matchExp,
-                castStart = _ref6.castStart,
-                castEnd = _ref6.castEnd,
-                castSize = _ref6.castSize,
-                skipSize = _ref6.skipSize,
-                enter = _ref6.enter,
-                next = _ref6.next;
-
-            if (matchExp === ".") {
-              skipSize && path.push(content.substr(castStart, skipSize));
-              next();
-            }
-
-            if (matchExp === "[") {
-              var stackCount = 0;
-
-              if (skipSize) {
-                path.push(__filterDotPath(content.substr(castStart, skipSize), castStart !== 0));
-              }
-
-              enter(["[", "]"], function (_ref7) {
-                var matchExp = _ref7.matchExp,
-                    castStart = _ref7.castStart,
-                    castEnd = _ref7.castEnd,
-                    more = _ref7.more,
-                    exit = _ref7.exit;
-                if (matchExp === "[") stackCount++;
-                if (matchExp === "]") stackCount--;
-                if (matchExp === null) return;
-
-                if (stackCount === 0) {
-                  path.push(__filterBlockPath(content.substring(castStart, castEnd)));
-                  exit();
-                } else {
-                  more();
-                }
-              });
-            }
-
-            if (matchExp === null) {
-              path.push(__filterDotPath(content.substr(castStart, castEnd), castStart !== 0));
-            }
-          }, {
-            path: []
-          }),
-              result = _castString.props.path;
-
-          return result;
-        }
-      }
-
-      return [];
-    };
-  }();
-
-  _exports.castPath = castPath;
 
   var free = function free(datum) {
     var dest = {};
     Object.keys(datum).forEach(function (key) {
       if (!/^\$/.test(key)) {
-        dest[key] = _cloneDeep(datum[key]);
+        dest[key] = cloneDeep(datum[key]);
       }
     });
     return dest;

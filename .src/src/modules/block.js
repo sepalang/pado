@@ -1,11 +1,25 @@
 import {
-  hasValueProperty,
   asArray,
   get,
   cloneDeep,
   forMap,
   domainRangeValue
 } from '../functions'
+
+// ?
+const hasValueProperty = function(obj,value,key){
+  if(arguments.length == 1 && likeObject(obj)) return isEmpty(obj);
+  if(isArray(obj)) for(var i=0,l=obj.length;i<l;i++) if(obj[i] === value) return true;
+  if(likeObject(obj)){
+    if(key){
+      return get(obj,key) === value;
+    } else {
+      for(var key in obj) if(get(obj,key) === value) return true;
+    }
+  }
+  return false;
+};
+
 
 //Scale foundation
 //정의역과 치역을 계산하여 결과값을 리턴함, 속성별로 정의하여 다중 차원 지원

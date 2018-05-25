@@ -15,7 +15,7 @@ import {
 
 import {
   get
-} from './reducer';
+} from './read';
 
 export const unique = function(array){
   var value = [],result = [], array = toArray(array);
@@ -30,67 +30,6 @@ export const unique = function(array){
   }
   return result;
 }
-
-export const hasValue = (function(){
-  var defaultObjectValueFunc = function(object,value){
-    return object === value;
-  };
-    
-  var functionKeyObjectValueProc = function(functionKey){
-    return function(object,value){
-      return Boolean(functionKey(object,value));
-    };
-  };
-    
-  var selectKeyObjectValueProc = function(leftSelect,rightSelect){
-    var useLeftSelector  = (typeof leftSelect === "string" || typeof leftSelect === "number")
-    var useRightSelector = leftSelect === rightSelect ? useLeftSelector : (typeof rightSelect === "string" || typeof rightSelect === "number");
-        
-    return function(object,value){
-      if(useLeftSelector  && !object.hasOwnProperty(leftSelect)) return false;
-      if(useRightSelector && !value.hasOwnProperty(rightSelect)) return false;
-            
-      return (useLeftSelector ? get(object,leftSelect) : object) === (useRightSelector ? get(value,rightSelect) : value);
-    };
-  };
-    
-  return function(obj,value,key,getKey){
-    if(typeof key === "boolean"){
-      if(typeof getKey !== "boolean"){
-        getKey = key;
-      }
-      key = void 0;
-    }
-        
-    if(obj === value){
-      return true;
-    } else if(isObject(obj)){
-      if(value === (void 0) && key === (void 0)) return !isEmpty(obj);
-            
-      var proc;
-            
-      if(key){
-        if(typeof key === "function") {
-          proc = functionKeyObjectValueProc(key);
-        } else if(isArray(key) && key.length > 1){
-          proc = selectKeyObjectValueProc(key[0],key[1]);
-        } else if(typeof key === "string" || typeof key === "number"){
-          proc = selectKeyObjectValueProc(key,key);
-        }
-      } else {
-        proc = defaultObjectValueFunc;
-      }
-            
-      if(isArray(obj)){
-        for(var i=0,l=obj.length;i<l;i++) if(proc(obj[i],value)) return getKey ? i : true;
-      } else {
-        for(var objKey in obj) if(obj.hasOwnProperty(objKey) && proc(obj[objKey],value)) return getKey ? objKey : true; 
-      }
-    }
-        
-    return getKey ? void 0 : false;
-  }
-}());
 
 export const getKeyBy = function(object,value){
   if(isFunction(value)){

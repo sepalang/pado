@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.accurateTimeout = _exports.limitOf = void 0;
+  _exports.turn = _exports.accurateTimeout = _exports.limitOf = void 0;
 
   var limitOf = function () {
     var limitNumber = function limitNumber(number, max, min) {
@@ -130,5 +130,18 @@
   }(setTimeout);
 
   _exports.accurateTimeout = accurateTimeout;
+
+  var turn = function turn(i, p, ts) {
+    if (i < 0) {
+      var abs = Math.abs(i / ts);
+      i = p - (abs > p ? abs % p : abs);
+    }
+
+    ts = ts || 1;
+    i = Math.floor(i / ts);
+    return p > i ? i : i % p;
+  };
+
+  _exports.turn = turn;
 });
 //# sourceMappingURL=nice.js.map

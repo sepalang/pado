@@ -1,19 +1,24 @@
-import { castPath } from '../src/functions/cast';
+import { cloneDeep, free } from '../src/functions/cast';
 
 describe('Functions cast', () => {
-
-  it('castPath', ()=>{
-    expect( castPath('hello') ).toEqual(['hello']);
-    expect( castPath('hello.world') ).toEqual(['hello','world']);
-    expect( castPath(`hello['world']`) ).toEqual(['hello','world']);
-    expect( castPath(`hello["world"]`) ).toEqual(['hello','world']);
-    expect( castPath(`a[1][2]`) ).toEqual(['a',1,2]);
+  const a = {name:'a', id:12};
+  
+  it('cloneDeep', ()=>{
+    expect( cloneDeep(a) ).toEqual(a); 
+  });
+  
+  it('free', ()=>{
+    const a = {name:'a', $checked:true};
+    const b = {name:'b', $checked:true, $detail:{ info:[], meta:[] }};
+    const c = {$checked:true, $detail:{ info:[], meta:[] }};
+    const d = {name:'b', id:30, _check:false};
+    const e = {$$:'double', $$$:'triple'};
     
-    //
-    expect( castPath(`hello[world]`) ).toEqual(['hello','world']);
-    expect( castPath(`hello[world].my[world]`) ).toEqual(['hello','world','my','world']);
-    expect( castPath(`hello[world].my[0]`) ).toEqual(['hello','world','my',0]);
-    
+    expect( free(a) ).toEqual({name:'a'});
+    expect( free(b) ).toEqual({name:'b'});
+    expect( free(c) ).toEqual({});
+    expect( free(d) ).toEqual({name:'b', id:30, _check:false});
+    expect( free(e) ).toEqual({});
   });
   
 });

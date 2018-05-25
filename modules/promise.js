@@ -143,7 +143,7 @@
     var resetScope = 0;
 
     var nextWheelTick = function nextWheelTick(tick, value, tickScope) {
-      var nowAction = tasks[turn(tick, taskLength, 1)];
+      var nowAction = tasks[(0, _functions.turn)(tick, taskLength, 1)];
 
       var isActiveFn = function isActiveFn() {
         return tickScope === resetScope;
