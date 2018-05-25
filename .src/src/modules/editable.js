@@ -2,10 +2,9 @@ import {
   free,
   cloneDeep     as _cloneDeep,
   get           as _get,
-  isPlainObject as _isPlainObject
- } from '../functions'
-
-import _isEqual from 'lodash/isEqual';
+  isPlainObject as _isPlainObject,
+  isEqual       as _isEqual
+} from '../functions';
 
 const EDITABLE_DEFAULT_KEY = "$editable";
 

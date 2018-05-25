@@ -1,5 +1,5 @@
-import { deepKeys } from '../../src';
+import { eqeq } from '../../src';
 
-const result = deepKeys([null,{},{a:1,b:2,arr:[3,4,[5,null]]}])
+const result = eqeq({foo:"bar"},{foo:"bar"})
 
-console.log({ result });
+console.log("result",result);

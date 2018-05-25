@@ -1,4 +1,13 @@
-import { isObject, likeObject, isEmpty, isPlainObject, eqof, eqeq } from '../src/functions/isLike';
+import {
+  isObject,
+  likeObject,
+  isEmpty,
+  isPlainObject,
+  eqof,
+  eqeq,
+  isEqual,
+  likeEqual
+} from '../src/functions/isLike';
 describe('Functions isLike', () => {
   
   it('select', () => {
@@ -89,9 +98,65 @@ describe('Functions isLike', () => {
     expect( eqeq(true,true) ).toEqual(true);
     
     //
+    expect( eqeq([],[]) ).toEqual(true);
+    expect( eqeq({},{}) ).toEqual(true);
+    
+    //
+    expect( eqeq(["1"],[1]) ).toEqual(true);
+    expect( eqeq([47],["47"]) ).toEqual(true);
+    expect( eqeq({foo:"bar"},{foo:"bar"}) ).toEqual(true);
+    expect( eqeq([{foo:"bar"}],[{foo:"bar"}]) ).toEqual(true);
+    expect( eqeq({foo:123},{foo:"123"}) ).toEqual(true);
+    
+    //
+    expect( eqeq([{foo:123,bar:[2,[3,4]]}],[{foo:123,bar:[2,[3,4]]}]) ).toEqual(true);
+    expect( eqeq([{foo:123,bar:[2,3]}],[{foo:"123",bar:["2","3"]}]) ).toEqual(true);
+    
+    //
     expect( eqeq(false,true) ).toEqual(false);
     expect( eqeq(1,2) ).toEqual(false);
     expect( eqeq("3","4") ).toEqual(false);
+  });
+  
+  it('isEqual', () => {
+    expect( isEqual(1,1) ).toEqual(true);
+    expect( isEqual(undefined,null) ).toEqual(true);
+    expect( isEqual(NaN,null) ).toEqual(true);
+    expect( isEqual("47","47") ).toEqual(true);
+    expect( isEqual(true,true) ).toEqual(true);
+    
+    //
+    expect( isEqual([],[]) ).toEqual(true);
+    expect( isEqual({},{}) ).toEqual(true);
+    
+    //
+    expect( isEqual([1],[1]) ).toEqual(true);
+    expect( isEqual(["1"],[1]) ).toEqual(false);
+    
+    //
+    expect( isEqual({foo:"bar"},{foo:"bar"}) ).toEqual(true);
+    expect( isEqual({foo:123},{foo:"123"}) ).toEqual(false);
+    
+    //
+    expect( isEqual([{foo:"123",bar:[2,3]}],[{foo:"123",bar:[2,3]}]) ).toEqual(true);
+    expect( isEqual([{foo:"123",bar:[2,3]}],[{foo:"123",bar:["2","3"]}]) ).toEqual(false);
+    
+    //
+    expect( isEqual("1",1) ).toEqual(false);
+    expect( isEqual(true,false) ).toEqual(false);
+    expect( isEqual(1,2) ).toEqual(false);
+    expect( isEqual("3","4") ).toEqual(false);
+  });
+  
+  it('likeEqual', () => {
+    expect( likeEqual([],[]) ).toEqual(true);
+    expect( likeEqual({},{}) ).toEqual(true);
+    expect( likeEqual([[[2,3],4],5],[[[2,3],4],5]) ).toEqual(true);
+    
+    expect( likeEqual({$edit:true},{$edit:false}) ).toEqual(true);
+    expect( likeEqual({$history:[1,2]},{$history:[1,2]}) ).toEqual(true);
+    expect( likeEqual({_history:[1,2]},{_history:[1,2]}) ).toEqual(true);
+    expect( likeEqual({_history:[1,2],name:"ana"},{_history:[1,2,3],name:"ana"}) ).toEqual(true);
   });
   
 });

@@ -132,39 +132,55 @@ export const eqof = function(it){
   }
 }
 
-export const eqeq = function(value, other){
-  if(arguments.length < 2){
-    return false;
-  }
+const baseEq = function(value, other, filter, depth=0, strict){
+  if(arguments.length < 2) return false;
   
-  const rootType = eqof(value);
+  const valueType = eqof(value);
+  const otherType = eqof(other);
   
-  if(rootType !== eqof(other)){
-    return false;
-  }
+  if(valueType !== otherType) return false;
   
-  switch(rootType){
+  switch(valueType){
   case "none":
     return true;
+  case "array":
+    if(value.length !== other.length){
+      return false;
+    }
+    return value.every((vValue,i)=>{
+      const oValue = other[i];
+      return (typeof filter === "function" && filter(i,[vValue,oValue],depth) === false) ? true : baseEq(vValue,oValue,filter,depth+1,strict);
+    });
+    break;
+  case "hash":
+    const vKeys = Object.keys(value), oKeys = Object.keys(other);
+    if(vKeys.length !== oKeys.length || !baseEq(vKeys.sort(),oKeys.sort())) return false;
+    return vKeys.every((key)=>{
+      const vValue = value[key];
+      const oValue = other[key];
+      return (typeof filter === "function" && filter(key,[vValue,oValue],depth) === false) ? true : baseEq(vValue,oValue,filter,depth+1,strict);
+    });
+    break;
+  case "node":
+  case "object":
+  case "function":
+  case "boolean":
+  case "value":
   default:
-    return value == other
+    return strict ? value === other : value == other;
   }
 }
 
-export const isEqual = function(value, other){
-  if (value === other) {
-    return true;
-  }
-  
-  if(isAbsoluteNaN(value) && isAbsoluteNaN(other)){
-    return true;
-  }
-}
+export const isEqual   = (value, other, filter, depth)=>baseEq(value, other, filter, depth, true);
+export const likeEqual = (value, other, filter, depth)=>baseEq(
+  value,
+  other,
+  (key,values,depth)=>/^(\$|\_)/.test(key) ? false : typeof filter === "function" ? filter(key,values,depth) : true, 
+  depth, 
+  true
+);
+export const eqeq      = (value, other, filter, depth)=>baseEq(value, other, filter, depth, false);
 
-// ignore _ $
-export const likeEqual = function(){
-  
-}
 
 export const isExsist = function(value){
   if(value === true){

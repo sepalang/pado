@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.constructor", "core-js/modules/es6.number.constructor"], factory);
+    define(["exports", "core-js/modules/es6.array.sort", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.regexp.constructor", "core-js/modules/es6.number.constructor"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.constructor"), require("core-js/modules/es6.number.constructor"));
+    factory(exports, require("core-js/modules/es6.array.sort"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.regexp.constructor"), require("core-js/modules/es6.number.constructor"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.es6Number);
+    factory(mod.exports, global.es6Array, global.webDom, global.es6Array, global.es6Object, global.es6Regexp, global.es6Number);
     global.isLike = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _es6Number) {
+})(this, function (_exports, _es6Array, _webDom, _es6Array2, _es6Object, _es6Regexp, _es6Number) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.notExsist = _exports.isExsist = _exports.likeEqual = _exports.isEqual = _exports.eqeq = _exports.eqof = _exports.isEnumerableObject = _exports.isPlainObject = _exports.likeRegexp = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isInfinity = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
+  _exports.notExsist = _exports.isExsist = _exports.eqeq = _exports.likeEqual = _exports.isEqual = _exports.eqof = _exports.isEnumerableObject = _exports.isPlainObject = _exports.likeRegexp = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isInfinity = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
 
   var isAbsoluteNaN = function isAbsoluteNaN(it) {
     return it !== it && typeof it === "number";
@@ -214,44 +214,71 @@
 
   _exports.eqof = eqof;
 
-  var eqeq = function eqeq(value, other) {
-    if (arguments.length < 2) {
-      return false;
+  var baseEq = function baseEq(value, other, filter, depth, strict) {
+    if (depth === void 0) {
+      depth = 0;
     }
 
-    var rootType = eqof(value);
+    if (arguments.length < 2) return false;
+    var valueType = eqof(value);
+    var otherType = eqof(other);
+    if (valueType !== otherType) return false;
 
-    if (rootType !== eqof(other)) {
-      return false;
-    }
-
-    switch (rootType) {
+    switch (valueType) {
       case "none":
         return true;
 
+      case "array":
+        if (value.length !== other.length) {
+          return false;
+        }
+
+        return value.every(function (vValue, i) {
+          var oValue = other[i];
+          return typeof filter === "function" && filter(i, [vValue, oValue], depth) === false ? true : baseEq(vValue, oValue, filter, depth + 1, strict);
+        });
+        break;
+
+      case "hash":
+        var vKeys = Object.keys(value),
+            oKeys = Object.keys(other);
+        if (vKeys.length !== oKeys.length || !baseEq(vKeys.sort(), oKeys.sort())) return false;
+        return vKeys.every(function (key) {
+          var vValue = value[key];
+          var oValue = other[key];
+          return typeof filter === "function" && filter(key, [vValue, oValue], depth) === false ? true : baseEq(vValue, oValue, filter, depth + 1, strict);
+        });
+        break;
+
+      case "node":
+      case "object":
+      case "function":
+      case "boolean":
+      case "value":
       default:
-        return value == other;
+        return strict ? value === other : value == other;
     }
   };
 
-  _exports.eqeq = eqeq;
-
-  var isEqual = function isEqual(value, other) {
-    if (value === other) {
-      return true;
-    }
-
-    if (isAbsoluteNaN(value) && isAbsoluteNaN(other)) {
-      return true;
-    }
-  }; // ignore _ $
-
+  var isEqual = function isEqual(value, other, filter, depth) {
+    return baseEq(value, other, filter, depth, true);
+  };
 
   _exports.isEqual = isEqual;
 
-  var likeEqual = function likeEqual() {};
+  var likeEqual = function likeEqual(value, other, filter, depth) {
+    return baseEq(value, other, function (key, values, depth) {
+      return /^(\$|\_)/.test(key) ? false : typeof filter === "function" ? filter(key, values, depth) : true;
+    }, depth, true);
+  };
 
   _exports.likeEqual = likeEqual;
+
+  var eqeq = function eqeq(value, other, filter, depth) {
+    return baseEq(value, other, filter, depth, false);
+  };
+
+  _exports.eqeq = eqeq;
 
   var isExsist = function isExsist(value) {
     if (value === true) {

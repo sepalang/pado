@@ -1,26 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "../functions", "lodash/isEqual"], factory);
+    define(["exports", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "../functions"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("../functions"), require("lodash/isEqual"));
+    factory(exports, require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("../functions"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Object, global.webDom, global.functions, global.isEqual);
+    factory(mod.exports, global.es6Array, global.es6Object, global.webDom, global.functions);
     global.editable = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Object, _webDom, _functions, _isEqual2) {
+})(this, function (_exports, _es6Array, _es6Object, _webDom, _functions) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
   _exports.editable = _exports.expandEditable = _exports.beginEditable = _exports.changedEditable = _exports.commitEditable = _exports.cancleEditable = _exports.exitEditable = _exports.enterEditable = _exports.isEditable = void 0;
-  _isEqual2 = _interopRequireDefault(_isEqual2);
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
   var EDITABLE_DEFAULT_KEY = "$editable";
 
   var isEditPossibleDataType = function isEditPossibleDataType(model) {
@@ -145,7 +141,7 @@
 
   var changedEditable = function changedEditable(model) {
     if (!isEditPossibleDataType(model) || !_isEditable(model)) return false;
-    return !(0, _isEqual2.default)(cloneCurrentModel(model), getLastModel(model));
+    return !(0, _functions.isEqual)(cloneCurrentModel(model), getLastModel(model));
   };
 
   _exports.changedEditable = changedEditable;
