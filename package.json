@@ -1,6 +1,6 @@
 {
   "name": "pado",
-  "version": "0.5.10",
+  "version": "0.6.0",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -8,19 +8,19 @@
     "url": "https://github.com/sepalang/pado"
   },
   "scripts": {
-    "start": "babel-node .src/test/src-test.js",
+    "start": "babel-node .util/test/src-test.js",
     "clear:dist": "rimraf ./*.js ./*.js.map ./functions ./modules",
-    "build:default": "padoc .src/src ./ -m umd -s",
-    "build:pack": "padoc --pack .src/src/pado.js ./pado.js -m umd -n pado -s",
+    "build:default": "padoc .src ./ -m umd -s",
+    "build:pack": "padoc --pack .src/pado.js ./pado.js -m umd -n pado -s",
     "build": "npm run clear:dist && npm run build:default && npm run build:pack",
-    "report:index": "madge .src/src/index.js --image .src/report/index.report.png",
-    "report:pado": "madge .src/src/pado.js --image .src/report/pado.report.png",
-    "report:modules": "madge .src/src/modules/index.js --image .src/report/modules.report.png",
-    "report:functions": "madge .src/src/functions/index.js --image .src/report/functions.report.png",
+    "report:index": "madge .src/index.js --image .util/report/index.report.png",
+    "report:pado": "madge .src/pado.js --image .util/report/pado.report.png",
+    "report:modules": "madge .src/modules/index.js --image .util/report/modules.report.png",
+    "report:functions": "madge .src/functions/index.js --image .util/report/functions.report.png",
     "report": "npm run report:index & npm run report:pado & npm run report:modules & npm run report:functions",
-    "test": "padoc --test .src/test --verbose",
-    "labp": "padoc --pack .src/sample/labs/entry.a.js .src/sample/labs/pack.a.sample.js && padoc --pack .src/sample/labs/entry.b.js .src/sample/labs/pack.b.sample.js",
-    "t": "padoc --exec .src/sample/use/cast.use.js"
+    "test": "padoc --test .util/test --verbose",
+    "labp": "padoc --pack .util/sample/labs/entry.a.js .util/sample/labs/pack.a.sample.js && padoc --pack .util/sample/labs/entry.b.js .util/sample/labs/pack.b.sample.js",
+    "t": "padoc --exec .util/sample/use/cast.use.js"
   },
   "author": "AHN HO JUNG",
   "license": "MIT",

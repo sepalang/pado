@@ -1,4 +1,4 @@
-import { all } from '../src/functions/enumerable';
+import { all } from '../../.src/functions/enumerable';
 describe('Functions enumerable', () => {
   
   it('all', () => {

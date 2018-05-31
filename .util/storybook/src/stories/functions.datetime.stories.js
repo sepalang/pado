@@ -12,7 +12,7 @@ storiesOf('Function|datetime', module)
   //timestampExp
   //timescaleExp
   
-  const { dateExp } = require("../../../src/functions/datetime");
+  const { dateExp } = require("../../../../.src/functions/datetime");
   return {
     mixins:[FunctionGuide],
     computed:{
@@ -34,7 +34,7 @@ storiesOf('Function|datetime', module)
 .add('timestampExp',() => {
   //timescaleExp
   
-  const { timestampExp } = require("../../../src/functions/datetime");
+  const { timestampExp } = require("../../../../.src/functions/datetime");
   return {
     mixins:[FunctionGuide],
     computed:{
@@ -53,7 +53,7 @@ storiesOf('Function|datetime', module)
   };
 })
 .add('timescaleExp',() => {
-  const { timescaleExp } = require("../../../src/functions/datetime");
+  const { timescaleExp } = require("../../../../.src/functions/datetime");
   return {
     mixins:[FunctionGuide],
     computed:{

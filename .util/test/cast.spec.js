@@ -1,4 +1,4 @@
-import { cloneDeep, free } from '../src/functions/cast';
+import { cloneDeep, free } from '../../.src/functions/cast';
 
 describe('Functions cast', () => {
   const a = {name:'a', id:12};

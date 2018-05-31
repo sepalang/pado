@@ -28,8 +28,8 @@ castingStart                   cursor -->>
 ____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
 re
 */
-import { readString } from '../src/functions/read';
-import { ranger } from '../src/modules/ranger';
+import { readString } from '../../.src/functions/read';
+import { ranger } from '../../.src/modules/ranger';
 
 describe('Functions read::readString', () => {
   it('readString matchIndex', () => {

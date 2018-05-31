@@ -3,5 +3,5 @@
 node_modules
 */**/package-lock.json
 *.sample.js
-.src/report/*
-!.src/report/*.md
+.util/report/*
+!.util/report/*.md

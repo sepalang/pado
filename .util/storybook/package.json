@@ -1,6 +1,6 @@
 {
-  "name": "Pado stroybook",
-  "version": "0.1",
+  "name": "Pado_stroybook",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "build": "build-storybook -s public -o ../../docs",

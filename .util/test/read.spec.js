@@ -1,4 +1,4 @@
-import { readPath, get, hasValue } from '../src/functions/read';
+import { readPath, get, hasValue } from '../../.src/functions/read';
 
 describe('Functions read', () => {
 

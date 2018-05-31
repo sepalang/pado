@@ -1,4 +1,4 @@
-import { ranger } from '../src/modules/ranger';
+import { ranger } from '../../.src/modules/ranger';
 
 describe('Functions ranger', () => {
   

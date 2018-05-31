@@ -8,7 +8,7 @@ import {
 
 storiesOf('Function|cast', module)
 .add('asArray',() => {
-  const { asArray } = require("../../../src/functions/cast");
+  const { asArray } = require("../../../../.src/functions/cast");
   return {
     mixins:[FunctionGuide],
     computed:{
@@ -35,7 +35,7 @@ storiesOf('Function|cast', module)
   };
 })
 .add('asObject',() => {
-  const { asObject } = require("../../../src/functions/cast");
+  const { asObject } = require("../../../../.src/functions/cast");
   return {
     mixins:[FunctionGuide],
     computed:{
