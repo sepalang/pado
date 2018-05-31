@@ -1764,6 +1764,53 @@
     return scale;
   };
 
+  var argumentNamesBy = function getArgs(fn) {
+    if (typeof fn !== "function") return []; // normal -  function[^\(]*?\(([^)]*)\)
+    // arrow  -  \([\)]*\)\s*\=\>\s*\{
+
+    var args = fn.toString().match(/function[^\(]*?\(([^)]*)\)|\([\)]*\)\s*\=\>\s*\{/)[1];
+    if (!args) return [];
+    return args.split(',').map(function (s) {
+      return s.trim();
+    }).filter(function (n) {
+      return n;
+    });
+  };
+  var scopelizeBy = function scopelizeBy(evalCommand) {
+    if (evalCommand.indexOf("return") > -1) ; else {
+      evalCommand = "  return " + evalCommand;
+    }
+
+    var command = evalCommand;
+
+    var scopeBeforeFn = function scopeBeforeFn(scope, info) {
+      var params = [];
+      var fnArgs = [];
+      Object.keys(scope).forEach(function (key) {
+        params.push(scope[key]);
+        fnArgs.push(key);
+      });
+      fnArgs.push(command);
+      var makeFn = Function.apply(Function, fnArgs);
+
+      if (typeof info === "function") {
+        info({
+          func: makeFn,
+          args: fnArgs,
+          params: params
+        });
+      }
+
+      return makeFn.apply(void 0, params);
+    };
+
+    scopeBeforeFn.scoped = function () {
+      return command;
+    };
+
+    return scopeBeforeFn;
+  };
+
   var hasValueProperty = function hasValueProperty(obj, value, key) {
     if (arguments.length == 1 && likeObject(obj)) return isEmpty(obj);
     if (isArray(obj)) for (var i = 0, l = obj.length; i < l; i++) {
@@ -2727,6 +2774,37 @@
 
     return wheelControls;
   };
+  var promisify = PromiseFunction.promisify = function (asyncErrCallbackfn) {
+    var argumentNames = argumentNamesBy(asyncErrCallbackfn).slice(1);
+
+    var promisified = function promisified() {
+      var _this = this;
+
+      var args = Array.from(arguments);
+      return new Promise(function (resolve, reject) {
+        asyncErrCallbackfn.apply(_this, args.concat(function (err) {
+          var _Array$from = Array.from(arguments),
+              error = _Array$from[0],
+              callbakArgs = _Array$from.slice(1);
+
+          if (error) {
+            reject(error);
+          } else if (argumentNames.length && callbakArgs.length > 1) {
+            resolve(argumentNames.reduce(function (dest, name, index) {
+              dest[name] = callbakArgs[index];
+              return dest;
+            }, {}));
+          } else {
+            resolve(callbakArgs[0]);
+          }
+        }));
+      });
+    };
+
+    return function () {
+      return promisified.apply(this, Array.from(arguments));
+    };
+  };
   var sequance = PromiseFunction.sequance = function (funcArray, opts) {
     return PromiseFunction(function (resolve, reject) {
       var option = asObject(opts, "concurrent");
@@ -3506,6 +3584,8 @@
     get: get,
     hasProperty: hasProperty,
     hasValue: hasValue$1,
+    argumentNamesBy: argumentNamesBy,
+    scopelizeBy: scopelizeBy,
     promise: promise,
     space: space,
     block: block,

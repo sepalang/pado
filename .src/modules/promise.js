@@ -1,4 +1,4 @@
-import { asArray, asObject, isNumber, turn } from '../functions';
+import { asArray, asObject, isNumber, turn, argumentNamesBy } from '../functions';
 import { operate } from './operate';
 
 const PromiseClass = Promise;
@@ -184,6 +184,31 @@ export const wheel = PromiseFunction.wheel = function(tasks, option) {
   };
   
   return wheelControls;
+}
+
+export const promisify = PromiseFunction.promisify = function(asyncErrCallbackfn){
+  const argumentNames = argumentNamesBy(asyncErrCallbackfn).slice(1);
+  const promisified   = function(){
+    const args = Array.from(arguments);
+    return new Promise((resolve, reject)=>{
+      asyncErrCallbackfn.apply(this, args.concat(function (err) {
+        const [error, ...callbakArgs] = Array.from(arguments);
+        if (error) {
+          reject(error);
+        } else if (argumentNames.length && callbakArgs.length > 1) {
+          resolve(argumentNames.reduce((dest, name, index)=>{
+            dest[name] = callbakArgs[index];
+            return dest;
+          },{}));
+        } else {
+          resolve(callbakArgs[0]);
+        }
+      }));
+    });
+  };
+  return function(){
+    return promisified.apply(this,Array.from(arguments))
+  };
 }
 
 export const sequance = PromiseFunction.sequance = function(funcArray, opts){

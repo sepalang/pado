@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.object.keys", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/es6.string.repeat", "core-js/modules/es6.number.constructor", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.promise", "../functions", "./operate"], factory);
+    define(["exports", "core-js/modules/es6.object.keys", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/es6.string.repeat", "core-js/modules/es6.number.constructor", "core-js/modules/es6.array.from", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.promise", "../functions", "./operate"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.object.keys"), require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.string.repeat"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.promise"), require("../functions"), require("./operate"));
+    factory(exports, require("core-js/modules/es6.object.keys"), require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.string.repeat"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/es6.array.from"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.promise"), require("../functions"), require("./operate"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Object, global.runtime, global.es6Array, global.es6String, global.es6Number, global.webDom, global.es6Array, global.es6, global.functions, global.operate);
+    factory(mod.exports, global.es6Object, global.runtime, global.es6Array, global.es6String, global.es6Number, global.es6Array, global.webDom, global.es6Array, global.es6, global.functions, global.operate);
     global.promise = mod.exports;
   }
-})(this, function (_exports, _es6Object, _runtime, _es6Array, _es6String, _es6Number, _webDom, _es6Array2, _es, _functions, _operate) {
+})(this, function (_exports, _es6Object, _runtime, _es6Array, _es6String, _es6Number, _es6Array2, _webDom, _es6Array3, _es, _functions, _operate) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.sequance = _exports.wheel = _exports.defer = _exports.abort = _exports.valueOf = _exports.timeout = _exports.reject = _exports.resolve = _exports.all = _exports.promise = void 0;
+  _exports.sequance = _exports.promisify = _exports.wheel = _exports.defer = _exports.abort = _exports.valueOf = _exports.timeout = _exports.reject = _exports.resolve = _exports.all = _exports.promise = void 0;
 
   function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
 
@@ -242,6 +242,40 @@
   };
 
   _exports.wheel = wheel;
+
+  var promisify = PromiseFunction.promisify = function (asyncErrCallbackfn) {
+    var argumentNames = (0, _functions.argumentNamesBy)(asyncErrCallbackfn).slice(1);
+
+    var promisified = function promisified() {
+      var _this = this;
+
+      var args = Array.from(arguments);
+      return new Promise(function (resolve, reject) {
+        asyncErrCallbackfn.apply(_this, args.concat(function (err) {
+          var _Array$from = Array.from(arguments),
+              error = _Array$from[0],
+              callbakArgs = _Array$from.slice(1);
+
+          if (error) {
+            reject(error);
+          } else if (argumentNames.length && callbakArgs.length > 1) {
+            resolve(argumentNames.reduce(function (dest, name, index) {
+              dest[name] = callbakArgs[index];
+              return dest;
+            }, {}));
+          } else {
+            resolve(callbakArgs[0]);
+          }
+        }));
+      });
+    };
+
+    return function () {
+      return promisified.apply(this, Array.from(arguments));
+    };
+  };
+
+  _exports.promisify = promisify;
 
   var sequance = PromiseFunction.sequance = function (funcArray, opts) {
     return PromiseFunction(function (resolve, reject) {
