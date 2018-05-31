@@ -2612,7 +2612,7 @@
     }
 
     var finished = false;
-    var defer = PromiseFunction.defer();
+    var defer;
     var limit = typeof option.limit === "number" && option.limit > 0 ? parseInt(option.limit, 10) : 10000;
     var taskLength = tasks.length;
     var wheelTick = 0;
@@ -2653,39 +2653,67 @@
       }
     };
 
-    defer.promise.then(function (e) {
+    var thenStack = [function (e) {
       if (finished === null) return PromiseFunction.abort();
       finished = true;
       return e;
-    }).catch(function (e) {
+    }];
+    var catchStack = [function (e) {
       if (finished === null) return PromiseFunction.abort();
       finished = true;
-      return e;
-    });
+      return PromiseFunction.reject(e);
+    }];
 
-    defer.stop = function (resetTick) {
+    var deferReset = function deferReset(resetTick) {
+      defer && defer.stop(); //
+
+      defer = PromiseFunction.defer();
+      thenStack.forEach(function (fn) {
+        return defer.promise.then(fn);
+      });
+      catchStack.forEach(function (fn) {
+        return defer.promise.catch(fn);
+      }); //
+
+      defer.stop = function (resetTick) {
+        finished = null;
+        resetScope += 1;
+      };
+
+      defer.start = function (resetTick) {
+        if (finished === null) {
+          finished = false;
+          wheelTick = typeof resetTick === "number" ? resetTick : 0;
+          nextWheelTick(wheelTick++, option.value, resetScope);
+        }
+      }; //
+
+
+      defer.reset = deferReset; //
+
       finished = null;
-      resetScope += 1;
-    };
-
-    defer.start = function (resetTick) {
-      if (finished === null) {
-        finished = false;
-        wheelTick = typeof resetTick === "number" ? resetTick : 0;
-        nextWheelTick(wheelTick++, option.value, resetScope);
-      }
-    };
-
-    defer.reset = function (resetTick) {
-      defer.stop();
       defer.start(resetTick);
     };
 
-    defer.reset(0);
-    return defer;
+    deferReset(0);
+
+    var wheelControls = _objectSpread({}, defer, {
+      then: function then(fn) {
+        defer.promise.then(fn);
+        thenStack.push(fn);
+        return wheelControls;
+      },
+      catch: function _catch(fn) {
+        defer.promise.catch(fn);
+        catchStack.push(fn);
+        return wheelControls;
+      }
+    });
+
+    return wheelControls;
   };
   var sequance = PromiseFunction.sequance = function (funcArray, opts) {
-    return q(function (resolve, reject) {
+    return PromiseFunction(function (resolve, reject) {
       var option = asObject(opts, "concurrent");
 
       if (option.concurrent === true) {
@@ -2730,7 +2758,7 @@
                     }
 
                     _context.next = 4;
-                    return q.timeout(option.interval);
+                    return PromiseFunction.timeout(option.interval);
 
                   case 4:
                     return _context.abrupt("return", entry);

@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/es6.string.repeat", "core-js/modules/es6.number.constructor", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.promise", "../functions", "./operate"], factory);
+    define(["exports", "core-js/modules/es6.object.keys", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/es6.string.repeat", "core-js/modules/es6.number.constructor", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.promise", "../functions", "./operate"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.string.repeat"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.promise"), require("../functions"), require("./operate"));
+    factory(exports, require("core-js/modules/es6.object.keys"), require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.string.repeat"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.promise"), require("../functions"), require("./operate"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.runtime, global.es6Array, global.es6String, global.es6Number, global.webDom, global.es6Array, global.es6, global.functions, global.operate);
+    factory(mod.exports, global.es6Object, global.runtime, global.es6Array, global.es6String, global.es6Number, global.webDom, global.es6Array, global.es6, global.functions, global.operate);
     global.promise = mod.exports;
   }
-})(this, function (_exports, _runtime, _es6Array, _es6String, _es6Number, _webDom, _es6Array2, _es, _functions, _operate) {
+})(this, function (_exports, _es6Object, _runtime, _es6Array, _es6String, _es6Number, _webDom, _es6Array2, _es, _functions, _operate) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -19,6 +19,10 @@
   _exports.sequance = _exports.wheel = _exports.defer = _exports.abort = _exports.valueOf = _exports.timeout = _exports.reject = _exports.resolve = _exports.all = _exports.promise = void 0;
 
   function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
+
+  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+  function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
   var PromiseClass = Promise;
 
@@ -136,7 +140,7 @@
     }
 
     var finished = false;
-    var defer = PromiseFunction.defer();
+    var defer;
     var limit = typeof option.limit === "number" && option.limit > 0 ? parseInt(option.limit, 10) : 10000;
     var taskLength = tasks.length;
     var wheelTick = 0;
@@ -177,42 +181,70 @@
       }
     };
 
-    defer.promise.then(function (e) {
+    var thenStack = [function (e) {
       if (finished === null) return PromiseFunction.abort();
       finished = true;
       return e;
-    }).catch(function (e) {
+    }];
+    var catchStack = [function (e) {
       if (finished === null) return PromiseFunction.abort();
       finished = true;
-      return e;
-    });
+      return PromiseFunction.reject(e);
+    }];
 
-    defer.stop = function (resetTick) {
+    var deferReset = function deferReset(resetTick) {
+      defer && defer.stop(); //
+
+      defer = PromiseFunction.defer();
+      thenStack.forEach(function (fn) {
+        return defer.promise.then(fn);
+      });
+      catchStack.forEach(function (fn) {
+        return defer.promise.catch(fn);
+      }); //
+
+      defer.stop = function (resetTick) {
+        finished = null;
+        resetScope += 1;
+      };
+
+      defer.start = function (resetTick) {
+        if (finished === null) {
+          finished = false;
+          wheelTick = typeof resetTick === "number" ? resetTick : 0;
+          nextWheelTick(wheelTick++, option.value, resetScope);
+        }
+      }; //
+
+
+      defer.reset = deferReset; //
+
       finished = null;
-      resetScope += 1;
-    };
-
-    defer.start = function (resetTick) {
-      if (finished === null) {
-        finished = false;
-        wheelTick = typeof resetTick === "number" ? resetTick : 0;
-        nextWheelTick(wheelTick++, option.value, resetScope);
-      }
-    };
-
-    defer.reset = function (resetTick) {
-      defer.stop();
       defer.start(resetTick);
     };
 
-    defer.reset(0);
-    return defer;
+    deferReset(0);
+
+    var wheelControls = _objectSpread({}, defer, {
+      then: function then(fn) {
+        defer.promise.then(fn);
+        thenStack.push(fn);
+        return wheelControls;
+      },
+      catch: function _catch(fn) {
+        defer.promise.catch(fn);
+        catchStack.push(fn);
+        return wheelControls;
+      }
+    });
+
+    return wheelControls;
   };
 
   _exports.wheel = wheel;
 
   var sequance = PromiseFunction.sequance = function (funcArray, opts) {
-    return q(function (resolve, reject) {
+    return PromiseFunction(function (resolve, reject) {
       var option = (0, _functions.asObject)(opts, "concurrent");
 
       if (option.concurrent === true) {
@@ -257,7 +289,7 @@
                     }
 
                     _context.next = 4;
-                    return q.timeout(option.interval);
+                    return PromiseFunction.timeout(option.interval);
 
                   case 4:
                     return _context.abrupt("return", entry);
