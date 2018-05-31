@@ -1,6 +1,6 @@
 {
   "name": "pado",
-  "version": "0.6.1",
+  "version": "0.0.62",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
