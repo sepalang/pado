@@ -18,10 +18,6 @@ import {
   asArray
 } from './cast'
 
-import {
-  top
-} from './reduce'
-
 
 //read.readString.spec.js
 export const readString = (function(){
@@ -54,11 +50,11 @@ export const readString = (function(){
       
       //find match
       const matchesMap = matchEntries.map(([matchType, matchExp])=>([matchString(text,matchExp,cursor), matchType, matchExp]));
-      let firstMatch   = top(matchesMap,([a,aPriority],[b,bPriority])=>(
+      let firstMatch   = asArray(matchesMap).sort(([a,aPriority],[b,bPriority])=>(
         a[0]<0?true:
         b[0]<0?false:
         a[0]==b[0]?aPriority<bPriority:a[0]>b[0]
-      ));
+      ))[0];
       
       // top match is not exsist
       if(!firstMatch){ return false; }
