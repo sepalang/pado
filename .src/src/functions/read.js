@@ -199,6 +199,12 @@ export const readPath = (function(){
       }
     
       if(typeof pathParam === "string"){
+        //one depth
+        if(!/\.|\[/.test(pathParam)){
+          return [pathParam];
+        }
+        
+        //multiple depth
         const { props:{ path:result } } = readString(pathParam,[".","["],({
           content, props:{ path }, matchExp, castStart, castEnd, castSize, skipSize, enter, next
         })=>{

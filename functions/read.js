@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.function.name", "./isLike", "./remark", "./enumerable", "./cast", "./reduce"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.function.name", "core-js/modules/es6.array.sort", "./isLike", "./remark", "./enumerable", "./cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.function.name"), require("./isLike"), require("./remark"), require("./enumerable"), require("./cast"), require("./reduce"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.function.name"), require("core-js/modules/es6.array.sort"), require("./isLike"), require("./remark"), require("./enumerable"), require("./cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.es6Function, global.isLike, global.remark, global.enumerable, global.cast, global.reduce);
+    factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.es6Function, global.es6Array, global.isLike, global.remark, global.enumerable, global.cast);
     global.read = mod.exports;
   }
-})(this, function (_exports, _webDom, _es6Array, _es6Object, _es6Function, _isLike, _remark, _enumerable, _cast, _reduce) {
+})(this, function (_exports, _webDom, _es6Array, _es6Object, _es6Function, _es6Array2, _isLike, _remark, _enumerable, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -66,13 +66,13 @@
               matchExp = _ref2[1];
           return [(0, _remark.matchString)(text, matchExp, cursor), matchType, matchExp];
         });
-        var firstMatch = (0, _reduce.top)(matchesMap, function (_ref3, _ref4) {
+        var firstMatch = (0, _cast.asArray)(matchesMap).sort(function (_ref3, _ref4) {
           var a = _ref3[0],
               aPriority = _ref3[1];
           var b = _ref4[0],
               bPriority = _ref4[1];
           return a[0] < 0 ? true : b[0] < 0 ? false : a[0] == b[0] ? aPriority < bPriority : a[0] > b[0];
-        }); // top match is not exsist
+        })[0]; // top match is not exsist
 
         if (!firstMatch) {
           return false;
@@ -217,6 +217,12 @@
         }
 
         if (typeof pathParam === "string") {
+          //one depth
+          if (!/\.|\[/.test(pathParam)) {
+            return [pathParam];
+          } //multiple depth
+
+
           var _readString = readString(pathParam, [".", "["], function (_ref5) {
             var content = _ref5.content,
                 path = _ref5.props.path,

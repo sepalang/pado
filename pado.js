@@ -665,71 +665,6 @@
     }, object);
   };
 
-  var cut = function cut(collection, cutLength, emptyDefault) {
-    if (cutLength === void 0) {
-      cutLength = 1;
-    }
-
-    if (emptyDefault === void 0) {
-      emptyDefault = undefined;
-    }
-
-    var data = asArray$1(collection);
-    var fill = emptyDefault;
-
-    if (data.length > cutLength) {
-      data.splice(cutLength, Number.POSITIVE_INFINITY);
-      return data;
-    }
-
-    var dataLength = data.length;
-
-    if (typeof emptyDefault !== "function") {
-      fill = function fill() {
-        return emptyDefault;
-      };
-    }
-
-    for (var i = 0, l = cutLength - dataLength; i < l; i++) {
-      data.push(fill(dataLength++, i));
-    }
-
-    return data;
-  }; //reduce.spec.js
-
-  var top = function top(data, iteratee, topLength) {
-    switch (typeof iteratee) {
-      case "function":
-        //iteratee=iteratee;
-        break;
-
-      case "boolean":
-        iteratee = iteratee ? function (a, b) {
-          return a < b;
-        } : function (a, b) {
-          return a > b;
-        };
-        break;
-
-      default:
-        iteratee = function iteratee(a, b) {
-          return a < b;
-        };
-
-        break;
-    }
-
-    if (typeof topLength === "boolean") {
-      topLength = topLength ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
-    }
-
-    return isNumber(topLength) || isInfinity(topLength) ? asArray$1(data).sort(function (a, b) {
-      return iteratee(a, b);
-    }).splice(0, topLength) : asArray$1(data).sort(function (a, b) {
-      return iteratee(a, b);
-    })[0];
-  };
-
   var readString = function () {
     var rebaseMatches = function rebaseMatches(matches) {
       return entries(asArray$1(matches));
@@ -773,13 +708,13 @@
               matchExp = _ref2[1];
           return [matchString(text, matchExp, cursor), matchType, matchExp];
         });
-        var firstMatch = top(matchesMap, function (_ref3, _ref4) {
+        var firstMatch = asArray$1(matchesMap).sort(function (_ref3, _ref4) {
           var a = _ref3[0],
               aPriority = _ref3[1];
           var b = _ref4[0],
               bPriority = _ref4[1];
           return a[0] < 0 ? true : b[0] < 0 ? false : a[0] == b[0] ? aPriority < bPriority : a[0] > b[0];
-        }); // top match is not exsist
+        })[0]; // top match is not exsist
 
         if (!firstMatch) {
           return false;
@@ -921,6 +856,12 @@
         }
 
         if (typeof pathParam === "string") {
+          //one depth
+          if (!/\.|\[/.test(pathParam)) {
+            return [pathParam];
+          } //multiple depth
+
+
           var _readString = readString(pathParam, [".", "["], function (_ref5) {
             var content = _ref5.content,
                 path = _ref5.props.path,
@@ -1391,6 +1332,80 @@
     }
     index = ta.length == index ? 0 : index;
     return ta[index];
+  };
+
+  var cut = function cut(collection, cutLength, emptyDefault) {
+    if (cutLength === void 0) {
+      cutLength = 1;
+    }
+
+    if (emptyDefault === void 0) {
+      emptyDefault = undefined;
+    }
+
+    var data = asArray$1(collection);
+    var fill = emptyDefault;
+
+    if (data.length > cutLength) {
+      data.splice(cutLength, Number.POSITIVE_INFINITY);
+      return data;
+    }
+
+    var dataLength = data.length;
+
+    if (typeof emptyDefault !== "function") {
+      fill = function fill() {
+        return emptyDefault;
+      };
+    }
+
+    for (var i = 0, l = cutLength - dataLength; i < l; i++) {
+      data.push(fill(dataLength++, i));
+    }
+
+    return data;
+  }; //reduce.spec.js
+
+  var top = function top(data, iteratee, topLength) {
+    switch (typeof iteratee) {
+      case "function":
+        //iteratee=iteratee;
+        break;
+
+      case "string":
+        var path = iteratee;
+
+        iteratee = function iteratee(a, b) {
+          return get(a, path) < get(b, path);
+        };
+
+        break;
+
+      case "boolean":
+        iteratee = iteratee ? function (a, b) {
+          return a < b;
+        } : function (a, b) {
+          return a > b;
+        };
+        break;
+
+      default:
+        iteratee = function iteratee(a, b) {
+          return a < b;
+        };
+
+        break;
+    }
+
+    if (typeof topLength === "boolean") {
+      topLength = topLength ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+    }
+
+    return isNumber(topLength) || isInfinity(topLength) ? asArray$1(data).sort(function (a, b) {
+      return iteratee(a, b);
+    }).splice(0, topLength) : asArray$1(data).sort(function (a, b) {
+      return iteratee(a, b);
+    })[0];
   };
 
   var limitOf = function () {

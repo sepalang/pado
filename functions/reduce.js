@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.sort", "core-js/modules/es6.number.constructor", "./isLike", "./cast"], factory);
+    define(["exports", "core-js/modules/es6.array.sort", "core-js/modules/es6.number.constructor", "./isLike", "./cast", "./read"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.number.constructor"), require("./isLike"), require("./cast"));
+    factory(exports, require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.number.constructor"), require("./isLike"), require("./cast"), require("./read"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Number, global.isLike, global.cast);
+    factory(mod.exports, global.es6Array, global.es6Number, global.isLike, global.cast, global.read);
     global.reduce = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Number, _isLike, _cast) {
+})(this, function (_exports, _es6Array, _es6Number, _isLike, _cast, _read) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -58,6 +58,15 @@
     switch (typeof iteratee) {
       case "function":
         //iteratee=iteratee;
+        break;
+
+      case "string":
+        var path = iteratee;
+
+        iteratee = function iteratee(a, b) {
+          return (0, _read.get)(a, path) < (0, _read.get)(b, path);
+        };
+
         break;
 
       case "boolean":
