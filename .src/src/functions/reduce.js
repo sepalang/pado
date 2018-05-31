@@ -7,6 +7,10 @@ import {
   asArray
 } from './cast'
 
+import {
+  get
+} from './read'
+
 //reduce.spec.js
 export const cut = function(collection,cutLength=1,emptyDefault=undefined){
   let data = asArray(collection);
@@ -35,6 +39,10 @@ export const top = function(data,iteratee,topLength){
   switch(typeof iteratee){
   case "function":
     //iteratee=iteratee;
+    break;
+  case "string":
+    const path = iteratee;
+    iteratee=(a,b)=>get(a,path)<get(b,path);
     break;
   case "boolean":
     iteratee=iteratee?(a,b)=>a<b:(a,b)=>a>b;
