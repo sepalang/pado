@@ -181,7 +181,6 @@ export const likeEqual = (value, other, filter, depth)=>baseEq(
 );
 export const eqeq      = (value, other, filter, depth)=>baseEq(value, other, filter, depth, false);
 
-
 export const isExsist = function(value){
   if(value === true){
     return true;
@@ -197,3 +196,5 @@ export const isExsist = function(value){
 }
 
 export const notExsist = value=>!isExsist(value)
+
+export const likePromise = (target)=>(typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function");

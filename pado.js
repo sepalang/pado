@@ -292,6 +292,9 @@
   var notExsist = function notExsist(value) {
     return !isExsist(value);
   };
+  var likePromise = function likePromise(target) {
+    return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";
+  };
 
   var asArray$1 = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
@@ -2576,19 +2579,17 @@
   }();
 
   var PromiseClass = Promise;
-
-  var isMaybePromise = function isMaybePromise(target) {
-    return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";
-  };
-
   var resolveFn = PromiseClass.resolve;
   var rejectFn = PromiseClass.reject;
-
-  var PromiseFunction = function PromiseFunction(fn) {
+  var newPromise = function newPromise(fn) {
     return new PromiseClass(function (r, c) {
       var maybeAwaiter = fn(r, c);
-      isMaybePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
+      likePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
     });
+  };
+
+  var PromiseFunction = function PromiseFunction(fn) {
+    return newPromise(fn);
   };
 
   var promise = PromiseFunction;
@@ -2597,13 +2598,13 @@
   var reject = PromiseFunction.reject = rejectFn;
   var timeout = PromiseFunction.timeout = function (fn, time) {
     if (typeof fn === "number") {
-      return PromiseFunction(function (resolve) {
+      return newPromise(function (resolve) {
         return setTimeout(function () {
           return resolve(time);
         }, fn);
       });
     } else {
-      return PromiseFunction(function (resolve) {
+      return newPromise(function (resolve) {
         return setTimeout(function () {
           return resolve(typeof fn === "function" ? fn() : fn);
         }, time);
@@ -2611,8 +2612,8 @@
     }
   };
   var valueOf = PromiseFunction.valueOf = function (maybeQ) {
-    return PromiseFunction(function (resolve, reject) {
-      isMaybePromise(maybeQ) ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
+    return newPromise(function (resolve, reject) {
+      likePromise(maybeQ) ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
     });
   };
   var abortMessage = new function () {
@@ -2650,6 +2651,37 @@
       resolve: resolve,
       reject: reject,
       promise: promise
+    };
+  };
+  var promisify = PromiseFunction.promisify = function (asyncErrCallbackfn) {
+    var argumentNames = argumentNamesBy(asyncErrCallbackfn).slice(1);
+
+    var promisified = function promisified() {
+      var _this = this;
+
+      var args = Array.from(arguments);
+      return new Promise(function (resolve, reject) {
+        asyncErrCallbackfn.apply(_this, args.concat(function (err) {
+          var _Array$from = Array.from(arguments),
+              error = _Array$from[0],
+              callbakArgs = _Array$from.slice(1);
+
+          if (error) {
+            reject(error);
+          } else if (argumentNames.length && callbakArgs.length > 1) {
+            resolve(argumentNames.reduce(function (dest, name, index) {
+              dest[name] = callbakArgs[index];
+              return dest;
+            }, {}));
+          } else {
+            resolve(callbakArgs[0]);
+          }
+        }));
+      });
+    };
+
+    return function () {
+      return promisified.apply(this, Array.from(arguments));
     };
   };
   var wheel = PromiseFunction.wheel = function (tasks, option) {
@@ -2774,39 +2806,8 @@
 
     return wheelControls;
   };
-  var promisify = PromiseFunction.promisify = function (asyncErrCallbackfn) {
-    var argumentNames = argumentNamesBy(asyncErrCallbackfn).slice(1);
-
-    var promisified = function promisified() {
-      var _this = this;
-
-      var args = Array.from(arguments);
-      return new Promise(function (resolve, reject) {
-        asyncErrCallbackfn.apply(_this, args.concat(function (err) {
-          var _Array$from = Array.from(arguments),
-              error = _Array$from[0],
-              callbakArgs = _Array$from.slice(1);
-
-          if (error) {
-            reject(error);
-          } else if (argumentNames.length && callbakArgs.length > 1) {
-            resolve(argumentNames.reduce(function (dest, name, index) {
-              dest[name] = callbakArgs[index];
-              return dest;
-            }, {}));
-          } else {
-            resolve(callbakArgs[0]);
-          }
-        }));
-      });
-    };
-
-    return function () {
-      return promisified.apply(this, Array.from(arguments));
-    };
-  };
   var sequance = PromiseFunction.sequance = function (funcArray, opts) {
-    return PromiseFunction(function (resolve, reject) {
+    return newPromise(function (resolve, reject) {
       var option = asObject(opts, "concurrent");
 
       if (option.concurrent === true) {
@@ -3543,6 +3544,7 @@
     eqeq: eqeq,
     isExsist: isExsist,
     notExsist: notExsist,
+    likePromise: likePromise,
     asArray: asArray$1,
     toArray: toArray,
     asObject: asObject,

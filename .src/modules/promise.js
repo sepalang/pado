@@ -1,34 +1,34 @@
-import { asArray, asObject, isNumber, turn, argumentNamesBy } from '../functions';
+import { asArray, asObject, isNumber, likePromise, turn, argumentNamesBy } from '../functions';
 import { operate } from './operate';
 
 const PromiseClass = Promise;
 
-const isMaybePromise = (target)=>(typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function");
 const resolveFn = PromiseClass.resolve;
 const rejectFn = PromiseClass.reject;
 
-const PromiseFunction = function(fn) { 
-  return new PromiseClass((r,c)=>{
-    const maybeAwaiter = fn(r,c);
-    isMaybePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
-  });
-};
+export const newPromise=(fn)=>(new PromiseClass((r,c)=>{
+  const maybeAwaiter = fn(r,c);
+  likePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
+}));
+
+const PromiseFunction = (fn)=>newPromise(fn);
 
 export const promise = PromiseFunction;
 export const all     = PromiseFunction.all = Promise.all;
 export const resolve = PromiseFunction.resolve = resolveFn;
 export const reject  = PromiseFunction.reject = rejectFn;
+
 export const timeout = PromiseFunction.timeout = function(fn,time){
   if(typeof fn === "number"){
-    return PromiseFunction( resolve => setTimeout(() => resolve(time), fn) );
+    return newPromise( resolve => setTimeout(() => resolve(time), fn) );
   } else {
-    return PromiseFunction( resolve => setTimeout(() => resolve(typeof fn === "function" ? fn() : fn),time) );
+    return newPromise( resolve => setTimeout(() => resolve(typeof fn === "function" ? fn() : fn),time) );
   }
 };
 
 export const valueOf = PromiseFunction.valueOf = function(maybeQ){
-  return PromiseFunction(function(resolve,reject){
-    isMaybePromise(maybeQ) ?
+  return newPromise(function(resolve,reject){
+    likePromise(maybeQ) ?
     maybeQ.then(resolve).catch(reject) :
     resolve(maybeQ) ;
   });
@@ -62,6 +62,31 @@ export const defer = PromiseFunction.defer = function(){
     resolve: resolve,
     reject: reject,
     promise: promise
+  };
+};
+
+export const promisify = PromiseFunction.promisify = function(asyncErrCallbackfn){
+  const argumentNames = argumentNamesBy(asyncErrCallbackfn).slice(1);
+  const promisified   = function(){
+    const args = Array.from(arguments);
+    return new Promise((resolve, reject)=>{
+      asyncErrCallbackfn.apply(this, args.concat(function (err) {
+        const [error, ...callbakArgs] = Array.from(arguments);
+        if (error) {
+          reject(error);
+        } else if (argumentNames.length && callbakArgs.length > 1) {
+          resolve(argumentNames.reduce((dest, name, index)=>{
+            dest[name] = callbakArgs[index];
+            return dest;
+          },{}));
+        } else {
+          resolve(callbakArgs[0]);
+        }
+      }));
+    });
+  };
+  return function(){
+    return promisified.apply(this,Array.from(arguments))
   };
 };
 
@@ -186,33 +211,8 @@ export const wheel = PromiseFunction.wheel = function(tasks, option) {
   return wheelControls;
 }
 
-export const promisify = PromiseFunction.promisify = function(asyncErrCallbackfn){
-  const argumentNames = argumentNamesBy(asyncErrCallbackfn).slice(1);
-  const promisified   = function(){
-    const args = Array.from(arguments);
-    return new Promise((resolve, reject)=>{
-      asyncErrCallbackfn.apply(this, args.concat(function (err) {
-        const [error, ...callbakArgs] = Array.from(arguments);
-        if (error) {
-          reject(error);
-        } else if (argumentNames.length && callbakArgs.length > 1) {
-          resolve(argumentNames.reduce((dest, name, index)=>{
-            dest[name] = callbakArgs[index];
-            return dest;
-          },{}));
-        } else {
-          resolve(callbakArgs[0]);
-        }
-      }));
-    });
-  };
-  return function(){
-    return promisified.apply(this,Array.from(arguments))
-  };
-}
-
 export const sequance = PromiseFunction.sequance = function(funcArray, opts){
-  return PromiseFunction(function(resolve, reject){
+  return newPromise(function(resolve, reject){
     const option = asObject(opts,"concurrent");
       
     if(option.concurrent === true){

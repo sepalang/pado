@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.notExsist = _exports.isExsist = _exports.eqeq = _exports.likeEqual = _exports.isEqual = _exports.eqof = _exports.isEnumerableObject = _exports.isPlainObject = _exports.likeRegexp = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isInfinity = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
+  _exports.likePromise = _exports.notExsist = _exports.isExsist = _exports.eqeq = _exports.likeEqual = _exports.isEqual = _exports.eqof = _exports.isEnumerableObject = _exports.isPlainObject = _exports.likeRegexp = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isInfinity = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
 
   var isAbsoluteNaN = function isAbsoluteNaN(it) {
     return it !== it && typeof it === "number";
@@ -303,5 +303,11 @@
   };
 
   _exports.notExsist = notExsist;
+
+  var likePromise = function likePromise(target) {
+    return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";
+  };
+
+  _exports.likePromise = likePromise;
 });
 //# sourceMappingURL=isLike.js.map
