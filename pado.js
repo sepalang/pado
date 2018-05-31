@@ -2587,16 +2587,17 @@
       likePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
     });
   };
-
-  var PromiseFunction = function PromiseFunction(fn) {
+  var promise = function promise(fn) {
     return newPromise(fn);
   };
-
-  var promise = PromiseFunction;
-  var all$1 = PromiseFunction.all = Promise.all;
-  var resolve = PromiseFunction.resolve = resolveFn;
-  var reject = PromiseFunction.reject = rejectFn;
-  var timeout = PromiseFunction.timeout = function (fn, time) {
+  var PromiseFunction = promise;
+  var all$1 = Promise.all;
+  PromiseFunction.all = all$1;
+  var resolve = resolveFn;
+  PromiseFunction.resolve = resolve;
+  var reject = rejectFn;
+  PromiseFunction.reject = reject;
+  var timeout = function timeout(fn, time) {
     if (typeof fn === "number") {
       return newPromise(function (resolve) {
         return setTimeout(function () {
@@ -2611,11 +2612,13 @@
       });
     }
   };
-  var valueOf = PromiseFunction.valueOf = function (maybeQ) {
+  PromiseFunction.timeout = timeout;
+  var valueOf = function valueOf(maybeQ) {
     return newPromise(function (resolve, reject) {
       likePromise(maybeQ) ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
     });
   };
+  PromiseFunction.valueOf = valueOf;
   var abortMessage = new function () {
     Object.defineProperty(this, "message", {
       get: function get$$1() {
@@ -2628,7 +2631,7 @@
       }
     });
   }();
-  var abort = PromiseFunction.abort = function (notifyConsole) {
+  var abort = function abort(notifyConsole) {
     if (notifyConsole === void 0) {
       notifyConsole = undefined;
     }
@@ -2641,7 +2644,8 @@
       reject(abortMessage);
     });
   };
-  var defer = PromiseFunction.defer = function () {
+  PromiseFunction.abort = abort;
+  var defer = function defer() {
     var resolve, reject;
     var promise = new PromiseClass(function () {
       resolve = arguments[0];
@@ -2653,274 +2657,7 @@
       promise: promise
     };
   };
-  var promisify = PromiseFunction.promisify = function (asyncErrCallbackfn) {
-    var argumentNames = argumentNamesBy(asyncErrCallbackfn).slice(1);
-
-    var promisified = function promisified() {
-      var _this = this;
-
-      var args = Array.from(arguments);
-      return new Promise(function (resolve, reject) {
-        asyncErrCallbackfn.apply(_this, args.concat(function (err) {
-          var _Array$from = Array.from(arguments),
-              error = _Array$from[0],
-              callbakArgs = _Array$from.slice(1);
-
-          if (error) {
-            reject(error);
-          } else if (argumentNames.length && callbakArgs.length > 1) {
-            resolve(argumentNames.reduce(function (dest, name, index) {
-              dest[name] = callbakArgs[index];
-              return dest;
-            }, {}));
-          } else {
-            resolve(callbakArgs[0]);
-          }
-        }));
-      });
-    };
-
-    return function () {
-      return promisified.apply(this, Array.from(arguments));
-    };
-  };
-  var wheel = PromiseFunction.wheel = function (tasks, option) {
-    if (!(tasks instanceof Array)) {
-      return PromiseFunction.reject(new Error("tasks must be array"));
-    }
-
-    if (!tasks.length || !tasks.some(function (e) {
-      return typeof e === "function";
-    })) {
-      return PromiseFunction.reject(new Error("not found wheel executable"));
-    }
-
-    if (!tasks.some(function (e) {
-      return typeof e !== "function" || typeof e !== "number";
-    })) {
-      return PromiseFunction.reject(new Error("wheel task only function or number executable"));
-    }
-
-    if (typeof option !== "object") {
-      option = {};
-    }
-
-    var finished = false;
-    var defer;
-    var limit = typeof option.limit === "number" && option.limit > 0 ? parseInt(option.limit, 10) : 10000;
-    var taskLength = tasks.length;
-    var wheelTick = 0;
-    var resetScope = 0;
-
-    var nextWheelTick = function nextWheelTick(tick, value, tickScope) {
-      var nowAction = tasks[turn(tick, taskLength, 1)];
-
-      var isActiveFn = function isActiveFn() {
-        return tickScope === resetScope;
-      };
-
-      var nextTickFn = function nextTickFn(passValue) {
-        // if reset called
-        if (!isActiveFn()) return; // if over tick
-
-        if (wheelTick > limit) {
-          return defer.reject(new Error("limit"));
-        }
-
-        if (finished === false) {
-          nextWheelTick(wheelTick++, passValue, tickScope);
-        }
-      };
-
-      if (typeof nowAction === "function") {
-        nowAction({
-          value: value,
-          next: nextTickFn,
-          isActive: isActiveFn,
-          resolve: defer.resolve,
-          reject: defer.reject
-        }, Math.floor(tick / tasks.length), tick);
-      } else if (typeof nowAction === "number") {
-        setTimeout(function () {
-          nextTickFn(value);
-        }, nowAction);
-      }
-    };
-
-    var thenStack = [function (e) {
-      if (finished === null) return PromiseFunction.abort();
-      finished = true;
-      return e;
-    }];
-    var catchStack = [function (e) {
-      if (finished === null) return PromiseFunction.abort();
-      finished = true;
-      return PromiseFunction.reject(e);
-    }];
-
-    var deferReset = function deferReset(resetTick) {
-      defer && defer.stop(); //
-
-      defer = PromiseFunction.defer();
-      thenStack.forEach(function (fn) {
-        return defer.promise.then(fn);
-      });
-      catchStack.forEach(function (fn) {
-        return defer.promise.catch(fn);
-      }); //
-
-      defer.stop = function (resetTick) {
-        finished = null;
-        resetScope += 1;
-      };
-
-      defer.start = function (resetTick) {
-        if (finished === null) {
-          finished = false;
-          wheelTick = typeof resetTick === "number" ? resetTick : 0;
-          nextWheelTick(wheelTick++, option.value, resetScope);
-        }
-      }; //
-
-
-      defer.reset = deferReset; //
-
-      finished = null;
-      defer.start(resetTick);
-    };
-
-    deferReset(0);
-
-    var wheelControls = _objectSpread({}, defer, {
-      then: function then(fn) {
-        defer.promise.then(fn);
-        thenStack.push(fn);
-        return wheelControls;
-      },
-      catch: function _catch(fn) {
-        defer.promise.catch(fn);
-        catchStack.push(fn);
-        return wheelControls;
-      }
-    });
-
-    return wheelControls;
-  };
-  var sequance = PromiseFunction.sequance = function (funcArray, opts) {
-    return newPromise(function (resolve, reject) {
-      var option = asObject(opts, "concurrent");
-
-      if (option.concurrent === true) {
-        option.concurrent = Number.POSITIVE_INFINITY;
-      } else if (!isNumber(option.concurrent) || option.concurrent < 1) {
-        option.concurrent = 1;
-      }
-
-      if (!isNumber(option.interval) || option.interval < -1) {
-        option.interval = -1;
-      }
-
-      if (!isNumber(option.repeat) || option.repeat < 1) {
-        option.repeat = 1;
-      } //set task with repeat
-
-
-      var sequanceTaskEntries = Array(option.repeat).fill(asArray$1(funcArray)).reduce(function (dest, tasks) {
-        tasks.forEach(function (fn, index) {
-          return dest.push([index, fn]);
-        });
-        return dest;
-      }, []);
-      var sequanceLength = sequanceTaskEntries.length;
-      var sequanceComplete = 0;
-      var sequanceReseult = Array(sequanceTaskEntries.length);
-      var sequanceOperator = operate({
-        output: function () {
-          var _output = _asyncToGenerator(
-          /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee(_ref) {
-            var entry;
-            return regeneratorRuntime.wrap(function _callee$(_context) {
-              while (1) {
-                switch (_context.prev = _context.next) {
-                  case 0:
-                    entry = _ref.entry;
-
-                    if (!(option.interval > -1)) {
-                      _context.next = 4;
-                      break;
-                    }
-
-                    _context.next = 4;
-                    return PromiseFunction.timeout(option.interval);
-
-                  case 4:
-                    return _context.abrupt("return", entry);
-
-                  case 5:
-                  case "end":
-                    return _context.stop();
-                }
-              }
-            }, _callee, this);
-          }));
-
-          return function output(_x) {
-            return _output.apply(this, arguments);
-          };
-        }(),
-        limitOutput: 1
-      }).operate({
-        concurrent: option.concurrent,
-        input: function () {
-          var _input = _asyncToGenerator(
-          /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee2(_ref2) {
-            var entry, index, fn;
-            return regeneratorRuntime.wrap(function _callee2$(_context2) {
-              while (1) {
-                switch (_context2.prev = _context2.next) {
-                  case 0:
-                    entry = _ref2.entry;
-                    index = entry[0], fn = entry[1];
-                    _context2.t0 = entry;
-                    _context2.next = 5;
-                    return fn();
-
-                  case 5:
-                    _context2.t1 = _context2.sent;
-
-                    _context2.t0.push.call(_context2.t0, _context2.t1);
-
-                    return _context2.abrupt("return", entry);
-
-                  case 8:
-                  case "end":
-                    return _context2.stop();
-                }
-              }
-            }, _callee2, this);
-          }));
-
-          return function input(_x2) {
-            return _input.apply(this, arguments);
-          };
-        }(),
-        output: function output(_ref3) {
-          var entry = _ref3.entry;
-          var index = entry[0],
-              fn = entry[1],
-              result = entry[2];
-          sequanceReseult[index] = result;
-          sequanceComplete++;
-
-          if (sequanceComplete === sequanceLength) {
-            resolve(sequanceReseult);
-          }
-        }
-      }).concat(sequanceTaskEntries);
-    });
-  };
+  PromiseFunction.defer = defer;
 
   var awaitLeadOnly = function awaitLeadOnly(func) {
     return alloc(function () {

@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.sequance = _exports.wheel = _exports.promisify = _exports.defer = _exports.abort = _exports.valueOf = _exports.timeout = _exports.reject = _exports.resolve = _exports.all = _exports.promise = _exports.newPromise = void 0;
+  _exports.batch = _exports.until = _exports.promisify = _exports.defer = _exports.abort = _exports.valueOf = _exports.timeout = _exports.reject = _exports.resolve = _exports.all = _exports.promise = _exports.newPromise = void 0;
 
   function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
 
@@ -37,20 +37,23 @@
 
   _exports.newPromise = newPromise;
 
-  var PromiseFunction = function PromiseFunction(fn) {
+  var promise = function promise(fn) {
     return newPromise(fn);
   };
 
-  var promise = PromiseFunction;
   _exports.promise = promise;
-  var all = PromiseFunction.all = Promise.all;
+  var PromiseFunction = promise;
+  var all = Promise.all;
   _exports.all = all;
-  var resolve = PromiseFunction.resolve = resolveFn;
+  PromiseFunction.all = all;
+  var resolve = resolveFn;
   _exports.resolve = resolve;
-  var reject = PromiseFunction.reject = rejectFn;
+  PromiseFunction.resolve = resolve;
+  var reject = rejectFn;
   _exports.reject = reject;
+  PromiseFunction.reject = reject;
 
-  var timeout = PromiseFunction.timeout = function (fn, time) {
+  var timeout = function timeout(fn, time) {
     if (typeof fn === "number") {
       return newPromise(function (resolve) {
         return setTimeout(function () {
@@ -67,14 +70,16 @@
   };
 
   _exports.timeout = timeout;
+  PromiseFunction.timeout = timeout;
 
-  var valueOf = PromiseFunction.valueOf = function (maybeQ) {
+  var valueOf = function valueOf(maybeQ) {
     return newPromise(function (resolve, reject) {
       (0, _functions.likePromise)(maybeQ) ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
     });
   };
 
   _exports.valueOf = valueOf;
+  PromiseFunction.valueOf = valueOf;
   var abortMessage = new function () {
     Object.defineProperty(this, "message", {
       get: function get() {
@@ -88,7 +93,7 @@
     });
   }();
 
-  var abort = PromiseFunction.abort = function (notifyConsole) {
+  var abort = function abort(notifyConsole) {
     if (notifyConsole === void 0) {
       notifyConsole = undefined;
     }
@@ -103,8 +108,9 @@
   };
 
   _exports.abort = abort;
+  PromiseFunction.abort = abort;
 
-  var defer = PromiseFunction.defer = function () {
+  var defer = function defer() {
     var resolve, reject;
     var promise = new PromiseClass(function () {
       resolve = arguments[0];
@@ -118,8 +124,9 @@
   };
 
   _exports.defer = defer;
+  PromiseFunction.defer = defer;
 
-  var promisify = PromiseFunction.promisify = function (asyncErrCallbackfn) {
+  var promisify = function promisify(asyncErrCallbackfn) {
     var argumentNames = (0, _functions.argumentNamesBy)(asyncErrCallbackfn).slice(1);
 
     var promisified = function promisified() {
@@ -153,7 +160,7 @@
 
   _exports.promisify = promisify;
 
-  var wheel = PromiseFunction.wheel = function (tasks, option) {
+  var until = function until(tasks, option) {
     if (!(tasks instanceof Array)) {
       return PromiseFunction.reject(new Error("tasks must be array"));
     }
@@ -276,9 +283,9 @@
     return wheelControls;
   };
 
-  _exports.wheel = wheel;
+  _exports.until = until;
 
-  var sequance = PromiseFunction.sequance = function (funcArray, opts) {
+  var batch = function batch(funcArray, opts) {
     return newPromise(function (resolve, reject) {
       var option = (0, _functions.asObject)(opts, "concurrent");
 
@@ -394,6 +401,6 @@
     });
   };
 
-  _exports.sequance = sequance;
+  _exports.batch = batch;
 });
 //# sourceMappingURL=promise.js.map

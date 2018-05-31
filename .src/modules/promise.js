@@ -11,28 +11,35 @@ export const newPromise=(fn)=>(new PromiseClass((r,c)=>{
   likePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
 }));
 
-const PromiseFunction = (fn)=>newPromise(fn);
+export const promise = (fn)=>newPromise(fn);
+const PromiseFunction = promise;
 
-export const promise = PromiseFunction;
-export const all     = PromiseFunction.all = Promise.all;
-export const resolve = PromiseFunction.resolve = resolveFn;
-export const reject  = PromiseFunction.reject = rejectFn;
+export const all     = Promise.all;
+PromiseFunction.all  = all;
 
-export const timeout = PromiseFunction.timeout = function(fn,time){
+export const resolve    = resolveFn;
+PromiseFunction.resolve = resolve;
+
+export const reject    = rejectFn;
+PromiseFunction.reject = reject;
+
+export const timeout = function(fn,time){
   if(typeof fn === "number"){
     return newPromise( resolve => setTimeout(() => resolve(time), fn) );
   } else {
     return newPromise( resolve => setTimeout(() => resolve(typeof fn === "function" ? fn() : fn),time) );
   }
 };
+PromiseFunction.timeout = timeout;
 
-export const valueOf = PromiseFunction.valueOf = function(maybeQ){
+export const valueOf = function(maybeQ){
   return newPromise(function(resolve,reject){
     likePromise(maybeQ) ?
     maybeQ.then(resolve).catch(reject) :
     resolve(maybeQ) ;
   });
 };
+PromiseFunction.valueOf = valueOf;
 
 const abortMessage = new (function() {
   Object.defineProperty(this, "message", {
@@ -43,7 +50,7 @@ const abortMessage = new (function() {
   });
 })();
 
-export const abort = PromiseFunction.abort = function(notifyConsole = undefined) {
+export const abort = function(notifyConsole = undefined) {
   return new PromiseClass((resolve, reject)=>{
     if(notifyConsole === true) {
       console.warn("abort promise");
@@ -51,8 +58,9 @@ export const abort = PromiseFunction.abort = function(notifyConsole = undefined)
     reject(abortMessage);
   });
 };
+PromiseFunction.abort = abort;
 
-export const defer = PromiseFunction.defer = function(){
+export const defer = function(){
   var resolve, reject;
   var promise = new PromiseClass(function() {
     resolve = arguments[0];
@@ -64,8 +72,9 @@ export const defer = PromiseFunction.defer = function(){
     promise: promise
   };
 };
+PromiseFunction.defer = defer;
 
-export const promisify = PromiseFunction.promisify = function(asyncErrCallbackfn){
+export const promisify = function(asyncErrCallbackfn){
   const argumentNames = argumentNamesBy(asyncErrCallbackfn).slice(1);
   const promisified   = function(){
     const args = Array.from(arguments);
@@ -90,8 +99,7 @@ export const promisify = PromiseFunction.promisify = function(asyncErrCallbackfn
   };
 };
 
-export const wheel = PromiseFunction.wheel = function(tasks, option) {
-
+export const until = function(tasks, option) {
   if(!(tasks instanceof Array)) {
     return PromiseFunction.reject(new Error("tasks must be array"));
   }
@@ -211,7 +219,7 @@ export const wheel = PromiseFunction.wheel = function(tasks, option) {
   return wheelControls;
 }
 
-export const sequance = PromiseFunction.sequance = function(funcArray, opts){
+export const batch = function(funcArray, opts){
   return newPromise(function(resolve, reject){
     const option = asObject(opts,"concurrent");
       
