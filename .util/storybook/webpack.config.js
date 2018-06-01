@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 
-require("fs").writeFileSync(__dirname+"/log.json",JSON.stringify({
+require("fs").writeFileSync(__dirname+"/alias.json",JSON.stringify({
   vue$: 'vue/dist/vue.esm.js',
   "~/": __dirname,
   "@/": path.resolve(__dirname,"./src"),

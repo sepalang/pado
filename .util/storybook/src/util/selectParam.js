@@ -1,6 +1,6 @@
-import { text, select } from '@storybook/addon-knobs/vue';
-export { text, select } from '@storybook/addon-knobs/vue';
-export { withKnobs }  from '@storybook/addon-knobs/vue';
+import { text, select } from '@storybook/addon-knobs';
+export { text, select } from '@storybook/addon-knobs';
+export { withKnobs }  from '@storybook/addon-knobs';
 
 export const params = function(prefix="",knobsOptions=[]){
   if(typeof prefix === "string" && prefix.length){

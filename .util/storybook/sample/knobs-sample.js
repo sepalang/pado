@@ -29,7 +29,7 @@ import {
   color,
   date,
   button,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import WelcomeKnobs from './WelcomeKnobs.vue';
 story
 .addDecorator(withKnobs)
