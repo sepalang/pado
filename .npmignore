@@ -1,8 +1,4 @@
 /.nvmrc
 /.tm_properties
-
 /docs
-
-/.src/report
-/.src/storybook
-/.src/test
+/.util
