@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/pado",
-  "version": "0.0.70",
+  "version": "0.0.71",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -9,9 +9,11 @@
   },
   "scripts": {
     "start": "babel-node .util/test/src-test.js",
-    "clear:dist": "rimraf ./*.js ./*.js.map ./functions ./modules",
+    "clear:dist": "rimraf ./*.js ./*.js.map ./functions ./modules ./dom",
     "build:default": "padoc .src ./ -m umd -s",
-    "build:pack": "padoc --pack .src/pado.js ./pado.js -m umd -n pado -s",
+    "build:pack:node": "padoc --pack .src/pado.js ./pado.js -m umd -n pado -s",
+    "build:pack:dom": "padoc --pack .src/pado.dom.js ./dom/pado.dom.js -m umd -n pado -s",
+    "build:pack": "npm run build:pack:node && npm run build:pack:dom",
     "build": "npm run clear:dist && npm run build:default && npm run build:pack",
     "report:index": "madge .src/index.js --image .util/report/index.report.png",
     "report:pado": "madge .src/pado.js --image .util/report/pado.report.png",
