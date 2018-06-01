@@ -36,10 +36,13 @@ export default function DragHelper(element,option){
     //처음으로부터 변경된 거리
     pointerDrag.offsetX = pointerDrag.x - firstDrag.x;
     pointerDrag.offsetY = pointerDrag.y - firstDrag.y;
-  
+    
     //처음으로 부터 변경되어 엘리먼트 오프셋 크기
-    pointerDrag.left = dragParams.offset.left + pointerDrag.offsetX + "px";
-    pointerDrag.top  = dragParams.offset.top + pointerDrag.offsetY + "px";
+    pointerDrag.leftValue = dragParams.offset.left + pointerDrag.offsetX;
+    pointerDrag.topValue  = dragParams.offset.top + pointerDrag.offsetY;
+    
+    pointerDrag.left = pointerDrag.leftValue + "px";
+    pointerDrag.top  = pointerDrag.topValue + pointerDrag.offsetY + "px";
     
     return pointerDrag;
   }
