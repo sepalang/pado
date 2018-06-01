@@ -1,6 +1,16 @@
 const path = require('path');
 const webpack = require('webpack');
 
+require("fs").writeFileSync(__dirname+"/log.json",JSON.stringify({
+  vue$: 'vue/dist/vue.esm.js',
+  "~/": __dirname,
+  "@/": path.resolve(__dirname,"./src"),
+  "@layout/": path.resolve(__dirname,"src/layout"),
+  "@component/": path.resolve(__dirname,"src/component"),
+  "@util/": path.resolve(__dirname,"src/util"),
+  "@pado/": path.resolve(__dirname,"../../.src/")
+},2,2))
+
 module.exports = {
   entry: './src/index.js',
   output: {
@@ -43,7 +53,11 @@ module.exports = {
     alias: {
       vue$: 'vue/dist/vue.esm.js',
       "~/": __dirname,
-      "@/": path.resolve(__dirname,"../src")
+      "@/": path.resolve(__dirname,"./src"),
+      "@layout/": path.resolve(__dirname,"src/layout"),
+      "@component/": path.resolve(__dirname,"src/component"),
+      "@util/": path.resolve(__dirname,"src/util"),
+      "@pado/": path.resolve(__dirname,"../../.src/")
     }
   },
   devServer: {
