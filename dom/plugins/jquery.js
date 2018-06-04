@@ -20,17 +20,19 @@
   var $;
 
   try {
+    window, document;
     $ = require('jquery');
   } catch (e) {
-    try {
-      $ = jQuery || $;
-
-      if (!$) {
-        throw new Error("No jQuery");
-      }
-    } catch (e2) {
-      throw new Error("pado/dom sometimes requires jquery.");
-    }
+    var _jsdom = jsdom,
+        JSDOM = _jsdom.JSDOM;
+    var dom = new JSDOM('<html><head><meta charset="utf-8"></head><body></body></html>', {
+      contentType: "text/html",
+      userAgent: "Mellblomenator/9000",
+      includeNodeLocations: true
+    });
+    global.window = dom.window;
+    global.document = dom.document;
+    $ = require('jquery');
   }
 
   $.fn.extend({
@@ -48,6 +50,42 @@
     //파라메터 노드가 제이쿼리가 가진 노드 밖에 있는지 확인
     containsOut: function containsOut(node) {
       return !this.containsIn(node);
+    },
+    offsetAll: function offsetAll() {
+      var _this$eq = this.eq(0),
+          element = _this$eq[0];
+
+      var result;
+
+      if (!element) {
+        return;
+      }
+
+      if (element["innerWidth"]) {
+        result = {
+          top: 0,
+          left: 0,
+          width: window.innerWidth,
+          height: window.innerHeight,
+          right: window.innerWidth,
+          bottom: window.innerHeight
+        };
+      } else {
+        var offsetTop = element.offsetTop,
+            offsetLeft = element.offsetLeft,
+            offsetWidth = element.offsetWidth,
+            offsetHeight = element.offsetHeight;
+        result = {
+          top: offsetTop,
+          left: offsetLeft,
+          width: offsetWidth,
+          height: offsetHeight,
+          right: offsetLeft + offsetWidth,
+          bottom: offsetTop + offsetHeight
+        };
+      }
+
+      return result;
     }
   });
   var _default = $;

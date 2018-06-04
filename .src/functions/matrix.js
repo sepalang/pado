@@ -1,7 +1,7 @@
 import { asArray, cloneDeep } from './cast'
 import { isAbsoluteNaN } from './isLike'
 import { top } from './reduce';
-import { turn } from './nice';
+import { turn, limitOf } from './nice';
 import { times } from './enumerable';
 
 export const rangeModel = function(value,step,sizeBase){
@@ -64,19 +64,57 @@ export const range = function(value,stepSize,sizeBaseRange){
   return reverse ? r.reverse() : r;
 }
 
-export const domainRangeValue = function(domain,range,vs,nice){
-  return forMap(cloneDeep(vs),function(v,sel){
-    var $range  = sel ? range[sel]  : range;
-    var $domain = sel ? domain[sel] : domain;
+//TODO : move to ?
+export const hashMap = function(d,f){
+  if(typeof d === "object" && !isArray(d)){
+    for(let k in d) d[k] = f(d[k],k); 
+  } else {
+    return f(d,(void 0));
+  }
+  return d;
+};
+
+export const domainRangeValue = function(domain,range,vs,nice,limit){
+  return hashMap(cloneDeep(vs),function(v,sel){
+    const $range  = sel ? range[sel]  : range;
+    const $domain = sel ? domain[sel] : domain;
     if(!$range || !$domain){ return v; }
                     
-    var dSize = $domain[1] - $domain[0];
-    var sSize = $range[1] - $range[0];
-    var dRate = (v - $domain[0]) / dSize;
-    var calc  = $range[0] + sSize * dRate;
-                    
-    return nice ? Math.floor(calc) : calc;
+    const dSize = $domain[1] - $domain[0];
+    const sSize = $range[1] - $range[0];
+    const dRate = (v - $domain[0]) / dSize;
+    const calc  = $range[0] + sSize * dRate;
+    const result = nice ? Math.floor(calc) : calc;
+    
+    return limit ? 
+    $range[1] > $range[0] ? 
+    limitOf(result,$range[1],$range[0]) :
+    limitOf(result,$range[0],$range[1]) :
+    result;
   });
+};
+
+export const domainRangeInterpolate = function(domain,range,nice,limit){
+  let _domain = domain;
+  let _range  = range;
+  let _nice   = nice;
+  
+  const interpolate = (value)=>domainRangeValue(_domain,_range,value,_nice,limit);
+  
+  interpolate.domain = (domain)=>{
+    _domain = domain;
+    return interpolate;
+  }
+  interpolate.range = (range)=>{
+    _range = range
+    return interpolate;
+  }
+  interpolate.nice = (nice)=>{
+    _nice = nice;
+    return interpolate;
+  }
+  
+  return interpolate;
 };
 
 //matrixRange([1],[3]) // [[1], [2], [3]] 

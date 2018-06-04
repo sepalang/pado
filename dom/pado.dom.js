@@ -43,15 +43,16 @@
   try {
     $ = require('jquery');
   } catch (e) {
-    try {
-      $ = jQuery || $;
-
-      if (!$) {
-        throw new Error("No jQuery");
-      }
-    } catch (e2) {
-      throw new Error("pado/dom sometimes requires jquery.");
-    }
+    var _jsdom = jsdom,
+        JSDOM = _jsdom.JSDOM;
+    var dom = new JSDOM('<html><head><meta charset="utf-8"></head><body></body></html>', {
+      contentType: "text/html",
+      userAgent: "Mellblomenator/9000",
+      includeNodeLocations: true
+    });
+    global.window = dom.window;
+    global.document = dom.document;
+    $ = require('jquery');
   }
 
   $.fn.extend({
@@ -69,6 +70,42 @@
     //파라메터 노드가 제이쿼리가 가진 노드 밖에 있는지 확인
     containsOut: function containsOut(node) {
       return !this.containsIn(node);
+    },
+    offsetAll: function offsetAll() {
+      var _this$eq = this.eq(0),
+          element = _this$eq[0];
+
+      var result;
+
+      if (!element) {
+        return;
+      }
+
+      if (element["innerWidth"]) {
+        result = {
+          top: 0,
+          left: 0,
+          width: window.innerWidth,
+          height: window.innerHeight,
+          right: window.innerWidth,
+          bottom: window.innerHeight
+        };
+      } else {
+        var offsetTop = element.offsetTop,
+            offsetLeft = element.offsetLeft,
+            offsetWidth = element.offsetWidth,
+            offsetHeight = element.offsetHeight;
+        result = {
+          top: offsetTop,
+          left: offsetLeft,
+          width: offsetWidth,
+          height: offsetHeight,
+          right: offsetLeft + offsetWidth,
+          bottom: offsetTop + offsetHeight
+        };
+      }
+
+      return result;
     }
   });
   var $$1 = $;
@@ -107,8 +144,10 @@
       pointerDrag.offsetX = pointerDrag.x - firstDrag.x;
       pointerDrag.offsetY = pointerDrag.y - firstDrag.y; //처음으로 부터 변경되어 엘리먼트 오프셋 크기
 
-      pointerDrag.left = dragParams.offset.left + pointerDrag.offsetX + "px";
-      pointerDrag.top = dragParams.offset.top + pointerDrag.offsetY + "px";
+      pointerDrag.leftValue = dragParams.offset.left + pointerDrag.offsetX;
+      pointerDrag.topValue = dragParams.offset.top + pointerDrag.offsetY;
+      pointerDrag.left = pointerDrag.leftValue + "px";
+      pointerDrag.top = pointerDrag.topValue + pointerDrag.offsetY + "px";
       return pointerDrag;
     };
 
@@ -164,7 +203,7 @@
   var isNone = function isNone(data) {
     return isAbsoluteNaN(data) || data === undefined || data === null;
   };
-  var isArray = function isArray(data) {
+  var isArray$1 = function isArray(data) {
     return Array.isArray(data) || data instanceof Array;
   };
 
@@ -173,12 +212,12 @@
       defaultArray = undefined;
     }
 
-    if (isArray(data)) {
+    if (isArray$1(data)) {
       return data;
     }
 
     if (isNone(data)) {
-      return isArray(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
+      return isArray$1(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
     }
 
     if (typeof data === "object" && typeof data.toArray === "function") {

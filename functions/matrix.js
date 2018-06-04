@@ -10,13 +10,13 @@
     factory(mod.exports, global.webDom, global.cast, global.isLike, global.reduce, global.nice, global.enumerable);
     global.matrix = mod.exports;
   }
-})(this, function (_exports, _webDom, _cast, _isLike, _reduce, _nice, _enumerable) {
+})(this, function (_exports, _webDom, _cast, _isLike, _reduce, _nice2, _enumerable) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.matrixRange = _exports.domainRangeValue = _exports.range = _exports.rangeModel = void 0;
+  _exports.matrixRange = _exports.domainRangeInterpolate = _exports.domainRangeValue = _exports.hashMap = _exports.range = _exports.rangeModel = void 0;
 
   var rangeModel = function rangeModel(value, step, sizeBase) {
     var start, end, reverse;
@@ -91,12 +91,27 @@
     }
 
     return reverse ? r.reverse() : r;
-  };
+  }; //TODO : move to ?
+
 
   _exports.range = range;
 
-  var domainRangeValue = function domainRangeValue(domain, range, vs, nice) {
-    return forMap((0, _cast.cloneDeep)(vs), function (v, sel) {
+  var hashMap = function hashMap(d, f) {
+    if (typeof d === "object" && !isArray(d)) {
+      for (var k in d) {
+        d[k] = f(d[k], k);
+      }
+    } else {
+      return f(d, void 0);
+    }
+
+    return d;
+  };
+
+  _exports.hashMap = hashMap;
+
+  var domainRangeValue = function domainRangeValue(domain, range, vs, nice, limit) {
+    return hashMap((0, _cast.cloneDeep)(vs), function (v, sel) {
       var $range = sel ? range[sel] : range;
       var $domain = sel ? domain[sel] : domain;
 
@@ -108,13 +123,43 @@
       var sSize = $range[1] - $range[0];
       var dRate = (v - $domain[0]) / dSize;
       var calc = $range[0] + sSize * dRate;
-      return nice ? Math.floor(calc) : calc;
+      var result = nice ? Math.floor(calc) : calc;
+      return limit ? $range[1] > $range[0] ? (0, _nice2.limitOf)(result, $range[1], $range[0]) : (0, _nice2.limitOf)(result, $range[0], $range[1]) : result;
     });
+  };
+
+  _exports.domainRangeValue = domainRangeValue;
+
+  var domainRangeInterpolate = function domainRangeInterpolate(domain, range, nice, limit) {
+    var _domain = domain;
+    var _range = range;
+    var _nice = nice;
+
+    var interpolate = function interpolate(value) {
+      return domainRangeValue(_domain, _range, value, _nice, limit);
+    };
+
+    interpolate.domain = function (domain) {
+      _domain = domain;
+      return interpolate;
+    };
+
+    interpolate.range = function (range) {
+      _range = range;
+      return interpolate;
+    };
+
+    interpolate.nice = function (nice) {
+      _nice = nice;
+      return interpolate;
+    };
+
+    return interpolate;
   }; //matrixRange([1],[3]) // [[1], [2], [3]] 
   //matrixRange([1,1],[3,3]) // [[1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
 
 
-  _exports.domainRangeValue = domainRangeValue;
+  _exports.domainRangeInterpolate = domainRangeInterpolate;
 
   var matrixRange = function matrixRange(start, end, step, sizeBase) {
     var scales = [];
@@ -133,7 +178,7 @@
     (0, _cast.asArray)(scales).forEach(function (scaleCase, scaleIndex) {
       var scaleCaseLength = scaleCase.length;
       (0, _enumerable.times)(result.length, function (time) {
-        result[time][scaleIndex] = scaleCase[(0, _nice.turn)(time, scaleCaseLength, turnSize)];
+        result[time][scaleIndex] = scaleCase[(0, _nice2.turn)(time, scaleCaseLength, turnSize)];
       });
       turnSize = turnSize * scaleCaseLength;
     });

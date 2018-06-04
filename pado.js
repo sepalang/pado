@@ -661,7 +661,7 @@
 
     return result;
   };
-  var forMap$1 = function forMap(object, fn) {
+  var forMap = function forMap(object, fn) {
     return Object.keys(object).reduce(function (dest, key) {
       dest[key] = fn(object[key], key);
       return dest;
@@ -1597,9 +1597,21 @@
     }
 
     return reverse ? r.reverse() : r;
+  }; //TODO : move to ?
+
+  var hashMap = function hashMap(d, f) {
+    if (typeof d === "object" && !isArray(d)) {
+      for (var k in d) {
+        d[k] = f(d[k], k);
+      }
+    } else {
+      return f(d, void 0);
+    }
+
+    return d;
   };
-  var domainRangeValue = function domainRangeValue(domain, range, vs, nice) {
-    return forMap(cloneDeep(vs), function (v, sel) {
+  var domainRangeValue = function domainRangeValue(domain, range, vs, nice, limit) {
+    return hashMap(cloneDeep(vs), function (v, sel) {
       var $range = sel ? range[sel] : range;
       var $domain = sel ? domain[sel] : domain;
 
@@ -1611,8 +1623,35 @@
       var sSize = $range[1] - $range[0];
       var dRate = (v - $domain[0]) / dSize;
       var calc = $range[0] + sSize * dRate;
-      return nice ? Math.floor(calc) : calc;
+      var result = nice ? Math.floor(calc) : calc;
+      return limit ? $range[1] > $range[0] ? limitOf(result, $range[1], $range[0]) : limitOf(result, $range[0], $range[1]) : result;
     });
+  };
+  var domainRangeInterpolate = function domainRangeInterpolate(domain, range, nice, limit) {
+    var _domain = domain;
+    var _range = range;
+    var _nice = nice;
+
+    var interpolate = function interpolate(value) {
+      return domainRangeValue(_domain, _range, value, _nice, limit);
+    };
+
+    interpolate.domain = function (domain) {
+      _domain = domain;
+      return interpolate;
+    };
+
+    interpolate.range = function (range) {
+      _range = range;
+      return interpolate;
+    };
+
+    interpolate.nice = function (nice) {
+      _nice = nice;
+      return interpolate;
+    };
+
+    return interpolate;
   }; //matrixRange([1],[3]) // [[1], [2], [3]] 
   //matrixRange([1,1],[3,3]) // [[1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
 
@@ -1864,7 +1903,7 @@
         this.$space = this.$space || block.$space;
         this.$mask = this.$mask || block.$mask;
       } else {
-        this.$posSize = forMap$1(_cloneDeep(block), function (posSize) {
+        this.$posSize = forMap(_cloneDeep(block), function (posSize) {
           return !_.isArray(posSize) ? [posSize, 0] : posSize;
         });
       }
@@ -1888,17 +1927,17 @@
       return _cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
     },
     domainValue: function domainValue() {
-      return forMap$1(_cloneDeep(this.get()), function (posSize) {
+      return forMap(_cloneDeep(this.get()), function (posSize) {
         return posSize[0];
       });
     },
     domainSize: function domainSize() {
-      return forMap$1(_cloneDeep(this.get()), function (posSize) {
+      return forMap(_cloneDeep(this.get()), function (posSize) {
         return posSize[1];
       });
     },
     domainMap: function domainMap() {
-      return forMap$1(_cloneDeep(this.get()), function (posSize) {
+      return forMap(_cloneDeep(this.get()), function (posSize) {
         return {
           start: posSize[0],
           size: posSize[1],
@@ -1915,7 +1954,7 @@
           if (selectOtherBlock === this || selectOtherBlock.$space != this.$space) return red; //
 
           var inspectResult = [];
-          forMap$1(this.get(), function (thisPos, key) {
+          forMap(this.get(), function (thisPos, key) {
             var otherPos = get(selectOtherBlock.get(), key);
             if (otherPos[0] < thisPos[0] && otherPos[0] + otherPos[1] <= thisPos[0]) return inspectResult.push(false);
             if (otherPos[0] > thisPos[0] && thisPos[0] + thisPos[1] <= otherPos[0]) return inspectResult.push(false);
@@ -1937,7 +1976,7 @@
       var blockPosSize = this.get();
       var spaceDomain = this.$space.getDomain();
       var overflowDomain = mask && _cloneDeep(mask) || this.$space && this.$space.getDomain() || [];
-      return forMap$1(overflowDomain, function ($overflowSelected, sel) {
+      return forMap(overflowDomain, function ($overflowSelected, sel) {
         var $posSize = get(blockPosSize, sel);
         var $domain = get(spaceDomain, sel);
         return $posSize[0] < get($overflowSelected[0], $domain[0]) || $posSize[0] + $posSize[1] > get($overflowSelected[1], $domain[1]);
@@ -1945,7 +1984,7 @@
     },
     isOverflow: function isOverflow(mask) {
       var overflow = false;
-      forMap$1(this.overflow(mask), function (f) {
+      forMap(this.overflow(mask), function (f) {
         if (f) {
           overflow = true;
         }
@@ -1959,18 +1998,18 @@
       return this.isOverflow(this.$mask || mask);
     },
     rangeStart: function rangeStart() {
-      return this.$space.domainRange(forMap$1(this.get(), function (posSize) {
+      return this.$space.domainRange(forMap(this.get(), function (posSize) {
         return posSize[0];
       }));
     },
     rangeSize: function rangeSize() {
-      return this.$space.domainRangeSize(forMap$1(this.get(), function (posSize) {
+      return this.$space.domainRangeSize(forMap(this.get(), function (posSize) {
         return posSize[1];
       }));
     },
     rangeMap: function rangeMap() {
       var rangeSize = this.rangeSize();
-      return forMap$1(this.rangeStart(), function ($start, sel) {
+      return forMap(this.rangeStart(), function ($start, sel) {
         var $size = sel ? rangeSize[sel] : rangeSize;
         return {
           start: $start,
@@ -1982,7 +2021,7 @@
     map: function map() {
       var domainMap = this.domainMap();
       var rangeMap = this.rangeMap();
-      var blockMap = forMap$1(rangeMap, function (map, key) {
+      var blockMap = forMap(rangeMap, function (map, key) {
         map.rangeStart = map.start, map.rangeSize = map.size, map.rangeEnd = map.end;
         var $domainMap = get(domainMap, key);
         map.domainStart = $domainMap.start, map.domainSize = $domainMap.size, map.domainEnd = $domainMap.end;
@@ -2014,7 +2053,7 @@
 
   var Tracker = function Tracker(space, domainMask) {
     this.$space = space;
-    this.$domainMask = forMap$1(_cloneDeep(domainMask), function (mask, sel) {
+    this.$domainMask = forMap(_cloneDeep(domainMask), function (mask, sel) {
       if (typeof mask === "number") mask = [mask];
 
       if (mask instanceof Array) {
@@ -2036,10 +2075,10 @@
       return block;
     },
     domainBlock: function domainBlock(cursor, callback) {
-      var domainGrid = forMap$1(this.$space.getRange(), function (range$$1) {
+      var domainGrid = forMap(this.$space.getRange(), function (range$$1) {
         return range$$1[2];
       });
-      var block = this.block(forMap$1(this.$space.rangeDomain(cursor), function (cursorPoint, key) {
+      var block = this.block(forMap(this.$space.rangeDomain(cursor), function (cursorPoint, key) {
         return [cursorPoint, get(domainGrid, key)];
       }));
       var blockMap = block.map();
@@ -2058,7 +2097,7 @@
   Space.prototype = {
     domain: function domain(_domain) {
       //default grid scale
-      _domain = forMap$1(_domain, function (domain) {
+      _domain = forMap(_domain, function (domain) {
         if (!domain[2]) {
           domain[2] = 1;
         }
@@ -2068,7 +2107,7 @@
       this.$domain = _domain;
     },
     range: function range$$1(_range) {
-      _range = forMap$1(_range, function (range$$1) {
+      _range = forMap(_range, function (range$$1) {
         if (!range$$1[2]) {
           range$$1[2] = 1;
         }
@@ -2078,7 +2117,7 @@
       this.$range = _range;
     },
     getRange: function getRange() {
-      return forMap$1(_cloneDeep(this.$range), function (range$$1) {
+      return forMap(_cloneDeep(this.$range), function (range$$1) {
         for (var i = 0, l = range$$1.length; i < l; i++) {
           if (typeof range$$1[i] === "function") range$$1[i] = range$$1[i]();
         }
@@ -2087,7 +2126,7 @@
       });
     },
     getDomain: function getDomain() {
-      return forMap$1(_cloneDeep(this.$domain), function (domain) {
+      return forMap(_cloneDeep(this.$domain), function (domain) {
         for (var i = 0, l = domain.length; i < l; i++) {
           if (typeof domain[i] === "function") domain[i] = domain[i]();
         }
@@ -2096,7 +2135,7 @@
       });
     },
     domainRangeSize: function domainRangeSize(vs) {
-      return forMap$1(vs, function (v, sel) {
+      return forMap(vs, function (v, sel) {
         var $range = sel ? this.getRange()[sel] : this.getRange();
         var $domain = sel ? this.getDomain()[sel] : this.getDomain();
         return v / ($domain[1] - $domain[0]) * ($range[1] - $range[0]);
@@ -3296,7 +3335,7 @@
     all: all,
     deep: deep,
     times: times,
-    forMap: forMap$1,
+    forMap: forMap,
     cut: cut,
     top: top,
     rand64: rand64,
@@ -3304,7 +3343,9 @@
     randRange: randRange,
     rangeModel: rangeModel,
     range: range,
+    hashMap: hashMap,
     domainRangeValue: domainRangeValue,
+    domainRangeInterpolate: domainRangeInterpolate,
     matrixRange: matrixRange,
     dateExp: dateExp,
     timestampExp: timestampExp,
