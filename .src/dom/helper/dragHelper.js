@@ -1,4 +1,5 @@
 import $ from '../plugins/jquery';
+import { rebase } from '../../functions';
 
 //드래그
 const pointerParse = ({ clientX, clientY })=>{
@@ -10,7 +11,7 @@ const pointerParse = ({ clientX, clientY })=>{
 
 export default function DragHelper(element,option){
   const $element = $(element).eq(0);
-  
+  const delegates = [];
   let startFn;
   let moveFn;
   let endFn;
@@ -20,7 +21,14 @@ export default function DragHelper(element,option){
   let lastDrag   = null;
   
   const resetOptions = function(){
-    const getOptions = (typeof option === "function" ? option($element) : option);
+    const delegate = (delegateElement)=>{
+      $(delegateElement).each(function(){
+        delegates.push(this);
+        $(this).css("pointer-events","none");
+      });
+    };
+    
+    const getOptions = rebase(typeof option === "function" ? option({ element:$element, delegate }) : option);
     startFn = getOptions["start"];
     moveFn = getOptions["move"];
     endFn = getOptions["end"];
@@ -58,7 +66,7 @@ export default function DragHelper(element,option){
     firstDrag = pointerDrag;
     lastDrag  = pointerDrag;
     
-    dragParams = { offset:elementOffset, pointer:undefined };
+    dragParams = { offset:elementOffset, pointer:undefined, event:originalEvent };
     dragParams.pointer = getCurrentPointerDrag(originalEvent);
     
     startFn && startFn(dragParams);
@@ -77,6 +85,7 @@ export default function DragHelper(element,option){
       return;
     } else {
       dragParams.pointer = getCurrentPointerDrag(originalEvent);
+      dragParams.event   = originalEvent;
       moveFn(dragParams);
       lastDrag = pointerDrag;
     }
@@ -84,6 +93,7 @@ export default function DragHelper(element,option){
   
   const dragExit = function({ originalEvent }){
     dragParams.pointer = getCurrentPointerDrag(originalEvent);
+    dragParams.event   = originalEvent;
     endFn && endFn(dragParams);
     dragParams = undefined;
     

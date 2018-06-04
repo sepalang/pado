@@ -17,12 +17,17 @@ try {
   $ = require('jquery');
 }
 
-const isPointerEvent = $.isPointerEvent = function (e){
-  
+const getCurrentTarget = function(originalEvent, fallbackElement){
+  let result = originalEvent.currentTarget || originalEvent.target;
+  return (result && result.documentElement) ? (fallbackElement || result.documentElement) : document.documentElement;
+}
+
+const isElementEvent = $.isElementEvent = function (e){
+  return typeof e.stopPropagation === "function";
 }
 
 const getOriginalEvent = $.getOriginalEvent = function(e){
-  
+  if(!isElementEvent(e)) return undefined;
 };
 
 const getElementPosition = $.getElementPosition = function(el){
@@ -30,21 +35,26 @@ const getElementPosition = $.getElementPosition = function(el){
   
   if(!element) return null;
   
-  let xPosition = 0, yPosition = 0;
-  while(element){
+  let xPosition = 0;
+  let yPosition = 0;
+  
+  while(element && !element.documentElement){
     xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
     yPosition += (element.offsetTop  - element.scrollTop  + element.clientTop );
-    element = element.offsetParent;
+    element   = element.offsetParent;
   }
+  
   return {x:xPosition,y:yPosition};
 }
 
 
 const getPointerPosition = $.getPointerPosition = function(e, root){
+  
   root = !root ? document.documentElement : root;
 
   const evt = getOriginalEvent(e);
   const pos = getElementPosition(root);
+  
   if(!pos) return;
   
   pos.x = e.touches ? e.touches[0].pageX : e.clientX - pos.x;
@@ -76,7 +86,7 @@ $.fn.extend({
     $(window).predict(element)
     $(window).predict(element, {center:20});
   */
-  predict (offset){
+  predict (option,root){
     const [ element ] = this.eq(0);
     if(!element) return;
     
@@ -94,35 +104,55 @@ $.fn.extend({
       height:offsetHeight,
       right :offsetLeft + offsetWidth,
       bottom:offsetTop + offsetHeight,
-      center:(offsetWidth + offsetLeft) / 2,
-      middle:(offsetHeight + offsetTop) / 2
+      center:offsetLeft + offsetWidth / 2,
+      middle:offsetTop + offsetHeight / 2
     };
+    
+    
+    //if(isElementEvent(option)){
+    //  const { x:left, y:top } = getPointerPosition(offset);
+    //  option = { left, top };
+    //}
       
-    if(isPointerEvent(offset)){
-      const { x:left, y:top } = getPointerPosition(offset);
-      offset = { left, top };
-    }
+    if(isPlainObject(option)){
+      const allProps = ["top", "left", "width", "height", "right", "bottom", "center", "middle"].filter(key=>option.hasOwnProperty(key));
       
-    if(offset && isPlainObject(offset)){
-      ["top", "left", "width", "height", "right", "bottom", "center", "middle"].forEach((key)=>{
-        if(typeof offset[key] !== "number") return;
-          
+      //event option
+      allProps.forEach((key)=>{
+        const optionOfKey = option[key]
+        if(!isElementEvent(optionOfKey)) return;
+        const pointerPosition = getPointerPosition(optionOfKey,root || getCurrentTarget(optionOfKey, element) || element);
+        if(!pointerPosition) return;
+        
+        if(/left|width|right|center/.test(key)){
+          option[key] = pointerPosition["x"]
+        }
+        
+        if(/top|middle|bottom|height/.test(key)){
+          option[key] = pointerPosition["y"]
+        }
+      });
+      
+      allProps.forEach((key)=>{
+        if(typeof option[key] !== "number") return;
+
+        const valueOfKey = result[key];  
         let equalize;
-          
+        
         switch(key){
         case "top":
         case "middle":
-          equalize = ["y", offset[key] - result[key]];
+          equalize = ["y", option[key] - valueOfKey];
           break;
         case "left":
         case "center":
-          equalize = ["x", offset[key] - result[key]];
+          equalize = ["x", option[key] - valueOfKey];
           break;
         case "width":
-          equalize = ["width", offset[key] - result[key]];
+          equalize = ["width", option[key] - valueOfKey];
           break;
         case "height":
-          equalize = ["height", offset[key] - result[key]];
+          equalize = ["height", option[key] - valueOfKey];
           break;
         case "right":
           break;

@@ -1,15 +1,22 @@
 <template>
   <div class="pado-slider">
-    {{ showValue }}
     <div class="pado-slider-scrollbar"></div>
     <div class="pado-slider-scroller"></div>
+    <br><br>
+    <div>
+      {{ rate }}
+    </div>
+    <div>
+      {{ showValue }}
+    </div>
   </div>
 </template>
 <script>
 import PadoSlider from '../component/pado-slider.vue';
 import $ from '../../../../.src/dom/plugins/jquery';
 import { dragHelper } from '../../../../.src/dom/index';
-import { domainRangeValue } from '../../../../.src/functions';
+import { limitOf, domainRangeValue } from '../../../../.src/functions';
+
 
 export default {
   props: {
@@ -19,7 +26,8 @@ export default {
     
   },
   data:()=>({
-    showValue:"NaN"
+    showValue:"",
+    rate:"",
   }),
   mounted (){
     const $element = $(this.$el);
@@ -35,21 +43,21 @@ export default {
       });
     });
     
-    $scrollbar.on("mousedown",function(e){
-      const b = $scroller.predict("center",e);
-      console.log("b",b);
-    });
-    
-    
-    dragHelper($scroller,()=>{
+    dragHelper($scrollbar,({ element, delegate })=>{
+      
+      delegate($scroller);
+      
       return {
-        start:({ pointer })=>{
+        "start, move":({ event })=>{
+          let { left, width } = $scroller.predict({center:event}, element);
           
+          const scrollbarRight = element.width() - width;
+          const limitedValue   = limitOf(left,scrollbarRight);
           
-        },
-        move:({ pointer:{ left, leftValue } })=>{
-          $scroller.css("left",left);
-          this.showValue = left;
+          $scroller.css("left",limitedValue);
+          
+          this.showValue = { limitedValue, left, width };
+          this.rate = domainRangeValue([0, scrollbarRight],[0,100],limitedValue);
         },
         end:({ pointer })=>{
           console.log("pointer",pointer);
