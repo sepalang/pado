@@ -38,6 +38,39 @@
     return target;
   }
 
+  var isAbsoluteNaN = function isAbsoluteNaN(it) {
+    return it !== it && typeof it === "number";
+  };
+  var isNone = function isNone(data) {
+    return isAbsoluteNaN(data) || data === undefined || data === null;
+  };
+  var isArray$1 = function isArray(data) {
+    return Array.isArray(data) || data instanceof Array;
+  };
+  var isPlainObject = function isPlainObject(data) {
+    return typeof data === "object" && data.constructor === Object;
+  };
+
+  var asArray = function asArray(data, defaultArray) {
+    if (defaultArray === void 0) {
+      defaultArray = undefined;
+    }
+
+    if (isArray$1(data)) {
+      return data;
+    }
+
+    if (isNone(data)) {
+      return isArray$1(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
+    }
+
+    if (typeof data === "object" && typeof data.toArray === "function") {
+      return data.toArray();
+    }
+
+    return [data];
+  };
+
   var $;
 
   try {
@@ -55,6 +88,40 @@
     $ = require('jquery');
   }
 
+  var isPointerEvent = $.isPointerEvent = function (e) {};
+
+  var getOriginalEvent = $.getOriginalEvent = function (e) {};
+
+  var getElementPosition = $.getElementPosition = function (el) {
+    var _$ = $(el),
+        element = _$[0];
+
+    if (!element) return null;
+    var xPosition = 0,
+        yPosition = 0;
+
+    while (element) {
+      xPosition += element.offsetLeft - element.scrollLeft + element.clientLeft;
+      yPosition += element.offsetTop - element.scrollTop + element.clientTop;
+      element = element.offsetParent;
+    }
+
+    return {
+      x: xPosition,
+      y: yPosition
+    };
+  };
+
+  var getPointerPosition = $.getPointerPosition = function (e, root) {
+    root = !root ? document.documentElement : root;
+    var evt = getOriginalEvent(e);
+    var pos = getElementPosition(root);
+    if (!pos) return;
+    pos.x = e.touches ? e.touches[0].pageX : e.clientX - pos.x;
+    pos.y = e.touches ? e.touches[0].pageY : e.clientY - pos.y;
+    return pos;
+  };
+
   $.fn.extend({
     //파라메터 노드가 제이쿼리가 가진 노드 안에 있는지 확인
     containsIn: function containsIn(node) {
@@ -71,38 +138,113 @@
     containsOut: function containsOut(node) {
       return !this.containsIn(node);
     },
-    offsetAll: function offsetAll() {
+
+    /*
+      //
+      $(window).predict()
+      $(window).predict({center:20});
+      $(window).predict({center:event});
+      
+      //TODO
+      $(window).predict(element)
+      $(window).predict(element, {center:20});
+    */
+    predict: function predict(offset) {
       var _this$eq = this.eq(0),
           element = _this$eq[0];
 
-      var result;
+      if (!element) return;
 
-      if (!element) {
-        return;
+      var _ref = element["innerWidth"] ? {
+        offsetTop: 0,
+        offsetLeft: 0,
+        offsetWidth: window.innerWidth,
+        offsetHeight: window.innerHeight
+      } : element,
+          offsetTop = _ref.offsetTop,
+          offsetLeft = _ref.offsetLeft,
+          offsetWidth = _ref.offsetWidth,
+          offsetHeight = _ref.offsetHeight;
+
+      var result = {
+        top: offsetTop,
+        left: offsetLeft,
+        width: offsetWidth,
+        height: offsetHeight,
+        right: offsetLeft + offsetWidth,
+        bottom: offsetTop + offsetHeight,
+        center: (offsetWidth + offsetLeft) / 2,
+        middle: (offsetHeight + offsetTop) / 2
+      };
+
+      if (isPointerEvent(offset)) {
+        var _getPointerPosition = getPointerPosition(offset),
+            left = _getPointerPosition.x,
+            top$$1 = _getPointerPosition.y;
+
+        offset = {
+          left: left,
+          top: top$$1
+        };
       }
 
-      if (element["innerWidth"]) {
-        result = {
-          top: 0,
-          left: 0,
-          width: window.innerWidth,
-          height: window.innerHeight,
-          right: window.innerWidth,
-          bottom: window.innerHeight
-        };
-      } else {
-        var offsetTop = element.offsetTop,
-            offsetLeft = element.offsetLeft,
-            offsetWidth = element.offsetWidth,
-            offsetHeight = element.offsetHeight;
-        result = {
-          top: offsetTop,
-          left: offsetLeft,
-          width: offsetWidth,
-          height: offsetHeight,
-          right: offsetLeft + offsetWidth,
-          bottom: offsetTop + offsetHeight
-        };
+      if (offset && isPlainObject(offset)) {
+        ["top", "left", "width", "height", "right", "bottom", "center", "middle"].forEach(function (key) {
+          if (typeof offset[key] !== "number") return;
+          var equalize;
+
+          switch (key) {
+            case "top":
+            case "middle":
+              equalize = ["y", offset[key] - result[key]];
+              break;
+
+            case "left":
+            case "center":
+              equalize = ["x", offset[key] - result[key]];
+              break;
+
+            case "width":
+              equalize = ["width", offset[key] - result[key]];
+              break;
+
+            case "height":
+              equalize = ["height", offset[key] - result[key]];
+              break;
+
+            case "right":
+              break;
+
+            case "bottom":
+              break;
+          }
+
+          switch (equalize && equalize[0]) {
+            case "x":
+              result["left"] += equalize[1];
+              result["center"] += equalize[1];
+              result["right"] += equalize[1];
+              break;
+
+            case "y":
+              result["top"] += equalize[1];
+              result["middle"] += equalize[1];
+              result["bottom"] += equalize[1];
+              break;
+
+            case "width":
+              result["width"] += equalize[1];
+              result["right"] += equalize[1];
+              result["center"] += result["right"] - result["left"] / 2;
+              break;
+
+            case "height":
+              result["height"] += equalize[1];
+              result["bottom"] += equalize[1];
+              result["middle"] += result["bottom"] - result["top"] / 2;
+              break;
+          }
+        });
       }
 
       return result;
@@ -156,7 +298,7 @@
       //init
       resetOptions(); //
 
-      var elementOffset = $element.offsetAll();
+      var elementOffset = $element.predict();
       var pointerDrag = pointerParse(originalEvent);
       firstDrag = pointerDrag;
       lastDrag = pointerDrag;
@@ -196,36 +338,6 @@
     $element.on("mousedown", dragEnter);
     return $element;
   }
-
-  var isAbsoluteNaN = function isAbsoluteNaN(it) {
-    return it !== it && typeof it === "number";
-  };
-  var isNone = function isNone(data) {
-    return isAbsoluteNaN(data) || data === undefined || data === null;
-  };
-  var isArray$1 = function isArray(data) {
-    return Array.isArray(data) || data instanceof Array;
-  };
-
-  var asArray = function asArray(data, defaultArray) {
-    if (defaultArray === void 0) {
-      defaultArray = undefined;
-    }
-
-    if (isArray$1(data)) {
-      return data;
-    }
-
-    if (isNone(data)) {
-      return isArray$1(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
-    }
-
-    if (typeof data === "object" && typeof data.toArray === "function") {
-      return data.toArray();
-    }
-
-    return [data];
-  };
 
   function RepeatHelper(_ref) {
     var key = _ref.key,

@@ -52,7 +52,7 @@ export default function DragHelper(element,option){
     resetOptions();
     
     //
-    const elementOffset = $element.offsetAll();
+    const elementOffset = $element.predict();
     const pointerDrag   = pointerParse(originalEvent);
     
     firstDrag = pointerDrag;

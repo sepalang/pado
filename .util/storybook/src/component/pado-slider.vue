@@ -35,10 +35,17 @@ export default {
       });
     });
     
+    $scrollbar.on("mousedown",function(e){
+      const b = $scroller.predict("center",e);
+      console.log("b",b);
+    });
+    
+    
     dragHelper($scroller,()=>{
       return {
         start:({ pointer })=>{
-          console.log("pointer",pointer);
+          
+          
         },
         move:({ pointer:{ left, leftValue } })=>{
           $scroller.css("left",left);

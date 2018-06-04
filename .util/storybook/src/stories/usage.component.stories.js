@@ -9,9 +9,6 @@ import UsageComponentSlider from '../pages/UsageComponentSlider.vue';
 
 storiesOf('Usage|component', module)
 .add('slider',() => {
-  //dateExp
-  //timestampExp
-  //timescaleExp
   
   const { dateExp } = require("../../../../.src/functions/datetime");
   

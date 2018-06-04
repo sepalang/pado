@@ -68,7 +68,7 @@
       //init
       resetOptions(); //
 
-      var elementOffset = $element.offsetAll();
+      var elementOffset = $element.predict();
       var pointerDrag = pointerParse(originalEvent);
       firstDrag = pointerDrag;
       lastDrag = pointerDrag;
