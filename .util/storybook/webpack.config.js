@@ -1,15 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-
-require("fs").writeFileSync(__dirname+"/alias.json",JSON.stringify({
-  vue$: 'vue/dist/vue.esm.js',
-  "~/": __dirname,
-  "@/": path.resolve(__dirname,"./src"),
-  "@layout/": path.resolve(__dirname,"src/layout"),
-  "@component/": path.resolve(__dirname,"src/component"),
-  "@util/": path.resolve(__dirname,"src/util"),
-  "@pado/": path.resolve(__dirname,"../../.src/")
-},2,2))
+const configAlias = require('./.storybook/config.alias.js')(__dirname);
 
 module.exports = {
   entry: './src/index.js',
@@ -50,15 +41,7 @@ module.exports = {
     ],
   },
   resolve: {
-    alias: {
-      vue$: 'vue/dist/vue.esm.js',
-      "~/": __dirname,
-      "@/": path.resolve(__dirname,"./src"),
-      "@layout/": path.resolve(__dirname,"src/layout"),
-      "@component/": path.resolve(__dirname,"src/component"),
-      "@util/": path.resolve(__dirname,"src/util"),
-      "@pado/": path.resolve(__dirname,"../../.src/")
-    }
+    alias: configAlias
   },
   devServer: {
     historyApiFallback: true,
