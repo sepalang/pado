@@ -1,2 +1,2 @@
-import * as lo from 'lodash/get';
-console.log("lo",lo);
+import { domainRangeValue } from '../../../.src/functions';
+export default domainRangeValue;

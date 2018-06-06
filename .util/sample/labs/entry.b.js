@@ -1,2 +1,2 @@
-import { castString } from '../../src/functions/cast';
-export default castString;
+import { readString } from '../../../.src/functions/read';
+export default readString;
