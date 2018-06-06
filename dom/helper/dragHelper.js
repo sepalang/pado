@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "../plugins/jquery"], factory);
+    define(["exports", "../plugins/jquery", "../../functions"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("../plugins/jquery"));
+    factory(exports, require("../plugins/jquery"), require("../../functions"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.jquery);
+    factory(mod.exports, global.jquery, global.functions);
     global.dragHelper = mod.exports;
   }
-})(this, function (_exports, _jquery) {
+})(this, function (_exports, _jquery, _functions) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -33,6 +33,7 @@
 
   function DragHelper(element, option) {
     var $element = (0, _jquery.default)(element).eq(0);
+    var delegates = [];
     var startFn;
     var moveFn;
     var endFn;
@@ -41,7 +42,17 @@
     var lastDrag = null;
 
     var resetOptions = function resetOptions() {
-      var getOptions = typeof option === "function" ? option($element) : option;
+      var delegate = function delegate(delegateElement) {
+        (0, _jquery.default)(delegateElement).each(function () {
+          delegates.push(this);
+          (0, _jquery.default)(this).css("pointer-events", "none");
+        });
+      };
+
+      var getOptions = (0, _functions.rebase)(typeof option === "function" ? option({
+        element: $element,
+        delegate: delegate
+      }) : option);
       startFn = getOptions["start"];
       moveFn = getOptions["move"];
       endFn = getOptions["end"];
@@ -74,7 +85,8 @@
       lastDrag = pointerDrag;
       dragParams = {
         offset: elementOffset,
-        pointer: undefined
+        pointer: undefined,
+        event: originalEvent
       };
       dragParams.pointer = getCurrentPointerDrag(originalEvent);
       startFn && startFn(dragParams);
@@ -91,6 +103,7 @@
         return;
       } else {
         dragParams.pointer = getCurrentPointerDrag(originalEvent);
+        dragParams.event = originalEvent;
         moveFn(dragParams);
         lastDrag = pointerDrag;
       }
@@ -99,6 +112,7 @@
     var dragExit = function dragExit(_ref4) {
       var originalEvent = _ref4.originalEvent;
       dragParams.pointer = getCurrentPointerDrag(originalEvent);
+      dragParams.event = originalEvent;
       endFn && endFn(dragParams);
       dragParams = undefined;
       (0, _jquery.default)(document).off("mousemove", dragMove).off("mouseup", dragExit);

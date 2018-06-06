@@ -47,6 +47,13 @@
   var isArray$1 = function isArray(data) {
     return Array.isArray(data) || data instanceof Array;
   };
+  var isObject = function isObject(it) {
+    return it !== null && typeof it === "object" ? true : false;
+  };
+
+  var isNode = function isNode(a) {
+    return isObject(a) && typeof a.nodeType === "number";
+  };
   var isPlainObject = function isPlainObject(data) {
     return typeof data === "object" && data.constructor === Object;
   };
@@ -71,6 +78,56 @@
     return [data];
   };
 
+  var rebase = function rebase(obj, ref) {
+    var result = {};
+
+    for (var key in obj) {
+      if (key === ".*") {
+        var refValue = obj[key];
+
+        for (var i = 0, d = Object.keys(ref), l = d.length; i < l; i++) {
+          var refKey = d[i];
+
+          if (typeof refValue === "function") {
+            result[refKey] = obj[key];
+          } else {
+            if (typeof refValue !== "object" && typeof refValue !== "object" || isNode(refValue)) {
+              result[refKey] = refValue;
+            } else {
+              result[refKey] = Object.assign(result[refKey], refValue);
+            }
+          }
+        }
+      } else if (key.indexOf(",") > -1) {
+        key.split(",").forEach(function (deepKey) {
+          deepKey = deepKey.trim();
+
+          if (typeof obj[key] === "function") {
+            result[deepKey] = obj[key];
+          } else {
+            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode(obj[key])) {
+              result[deepKey] = obj[key];
+            } else {
+              result[deepKey] = Object.assign(result[deepKey] || (isArray$1(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
+            }
+          }
+        });
+      } else {
+        if (typeof obj[key] === "function") {
+          result[key] = obj[key];
+        } else {
+          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || isNode(obj[key])) {
+            result[key] = obj[key];
+          } else {
+            result[key] = Object.assign(result[key], obj[key]);
+          }
+        }
+      }
+    }
+
+    return result;
+  }; //TODO: Union hasValue
+
   var $;
 
   try {
@@ -88,19 +145,28 @@
     $ = require('jquery');
   }
 
-  var isPointerEvent = $.isPointerEvent = function (e) {};
+  var getCurrentTarget = function getCurrentTarget(originalEvent, fallbackElement) {
+    var result = originalEvent.currentTarget || originalEvent.target;
+    return result && result.documentElement ? fallbackElement || result.documentElement : document.documentElement;
+  };
 
-  var getOriginalEvent = $.getOriginalEvent = function (e) {};
+  var isElementEvent = $.isElementEvent = function (e) {
+    return typeof e.stopPropagation === "function";
+  };
+
+  var getOriginalEvent = $.getOriginalEvent = function (e) {
+    if (!isElementEvent(e)) return undefined;
+  };
 
   var getElementPosition = $.getElementPosition = function (el) {
     var _$ = $(el),
         element = _$[0];
 
     if (!element) return null;
-    var xPosition = 0,
-        yPosition = 0;
+    var xPosition = 0;
+    var yPosition = 0;
 
-    while (element) {
+    while (element && !element.documentElement) {
       xPosition += element.offsetLeft - element.scrollLeft + element.clientLeft;
       yPosition += element.offsetTop - element.scrollTop + element.clientTop;
       element = element.offsetParent;
@@ -149,7 +215,7 @@
       $(window).predict(element)
       $(window).predict(element, {center:20});
     */
-    predict: function predict(offset) {
+    predict: function predict(option, root) {
       var _this$eq = this.eq(0),
           element = _this$eq[0];
 
@@ -173,43 +239,54 @@
         height: offsetHeight,
         right: offsetLeft + offsetWidth,
         bottom: offsetTop + offsetHeight,
-        center: (offsetWidth + offsetLeft) / 2,
-        middle: (offsetHeight + offsetTop) / 2
-      };
+        center: offsetLeft + offsetWidth / 2,
+        middle: offsetTop + offsetHeight / 2
+      }; //if(isElementEvent(option)){
+      //  const { x:left, y:top } = getPointerPosition(offset);
+      //  option = { left, top };
+      //}
 
-      if (isPointerEvent(offset)) {
-        var _getPointerPosition = getPointerPosition(offset),
-            left = _getPointerPosition.x,
-            top$$1 = _getPointerPosition.y;
+      if (isPlainObject(option)) {
+        var allProps = ["top", "left", "width", "height", "right", "bottom", "center", "middle"].filter(function (key) {
+          return option.hasOwnProperty(key);
+        }); //event option
 
-        offset = {
-          left: left,
-          top: top$$1
-        };
-      }
+        allProps.forEach(function (key) {
+          var optionOfKey = option[key];
+          if (!isElementEvent(optionOfKey)) return;
+          var pointerPosition = getPointerPosition(optionOfKey, root || getCurrentTarget(optionOfKey, element) || element);
+          if (!pointerPosition) return;
 
-      if (offset && isPlainObject(offset)) {
-        ["top", "left", "width", "height", "right", "bottom", "center", "middle"].forEach(function (key) {
-          if (typeof offset[key] !== "number") return;
+          if (/left|width|right|center/.test(key)) {
+            option[key] = pointerPosition["x"];
+          }
+
+          if (/top|middle|bottom|height/.test(key)) {
+            option[key] = pointerPosition["y"];
+          }
+        });
+        allProps.forEach(function (key) {
+          if (typeof option[key] !== "number") return;
+          var valueOfKey = result[key];
           var equalize;
 
           switch (key) {
             case "top":
             case "middle":
-              equalize = ["y", offset[key] - result[key]];
+              equalize = ["y", option[key] - valueOfKey];
               break;
 
             case "left":
             case "center":
-              equalize = ["x", offset[key] - result[key]];
+              equalize = ["x", option[key] - valueOfKey];
               break;
 
             case "width":
-              equalize = ["width", offset[key] - result[key]];
+              equalize = ["width", option[key] - valueOfKey];
               break;
 
             case "height":
-              equalize = ["height", offset[key] - result[key]];
+              equalize = ["height", option[key] - valueOfKey];
               break;
 
             case "right":
@@ -271,7 +348,16 @@
     var lastDrag = null;
 
     var resetOptions = function resetOptions() {
-      var getOptions = typeof option === "function" ? option($element) : option;
+      var delegate = function delegate(delegateElement) {
+        $$1(delegateElement).each(function () {
+          $$1(this).css("pointer-events", "none");
+        });
+      };
+
+      var getOptions = rebase(typeof option === "function" ? option({
+        element: $element,
+        delegate: delegate
+      }) : option);
       startFn = getOptions["start"];
       moveFn = getOptions["move"];
       endFn = getOptions["end"];
@@ -304,7 +390,8 @@
       lastDrag = pointerDrag;
       dragParams = {
         offset: elementOffset,
-        pointer: undefined
+        pointer: undefined,
+        event: originalEvent
       };
       dragParams.pointer = getCurrentPointerDrag(originalEvent);
       startFn && startFn(dragParams);
@@ -321,6 +408,7 @@
         return;
       } else {
         dragParams.pointer = getCurrentPointerDrag(originalEvent);
+        dragParams.event = originalEvent;
         moveFn(dragParams);
         lastDrag = pointerDrag;
       }
@@ -329,6 +417,7 @@
     var dragExit = function dragExit(_ref4) {
       var originalEvent = _ref4.originalEvent;
       dragParams.pointer = getCurrentPointerDrag(originalEvent);
+      dragParams.event = originalEvent;
       endFn && endFn(dragParams);
       dragParams = undefined;
       $$1(document).off("mousemove", dragMove).off("mouseup", dragExit);
@@ -420,12 +509,45 @@
     return repeater;
   }
 
+  /*
+    const { x, y, radius, diameter } = drawCircleVars(this.size, this.stroke);
+    return `M${x} ${y} 
+    a ${radius} ${radius} 0 0 1 0 ${diameter}
+    a ${radius} ${radius} 0 0 1 0 -${diameter}`;
+  */
+  var drawCircleVars = function drawCircleVars(circleWidth, strokeWidth, drawRatio) {
+    if (strokeWidth === void 0) {
+      strokeWidth = 0;
+    }
+
+    if (drawRatio === void 0) {
+      drawRatio = 1;
+    }
+
+    var circumference = (circleWidth - strokeWidth) / 2 * (3.14159 * 2);
+    var radius = circumference / (3.14159 * 2);
+    var diameter = radius * 2;
+    var x = circleWidth / 2;
+    var y = strokeWidth / 2; //const circumLength  = drawRatio == 1 ? drawRatio : drawRatio * circumference;
+
+    return {
+      x: x,
+      y: y,
+      radius: radius,
+      diameter: diameter,
+      circumference: circumference,
+      circleWidth: circleWidth,
+      strokeWidth: strokeWidth
+    };
+  };
+
   var dragHelper = DragHelper;
   var repeatHelper = RepeatHelper;
 
   var helpers = /*#__PURE__*/Object.freeze({
     dragHelper: dragHelper,
-    repeatHelper: repeatHelper
+    repeatHelper: repeatHelper,
+    drawCircleVars: drawCircleVars
   });
 
   var DEFAULT = _objectSpread({}, helpers);
