@@ -128,22 +128,7 @@
     return result;
   }; //TODO: Union hasValue
 
-  var $;
-
-  try {
-    $ = require('jquery');
-  } catch (e) {
-    var _jsdom = jsdom,
-        JSDOM = _jsdom.JSDOM;
-    var dom = new JSDOM('<html><head><meta charset="utf-8"></head><body></body></html>', {
-      contentType: "text/html",
-      userAgent: "Mellblomenator/9000",
-      includeNodeLocations: true
-    });
-    global.window = dom.window;
-    global.document = dom.document;
-    $ = require('jquery');
-  }
+  var $ = require('jquery');
 
   var getCurrentTarget = function getCurrentTarget(originalEvent, fallbackElement) {
     var result = originalEvent.currentTarget || originalEvent.target;
@@ -327,7 +312,6 @@
       return result;
     }
   });
-  var $$1 = $;
 
   var pointerParse = function pointerParse(_ref) {
     var clientX = _ref.clientX,
@@ -339,7 +323,7 @@
   };
 
   function DragHelper(element, option) {
-    var $element = $$1(element).eq(0);
+    var $element = $(element).eq(0);
     var startFn;
     var moveFn;
     var endFn;
@@ -349,8 +333,8 @@
 
     var resetOptions = function resetOptions() {
       var delegate = function delegate(delegateElement) {
-        $$1(delegateElement).each(function () {
-          $$1(this).css("pointer-events", "none");
+        $(delegateElement).each(function () {
+          $(this).css("pointer-events", "none");
         });
       };
 
@@ -395,8 +379,8 @@
       };
       dragParams.pointer = getCurrentPointerDrag(originalEvent);
       startFn && startFn(dragParams);
-      $$1(document).on("mousemove", dragMove).on("mouseup", dragExit);
-      $$1("body").attr("dragging", "");
+      $(document).on("mousemove", dragMove).on("mouseup", dragExit);
+      $("body").attr("dragging", "");
     };
 
     var dragMove = function dragMove(_ref3) {
@@ -420,8 +404,8 @@
       dragParams.event = originalEvent;
       endFn && endFn(dragParams);
       dragParams = undefined;
-      $$1(document).off("mousemove", dragMove).off("mouseup", dragExit);
-      $$1("body").removeAttr("dragging");
+      $(document).off("mousemove", dragMove).off("mouseup", dragExit);
+      $("body").removeAttr("dragging");
     };
 
     $element.on("mousedown", dragEnter);
@@ -509,36 +493,94 @@
     return repeater;
   }
 
-  /*
-    const { x, y, radius, diameter } = drawCircleVars(this.size, this.stroke);
-    return `M${x} ${y} 
-    a ${radius} ${radius} 0 0 1 0 ${diameter}
-    a ${radius} ${radius} 0 0 1 0 -${diameter}`;
-  */
-  var drawCircleVars = function drawCircleVars(circleWidth, strokeWidth, drawRatio) {
-    if (strokeWidth === void 0) {
-      strokeWidth = 0;
+  var WINDOW_POPUP_DEFAULT_WIDTH = 1100;
+  var WINDOW_POPUP_DEFAULT_HEIGHT = 900;
+  var openWindow = function openWindow(href, windowParam) {
+    var hasParam = typeof windowParam === "object";
+    var windowName = hasParam && windowParam["name"] || "_blank";
+    var useResize = (hasParam && windowParam["resize"]) + "" !== "false";
+    var destWindowWidth = hasParam && windowParam["width"] || WINDOW_POPUP_DEFAULT_WIDTH;
+    var destWindowHeight = hasParam && windowParam["height"] || WINDOW_POPUP_DEFAULT_HEIGHT;
+    var availMaxWidth = screen.availWidth;
+    var availMaxHeight = screen.availHeight; // IE bottom bar
+
+    if (navigator.platform.indexOf("Win") === 0) {
+      availMaxHeight -= 65;
     }
 
-    if (drawRatio === void 0) {
-      drawRatio = 1;
+    if (destWindowWidth > availMaxWidth) destWindowWidth = availMaxWidth;
+    if (destWindowHeight > availMaxHeight) destWindowHeight = availMaxHeight;
+    var newWindow = window.open(href, windowName, "width=" + destWindowWidth + ",height=" + destWindowHeight + (useResize ? ",resizable=1" : "") + ",scrollbars=yes,status=1");
+    return newWindow;
+  };
+  var openTab = function openTab(href) {
+    var newWindow = window.open(href, '_blank');
+    newWindow.focus();
+    return newWindow;
+  };
+  var historyBack = function historyBack(_ref) {
+    var catchFallback = _ref.catchFallback;
+
+    try {
+      var history = window.history;
+      var initialPage = history.length < 2;
+
+      if (initialPage && catchFallback) {
+        if (typeof catchFallback === "string") {
+          location.href = catchFallback;
+        }
+
+        if (typeof catchFallback === "function") {
+          return catchFallback();
+        }
+      } else {
+        history.back();
+      }
+    } catch (e) {
+      return null;
+    }
+  };
+
+  var toDataString = function toDataString(tods) {
+    switch (typeof tods) {
+      case "string":
+        return "\"" + tods + "\"";
+
+      case "object":
+        return JSON.stringify(tods);
+
+      case "boolean":
+      case "undefined":
+      case "number":
+      default:
+        return "" + tods;
+    }
+  };
+
+  var fromDataString = function fromDataString(v) {
+    return eval("(" + v + ")");
+  }; //로컬스토리지 데이터 저장
+
+
+  var setLocalData = function setLocalData(k, v) {
+    var localStorage = window.localStorage;
+
+    if (typeof k === "object") {
+      Object.keys(k).forEach(function (key) {
+        localStorage.setItem(key, toDataString(k[key]));
+      });
+    } else {
+      localStorage.setItem(k, toDataString(v));
     }
 
-    var circumference = (circleWidth - strokeWidth) / 2 * (3.14159 * 2);
-    var radius = circumference / (3.14159 * 2);
-    var diameter = radius * 2;
-    var x = circleWidth / 2;
-    var y = strokeWidth / 2; //const circumLength  = drawRatio == 1 ? drawRatio : drawRatio * circumference;
+    return true;
+  }; //로컬스토리지 데이터 불러오기
 
-    return {
-      x: x,
-      y: y,
-      radius: radius,
-      diameter: diameter,
-      circumference: circumference,
-      circleWidth: circleWidth,
-      strokeWidth: strokeWidth
-    };
+  var getLocalData = function getLocalData(k) {
+    var localStorage = window.localStorage;
+    if (!arguments.length) return localStorage;
+    var stringData = localStorage.getItem(k);
+    return stringData == null ? undefined : fromDataString(stringData);
   };
 
   var dragHelper = DragHelper;
@@ -547,7 +589,11 @@
   var helpers = /*#__PURE__*/Object.freeze({
     dragHelper: dragHelper,
     repeatHelper: repeatHelper,
-    drawCircleVars: drawCircleVars
+    openWindow: openWindow,
+    openTab: openTab,
+    historyBack: historyBack,
+    setLocalData: setLocalData,
+    getLocalData: getLocalData
   });
 
   var DEFAULT = _objectSpread({}, helpers);

@@ -19,10 +19,19 @@
   _exports.drawCircleVars = void 0;
 
   /*
-    const { x, y, radius, diameter } = drawCircleVars(this.size, this.stroke);
-    return `M${x} ${y} 
+    usage
+    const size = 20
+    const stroke = 1
+  
+    const { x, y, radius, diameter } = drawCircleVars(size, stroke);
+    
+    const d = `M${x} ${y} 
     a ${radius} ${radius} 0 0 1 0 ${diameter}
-    a ${radius} ${radius} 0 0 1 0 -${diameter}`;
+    a ${radius} ${radius} 0 0 1 0 -${diameter}`
+  
+    <svg viewbox="0 0 {size} {size}">
+      <path d="{d}" stroke-width="stroke"></path>
+    </svg>
   */
   var drawCircleVars = function drawCircleVars(circleWidth, strokeWidth, drawRatio) {
     if (strokeWidth === void 0) {

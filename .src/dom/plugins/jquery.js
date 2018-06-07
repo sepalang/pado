@@ -1,21 +1,6 @@
 import { isPlainObject } from '../../functions';
 
-let $;
-
-try {
-  (window,document);
-  $ = require('jquery');
-} catch(e){
-  const { JSDOM } = jsdom;
-  const dom = new JSDOM('<html><head><meta charset="utf-8"></head><body></body></html>',{
-    contentType: "text/html",
-    userAgent: "Mellblomenator/9000",
-    includeNodeLocations: true
-  });
-  global.window = dom.window;
-  global.document = dom.document;
-  $ = require('jquery');
-}
+const $ = require('jquery');
 
 const getCurrentTarget = function(originalEvent, fallbackElement){
   let result = originalEvent.currentTarget || originalEvent.target;

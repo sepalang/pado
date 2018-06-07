@@ -17,23 +17,8 @@
     value: true
   });
   _exports.default = void 0;
-  var $;
 
-  try {
-    window, document;
-    $ = require('jquery');
-  } catch (e) {
-    var _jsdom = jsdom,
-        JSDOM = _jsdom.JSDOM;
-    var dom = new JSDOM('<html><head><meta charset="utf-8"></head><body></body></html>', {
-      contentType: "text/html",
-      userAgent: "Mellblomenator/9000",
-      includeNodeLocations: true
-    });
-    global.window = dom.window;
-    global.document = dom.document;
-    $ = require('jquery');
-  }
+  var $ = require('jquery');
 
   var getCurrentTarget = function getCurrentTarget(originalEvent, fallbackElement) {
     var result = originalEvent.currentTarget || originalEvent.target;
