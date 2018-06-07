@@ -13,6 +13,12 @@
     <div>
       {{ sliderValue }}
     </div>
+    
+    <div>
+      <pado-slider @drawInput="nomodelValue=$event"></pado-slider>
+      <br>
+      {{ nomodelValue }}
+    </div>
   </UsageLayout>
 </template>
 <script>
@@ -21,22 +27,12 @@
   
   export default {
     components:{ UsageLayout, PadoSlider },
-    props: {
-      
-    },
     data (){
       return {
+        nomodelValue:null,
         sliderValue:0,
         s2Value:0
       }
     }
   }
 </script>
-<style>
-  dd+dt {
-    margin-top:20px;
-  }
-  dd {
-    margin-left:20px;
-  }
-</style>
