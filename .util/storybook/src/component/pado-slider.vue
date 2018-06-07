@@ -2,13 +2,6 @@
   <div class="pado-slider">
     <div class="pado-slider-scrollbar"></div>
     <div class="pado-slider-scroller"></div>
-    <br><br>
-    <div>
-      {{ rate }}
-    </div>
-    <div>
-      {{ showValue }}
-    </div>
   </div>
 </template>
 <script>
@@ -20,10 +13,15 @@ import { limitOf, domainRangeValue } from '../../../../.src/functions';
 
 export default {
   props: {
-    
-  },
-  created (){
-    
+    value:{
+      default:0
+    },
+    maxValue:{
+      default:100
+    },
+    minValue:{
+      default:0
+    }
   },
   data:()=>({
     showValue:"",
@@ -34,37 +32,44 @@ export default {
     const $scrollbar = $element.find('.pado-slider-scrollbar');
     const $scroller  = $element.find('.pado-slider-scroller');
     
-    this.$on("draw",()=>{
-      var scrollSize  = ~~((bodyScreen.offsetHeight / bodyScreen.scrollHeight) * bodyScreen.offsetHeight);
-      var scrollPoint = domainRangeValue([0,bodyScreen.scrollHeight],[0,bodyScreen.offsetHeight],bodyScreen.scrollTop,true);
-      $scroller.css({
-          top:scrollerTop + "px",
-          height:scrollerHeight + "px"
-      });
+    this.$on("drawInput",(value)=>{
+      const modelValue   = value || this.value;
+      const barLength    = $scrollbar.width()-$scroller.width();
+      const leftPosition = domainRangeValue([this.minValue,this.maxValue],[0,barLength],modelValue);
+      $scroller.css("left",leftPosition);
     });
     
-    dragHelper($scrollbar,({ element, delegate })=>{
-      
-      delegate($scroller);
-      
+    this.$watch("value",(newValue)=>{
+      this.$emit("drawInput",newValue);
+    });
+    
+    this.windowResizeHandle = ()=>{
+      this.$emit("drawInput");
+    };
+    
+    $(window).on("resize",this.windowResizeHandle);
+    
+    dragHelper($scrollbar,({ element })=>{
+      $scroller.css("pointer-events","none");
+      let finalValue;
       return {
         "start, move":({ event })=>{
           let { left, width } = $scroller.predict({center:event}, element);
+          const barLength     = element.width() - width;
+          const leftValue     = limitOf(left,barLength);
           
-          const scrollbarRight = element.width() - width;
-          const limitedValue   = limitOf(left,scrollbarRight);
-          
-          $scroller.css("left",limitedValue);
-          
-          this.showValue = { limitedValue, left, width };
-          this.rate = domainRangeValue([0, scrollbarRight],[0,100],limitedValue);
+          finalValue = domainRangeValue([0, barLength],[this.minValue,this.maxValue],leftValue);
+          this.$emit("drawInput",Math.round(finalValue));
         },
         end:({ pointer })=>{
-          console.log("pointer",pointer);
+          const endValue = Math.round(typeof finalValue === "number" ? finalValue : this.value);
+          this.$emit("input",endValue);
         }
       }
-    })
-    
+    });
+  },
+  destroyed (){
+    $(window).off("resize",this.windowResizeHandle)
   }
 }
 </script>

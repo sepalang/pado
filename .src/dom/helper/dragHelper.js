@@ -11,7 +11,6 @@ const pointerParse = ({ clientX, clientY })=>{
 
 export default function DragHelper(element,option){
   const $element = $(element).eq(0);
-  const delegates = [];
   let startFn;
   let moveFn;
   let endFn;
@@ -21,14 +20,7 @@ export default function DragHelper(element,option){
   let lastDrag   = null;
   
   const resetOptions = function(){
-    const delegate = (delegateElement)=>{
-      $(delegateElement).each(function(){
-        delegates.push(this);
-        $(this).css("pointer-events","none");
-      });
-    };
-    
-    const getOptions = rebase(typeof option === "function" ? option({ element:$element, delegate }) : option);
+    const getOptions = rebase(typeof option === "function" ? option({ element:$element }) : option);
     startFn = getOptions["start"];
     moveFn = getOptions["move"];
     endFn = getOptions["end"];
