@@ -171,6 +171,9 @@ $.fn.extend({
     }
     
     return result;
+  },
+  flash (){
+    
   }
 });
 

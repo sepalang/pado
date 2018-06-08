@@ -32,6 +32,9 @@ export default {
     },
     bindMinValue(){
       return parseInt(this.minValue,10);
+    },
+    readOnly(){
+      return typeof this.$el.getAttribute("readOnly") === "string";
     }
   },
   mounted (){
@@ -63,6 +66,10 @@ export default {
       let finalValue;
       return {
         "start, move":({ event })=>{
+          if(this.readOnly){
+            event.preventDefault();
+          }
+          
           let { left, width } = $scroller.predict({center:event}, element);
           const barLength     = element.width() - width;
           const leftValue     = limitOf(left,barLength);
