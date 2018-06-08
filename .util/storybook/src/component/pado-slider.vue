@@ -6,8 +6,8 @@
 </template>
 <script>
 import PadoSlider from '../component/pado-slider.vue';
-import $ from '../../../../.src/dom/plugins/jquery';
-import { dragHelper } from '../../../../.src/dom/index';
+import $ from '../../../../.src/web/plugins/jquery';
+import { dragHelper } from '../../../../.src/web/index';
 import { limitOf, domainRangeValue } from '../../../../.src/functions';
 
 

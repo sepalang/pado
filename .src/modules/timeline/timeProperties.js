@@ -30,13 +30,13 @@ const TimePropertiesPrototype = {
 Object.defineProperties = {
   fps:{
     set(fps){
-      this._fps     = (typeof fps === "number") ? fps : this._fps;
+      this._fps = (typeof fps === "number") ? fps : this._fps;
     },
     get(){
-      return this._fps
-    };
+      return this._fps;
+    }
   },
-  _interval(){
+  _interval:{
     get (){
       return 1000 / this._fps;
     }

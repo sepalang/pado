@@ -33,9 +33,9 @@ Object.defineProperties = {
     },
     get(){
       return this._fps
-    };
+    }
   },
-  _interval(){
+  _interval:{
     get (){
       return 1000 / this._fps;
     }

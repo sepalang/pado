@@ -1,14 +1,14 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "./dom/index.js"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "./web/index.js"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("./dom/index.js"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("./web/index.js"));
   } else {
     var mod = {
       exports: {}
     };
     factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.index);
-    global.padoDom = mod.exports;
+    global.padoWeb = mod.exports;
   }
 })(this, function (_exports, _webDom, _es6Array, _es6Object, helpers) {
   "use strict";
@@ -30,4 +30,4 @@
   var _default = DEFAULT;
   _exports.default = _default;
 });
-//# sourceMappingURL=pado.dom.js.map
+//# sourceMappingURL=pado.web.js.map

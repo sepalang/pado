@@ -1,3 +1,3 @@
-import * as helpers from './dom/index.js'
+import * as helpers from './web/index.js'
 const DEFAULT = { ...helpers }
 export default DEFAULT;

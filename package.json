@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/pado",
-  "version": "0.0.75",
+  "version": "0.0.80",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -9,18 +9,18 @@
   },
   "scripts": {
     "start": "babel-node .util/test/src-test.js",
-    "clear:dist": "rimraf ./*.js ./*.js.map ./functions ./modules ./dom",
+    "clear:dist": "rimraf ./*.js ./*.js.map ./functions ./modules ./web",
     "build:default": "padoc .src ./ -m umd -s",
     "build:pack:node": "padoc --pack .src/pado.js ./pado.js -m umd -n pado -s",
-    "build:pack:dom": "padoc --pack .src/pado.dom.js ./dom/pado.dom.js -m umd -n pado -s",
-    "build:pack": "npm run build:pack:node && npm run build:pack:dom",
+    "build:pack:web": "padoc --pack .src/pado.web.js ./web/pado.web.js -m umd -n pado -s",
+    "build:pack": "npm run build:pack:node && npm run build:pack:web",
     "build": "npm run clear:dist && npm run build:default && npm run build:pack",
     "report:index": "madge .src/index.js --image .util/report/index.report.png",
     "report:pado": "madge .src/pado.js --image .util/report/pado.report.png",
     "report:modules": "madge .src/modules/index.js --image .util/report/modules.report.png",
     "report:functions": "madge .src/functions/index.js --image .util/report/functions.report.png",
     "report": "npm run report:index & npm run report:pado & npm run report:modules & npm run report:functions",
-    "test:dom": "padoc --test .util/test/dom --verbose",
+    "test:web": "padoc --test .util/test/web --verbose",
     "test": "padoc --test .util/test --verbose",
     "labp": "padoc --pack .util/sample/labs/entry.a.js .util/sample/labs/pack.a.sample.js && padoc --pack .util/sample/labs/entry.b.js .util/sample/labs/pack.b.sample.js",
     "t": "padoc --exec .util/sample/use/cast.use.js"

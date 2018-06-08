@@ -1853,6 +1853,47 @@
     return scopeBeforeFn;
   };
 
+  /*
+    usage
+    const size = 20
+    const stroke = 1
+
+    const { x, y, radius, diameter } = drawCircleVars(size, stroke);
+    
+    const d = `M${x} ${y} 
+    a ${radius} ${radius} 0 0 1 0 ${diameter}
+    a ${radius} ${radius} 0 0 1 0 -${diameter}`
+
+    <svg viewbox="0 0 {size} {size}">
+      <path d="{d}" stroke-width="stroke"></path>
+    </svg>
+  */
+  var drawCircleVars = function drawCircleVars(circleWidth, strokeWidth, drawRatio) {
+    if (strokeWidth === void 0) {
+      strokeWidth = 0;
+    }
+
+    if (drawRatio === void 0) {
+      drawRatio = 1;
+    }
+
+    var circumference = (circleWidth - strokeWidth) / 2 * (3.14159 * 2);
+    var radius = circumference / (3.14159 * 2);
+    var diameter = radius * 2;
+    var x = circleWidth / 2;
+    var y = strokeWidth / 2; //const circumLength  = drawRatio == 1 ? drawRatio : drawRatio * circumference;
+
+    return {
+      x: x,
+      y: y,
+      radius: radius,
+      diameter: diameter,
+      circumference: circumference,
+      circleWidth: circleWidth,
+      strokeWidth: strokeWidth
+    };
+  };
+
   var hasValueProperty = function hasValueProperty(obj, value, key) {
     if (arguments.length == 1 && likeObject(obj)) return isEmpty(obj);
     if (isArray(obj)) for (var i = 0, l = obj.length; i < l; i++) {
@@ -3366,6 +3407,7 @@
     hasValue: hasValue$1,
     argumentNamesBy: argumentNamesBy,
     scopelizeBy: scopelizeBy,
+    drawCircleVars: drawCircleVars,
     promise: promise,
     space: space,
     block: block,

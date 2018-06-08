@@ -6,17 +6,17 @@ require("core-js/modules/web.dom.iterable");
 
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./block", "./editable", "./makeup", "./paginate", "./promise", "./timeline", "./operate", "./session", "./ranger"], factory);
+    define(["exports", "./block", "./editable", "./makeup", "./paginate", "./promise", "./operate", "./session", "./ranger"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./block"), require("./editable"), require("./makeup"), require("./paginate"), require("./promise"), require("./timeline"), require("./operate"), require("./session"), require("./ranger"));
+    factory(exports, require("./block"), require("./editable"), require("./makeup"), require("./paginate"), require("./promise"), require("./operate"), require("./session"), require("./ranger"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.block, global.editable, global.makeup, global.paginate, global.promise, global.timeline, global.operate, global.session, global.ranger);
+    factory(mod.exports, global.block, global.editable, global.makeup, global.paginate, global.promise, global.operate, global.session, global.ranger);
     global.index = mod.exports;
   }
-})(this, function (_exports, _block, _editable, _makeup, _paginate, _promise, _timeline, _operate, _session, _ranger) {
+})(this, function (_exports, _block, _editable, _makeup, _paginate, _promise, _operate, _session, _ranger) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -68,16 +68,6 @@ require("core-js/modules/web.dom.iterable");
       enumerable: true,
       get: function get() {
         return _paginate[key];
-      }
-    });
-  });
-  Object.keys(_timeline).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-    Object.defineProperty(_exports, key, {
-      enumerable: true,
-      get: function get() {
-        return _timeline[key];
       }
     });
   });
