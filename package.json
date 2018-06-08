@@ -20,6 +20,7 @@
     "report:modules": "madge .src/modules/index.js --image .util/report/modules.report.png",
     "report:functions": "madge .src/functions/index.js --image .util/report/functions.report.png",
     "report": "npm run report:index & npm run report:pado & npm run report:modules & npm run report:functions",
+    "test:dom": "padoc --test .util/test/dom --verbose",
     "test": "padoc --test .util/test --verbose",
     "labp": "padoc --pack .util/sample/labs/entry.a.js .util/sample/labs/pack.a.sample.js && padoc --pack .util/sample/labs/entry.b.js .util/sample/labs/pack.b.sample.js",
     "t": "padoc --exec .util/sample/use/cast.use.js"
