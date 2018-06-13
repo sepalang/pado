@@ -1,1 +1,0 @@
-{"version":3,"sources":[".src/pado.web.js"],"names":["DEFAULT","helpers"],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;AACA,MAAMA,4BAAeC,OAAf,CAAN;;iBACeD,O","sourcesContent":["import * as helpers from './web/index.js'\nconst DEFAULT = { ...helpers }\nexport default DEFAULT;"],"file":"pado.web.js"}

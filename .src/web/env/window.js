@@ -4,7 +4,7 @@ const WINDOW_POPUP_DEFAULT_HEIGHT = 900;
 export const openWindow = function(href, windowParam) {
   const hasParam   = typeof windowParam === "object";
   const windowName = hasParam && windowParam["name"] || "_blank";
-  const useResize  = (hasParam && windowParam["resize"])+"" !== "false";
+  const useResize  = (hasParam && windowParam["resize"]+"") !== "false";
   
   let destWindowWidth  = (hasParam && windowParam["width"] || WINDOW_POPUP_DEFAULT_WIDTH);
   let destWindowHeight = (hasParam && windowParam["height"] || WINDOW_POPUP_DEFAULT_HEIGHT);
