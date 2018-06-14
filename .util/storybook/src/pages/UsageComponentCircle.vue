@@ -2,14 +2,19 @@
   <UsageLayout>
     <h1>Circle</h1>
     <div>
-      <pado-slider style="width:150px" v-bind:value="repeatCount" @drawInput="repeatCount=$event" @min-value="1"></pado-slider>
+      <pado-slider style="width:150px" v-model="circleSize" min-value="20"></pado-slider>
+      {{ circleSize }}
+    </div>
+    <div>
+      <pado-slider style="width:150px" v-bind:value="repeatCount" @drawInput="repeatCount=$event" min-value="1"></pado-slider>
       {{ repeatCount }}
-      <br>
+    </div>
+    <div>
       <pado-slider style="width:150px" v-bind:value="circleValue" @drawInput="circleValue=$event"></pado-slider>
       {{ circleValue }}
     </div>
     <div>
-      <pado-circle v-for="i in repeatCircles" :key="i" v-model="circleValue"></pado-circle>
+      <pado-circle v-for="i in repeatCircles" :key="i" v-model="circleValue" :size="circleSize"></pado-circle>
     </div>
   </UsageLayout>
 </template>
@@ -24,6 +29,7 @@
     data (){
       return {
         repeatCount:2,
+        circleSize:50,
         circleValue:80
       }
     },

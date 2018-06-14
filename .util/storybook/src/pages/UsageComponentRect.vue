@@ -5,7 +5,7 @@
       <pado-slider v-model="rectSize" min-value="20" max-value="800" style="width:150px"></pado-slider> {{ rectSize }}
     </div>
     <div>
-      <pado-rect v-model="circleValue" :size="rectSize"></pado-rect>
+      <pado-rect :size="rectSize"></pado-rect>
     </div>
   </UsageLayout>
 </template>

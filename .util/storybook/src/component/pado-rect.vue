@@ -50,6 +50,9 @@
     },
     watch: {
       changeBoundsWatchGroup (newValue){}
+    },
+    mounted (){
+      this.$emit("bounding",getElementBoundingRect(this.$el));
     }
   }
   </script>
