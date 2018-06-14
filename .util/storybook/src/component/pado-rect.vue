@@ -16,7 +16,13 @@
       height:{
         default:20
       },
-      size:{}
+      size:{},
+      left:{
+        default:0
+      },
+      top:{
+        default:0
+      }
     },
     computed:{
       rectValue (){
@@ -30,8 +36,19 @@
       },
       styleValue (){
         const { width, height } = this.rectValue;
-        return { width:width + "px", height:height + "px"};
+        const poistion = (this.left > 0 || this.top > 0) ? "absolute" : "relative";
+        const [left, top] = [this.left+"px", this.top+"px"];
+        return { width:width + "px", height:height + "px", poistion,left,top};
+      },
+      changeBoundsWatchGroup (){
+        this.$el && this.$emit("bounding",this.$el.getClientRects());
+        
+        return [this.size, this.left, this.top].length;
+        //return [this.size, this.point];
       }
+    },
+    watch: {
+      changeBoundsWatchGroup (newValue){}
     }
   }
   </script>
