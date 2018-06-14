@@ -18,7 +18,7 @@
     <div>
       Bounding = {{ bounding }}
     </div>
-    <div style="poisition:relative;">
+    <div class="recw" style="position:relative;">
       <pado-rect :size="rectSize" :left="x" :top="y" @bounding="bounding = $event"></pado-rect>
     </div>
   </UsageLayout>

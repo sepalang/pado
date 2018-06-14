@@ -7,6 +7,7 @@
   import $ from '../../../../.src/web/plugins/jquery';
   import { dragHelper } from '../../../../.src/web/index';
   import { domainRangeValue, drawCircleVars } from '../../../../.src/functions';
+  import { getElementBoundingRect } from '../../../../.src/web';
 
   export default {
     props: {
@@ -41,10 +42,10 @@
         return { width:width + "px", height:height + "px", poistion,left,top};
       },
       changeBoundsWatchGroup (){
-        this.$el && this.$emit("bounding",this.$el.getClientRects());
-        
+        this.$el && setTimeout(()=>{
+          this.$emit("bounding",getElementBoundingRect(this.$el));
+        });
         return [this.size, this.left, this.top].length;
-        //return [this.size, this.point];
       }
     },
     watch: {
