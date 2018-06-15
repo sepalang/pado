@@ -1,3 +1,5 @@
+import 'babel-polyfill'
+
 import { configure } from '@storybook/vue';
 import { setOptions } from '@storybook/addon-options';
 import Vue from 'vue';
