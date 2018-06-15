@@ -1,10 +1,24 @@
 const Point = function(x=0,y=0,z=0,w=0){
-  this._ref = { x,y,z,w };
+  const __ref = { x,y,z,w };
+  
+  Object.defineProperties(this,{
+    x:{ enumerable:true, get(){ return __ref.x; } },
+    y:{ enumerable:true, get(){ return __ref.y; } },
+    z:{ enumerable:true, get(){ return __ref.z; } },
+    w:{ enumerable:true, get(){ return __ref.w; } },
+  });
 };
 
 Point.prototype = {
-  toRect (width=0, height=0){
-    return new Rect(this.x,this.y,width,height);
+  pull (width=0, angle="horizontal"){
+    const { x, y, z, w } = this;
+    
+    switch(angle){
+      case "h": case "horizontal":
+        const xHalf = width <= 0 ? 0 : width/2;
+        return new Line(x-xHalf, y, z, w, x+xHalf, y, z, w);
+      default:
+    }
   },
   toObject (){
     return {
@@ -16,32 +30,61 @@ Point.prototype = {
   }
 };
 
-Object.defineProperties(Point.prototype,{
-  x:{ get(){ return this._ref.x; } },
-  y:{ get(){ return this._ref.y; } },
-  z:{ get(){ return this._ref.z; } },
-  w:{ get(){ return this._ref.w; } },
-});
-
 const Line = function(sx,sy,sz,sw,ex,ey,ez,ew){
-  this._ref = { sx,sy,sz,sw,ex,ey,ez,ew };
+  const __ref = { sx,sy,sz,sw,ex,ey,ez,ew };
+  
+  Object.defineProperties(this,{
+    start:{
+      enumerable:true,
+      get (){
+        return {
+          x:__ref.sx,
+          y:__ref.sy,
+          w:__ref.sw,
+          z:__ref.sz
+        }
+      }
+    },
+    end:{
+      enumerable:true,
+      get (){
+        return {
+          x:__ref.ex,
+          y:__ref.ey,
+          w:__ref.ew,
+          z:__ref.ez
+        }
+      }
+    }
+  });
 };
 
 Line.prototype =  {
+  points:function(pointCount=2){
+    const { start:{x:sx,y:sy,z:sz,w:sw}, end:{x:ex,y:ey,z:ez,w:ew} } = this;
+    const divCount = pointCount-1;
+    const [dx, dy, dz, dw]=[
+      ex-sx/divCount,
+      ey-sy/divCount,
+      ez-sz/divCount,
+      ew-sw/divCount
+    ];
+    
+    return Array(2).fill().map((v,i)=>new Point(sx+(dx*i),sy+(dy*i),sz+(dz*i),sw+(dw*i)));
+  },
   point:function(order){
     switch(order){
     case "e": case "end":
       const { x:px,y:py,z:pz,w:pw } = this.end;
       return new Point(px,py,pz,pw);
-    case "c": case "m":
-    case "center": case "middle":
+    case "c": case "m": case "center": case "middle":
       const { x:sx, y:sy, z:sz, w:sw } = this.start;
       const { x:ex, y:ey, z:ez, w:ew } = this.end;
       return new Point(
-        sx + ex/2,
-        sy + ey/2,
-        sz + ez/2,
-        sw + ew/2
+        sx/2 + ex/2,
+        sy/2 + ey/2,
+        sz/2 + ez/2,
+        sw/2 + ew/2
       );
     case "s": case "start":
     default:
@@ -51,32 +94,28 @@ Line.prototype =  {
   }
 };
 
-Object.defineProperties(Point.prototype,{
-  start:{
-    get (){
-      return {
-        x:this._ref.sx,
-        y:this._ref.sy,
-        w:this._ref.sw,
-        z:this._ref.sz
-      }
-    }
-  },
-  end:{
-    get (){
-      return {
-        x:this._ref.ex,
-        y:this._ref.ey,
-        w:this._ref.ew,
-        z:this._ref.ez
-      }
-    }
-  }
-});
+
 
 
 const Rect = function(left=0,top=0,width=0,height=0,x,y,valid=true){
-  this._ref = { left,top,width,height,x,y,valid }
+  const __ref = { left,top,width,height,x,y,valid }
+  
+  Object.defineProperties(this,{
+    x:{ enumerable:true, get(){ return typeof __ref.x === "number" ? __ref.x : __ref.left; } },
+    y:{ enumerable:true, get(){ return typeof __ref.y === "number" ? __ref.y : __ref.top; } },
+    width:{ enumerable:true, get(){ return __ref.width; } },
+    height:{ enumerable:true, get(){ return __ref.height; } },
+    left:{ enumerable:true, get(){ return __ref.left; } },
+    top:{ enumerable:true, get(){ return __ref.top; } },
+    right:{ enumerable:true, get(){ return this.left + this.width; } },
+    bottom:{ enumerable:true, get(){ return this.top + this.height; } },
+    valid:{ get(){ return typeof __ref.valid === "boolean" ? __ref.valid : (
+      typeof __ref.left === "number" &&
+      typeof __ref.top === "number" &&
+      __ref.width >= 0 &&
+      __ref.height >= 0
+    ) } }
+  });
 };
 
 Rect.prototype = {
@@ -85,13 +124,13 @@ Rect.prototype = {
   },
   line (order){
     switch(order){
-    case "top":
-      return new Line(this.left,this.top,0,0,this.left,this.right,0,0);
-    case "right":
+    case "top": case "t":
+      return new Line(this.left,this.top,0,0,this.right,this.top,0,0);
+    case "right": case "r":
       return new Line(this.right,this.top,0,0,this.right,this.bottom,0,0);
-    case "bottom":
-      return new Line(this.right,this.bottom,0,0,this.left,this.bottom,0,0);
-    case "left":
+    case "bottom": case "b":
+      return new Line(this.left,this.bottom,0,0,this.right,this.bottom,0,0);
+    case "left": case "l":
       return new Line(this.left,this.top,0,0,this.left,this.bottom,0,0);
     }
   },
@@ -104,21 +143,11 @@ Rect.prototype = {
       left:this.left,
       top:this.top,
       right:this.right,
-      bottom:this.bottom
+      bottom:this.bottom,
+      valid:this.valid
     }
   }
 };
-
-Object.defineProperties(Rect.prototype,{
-  x:{ get(){ return typeof this._ref.x === "number" ? this._ref.x : this._ref.left; } },
-  y:{ get(){ return typeof this._ref.y === "number" ? this._ref.y : this._ref.top; } },
-  width:{ get(){ return this._ref.width; } },
-  height:{ get(){ return this._ref.height; } },
-  left:{ get(){ return this._ref.x; } },
-  top:{ get(){ return this._ref.y; } },
-  right:{ get(){ return this.x + this.width; } },
-  bottom:{ get(){ return this.y + this.height; } },
-});
 
 export const point = function(x,y,z,w){
   return typeof x === "object" ? 

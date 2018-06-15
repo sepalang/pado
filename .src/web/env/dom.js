@@ -60,12 +60,10 @@ export const getElementBoundingRect = function(el){
   const win  = window;
   const body = doc.body;
   
-  const sb = getBoundingRect(el);
-  
   const elRect = getBoundingRect(el).toJSON();
   
-  if(!elRect.valid){
-    return elRect;
+  if(elRect.valid === false){
+    return rect(elRect);
   }
   
   let current = el;
@@ -88,4 +86,55 @@ export const getElementBoundingRect = function(el){
   } while( !!parent )
   
   return rect(elRect);
+}
+
+const SVGBuilder = function(){
+  this.drawVariants = [];
+};
+
+SVGBuilder.prototype = {
+  addPath (points,attributes){
+    this.drawVariants.push({
+      tag:"path",
+      attributes,
+      params:points
+    })
+    return this;
+  },
+  createElement (){
+    const svgTag = document.createElementNS('http://www.w3.org/2000/svg', "svg");
+    let realMaxWidth  = 0;
+    let realMaxHeigth = 0; 
+    
+    this.drawVariants.forEach(({ tag, attributes, params})=>{
+      if( tag === "path"){
+        const pathElement = document.createElementNS('http://www.w3.org/2000/svg', "path");
+        pathElement.setAttribute("fill","transparent");
+        pathElement.setAttribute("stroke","gray");
+        pathElement.setAttribute("stroke-width","1");
+        pathElement.setAttribute("stroke-linecap","butt");
+        pathElement.setAttribute("stroke-linejoin","miter");
+        
+        let dValue = "";
+        
+        params.forEach((point, index)=>{
+          const prefix = index === 0 ? 'M' : 'L';
+          if(point.x > realMaxWidth) realMaxWidth = point.x;
+          if(point.y > realMaxHeigth) realMaxHeigth = point.y;
+          dValue += `${prefix}${point.x} ${point.y} `;
+        });
+        
+        pathElement.setAttribute("d",dValue);
+        svgTag.appendChild(pathElement);
+      }
+    });
+    
+    svgTag.setAttribute("width",realMaxWidth);
+    svgTag.setAttribute("height",realMaxHeigth);
+    return svgTag;
+  }
+}
+
+export const makeSVG = function(){
+  return new SVGBuilder();
 }

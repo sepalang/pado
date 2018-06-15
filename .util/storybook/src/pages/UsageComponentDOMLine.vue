@@ -1,9 +1,13 @@
 <template>
   <UsageLayout>
     <h1>DOMLine</h1>
-    <div style="position:relative;">
-      <pado-rect class="root-rect" size="40"></pado-rect>
-      <pado-rect class="rect-right" size="40" left="100" top="100" dragmove></pado-rect>
+    <div class="yaaa" style="position:relative;">
+      <pado-rect class="root-rect" size="40" left="100" top="100"></pado-rect>
+      <pado-rect class="rect-upside" size="40" left="100" top="0" @drawPoint="drawLine" dragmove></pado-rect>
+      <pado-rect class="rect-upright" size="40" left="200" top="50" @drawPoint="drawLine" dragmove></pado-rect>
+      <pado-rect class="rect-downright" size="40" left="150" top="150" @drawPoint="drawLine" dragmove></pado-rect>
+      <pado-rect class="rect-downside" size="40" left="50" top="200" @drawPoint="drawLine" dragmove></pado-rect>
+      <div class="path-placeholder"></div>
     </div>
   </UsageLayout>
 </template>
@@ -11,7 +15,7 @@
   import UsageLayout from '../layout/UsageLayout.vue';
   import PadoSlider from '../component/pado-slider.vue';
   import PadoRect from '../component/pado-rect.vue';
-  import { dragHelper, getElementBoundingRect } from '../../../../.src/web';
+  import { dragHelper, getElementBoundingRect, makeSVG } from '../../../../.src/web';
   import { rect, line, point } from '../../../../.src/modules';
   import $ from 'jquery';
   
@@ -27,13 +31,24 @@
     },
     methods:{
       drawLine:function(){
-        const $rootRect = $(this.$el).find(".root-rect");
-        const $rectRight = $(this.$el).find(".rect-right");
+        const rootBoundingRect    = getElementBoundingRect( $(this.$el).find(".root-rect") );
+        const upsideBoundingRect  = getElementBoundingRect( $(this.$el).find(".rect-upside") );
+        const uprightBoundingRect = getElementBoundingRect( $(this.$el).find(".rect-upright") );
         
-        const rootBoundingRect = getElementBoundingRect($rootRect);
-        const rightBoundingRect = getElementBoundingRect($rectRight);
+        const downrightBoundingRect = getElementBoundingRect( $(this.$el).find(".rect-downright") );
+        const downBoundingRect      = getElementBoundingRect( $(this.$el).find(".rect-downside") );
         
-        //console.log("rootBoundingRect",rootBoundingRect)
+        const rootTopPoint    = rootBoundingRect.line("top").point("center");
+        const rootBottomPoint = rootBoundingRect.line("bottom").point("center");
+        const bottom2Points   = rootBottomPoint.pull(10).points(2);
+        
+        const svgTag = makeSVG()
+        .addPath([rootTopPoint,upsideBoundingRect.line("bottom").point("center")])
+        .addPath([rootTopPoint,uprightBoundingRect.line("left").point("center")])
+        .addPath([bottom2Points[0],downBoundingRect.line("top").point("center")])
+        .addPath([bottom2Points[1],downrightBoundingRect.line("left").point("center")])
+        .createElement();
+        $(this.$el).find(".path-placeholder").empty().append(svgTag);
       }
     },
     mounted (){
@@ -41,3 +56,11 @@
     }
   }
 </script>
+<style lang="scss">
+  .path-placeholder {
+    position:absolute;
+    top:0;
+    left:0;
+    pointer-events:none;
+  }
+</style>

@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.date.to-json", "../../modules/coordinate", "../../functions/isLike"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.date.to-json", "../../modules/coordinate", "../../functions/isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.date.to-json"), require("../../modules/coordinate"), require("../../functions/isLike"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.date.to-json"), require("../../modules/coordinate"), require("../../functions/isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Date, global.coordinate, global.isLike);
+    factory(mod.exports, global.webDom, global.es6Date, global.coordinate, global.isLike);
     global.dom = mod.exports;
   }
-})(this, function (_exports, _es6Date, _coordinate, _isLike) {
+})(this, function (_exports, _webDom, _es6Date, _coordinate, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.getElementBoundingRect = _exports.getBoundingRect = _exports.isElement = _exports.getNode = void 0;
+  _exports.makeSVG = _exports.getElementBoundingRect = _exports.getBoundingRect = _exports.isElement = _exports.getNode = void 0;
 
   var getNode = function getNode(el) {
     var select = (0, _isLike.likeArray)(el) ? el[0] : el;
@@ -85,11 +85,10 @@
     var doc = document;
     var win = window;
     var body = doc.body;
-    var sb = getBoundingRect(el);
     var elRect = getBoundingRect(el).toJSON();
 
-    if (!elRect.valid) {
-      return elRect;
+    if (elRect.valid === false) {
+      return (0, _coordinate.rect)(elRect);
     }
 
     var current = el;
@@ -118,5 +117,57 @@
   };
 
   _exports.getElementBoundingRect = getElementBoundingRect;
+
+  var SVGBuilder = function SVGBuilder() {
+    this.drawVariants = [];
+  };
+
+  SVGBuilder.prototype = {
+    addPath: function addPath(points, attributes) {
+      this.drawVariants.push({
+        tag: "path",
+        attributes: attributes,
+        params: points
+      });
+      return this;
+    },
+    createElement: function createElement() {
+      var svgTag = document.createElementNS('http://www.w3.org/2000/svg', "svg");
+      var realMaxWidth = 0;
+      var realMaxHeigth = 0;
+      this.drawVariants.forEach(function (_ref) {
+        var tag = _ref.tag,
+            attributes = _ref.attributes,
+            params = _ref.params;
+
+        if (tag === "path") {
+          var pathElement = document.createElementNS('http://www.w3.org/2000/svg', "path");
+          pathElement.setAttribute("fill", "transparent");
+          pathElement.setAttribute("stroke", "gray");
+          pathElement.setAttribute("stroke-width", "1");
+          pathElement.setAttribute("stroke-linecap", "butt");
+          pathElement.setAttribute("stroke-linejoin", "miter");
+          var dValue = "";
+          params.forEach(function (point, index) {
+            var prefix = index === 0 ? 'M' : 'L';
+            if (point.x > realMaxWidth) realMaxWidth = point.x;
+            if (point.y > realMaxHeigth) realMaxHeigth = point.y;
+            dValue += "" + prefix + point.x + " " + point.y + " ";
+          });
+          pathElement.setAttribute("d", dValue);
+          svgTag.appendChild(pathElement);
+        }
+      });
+      svgTag.setAttribute("width", realMaxWidth);
+      svgTag.setAttribute("height", realMaxHeigth);
+      return svgTag;
+    }
+  };
+
+  var makeSVG = function makeSVG() {
+    return new SVGBuilder();
+  };
+
+  _exports.makeSVG = makeSVG;
 });
 //# sourceMappingURL=dom.js.map

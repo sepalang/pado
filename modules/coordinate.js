@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
+    define(["exports", "core-js/modules/es6.array.fill"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports);
+    factory(exports, require("core-js/modules/es6.array.fill"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports);
+    factory(mod.exports, global.es6Array);
     global.coordinate = mod.exports;
   }
-})(this, function (_exports) {
+})(this, function (_exports, _es6Array) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -35,25 +35,63 @@
       w = 0;
     }
 
-    this._ref = {
+    var __ref = {
       x: x,
       y: y,
       z: z,
       w: w
     };
+    Object.defineProperties(this, {
+      x: {
+        enumerable: true,
+        get: function get() {
+          return __ref.x;
+        }
+      },
+      y: {
+        enumerable: true,
+        get: function get() {
+          return __ref.y;
+        }
+      },
+      z: {
+        enumerable: true,
+        get: function get() {
+          return __ref.z;
+        }
+      },
+      w: {
+        enumerable: true,
+        get: function get() {
+          return __ref.w;
+        }
+      }
+    });
   };
 
   Point.prototype = {
-    toRect: function toRect(width, height) {
+    pull: function pull(width, angle) {
       if (width === void 0) {
         width = 0;
       }
 
-      if (height === void 0) {
-        height = 0;
+      if (angle === void 0) {
+        angle = "horizontal";
       }
 
-      return new Rect(this.x, this.y, width, height);
+      var x = this.x,
+          y = this.y,
+          z = this.z,
+          w = this.w;
+
+      switch (angle) {
+        case "h":
+        case "horizontal":
+          var xHalf = width <= 0 ? 0 : width / 2;
+          return new Line(x - xHalf, y, z, w, x + xHalf, y, z, w);
+
+        default:
+      }
     },
     toObject: function toObject() {
       return {
@@ -64,31 +102,9 @@
       };
     }
   };
-  Object.defineProperties(Point.prototype, {
-    x: {
-      get: function get() {
-        return this._ref.x;
-      }
-    },
-    y: {
-      get: function get() {
-        return this._ref.y;
-      }
-    },
-    z: {
-      get: function get() {
-        return this._ref.z;
-      }
-    },
-    w: {
-      get: function get() {
-        return this._ref.w;
-      }
-    }
-  });
 
   var Line = function Line(sx, sy, sz, sw, ex, ey, ez, ew) {
-    this._ref = {
+    var __ref = {
       sx: sx,
       sy: sy,
       sz: sz,
@@ -98,70 +114,96 @@
       ez: ez,
       ew: ew
     };
+    Object.defineProperties(this, {
+      start: {
+        enumerable: true,
+        get: function get() {
+          return {
+            x: __ref.sx,
+            y: __ref.sy,
+            w: __ref.sw,
+            z: __ref.sz
+          };
+        }
+      },
+      end: {
+        enumerable: true,
+        get: function get() {
+          return {
+            x: __ref.ex,
+            y: __ref.ey,
+            w: __ref.ew,
+            z: __ref.ez
+          };
+        }
+      }
+    });
   };
 
   Line.prototype = {
+    points: function points(pointCount) {
+      if (pointCount === void 0) {
+        pointCount = 2;
+      }
+
+      var _this$start = this.start,
+          sx = _this$start.x,
+          sy = _this$start.y,
+          sz = _this$start.z,
+          sw = _this$start.w,
+          _this$end = this.end,
+          ex = _this$end.x,
+          ey = _this$end.y,
+          ez = _this$end.z,
+          ew = _this$end.w;
+      var divCount = pointCount - 1;
+      var dx = ex - sx / divCount,
+          dy = ey - sy / divCount,
+          dz = ez - sz / divCount,
+          dw = ew - sw / divCount;
+      return Array(2).fill().map(function (v, i) {
+        return new Point(sx + dx * i, sy + dy * i, sz + dz * i, sw + dw * i);
+      });
+    },
     point: function point(order) {
       switch (order) {
         case "e":
         case "end":
-          var _this$end = this.end,
-              px = _this$end.x,
-              py = _this$end.y,
-              pz = _this$end.z,
-              pw = _this$end.w;
+          var _this$end2 = this.end,
+              px = _this$end2.x,
+              py = _this$end2.y,
+              pz = _this$end2.z,
+              pw = _this$end2.w;
           return new Point(px, py, pz, pw);
 
         case "c":
         case "m":
         case "center":
         case "middle":
-          var _this$start = this.start,
-              sx = _this$start.x,
-              sy = _this$start.y,
-              sz = _this$start.z,
-              sw = _this$start.w;
-          var _this$end2 = this.end,
-              ex = _this$end2.x,
-              ey = _this$end2.y,
-              ez = _this$end2.z,
-              ew = _this$end2.w;
-          return new Point(sx + ex / 2, sy + ey / 2, sz + ez / 2, sw + ew / 2);
+          var _this$start2 = this.start,
+              sx = _this$start2.x,
+              sy = _this$start2.y,
+              sz = _this$start2.z,
+              sw = _this$start2.w;
+          var _this$end3 = this.end,
+              ex = _this$end3.x,
+              ey = _this$end3.y,
+              ez = _this$end3.z,
+              ew = _this$end3.w;
+          return new Point(sx / 2 + ex / 2, sy / 2 + ey / 2, sz / 2 + ez / 2, sw / 2 + ew / 2);
 
         case "s":
         case "start":
         default:
-          var _this$start2 = this.start,
-              x = _this$start2.x,
-              y = _this$start2.y,
-              z = _this$start2.z,
-              w = _this$start2.w;
+          var _this$start3 = this.start,
+              x = _this$start3.x,
+              y = _this$start3.y,
+              z = _this$start3.z,
+              w = _this$start3.w;
           return new Point(x, y, z, w);
       }
     }
   };
-  Object.defineProperties(Point.prototype, {
-    start: {
-      get: function get() {
-        return {
-          x: this._ref.sx,
-          y: this._ref.sy,
-          w: this._ref.sw,
-          z: this._ref.sz
-        };
-      }
-    },
-    end: {
-      get: function get() {
-        return {
-          x: this._ref.ex,
-          y: this._ref.ey,
-          w: this._ref.ew,
-          z: this._ref.ez
-        };
-      }
-    }
-  });
 
   var Rect = function Rect(left, top, width, height, x, y, valid) {
     if (left === void 0) {
@@ -184,7 +226,7 @@
       valid = true;
     }
 
-    this._ref = {
+    var __ref = {
       left: left,
       top: top,
       width: width,
@@ -193,6 +235,61 @@
       y: y,
       valid: valid
     };
+    Object.defineProperties(this, {
+      x: {
+        enumerable: true,
+        get: function get() {
+          return typeof __ref.x === "number" ? __ref.x : __ref.left;
+        }
+      },
+      y: {
+        enumerable: true,
+        get: function get() {
+          return typeof __ref.y === "number" ? __ref.y : __ref.top;
+        }
+      },
+      width: {
+        enumerable: true,
+        get: function get() {
+          return __ref.width;
+        }
+      },
+      height: {
+        enumerable: true,
+        get: function get() {
+          return __ref.height;
+        }
+      },
+      left: {
+        enumerable: true,
+        get: function get() {
+          return __ref.left;
+        }
+      },
+      top: {
+        enumerable: true,
+        get: function get() {
+          return __ref.top;
+        }
+      },
+      right: {
+        enumerable: true,
+        get: function get() {
+          return this.left + this.width;
+        }
+      },
+      bottom: {
+        enumerable: true,
+        get: function get() {
+          return this.top + this.height;
+        }
+      },
+      valid: {
+        get: function get() {
+          return typeof __ref.valid === "boolean" ? __ref.valid : typeof __ref.left === "number" && typeof __ref.top === "number" && __ref.width >= 0 && __ref.height >= 0;
+        }
+      }
+    });
   };
 
   Rect.prototype = {
@@ -202,15 +299,19 @@
     line: function line(order) {
       switch (order) {
         case "top":
-          return new Line(this.left, this.top, 0, 0, this.left, this.right, 0, 0);
+        case "t":
+          return new Line(this.left, this.top, 0, 0, this.right, this.top, 0, 0);
 
         case "right":
+        case "r":
           return new Line(this.right, this.top, 0, 0, this.right, this.bottom, 0, 0);
 
         case "bottom":
-          return new Line(this.right, this.bottom, 0, 0, this.left, this.bottom, 0, 0);
+        case "b":
+          return new Line(this.left, this.bottom, 0, 0, this.right, this.bottom, 0, 0);
 
         case "left":
+        case "l":
           return new Line(this.left, this.top, 0, 0, this.left, this.bottom, 0, 0);
       }
     },
@@ -223,52 +324,11 @@
         left: this.left,
         top: this.top,
         right: this.right,
-        bottom: this.bottom
+        bottom: this.bottom,
+        valid: this.valid
       };
     }
   };
-  Object.defineProperties(Rect.prototype, {
-    x: {
-      get: function get() {
-        return typeof this._ref.x === "number" ? this._ref.x : this._ref.left;
-      }
-    },
-    y: {
-      get: function get() {
-        return typeof this._ref.y === "number" ? this._ref.y : this._ref.top;
-      }
-    },
-    width: {
-      get: function get() {
-        return this._ref.width;
-      }
-    },
-    height: {
-      get: function get() {
-        return this._ref.height;
-      }
-    },
-    left: {
-      get: function get() {
-        return this._ref.x;
-      }
-    },
-    top: {
-      get: function get() {
-        return this._ref.y;
-      }
-    },
-    right: {
-      get: function get() {
-        return this.x + this.width;
-      }
-    },
-    bottom: {
-      get: function get() {
-        return this.y + this.height;
-      }
-    }
-  });
 
   var point = function point(x, y, z, w) {
     return typeof x === "object" ? new Ponint(x.x, x.y, x.z, x.w) : new Ponint(x, y, z, w);
