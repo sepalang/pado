@@ -1,2 +1,1 @@
-import { domainRangeValue } from '../../../.src/functions';
-export default domainRangeValue;
+export { getElementBoundingRect } from '../../../.src/web';
