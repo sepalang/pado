@@ -12,7 +12,7 @@ export const readUrl = function(inputUrl){
   }
   
   if(info === null) {
-    console.error("faild parse url",e);
+    console.error("faild parse url",inputUrl);
     return {
       url:url || null,
       valid:false
@@ -32,7 +32,7 @@ export const readUrl = function(inputUrl){
   const params = (function(){
     const result = {};
     if(query){
-      query.substr(1).split("&").forEach((onePiece,i)=>{
+      query.substr(1).split("&").forEach((onePiece)=>{
         const entry = onePiece.split("=");
         result[decodeURI(entry[0])] = decodeURI(entry[1]);
       });

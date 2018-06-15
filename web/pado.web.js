@@ -541,9 +541,7 @@
   };
   var getElementBoundingRect = function getElementBoundingRect(el) {
     el = getNode(el);
-    var doc = document;
     var win = window;
-    var body = doc.body;
     var elRect = getBoundingRect(el).toJSON();
 
     if (elRect.valid === false) {
@@ -738,7 +736,7 @@
     }
 
     if (info === null) {
-      console.error("faild parse url", e);
+      console.error("faild parse url", inputUrl);
       return {
         url: url || null,
         valid: false
@@ -760,7 +758,7 @@
       var result = {};
 
       if (query) {
-        query.substr(1).split("&").forEach(function (onePiece, i) {
+        query.substr(1).split("&").forEach(function (onePiece) {
           var entry = onePiece.split("=");
           result[decodeURI(entry[0])] = decodeURI(entry[1]);
         });

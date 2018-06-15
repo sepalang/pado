@@ -2,12 +2,10 @@ export {
   getElementBoundingRect,
   readUrl,
   windowRect,
-  screenRect,
   openWindow,
   closeWindow
- } from '../../../.src/web';
+ } from '../../../.src/web/env';
  
  export { 
-   
    rectWithRect
- } from '../../../.src/modules';
+ } from '../../../.src/modules/dimension';

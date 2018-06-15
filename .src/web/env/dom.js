@@ -58,7 +58,6 @@ export const getElementBoundingRect = function(el){
   
   const doc  = document;
   const win  = window;
-  const body = doc.body;
   
   const elRect = getBoundingRect(el).toJSON();
   

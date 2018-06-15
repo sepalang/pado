@@ -84,7 +84,6 @@
     el = getNode(el);
     var doc = document;
     var win = window;
-    var body = doc.body;
     var elRect = getBoundingRect(el).toJSON();
 
     if (elRect.valid === false) {

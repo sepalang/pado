@@ -30,7 +30,7 @@
     }
 
     if (info === null) {
-      console.error("faild parse url", e);
+      console.error("faild parse url", inputUrl);
       return {
         url: url || null,
         valid: false
@@ -52,7 +52,7 @@
       var result = {};
 
       if (query) {
-        query.substr(1).split("&").forEach(function (onePiece, i) {
+        query.substr(1).split("&").forEach(function (onePiece) {
           var entry = onePiece.split("=");
           result[decodeURI(entry[0])] = decodeURI(entry[1]);
         });
