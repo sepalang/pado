@@ -128,81 +128,259 @@
     return stringData == null ? undefined : fromDataString(stringData);
   };
 
-  var isElement = function isElement(el) {
-    return el instanceof Element;
-  };
-  var getBoundingRect = function getBoundingRect(el) {
-    if (!isElement(el)) {
-      return {
-        x: 0,
-        y: 0,
-        left: 0,
-        top: 0,
-        width: 0,
-        height: 0,
-        right: 0,
-        bottom: 0,
-        valid: false
-      };
+  var Point = function Point(x, y, z, w) {
+    if (x === void 0) {
+      x = 0;
     }
 
-    var doc = document;
-    var win = window;
-    var body = doc.body;
-    var offsetX = win.pageXOffset !== undefined ? win.pageXOffset : (doc.documentElement || body.parentNode || body).scrollLeft;
-    var offsetY = win.pageYOffset !== undefined ? win.pageYOffset : (doc.documentElement || body.parentNode || body).scrollTop;
-    var rect = el.getBoundingClientRect();
-
-    if (el !== body) {
-      var parent = el.parentNode;
-
-      while (parent !== body) {
-        offsetX += parent.scrollLeft;
-        offsetY += parent.scrollTop;
-        parent = parent.parentNode;
-      }
+    if (y === void 0) {
+      y = 0;
     }
 
-    return {
-      x: rect.left + offsetX,
-      y: rect.top + offsetY,
-      left: rect.left + offsetX,
-      top: rect.top + offsetY,
-      width: rect.width,
-      height: rect.height,
-      right: rect.right + offsetX,
-      bottom: rect.bottom + offsetY,
-      valid: true
+    if (z === void 0) {
+      z = 0;
+    }
+
+    if (w === void 0) {
+      w = 0;
+    }
+
+    this._ref = {
+      x: x,
+      y: y,
+      z: z,
+      w: w
     };
   };
-  var getElementBoundingRect = function getElementBoundingRect(el) {
-    var doc = document;
-    var win = window;
-    var body = doc.body;
-    var result = getBoundingRect(el);
-    var current = el;
-    var parent = el.parentNode;
 
-    do {
-      if (parent && !parent.html && !parent.body && /absoute|relative|fixed/.test(win.getComputedStyle(parent).getPropertyValue("position"))) {
-        var _getBoundingRect = getBoundingRect(parent),
-            top = _getBoundingRect.top,
-            left = _getBoundingRect.left;
-
-        result.top -= top;
-        result.left -= left;
-        result.right = result.left + result.width;
-        result.bottom = result.top + result.height;
-        current = parent = null;
-      } else if (!parent) {
-        current = null;
-      } else {
-        current = parent;
-        parent = current.parentNode;
+  Point.prototype = {
+    toRect: function toRect(width, height) {
+      if (width === void 0) {
+        width = 0;
       }
-    } while (!!parent);
 
-    return result;
+      if (height === void 0) {
+        height = 0;
+      }
+
+      return new Rect(this.x, this.y, width, height);
+    },
+    toObject: function toObject() {
+      return {
+        x: this.x,
+        y: this.y,
+        z: this.z,
+        w: this.w
+      };
+    }
+  };
+  Object.defineProperties(Point.prototype, {
+    x: {
+      get: function get() {
+        return this._ref.x;
+      }
+    },
+    y: {
+      get: function get() {
+        return this._ref.y;
+      }
+    },
+    z: {
+      get: function get() {
+        return this._ref.z;
+      }
+    },
+    w: {
+      get: function get() {
+        return this._ref.w;
+      }
+    }
+  });
+
+  var Line = function Line(sx, sy, sz, sw, ex, ey, ez, ew) {
+    this._ref = {
+      sx: sx,
+      sy: sy,
+      sz: sz,
+      sw: sw,
+      ex: ex,
+      ey: ey,
+      ez: ez,
+      ew: ew
+    };
+  };
+
+  Line.prototype = {
+    point: function point(order) {
+      switch (order) {
+        case "e":
+        case "end":
+          var _this$end = this.end,
+              px = _this$end.x,
+              py = _this$end.y,
+              pz = _this$end.z,
+              pw = _this$end.w;
+          return new Point(px, py, pz, pw);
+
+        case "c":
+        case "m":
+        case "center":
+        case "middle":
+          var _this$start = this.start,
+              sx = _this$start.x,
+              sy = _this$start.y,
+              sz = _this$start.z,
+              sw = _this$start.w;
+          var _this$end2 = this.end,
+              ex = _this$end2.x,
+              ey = _this$end2.y,
+              ez = _this$end2.z,
+              ew = _this$end2.w;
+          return new Point(sx + ex / 2, sy + ey / 2, sz + ez / 2, sw + ew / 2);
+
+        case "s":
+        case "start":
+        default:
+          var _this$start2 = this.start,
+              x = _this$start2.x,
+              y = _this$start2.y,
+              z = _this$start2.z,
+              w = _this$start2.w;
+          return new Point(x, y, z, w);
+      }
+    }
+  };
+  Object.defineProperties(Point.prototype, {
+    start: {
+      get: function get() {
+        return {
+          x: this._ref.sx,
+          y: this._ref.sy,
+          w: this._ref.sw,
+          z: this._ref.sz
+        };
+      }
+    },
+    end: {
+      get: function get() {
+        return {
+          x: this._ref.ex,
+          y: this._ref.ey,
+          w: this._ref.ew,
+          z: this._ref.ez
+        };
+      }
+    }
+  });
+
+  var Rect = function Rect(left, top, width, height, x, y, valid) {
+    if (left === void 0) {
+      left = 0;
+    }
+
+    if (top === void 0) {
+      top = 0;
+    }
+
+    if (width === void 0) {
+      width = 0;
+    }
+
+    if (height === void 0) {
+      height = 0;
+    }
+
+    if (valid === void 0) {
+      valid = true;
+    }
+
+    this._ref = {
+      left: left,
+      top: top,
+      width: width,
+      height: height,
+      x: x,
+      y: y,
+      valid: valid
+    };
+  };
+
+  Rect.prototype = {
+    point: function point() {
+      return new Point(this.x, this.y);
+    },
+    line: function line(order) {
+      switch (order) {
+        case "top":
+          return new Line(this.left, this.top, 0, 0, this.left, this.right, 0, 0);
+
+        case "right":
+          return new Line(this.right, this.top, 0, 0, this.right, this.bottom, 0, 0);
+
+        case "bottom":
+          return new Line(this.right, this.bottom, 0, 0, this.left, this.bottom, 0, 0);
+
+        case "left":
+          return new Line(this.left, this.top, 0, 0, this.left, this.bottom, 0, 0);
+      }
+    },
+    toJSON: function toJSON() {
+      return {
+        x: this.x,
+        y: this.y,
+        width: this.width,
+        height: this.height,
+        left: this.left,
+        top: this.top,
+        right: this.right,
+        bottom: this.bottom
+      };
+    }
+  };
+  Object.defineProperties(Rect.prototype, {
+    x: {
+      get: function get() {
+        return typeof this._ref.x === "number" ? this._ref.x : this._ref.left;
+      }
+    },
+    y: {
+      get: function get() {
+        return typeof this._ref.y === "number" ? this._ref.y : this._ref.top;
+      }
+    },
+    width: {
+      get: function get() {
+        return this._ref.width;
+      }
+    },
+    height: {
+      get: function get() {
+        return this._ref.height;
+      }
+    },
+    left: {
+      get: function get() {
+        return this._ref.x;
+      }
+    },
+    top: {
+      get: function get() {
+        return this._ref.y;
+      }
+    },
+    right: {
+      get: function get() {
+        return this.x + this.width;
+      }
+    },
+    bottom: {
+      get: function get() {
+        return this.y + this.height;
+      }
+    }
+  });
+  var rect = function rect(left, top, width, height, x, y, valid) {
+    return typeof left === "object" ? new Rect(left.left, left.top, left.width, left.height, left.x, left.y, left.valid) : new Rect(left, top, width, height, x, y, valid);
   };
 
   var isAbsoluteNaN = function isAbsoluteNaN(it) {
@@ -217,12 +395,120 @@
   var isObject = function isObject(it) {
     return it !== null && typeof it === "object" ? true : false;
   };
+  var likeArray = function (nodeFn, webFn) {
+    var definedNodeList;
+
+    try {
+      definedNodeList = 0 instanceof NodeList;
+      definedNodeList = true;
+    } catch (e) {
+      definedNodeList = false;
+    }
+
+    return definedNodeList ? webFn : nodeFn;
+  }( //nodeFn
+  function (data) {
+    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray$1(data);
+  }, //webFn
+  function (data) {
+    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray$1(data) || data instanceof NodeList;
+  }); //TODO : native isPlainObject
 
   var isNode = function isNode(a) {
     return isObject(a) && typeof a.nodeType === "number";
   };
   var isPlainObject = function isPlainObject(data) {
     return typeof data === "object" && data.constructor === Object;
+  };
+
+  var getNode = function getNode(el) {
+    var select = likeArray(el) ? el[0] : el;
+    return isNode(select) ? select : undefined;
+  };
+  var isElement = function isElement(el) {
+    return el instanceof Element;
+  };
+  var getBoundingRect = function getBoundingRect(el) {
+    el = getNode(el);
+
+    if (!isElement(el)) {
+      return rect({
+        x: 0,
+        y: 0,
+        left: 0,
+        top: 0,
+        width: 0,
+        height: 0,
+        right: 0,
+        bottom: 0,
+        valid: false
+      });
+    }
+
+    var doc = document;
+    var win = window;
+    var body = doc.body;
+    var offsetX = win.pageXOffset !== undefined ? win.pageXOffset : (doc.documentElement || body.parentNode || body).scrollLeft;
+    var offsetY = win.pageYOffset !== undefined ? win.pageYOffset : (doc.documentElement || body.parentNode || body).scrollTop;
+    var boundingRect = el.getBoundingClientRect();
+
+    if (el !== body) {
+      var parent = el.parentNode;
+
+      while (parent !== body) {
+        offsetX += parent.scrollLeft;
+        offsetY += parent.scrollTop;
+        parent = parent.parentNode;
+      }
+    }
+
+    return rect({
+      x: boundingRect.left + offsetX,
+      y: boundingRect.top + offsetY,
+      left: boundingRect.left + offsetX,
+      top: boundingRect.top + offsetY,
+      width: boundingRect.width,
+      height: boundingRect.height,
+      right: boundingRect.right + offsetX,
+      bottom: boundingRect.bottom + offsetY,
+      valid: true
+    });
+  };
+  var getElementBoundingRect = function getElementBoundingRect(el) {
+    el = getNode(el);
+    var doc = document;
+    var win = window;
+    var body = doc.body;
+    var sb = getBoundingRect(el);
+    var elRect = getBoundingRect(el).toJSON();
+
+    if (!elRect.valid) {
+      return elRect;
+    }
+
+    var current = el;
+    var parent = el.parentNode;
+
+    do {
+      if (parent && !parent.html && !parent.body && /absoute|relative|fixed/.test(win.getComputedStyle(parent).getPropertyValue("position"))) {
+        var _getBoundingRect = getBoundingRect(parent),
+            top = _getBoundingRect.top,
+            left = _getBoundingRect.left;
+
+        elRect.top -= top;
+        elRect.left -= left;
+        elRect.right = elRect.left + elRect.width;
+        elRect.bottom = elRect.top + elRect.height;
+        current = parent = null;
+      } else if (!parent) {
+        current = null;
+      } else {
+        current = parent;
+        parent = current.parentNode;
+      }
+    } while (!!parent);
+
+    return rect(elRect);
   };
 
   var asArray = function asArray(data, defaultArray) {
@@ -771,6 +1057,7 @@
     historyBack: historyBack,
     setLocalData: setLocalData,
     getLocalData: getLocalData,
+    getNode: getNode,
     isElement: isElement,
     getBoundingRect: getBoundingRect,
     getElementBoundingRect: getElementBoundingRect,

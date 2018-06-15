@@ -116,10 +116,10 @@
     return definedNodeList ? webFn : nodeFn;
   }( //nodeFn
   function (data) {
-    return isArray(data);
+    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray(data);
   }, //webFn
   function (data) {
-    return isArray(data) || data instanceof NodeList;
+    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray(data) || data instanceof NodeList;
   }); //TODO : native isPlainObject
 
 

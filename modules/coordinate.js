@@ -163,13 +163,13 @@
     }
   });
 
-  var Rect = function Rect(x, y, width, height) {
-    if (x === void 0) {
-      x = 0;
+  var Rect = function Rect(left, top, width, height, x, y, valid) {
+    if (left === void 0) {
+      left = 0;
     }
 
-    if (y === void 0) {
-      y = 0;
+    if (top === void 0) {
+      top = 0;
     }
 
     if (width === void 0) {
@@ -180,11 +180,18 @@
       height = 0;
     }
 
-    this.__ref = {
+    if (valid === void 0) {
+      valid = true;
+    }
+
+    this._ref = {
+      left: left,
+      top: top,
+      width: width,
+      height: height,
       x: x,
       y: y,
-      width: width,
-      height: height
+      valid: valid
     };
   };
 
@@ -207,7 +214,7 @@
           return new Line(this.left, this.top, 0, 0, this.left, this.bottom, 0, 0);
       }
     },
-    object: function object() {
+    toJSON: function toJSON() {
       return {
         x: this.x,
         y: this.y,
@@ -223,12 +230,12 @@
   Object.defineProperties(Rect.prototype, {
     x: {
       get: function get() {
-        return this._ref.x;
+        return typeof this._ref.x === "number" ? this._ref.x : this._ref.left;
       }
     },
     y: {
       get: function get() {
-        return this._ref.y;
+        return typeof this._ref.y === "number" ? this._ref.y : this._ref.top;
       }
     },
     width: {
@@ -275,8 +282,8 @@
 
   _exports.line = line;
 
-  var rect = function rect(x, y, width, height) {
-    return typeof x === "object" ? new Rect(x.x, x.y, x.width, x.height) : new Rect(x, y, width, height);
+  var rect = function rect(left, top, width, height, x, y, valid) {
+    return typeof left === "object" ? new Rect(left.left, left.top, left.width, left.height, left.x, left.y, left.valid) : new Rect(left, top, width, height, x, y, valid);
   };
 
   _exports.rect = rect;

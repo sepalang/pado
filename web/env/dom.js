@@ -1,22 +1,29 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
+    define(["exports", "core-js/modules/es6.date.to-json", "../../modules/coordinate", "../../functions/isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports);
+    factory(exports, require("core-js/modules/es6.date.to-json"), require("../../modules/coordinate"), require("../../functions/isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports);
+    factory(mod.exports, global.es6Date, global.coordinate, global.isLike);
     global.dom = mod.exports;
   }
-})(this, function (_exports) {
+})(this, function (_exports, _es6Date, _coordinate, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.getElementBoundingRect = _exports.getBoundingRect = _exports.isElement = void 0;
+  _exports.getElementBoundingRect = _exports.getBoundingRect = _exports.isElement = _exports.getNode = void 0;
+
+  var getNode = function getNode(el) {
+    var select = (0, _isLike.likeArray)(el) ? el[0] : el;
+    return (0, _isLike.isNode)(select) ? select : undefined;
+  };
+
+  _exports.getNode = getNode;
 
   var isElement = function isElement(el) {
     return el instanceof Element;
@@ -25,8 +32,10 @@
   _exports.isElement = isElement;
 
   var getBoundingRect = function getBoundingRect(el) {
+    el = getNode(el);
+
     if (!isElement(el)) {
-      return {
+      return (0, _coordinate.rect)({
         x: 0,
         y: 0,
         left: 0,
@@ -36,7 +45,7 @@
         right: 0,
         bottom: 0,
         valid: false
-      };
+      });
     }
 
     var doc = document;
@@ -44,7 +53,7 @@
     var body = doc.body;
     var offsetX = win.pageXOffset !== undefined ? win.pageXOffset : (doc.documentElement || body.parentNode || body).scrollLeft;
     var offsetY = win.pageYOffset !== undefined ? win.pageYOffset : (doc.documentElement || body.parentNode || body).scrollTop;
-    var rect = el.getBoundingClientRect();
+    var boundingRect = el.getBoundingClientRect();
 
     if (el !== body) {
       var parent = el.parentNode;
@@ -56,26 +65,33 @@
       }
     }
 
-    return {
-      x: rect.left + offsetX,
-      y: rect.top + offsetY,
-      left: rect.left + offsetX,
-      top: rect.top + offsetY,
-      width: rect.width,
-      height: rect.height,
-      right: rect.right + offsetX,
-      bottom: rect.bottom + offsetY,
+    return (0, _coordinate.rect)({
+      x: boundingRect.left + offsetX,
+      y: boundingRect.top + offsetY,
+      left: boundingRect.left + offsetX,
+      top: boundingRect.top + offsetY,
+      width: boundingRect.width,
+      height: boundingRect.height,
+      right: boundingRect.right + offsetX,
+      bottom: boundingRect.bottom + offsetY,
       valid: true
-    };
+    });
   };
 
   _exports.getBoundingRect = getBoundingRect;
 
   var getElementBoundingRect = function getElementBoundingRect(el) {
+    el = getNode(el);
     var doc = document;
     var win = window;
     var body = doc.body;
-    var result = getBoundingRect(el);
+    var sb = getBoundingRect(el);
+    var elRect = getBoundingRect(el).toJSON();
+
+    if (!elRect.valid) {
+      return elRect;
+    }
+
     var current = el;
     var parent = el.parentNode;
 
@@ -85,10 +101,10 @@
             top = _getBoundingRect.top,
             left = _getBoundingRect.left;
 
-        result.top -= top;
-        result.left -= left;
-        result.right = result.left + result.width;
-        result.bottom = result.top + result.height;
+        elRect.top -= top;
+        elRect.left -= left;
+        elRect.right = elRect.left + elRect.width;
+        elRect.bottom = elRect.top + elRect.height;
         current = parent = null;
       } else if (!parent) {
         current = null;
@@ -98,7 +114,7 @@
       }
     } while (!!parent);
 
-    return result;
+    return (0, _coordinate.rect)(elRect);
   };
 
   _exports.getElementBoundingRect = getElementBoundingRect;

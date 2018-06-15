@@ -75,8 +75,8 @@ Object.defineProperties(Point.prototype,{
 });
 
 
-const Rect = function(x=0,y=0,width=0,height=0){
-  this.__ref = { x,y,width,height }
+const Rect = function(left=0,top=0,width=0,height=0,x,y,valid=true){
+  this._ref = { left,top,width,height,x,y,valid }
 };
 
 Rect.prototype = {
@@ -95,7 +95,7 @@ Rect.prototype = {
       return new Line(this.left,this.top,0,0,this.left,this.bottom,0,0);
     }
   },
-  object (){
+  toJSON (){
     return {
       x:this.x,
       y:this.y,
@@ -110,8 +110,8 @@ Rect.prototype = {
 };
 
 Object.defineProperties(Rect.prototype,{
-  x:{ get(){ return this._ref.x; } },
-  y:{ get(){ return this._ref.y; } },
+  x:{ get(){ return typeof this._ref.x === "number" ? this._ref.x : this._ref.left; } },
+  y:{ get(){ return typeof this._ref.y === "number" ? this._ref.y : this._ref.top; } },
   width:{ get(){ return this._ref.width; } },
   height:{ get(){ return this._ref.height; } },
   left:{ get(){ return this._ref.x; } },
@@ -130,8 +130,8 @@ export const line = function(start,end){
   new Line(start.x,start.y,start.z,start.w,end.x,end.y,end.z,end.w);
 };
 
-export const rect = function(x,y,width,height){
-  return typeof x === "object" ?
-  new Rect(x.x,x.y,x.width,x.height) :
-  new Rect(x,y,width,height);
+export const rect = function(left,top,width,height,x,y,valid){
+  return typeof left === "object" ?
+  new Rect(left.left,left.top,left.width,left.height,left.x,left.y,left.valid) :
+  new Rect(left,top,width,height,x,y,valid);
 };
