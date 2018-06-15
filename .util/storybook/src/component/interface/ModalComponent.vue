@@ -6,25 +6,40 @@
 <script>
 import $ from 'jquery';
 import LinkComponent from '../mixins/LinkComponent';
+import { getElementBoundingRect } from '../../../../../.src/web';
 
 export default {
   mixins:[ LinkComponent ],
-  methods: {
-    close:async function() {
-      const closeResult = await this.$link.dispatch("close");
-      if(closeResult.some(r=>r===false)) return;
-      $(this.$el).removeAttr("open");
-      this.$destroy();
-    }
-  },
   mounted:async function() {
     const openResult = await this.$link.dispatch("open");
     if(openResult.some(r=>r===false)) return;
+    
     $(this.$el)
     .attr("open","")
     .on("click",".modal-close-action", ()=>{
       this.close();
     });
+    
+    this.dialogPosition();
+  },
+  methods:{
+    close:async function() {
+      const closeResult = await this.$link.dispatch("close");
+      if(closeResult.some(r=>r===false)) return;
+      $(this.$el).removeAttr("open");
+      this.$destroy();
+    },
+    dialogPosition(){
+      const modalElement = this.$el;
+      const dialogElement = this.$el.children[0];
+      if(!dialogElement){ return; }
+      
+      const { height:modalHeight }  = getElementBoundingRect(modalElement);
+      const { height:dialogHeight } = getElementBoundingRect(dialogElement);
+      let marginTop = ((modalHeight - dialogHeight) / 2) - 20;
+      
+      $(dialogElement).css("top",`${marginTop}px`);
+    }
   },
   destroyed() {
     $(this.$el).remove();

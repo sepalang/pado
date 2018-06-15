@@ -16,7 +16,6 @@
   import PadoSlider from '../component/pado-slider.vue';
   import PadoRect from '../component/pado-rect.vue';
   import { dragHelper, getElementBoundingRect, makeSVG } from '../../../../.src/web';
-  import { rect, line, point } from '../../../../.src/modules';
   import $ from 'jquery';
   
   export default {
