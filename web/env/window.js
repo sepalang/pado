@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.historyBack = _exports.openTab = _exports.openWindow = void 0;
+  _exports.historyBack = _exports.openTab = _exports.closeWindow = _exports.openWindow = void 0;
   var WINDOW_POPUP_DEFAULT_WIDTH = 1100;
   var WINDOW_POPUP_DEFAULT_HEIGHT = 900;
 
@@ -26,6 +26,8 @@
     var useResize = (hasParam && windowParam["resize"] + "") !== "false";
     var destWindowWidth = hasParam && windowParam["width"] || WINDOW_POPUP_DEFAULT_WIDTH;
     var destWindowHeight = hasParam && windowParam["height"] || WINDOW_POPUP_DEFAULT_HEIGHT;
+    var destWindowTop = hasParam && windowParam["top"] || windowParam["y"] || 0;
+    var destWindowLeft = hasParam && windowParam["left"] || windowParam["x"] || 0;
     var availMaxWidth = screen.availWidth;
     var availMaxHeight = screen.availHeight; // IE bottom bar
 
@@ -35,11 +37,17 @@
 
     if (destWindowWidth > availMaxWidth) destWindowWidth = availMaxWidth;
     if (destWindowHeight > availMaxHeight) destWindowHeight = availMaxHeight;
-    var newWindow = window.open(href, windowName, "width=" + destWindowWidth + ",height=" + destWindowHeight + (useResize ? ",resizable=1" : "") + ",scrollbars=yes,status=1");
+    var newWindow = window.open(href, windowName, "top=" + destWindowTop + ",left=" + destWindowLeft + ",width=" + destWindowWidth + ",height=" + destWindowHeight + (useResize ? ",resizable=1" : ",resizable=0") + ",scrollbars=yes,status=1");
     return newWindow;
   };
 
   _exports.openWindow = openWindow;
+
+  var closeWindow = function closeWindow() {
+    window.close();
+  };
+
+  _exports.closeWindow = closeWindow;
 
   var openTab = function openTab(href) {
     var newWindow = window.open(href, '_blank');

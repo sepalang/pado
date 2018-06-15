@@ -8,7 +8,7 @@
       exports: {}
     };
     factory(mod.exports, global.es6Array);
-    global.coordinate = mod.exports;
+    global.baseDimenstion = mod.exports;
   }
 })(this, function (_exports, _es6Array) {
   "use strict";
@@ -348,4 +348,4 @@
 
   _exports.rect = rect;
 });
-//# sourceMappingURL=coordinate.js.map
+//# sourceMappingURL=baseDimenstion.js.map

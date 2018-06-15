@@ -46,6 +46,8 @@
     var useResize = (hasParam && windowParam["resize"] + "") !== "false";
     var destWindowWidth = hasParam && windowParam["width"] || WINDOW_POPUP_DEFAULT_WIDTH;
     var destWindowHeight = hasParam && windowParam["height"] || WINDOW_POPUP_DEFAULT_HEIGHT;
+    var destWindowTop = hasParam && windowParam["top"] || windowParam["y"] || 0;
+    var destWindowLeft = hasParam && windowParam["left"] || windowParam["x"] || 0;
     var availMaxWidth = screen.availWidth;
     var availMaxHeight = screen.availHeight; // IE bottom bar
 
@@ -55,8 +57,11 @@
 
     if (destWindowWidth > availMaxWidth) destWindowWidth = availMaxWidth;
     if (destWindowHeight > availMaxHeight) destWindowHeight = availMaxHeight;
-    var newWindow = window.open(href, windowName, "width=" + destWindowWidth + ",height=" + destWindowHeight + (useResize ? ",resizable=1" : "") + ",scrollbars=yes,status=1");
+    var newWindow = window.open(href, windowName, "top=" + destWindowTop + ",left=" + destWindowLeft + ",width=" + destWindowWidth + ",height=" + destWindowHeight + (useResize ? ",resizable=1" : ",resizable=0") + ",scrollbars=yes,status=1");
     return newWindow;
+  };
+  var closeWindow = function closeWindow() {
+    window.close();
   };
   var openTab = function openTab(href) {
     var newWindow = window.open(href, '_blank');
@@ -568,6 +573,22 @@
     } while (!!parent);
 
     return rect(elRect);
+  };
+  var windowRect = function windowRect() {
+    return rect({
+      left: window.screenLeft || window.screenX,
+      top: window.screenTop || window.screenY,
+      width: window.outerWidth,
+      height: window.outerHeight
+    });
+  };
+  var screenRect = function screenRect() {
+    return rect({
+      left: 0,
+      top: 0,
+      width: screen.width,
+      height: screen.height
+    });
   };
 
   var SVGBuilder = function SVGBuilder() {
@@ -1161,6 +1182,7 @@
 
   var helpers = /*#__PURE__*/Object.freeze({
     openWindow: openWindow,
+    closeWindow: closeWindow,
     openTab: openTab,
     historyBack: historyBack,
     setLocalData: setLocalData,
@@ -1169,6 +1191,8 @@
     isElement: isElement,
     getBoundingRect: getBoundingRect,
     getElementBoundingRect: getElementBoundingRect,
+    windowRect: windowRect,
+    screenRect: screenRect,
     makeSVG: makeSVG,
     readUrl: readUrl,
     serialize: serialize,

@@ -5,9 +5,11 @@ export const openWindow = function(href, windowParam) {
   const hasParam   = typeof windowParam === "object";
   const windowName = hasParam && windowParam["name"] || "_blank";
   const useResize  = (hasParam && windowParam["resize"]+"") !== "false";
-  
+
   let destWindowWidth  = (hasParam && windowParam["width"] || WINDOW_POPUP_DEFAULT_WIDTH);
   let destWindowHeight = (hasParam && windowParam["height"] || WINDOW_POPUP_DEFAULT_HEIGHT);
+  let destWindowTop    = (hasParam && windowParam["top"] || windowParam["y"] || 0);
+  let destWindowLeft   = (hasParam && windowParam["left"] || windowParam["x"] || 0);
 
   const availMaxWidth = screen.availWidth;
   let availMaxHeight = screen.availHeight;
@@ -23,10 +25,14 @@ export const openWindow = function(href, windowParam) {
   const newWindow = window.open(
     href,
     windowName,
-    `width=${destWindowWidth},height=${destWindowHeight}${useResize ? ",resizable=1" : ""},scrollbars=yes,status=1`
+    `top=${destWindowTop},left=${destWindowLeft},width=${destWindowWidth},height=${destWindowHeight}${useResize ? ",resizable=1" : ",resizable=0"},scrollbars=yes,status=1`
   );
 
   return newWindow;
+};
+
+export const closeWindow = function(){
+  window.close();
 };
 
 export const openTab = function(href) {

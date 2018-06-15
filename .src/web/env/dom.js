@@ -1,4 +1,4 @@
-import { rect } from "../../modules/coordinate";
+import { rect } from "../../modules/dimension";
 import { likeArray, isNode } from "../../functions/isLike";
 
 export const getNode = function(el){
@@ -86,6 +86,24 @@ export const getElementBoundingRect = function(el){
   } while( !!parent )
   
   return rect(elRect);
+}
+
+export const windowRect = function(){
+  return rect({
+    left:window.screenLeft || window.screenX,
+    top:window.screenTop || window.screenY,
+    width:window.outerWidth,
+    height:window.outerHeight
+  });
+}
+
+export const screenRect = function(){
+  return rect({
+    left:0,
+    top:0,
+    width:screen.width,
+    height:screen.height
+  });
 }
 
 const SVGBuilder = function(){

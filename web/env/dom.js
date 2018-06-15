@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.date.to-json", "../../modules/coordinate", "../../functions/isLike"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.date.to-json", "../../modules/dimension", "../../functions/isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.date.to-json"), require("../../modules/coordinate"), require("../../functions/isLike"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.date.to-json"), require("../../modules/dimension"), require("../../functions/isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.es6Date, global.coordinate, global.isLike);
+    factory(mod.exports, global.webDom, global.es6Date, global.dimension, global.isLike);
     global.dom = mod.exports;
   }
-})(this, function (_exports, _webDom, _es6Date, _coordinate, _isLike) {
+})(this, function (_exports, _webDom, _es6Date, _dimension, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.makeSVG = _exports.getElementBoundingRect = _exports.getBoundingRect = _exports.isElement = _exports.getNode = void 0;
+  _exports.makeSVG = _exports.screenRect = _exports.windowRect = _exports.getElementBoundingRect = _exports.getBoundingRect = _exports.isElement = _exports.getNode = void 0;
 
   var getNode = function getNode(el) {
     var select = (0, _isLike.likeArray)(el) ? el[0] : el;
@@ -35,7 +35,7 @@
     el = getNode(el);
 
     if (!isElement(el)) {
-      return (0, _coordinate.rect)({
+      return (0, _dimension.rect)({
         x: 0,
         y: 0,
         left: 0,
@@ -65,7 +65,7 @@
       }
     }
 
-    return (0, _coordinate.rect)({
+    return (0, _dimension.rect)({
       x: boundingRect.left + offsetX,
       y: boundingRect.top + offsetY,
       left: boundingRect.left + offsetX,
@@ -88,7 +88,7 @@
     var elRect = getBoundingRect(el).toJSON();
 
     if (elRect.valid === false) {
-      return (0, _coordinate.rect)(elRect);
+      return (0, _dimension.rect)(elRect);
     }
 
     var current = el;
@@ -113,10 +113,32 @@
       }
     } while (!!parent);
 
-    return (0, _coordinate.rect)(elRect);
+    return (0, _dimension.rect)(elRect);
   };
 
   _exports.getElementBoundingRect = getElementBoundingRect;
+
+  var windowRect = function windowRect() {
+    return (0, _dimension.rect)({
+      left: window.screenLeft || window.screenX,
+      top: window.screenTop || window.screenY,
+      width: window.outerWidth,
+      height: window.outerHeight
+    });
+  };
+
+  _exports.windowRect = windowRect;
+
+  var screenRect = function screenRect() {
+    return (0, _dimension.rect)({
+      left: 0,
+      top: 0,
+      width: screen.width,
+      height: screen.height
+    });
+  };
+
+  _exports.screenRect = screenRect;
 
   var SVGBuilder = function SVGBuilder() {
     this.drawVariants = [];

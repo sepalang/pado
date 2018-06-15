@@ -74,6 +74,32 @@
     return target;
   }
 
+  function _objectWithoutProperties(source, excluded) {
+    if (source == null) return {};
+    var target = {};
+    var sourceKeys = Object.keys(source);
+    var key, i;
+
+    for (i = 0; i < sourceKeys.length; i++) {
+      key = sourceKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      target[key] = source[key];
+    }
+
+    if (Object.getOwnPropertySymbols) {
+      var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+      for (i = 0; i < sourceSymbolKeys.length; i++) {
+        key = sourceSymbolKeys[i];
+        if (excluded.indexOf(key) >= 0) continue;
+        if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+        target[key] = source[key];
+      }
+    }
+
+    return target;
+  }
+
   var isAbsoluteNaN = function isAbsoluteNaN(it) {
     return it !== it && typeof it === "number";
   };
@@ -3648,6 +3674,39 @@
     return typeof left === "object" ? new Rect(left.left, left.top, left.width, left.height, left.x, left.y, left.valid) : new Rect(left, top, width, height, x, y, valid);
   };
 
+  var rectWithRect = function rectWithRect(_ref2, _ref, position) {
+    var refX = _ref2.left,
+        refY = _ref2.top,
+        refWidth = _ref2.width,
+        refHeight = _ref2.height;
+
+    var _ref$left = _ref.left,
+        left = _ref$left === void 0 ? 0 : _ref$left,
+        _ref$top = _ref.top,
+        top = _ref$top === void 0 ? 0 : _ref$top,
+        width = _ref.width,
+        height = _ref.height,
+        targetProps = _objectWithoutProperties(_ref, ["left", "top", "width", "height"]);
+
+    switch (position) {
+      case "center":
+        return rect(_objectSpread({
+          left: refX + refWidth / 2 - width / 2,
+          top: refY + refHeight / 2 - height / 2,
+          width: width,
+          height: height
+        }, targetProps));
+
+      default:
+        return rect(_objectSpread({
+          left: left,
+          top: top,
+          width: width,
+          height: height
+        }, targetProps));
+    }
+  };
+
 
 
   var functions = /*#__PURE__*/Object.freeze({
@@ -3757,7 +3816,8 @@
     ranger: ranger,
     point: point,
     line: line,
-    rect: rect
+    rect: rect,
+    rectWithRect: rectWithRect
   });
 
   var Bow = function Bow() {};
