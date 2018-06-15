@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/pado",
-  "version": "0.0.90",
+  "version": "0.0.91",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -32,7 +32,7 @@
     "functions"
   ],
   "devDependencies": {
-    "@sepalang/padoc": "^0.7.18",
+    "@sepalang/padoc": "^0.7.20",
     "jquery": "^3.3.1",
     "jsdom": "^11.11.0",
     "madge": "^3.1.1",
