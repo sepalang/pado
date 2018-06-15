@@ -1,4 +1,15 @@
+export const isElement = function(el){
+  return el instanceof Element;
+};
+
 export const getBoundingRect = function(el){
+  
+  if(!isElement(el)){
+    return {
+      x:0,y:0,left:0,top:0,width:0,height:0,right:0,bottom:0,valid:false
+    };
+  }
+  
   const doc = document;
   const win = window;
   const body = doc.body;
@@ -28,7 +39,8 @@ export const getBoundingRect = function(el){
     width : rect.width,
     height: rect.height,
     right : rect.right + offsetX,
-    bottom: rect.bottom + offsetY
+    bottom: rect.bottom + offsetY,
+    valid : true
   };
 }
 

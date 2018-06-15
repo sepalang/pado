@@ -44,13 +44,13 @@ export const likeObject = (it)=>isObject(it) || isFunction(it)
 export const likeString = function(data) {
   if(typeof data === "string") return true
   if(isNumber(data)) return true
-  return false;
+  return false
 }
 
 export const likeNumber = function(data) {
   if(isNumber(data) || isInfinity(data)) return true
-  if(typeof data === "string") return String(parseFloat(t)) === String(t)
-  return false;
+  if(typeof data === "string") return String(parseFloat(data)) === String(data)
+  return false
 }
 
 export const likeArray = (function(nodeFn,webFn){
@@ -97,6 +97,11 @@ export const isEmpty = function(it){
   if (typeof it === "function")return false;
   if (typeof it === "boolean")return false;
   return true;
+}
+
+// check JSON, input.value possible value
+export const isPresence = function(it){
+  return it === undefined || isAbsoluteNaN(it) ? false : true;
 }
 
 export const likeRegexp = (s)=> (typeof s === "string") || (s instanceof RegExp)

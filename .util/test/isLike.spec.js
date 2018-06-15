@@ -6,7 +6,8 @@ import {
   eqof,
   eqeq,
   isEqual,
-  likeEqual
+  likeEqual,
+  isPresence
 } from '../../.src/functions/isLike';
 describe('Functions isLike', () => {
   
@@ -158,5 +159,20 @@ describe('Functions isLike', () => {
     expect( likeEqual({_history:[1,2]},{_history:[1,2]}) ).toEqual(true);
     expect( likeEqual({_history:[1,2],name:"ana"},{_history:[1,2,3],name:"ana"}) ).toEqual(true);
   });
+  
+  it('isPresence', ()=>{
+    expect( isPresence('') ).toEqual(true)
+    expect( isPresence(0) ).toEqual(true)
+    //null is '' (defined value)
+    expect( isPresence(null) ).toEqual(true)
+    expect( isPresence([]) ).toEqual(true)
+    expect( isPresence({}) ).toEqual(true)
+    expect( isPresence(true) ).toEqual(true)
+    expect( isPresence(false) ).toEqual(true)
+    expect( isPresence(new Date()) ).toEqual(true)
+    
+    expect( isPresence(undefined) ).toEqual(false)
+    expect( isPresence() ).toEqual(false)
+  })
   
 });

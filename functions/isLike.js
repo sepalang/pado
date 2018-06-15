@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.likePromise = _exports.notExsist = _exports.isExsist = _exports.eqeq = _exports.likeEqual = _exports.isEqual = _exports.eqof = _exports.isEnumerableObject = _exports.isPlainObject = _exports.likeRegexp = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isInfinity = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
+  _exports.likePromise = _exports.notExsist = _exports.isExsist = _exports.eqeq = _exports.likeEqual = _exports.isEqual = _exports.eqof = _exports.isEnumerableObject = _exports.isPlainObject = _exports.likeRegexp = _exports.isPresence = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isInfinity = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
 
   var isAbsoluteNaN = function isAbsoluteNaN(it) {
     return it !== it && typeof it === "number";
@@ -97,7 +97,7 @@
 
   var likeNumber = function likeNumber(data) {
     if (isNumber(data) || isInfinity(data)) return true;
-    if (typeof data === "string") return String(parseFloat(t)) === String(t);
+    if (typeof data === "string") return String(parseFloat(data)) === String(data);
     return false;
   };
 
@@ -158,9 +158,16 @@
     if (typeof it === "function") return false;
     if (typeof it === "boolean") return false;
     return true;
-  };
+  }; // check JSON, input.value possible value
+
 
   _exports.isEmpty = isEmpty;
+
+  var isPresence = function isPresence(it) {
+    return it === undefined || isAbsoluteNaN(it) ? false : true;
+  };
+
+  _exports.isPresence = isPresence;
 
   var likeRegexp = function likeRegexp(s) {
     return typeof s === "string" || s instanceof RegExp;

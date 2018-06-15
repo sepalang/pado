@@ -128,7 +128,24 @@
     return stringData == null ? undefined : fromDataString(stringData);
   };
 
+  var isElement = function isElement(el) {
+    return el instanceof Element;
+  };
   var getBoundingRect = function getBoundingRect(el) {
+    if (!isElement(el)) {
+      return {
+        x: 0,
+        y: 0,
+        left: 0,
+        top: 0,
+        width: 0,
+        height: 0,
+        right: 0,
+        bottom: 0,
+        valid: false
+      };
+    }
+
     var doc = document;
     var win = window;
     var body = doc.body;
@@ -154,7 +171,8 @@
       width: rect.width,
       height: rect.height,
       right: rect.right + offsetX,
-      bottom: rect.bottom + offsetY
+      bottom: rect.bottom + offsetY,
+      valid: true
     };
   };
   var getElementBoundingRect = function getElementBoundingRect(el) {
@@ -753,6 +771,7 @@
     historyBack: historyBack,
     setLocalData: setLocalData,
     getLocalData: getLocalData,
+    isElement: isElement,
     getBoundingRect: getBoundingRect,
     getElementBoundingRect: getElementBoundingRect,
     readUrl: readUrl,

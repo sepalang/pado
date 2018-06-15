@@ -123,7 +123,7 @@
   };
   var likeNumber = function likeNumber(data) {
     if (isNumber(data) || isInfinity(data)) return true;
-    if (typeof data === "string") return String(parseFloat(t)) === String(t);
+    if (typeof data === "string") return String(parseFloat(data)) === String(data);
     return false;
   };
   var likeArray = function (nodeFn, webFn) {
@@ -175,6 +175,10 @@
     if (typeof it === "function") return false;
     if (typeof it === "boolean") return false;
     return true;
+  }; // check JSON, input.value possible value
+
+  var isPresence = function isPresence(it) {
+    return it === undefined || isAbsoluteNaN(it) ? false : true;
   };
   var likeRegexp = function likeRegexp(s) {
     return typeof s === "string" || s instanceof RegExp;
@@ -3606,6 +3610,7 @@
     likeArray: likeArray,
     isNode: isNode,
     isEmpty: isEmpty$1,
+    isPresence: isPresence,
     likeRegexp: likeRegexp,
     isPlainObject: isPlainObject,
     isEnumerableObject: isEnumerableObject,
