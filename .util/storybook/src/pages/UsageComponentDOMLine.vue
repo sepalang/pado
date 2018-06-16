@@ -7,6 +7,7 @@
       <pado-rect class="rect-upright" size="40" left="200" top="50" @drawPoint="drawLine" dragmove></pado-rect>
       <pado-rect class="rect-downright" size="40" left="150" top="150" @drawPoint="drawLine" dragmove></pado-rect>
       <pado-rect class="rect-downside" size="40" left="50" top="200" @drawPoint="drawLine" dragmove></pado-rect>
+      <pado-rect class="rect-angledown" size="40" left="200" top="200" @drawPoint="drawLine" dragmove></pado-rect>
       <div class="path-placeholder"></div>
     </div>
   </UsageLayout>
@@ -36,17 +37,26 @@
         
         const downrightBoundingRect = getElementBoundingRect( $(this.$el).find(".rect-downright") );
         const downBoundingRect      = getElementBoundingRect( $(this.$el).find(".rect-downside") );
+        const angleDownBoundingRect = getElementBoundingRect( $(this.$el).find(".rect-angledown") );
         
         const rootTopPoint    = rootBoundingRect.line("top").point("center");
         const rootBottomPoint = rootBoundingRect.line("bottom").point("center");
         const bottom2Points   = rootBottomPoint.pull(10).points(2);
         
+        //rootTopPoint.line()
+        const anglePath = bottom2Points
+        .eq(1)
+        .arrayWith(angleDownBoundingRect.findPoint("left center"))
+        .join((first,last)=>first.rectWith(last).findPoint("left down"));
+        
         const svgTag = makeSVG()
         .addPath([rootTopPoint,upsideBoundingRect.line("bottom").point("center")])
         .addPath([rootTopPoint,uprightBoundingRect.line("left").point("center")])
-        .addPath([bottom2Points[0],downBoundingRect.line("top").point("center")])
-        .addPath([bottom2Points[1],downrightBoundingRect.line("left").point("center")])
+        .addPath([bottom2Points.eq(0),downBoundingRect.findPoint("top center")])
+        .addPath([bottom2Points.eq(1),downrightBoundingRect.findPoint("left center")])
+        .addPath(anglePath,{ "strokeWidth":2 , "stroke":"blue"})
         .createElement();
+        
         $(this.$el).find(".path-placeholder").empty().append(svgTag);
       }
     },

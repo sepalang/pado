@@ -126,9 +126,14 @@ SVGBuilder.prototype = {
     this.drawVariants.forEach(({ tag, attributes, params})=>{
       if( tag === "path"){
         const pathElement = document.createElementNS('http://www.w3.org/2000/svg', "path");
-        pathElement.setAttribute("fill","transparent");
-        pathElement.setAttribute("stroke","gray");
-        pathElement.setAttribute("stroke-width","1");
+        
+        if(typeof attributes !== "object"){
+          attributes = {};
+        }
+        
+        pathElement.setAttribute("fill", attributes['fill'] || "transparent");
+        pathElement.setAttribute("stroke", attributes['stroke'] || "gray");
+        pathElement.setAttribute("stroke-width", attributes['strokeWidth'] || attributes['stroke-width'] || "1");
         pathElement.setAttribute("stroke-linecap","butt");
         pathElement.setAttribute("stroke-linejoin","miter");
         
@@ -145,7 +150,7 @@ SVGBuilder.prototype = {
         svgTag.appendChild(pathElement);
       }
     });
-    
+    svgTag.setAttribute("style","overflow:visible;");
     svgTag.setAttribute("width",realMaxWidth);
     svgTag.setAttribute("height",realMaxHeigth);
     return svgTag;
