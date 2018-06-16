@@ -41,12 +41,12 @@
         
         const rootTopPoint    = rootBoundingRect.line("top").point("center");
         const rootBottomPoint = rootBoundingRect.line("bottom").point("center");
-        const bottom2Points   = rootBottomPoint.pull(10).points(2);
+        const bottom2Points   = rootBottomPoint.pull(10);
         
         //rootTopPoint.line()
         const anglePath = bottom2Points
         .eq(1)
-        .arrayWith(angleDownBoundingRect.findPoint("left center"))
+        .lineWith(angleDownBoundingRect.findPoint("left center"))
         .join((first,last)=>first.rectWith(last).findPoint("left down"));
         
         const svgTag = makeSVG()

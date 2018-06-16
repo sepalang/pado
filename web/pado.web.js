@@ -133,6 +133,68 @@
     return stringData == null ? undefined : fromDataString(stringData);
   };
 
+  var isAbsoluteNaN = function isAbsoluteNaN(it) {
+    return it !== it && typeof it === "number";
+  };
+  var isNone = function isNone(data) {
+    return isAbsoluteNaN(data) || data === undefined || data === null;
+  };
+  var isArray$1 = function isArray(data) {
+    return Array.isArray(data) || data instanceof Array;
+  };
+  var isObject = function isObject(it) {
+    return it !== null && typeof it === "object" ? true : false;
+  };
+  var likeArray = function (nodeFn, webFn) {
+    var definedNodeList;
+
+    try {
+      definedNodeList = 0 instanceof NodeList;
+      definedNodeList = true;
+    } catch (e) {
+      definedNodeList = false;
+    }
+
+    return definedNodeList ? webFn : nodeFn;
+  }( //nodeFn
+  function (data) {
+    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray$1(data);
+  }, //webFn
+  function (data) {
+    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray$1(data) || data instanceof NodeList;
+  }); //TODO : native isPlainObject
+
+  var isNode = function isNode(a) {
+    return isObject(a) && typeof a.nodeType === "number";
+  };
+  var isPlainObject = function isPlainObject(data) {
+    return typeof data === "object" && data.constructor === Object;
+  };
+
+  var asArray = function asArray(data, defaultArray) {
+    if (defaultArray === void 0) {
+      defaultArray = undefined;
+    }
+
+    if (isArray$1(data)) {
+      return data;
+    }
+
+    if (isNone(data)) {
+      return isArray$1(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
+    }
+
+    if (typeof data === "object" && typeof data.toArray === "function") {
+      return data.toArray();
+    }
+
+    return [data];
+  };
+
+  var likePoint = function likePoint(p) {
+    return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y");
+  };
+
   var Point = function Point(x, y, z, w) {
     if (x === void 0) {
       x = 0;
@@ -203,12 +265,48 @@
         case "h":
         case "horizontal":
           var xHalf = width <= 0 ? 0 : width / 2;
-          return new Line(x - xHalf, y, z, w, x + xHalf, y, z, w);
+          return new Line([{
+            x: x - xHalf,
+            y: y,
+            z: z,
+            w: w
+          }, {
+            x: x + xHalf,
+            y: y,
+            z: z,
+            w: w
+          }]);
 
         default:
       }
     },
-    toObject: function toObject() {
+    lineWith: function lineWith(destPoint) {
+      var points = asArray(destPoint);
+      points.unshift(this);
+      var pointArray = new Line(points.map(function (_ref) {
+        var x = _ref.x,
+            y = _ref.y,
+            z = _ref.z,
+            w = _ref.w;
+        return new Point(x, y, z, w);
+      }));
+      return pointArray;
+    },
+    rectWith: function rectWith(_ref2) {
+      var x = _ref2.x,
+          y = _ref2.y;
+
+      var _ref3 = this.x > x ? [this.x, x] : [x, this.x],
+          largeX = _ref3[0],
+          smallX = _ref3[1];
+
+      var _ref4 = this.y > y ? [this.y, y] : [y, this.y],
+          largeY = _ref4[0],
+          smallY = _ref4[1];
+
+      return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0);
+    },
+    toJSON: function toJSON() {
       return {
         x: this.x,
         y: this.y,
@@ -218,107 +316,158 @@
     }
   };
 
-  var Line = function Line(sx, sy, sz, sw, ex, ey, ez, ew) {
-    var __ref = {
-      sx: sx,
-      sy: sy,
-      sz: sz,
-      sw: sw,
-      ex: ex,
-      ey: ey,
-      ez: ez,
-      ew: ew
-    };
-    Object.defineProperties(this, {
-      start: {
-        enumerable: true,
-        get: function get() {
-          return {
-            x: __ref.sx,
-            y: __ref.sy,
-            w: __ref.sw,
-            z: __ref.sz
-          };
-        }
-      },
-      end: {
-        enumerable: true,
-        get: function get() {
-          return {
-            x: __ref.ex,
-            y: __ref.ey,
-            w: __ref.ew,
-            z: __ref.ez
-          };
-        }
-      }
+  (function (methods) {
+    var prototype = [];
+    Object.keys(methods).forEach(function (key) {
+      prototype[key] = methods[key];
+    });
+  })({
+    eq: function eq(index) {
+      return this[index];
+    },
+    join: function join(fn) {
+      var _this2 = this;
+
+      var joins = [];
+      this.forEach(function (refp, i) {
+        joins.push(refp);
+        if (!_this2[i + 1]) return;
+        var newp = fn(refp, _this2[i + 1], i);
+        if (!likePoint(newp)) return;
+        var x = newp.x,
+            y = newp.y,
+            z = newp.z,
+            w = newp.w;
+        joins.push(new Point(x, y, z, w));
+      });
+      this.splice(0, this.length);
+      joins.forEach(function (p) {
+        return _this2.push(p);
+      });
+      return this;
+    },
+    toJSON: function toJSON() {
+      var result = [];
+      this.points.forEach(function (p) {
+        return result.push(p.toJSON());
+      });
+      return result;
+    }
+  });
+
+  var Line = function Line(pointArray) {
+    var _this3 = this;
+
+    asArray(pointArray).forEach(function (point) {
+      if (!likePoint(point)) return;
+      var x = point.x,
+          y = point.y,
+          z = point.z,
+          w = point.w;
+
+      _this3.push(new Point(x, y, z, w));
     });
   };
 
-  Line.prototype = {
-    points: function points(pointCount) {
-      if (pointCount === void 0) {
-        pointCount = 2;
+  (function (classFunction, methods) {
+    var prototype = [];
+    classFunction.prototype = prototype;
+    Object.keys(methods).forEach(function (key) {
+      prototype[key] = methods[key];
+    });
+    Object.defineProperties(prototype, {
+      start: {
+        enumerable: false,
+        get: function get() {
+          return this[0];
+        }
+      },
+      end: {
+        enumerable: false,
+        get: function get() {
+          return !this.length ? void 0 : this[this.length - 1];
+        }
       }
+    });
+  })(Line, {
+    eq: function eq(index) {
+      return this[index];
+    },
+    join: function join(fn) {
+      var _this4 = this;
 
-      var _this$start = this.start,
-          sx = _this$start.x,
-          sy = _this$start.y,
-          sz = _this$start.z,
-          sw = _this$start.w,
-          _this$end = this.end,
-          ex = _this$end.x,
-          ey = _this$end.y,
-          ez = _this$end.z,
-          ew = _this$end.w;
-      var divCount = pointCount - 1;
-      var dx = ex - sx / divCount,
-          dy = ey - sy / divCount,
-          dz = ez - sz / divCount,
-          dw = ew - sw / divCount;
-      return Array(2).fill().map(function (v, i) {
-        return new Point(sx + dx * i, sy + dy * i, sz + dz * i, sw + dw * i);
+      var joins = [];
+      this.forEach(function (refp, i) {
+        joins.push(refp);
+        if (!_this4[i + 1]) return;
+        var newp = fn(refp, _this4[i + 1], i);
+        if (!likePoint(newp)) return;
+        var x = newp.x,
+            y = newp.y,
+            z = newp.z,
+            w = newp.w;
+        joins.push(new Point(x, y, z, w));
       });
+      this.splice(0, this.length);
+      joins.forEach(function (p) {
+        return _this4.push(p);
+      });
+      return this;
     },
     point: function point(order) {
       switch (order) {
         case "e":
         case "end":
-          var _this$end2 = this.end,
-              px = _this$end2.x,
-              py = _this$end2.y,
-              pz = _this$end2.z,
-              pw = _this$end2.w;
+        case "d":
+        case "down":
+        case "r":
+        case "right":
+          var _this$end = this.end,
+              px = _this$end.x,
+              py = _this$end.y,
+              pz = _this$end.z,
+              pw = _this$end.w;
           return new Point(px, py, pz, pw);
 
         case "c":
         case "m":
         case "center":
         case "middle":
-          var _this$start2 = this.start,
-              sx = _this$start2.x,
-              sy = _this$start2.y,
-              sz = _this$start2.z,
-              sw = _this$start2.w;
-          var _this$end3 = this.end,
-              ex = _this$end3.x,
-              ey = _this$end3.y,
-              ez = _this$end3.z,
-              ew = _this$end3.w;
+          var _this$start = this.start,
+              sx = _this$start.x,
+              sy = _this$start.y,
+              sz = _this$start.z,
+              sw = _this$start.w;
+          var _this$end2 = this.end,
+              ex = _this$end2.x,
+              ey = _this$end2.y,
+              ez = _this$end2.z,
+              ew = _this$end2.w;
           return new Point(sx / 2 + ex / 2, sy / 2 + ey / 2, sz / 2 + ez / 2, sw / 2 + ew / 2);
 
         case "s":
         case "start":
+        case "u":
+        case "up":
+        case "l":
+        case "left":
         default:
-          var _this$start3 = this.start,
-              x = _this$start3.x,
-              y = _this$start3.y,
-              z = _this$start3.z,
-              w = _this$start3.w;
+          var _this$start2 = this.start,
+              x = _this$start2.x,
+              y = _this$start2.y,
+              z = _this$start2.z,
+              w = _this$start2.w;
           return new Point(x, y, z, w);
       }
+    },
+    toJSON: function toJSON() {
+      var result = [];
+      this.points.forEach(function (p) {
+        return result.push(p.toJSON());
+      });
+      return result;
     }
-  };
+  });
 
   var Rect = function Rect(left, top, width, height, x, y, valid) {
     if (left === void 0) {
@@ -367,12 +516,26 @@
         enumerable: true,
         get: function get() {
           return __ref.width;
+        },
+        set: function set(newValue) {
+          var oldValue = __ref.width;
+          var offsetValue = newValue - oldValue;
+          __ref.width = newValue;
+          __ref.right += offsetValue;
+          return newValue;
         }
       },
       height: {
         enumerable: true,
         get: function get() {
           return __ref.height;
+        },
+        set: function set(newValue) {
+          var oldValue = __ref.height;
+          var offsetValue = newValue - oldValue;
+          __ref.height = newValue;
+          __ref.bottom += offsetValue;
+          return newValue;
         }
       },
       left: {
@@ -408,27 +571,72 @@
   };
 
   Rect.prototype = {
-    point: function point() {
-      return new Point(this.x, this.y);
-    },
     line: function line(order) {
       switch (order) {
-        case "top":
-        case "t":
-          return new Line(this.left, this.top, 0, 0, this.right, this.top, 0, 0);
-
         case "right":
         case "r":
-          return new Line(this.right, this.top, 0, 0, this.right, this.bottom, 0, 0);
+          return new Line([{
+            x: this.right,
+            y: this.top,
+            z: 0,
+            w: 0
+          }, {
+            x: this.right,
+            y: this.bottom,
+            z: 0,
+            w: 0
+          }]);
 
         case "bottom":
         case "b":
-          return new Line(this.left, this.bottom, 0, 0, this.right, this.bottom, 0, 0);
+          return new Line([{
+            x: this.left,
+            y: this.bottom,
+            z: 0,
+            w: 0
+          }, {
+            x: this.right,
+            y: this.bottom,
+            z: 0,
+            w: 0
+          }]);
 
         case "left":
         case "l":
-          return new Line(this.left, this.top, 0, 0, this.left, this.bottom, 0, 0);
+          return new Line([{
+            x: this.left,
+            y: this.top,
+            z: 0,
+            w: 0
+          }, {
+            x: this.left,
+            y: this.bottom,
+            z: 0,
+            w: 0
+          }]);
+
+        case "top":
+        case "t":
+        default:
+          return new Line([{
+            x: this.left,
+            y: this.top,
+            z: 0,
+            w: 0
+          }, {
+            x: this.right,
+            y: this.top,
+            z: 0,
+            w: 0
+          }]);
       }
+    },
+    findPoint: function findPoint(findWord) {
+      var _ref5 = isArray$1(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref5[0],
+          pointFind = _ref5[1];
+
+      return this.line(lineFind).point(pointFind);
     },
     toJSON: function toJSON() {
       return {
@@ -446,44 +654,6 @@
   };
   var rect = function rect(left, top, width, height, x, y, valid) {
     return typeof left === "object" ? new Rect(left.left, left.top, left.width, left.height, left.x, left.y, left.valid) : new Rect(left, top, width, height, x, y, valid);
-  };
-
-  var isAbsoluteNaN = function isAbsoluteNaN(it) {
-    return it !== it && typeof it === "number";
-  };
-  var isNone = function isNone(data) {
-    return isAbsoluteNaN(data) || data === undefined || data === null;
-  };
-  var isArray$1 = function isArray(data) {
-    return Array.isArray(data) || data instanceof Array;
-  };
-  var isObject = function isObject(it) {
-    return it !== null && typeof it === "object" ? true : false;
-  };
-  var likeArray = function (nodeFn, webFn) {
-    var definedNodeList;
-
-    try {
-      definedNodeList = 0 instanceof NodeList;
-      definedNodeList = true;
-    } catch (e) {
-      definedNodeList = false;
-    }
-
-    return definedNodeList ? webFn : nodeFn;
-  }( //nodeFn
-  function (data) {
-    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray$1(data);
-  }, //webFn
-  function (data) {
-    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray$1(data) || data instanceof NodeList;
-  }); //TODO : native isPlainObject
-
-  var isNode = function isNode(a) {
-    return isObject(a) && typeof a.nodeType === "number";
-  };
-  var isPlainObject = function isPlainObject(data) {
-    return typeof data === "object" && data.constructor === Object;
   };
 
   var getNode = function getNode(el) {
@@ -613,9 +783,14 @@
 
         if (tag === "path") {
           var pathElement = document.createElementNS('http://www.w3.org/2000/svg', "path");
-          pathElement.setAttribute("fill", "transparent");
-          pathElement.setAttribute("stroke", "gray");
-          pathElement.setAttribute("stroke-width", "1");
+
+          if (typeof attributes !== "object") {
+            attributes = {};
+          }
+
+          pathElement.setAttribute("fill", attributes['fill'] || "transparent");
+          pathElement.setAttribute("stroke", attributes['stroke'] || "gray");
+          pathElement.setAttribute("stroke-width", attributes['strokeWidth'] || attributes['stroke-width'] || "1");
           pathElement.setAttribute("stroke-linecap", "butt");
           pathElement.setAttribute("stroke-linejoin", "miter");
           var dValue = "";
@@ -629,6 +804,7 @@
           svgTag.appendChild(pathElement);
         }
       });
+      svgTag.setAttribute("style", "overflow:visible;");
       svgTag.setAttribute("width", realMaxWidth);
       svgTag.setAttribute("height", realMaxHeigth);
       return svgTag;
@@ -636,26 +812,6 @@
   };
   var makeSVG = function makeSVG() {
     return new SVGBuilder();
-  };
-
-  var asArray = function asArray(data, defaultArray) {
-    if (defaultArray === void 0) {
-      defaultArray = undefined;
-    }
-
-    if (isArray$1(data)) {
-      return data;
-    }
-
-    if (isNone(data)) {
-      return isArray$1(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
-    }
-
-    if (typeof data === "object" && typeof data.toArray === "function") {
-      return data.toArray();
-    }
-
-    return [data];
   };
 
   var rebase = function rebase(obj, ref) {

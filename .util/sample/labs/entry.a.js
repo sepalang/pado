@@ -3,7 +3,8 @@ export {
   readUrl,
   windowRect,
   openWindow,
-  closeWindow
+  closeWindow,
+  makeSVG
  } from '../../../.src/web/env';
  
  export { 

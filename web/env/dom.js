@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.date.to-json", "../../modules/dimension", "../../functions/isLike"], factory);
+    define(["exports", "core-js/modules/es6.array.fill", "core-js/modules/web.dom.iterable", "core-js/modules/es6.date.to-json", "../../modules/dimension", "../../functions/isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.date.to-json"), require("../../modules/dimension"), require("../../functions/isLike"));
+    factory(exports, require("core-js/modules/es6.array.fill"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.date.to-json"), require("../../modules/dimension"), require("../../functions/isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.es6Date, global.dimension, global.isLike);
+    factory(mod.exports, global.es6Array, global.webDom, global.es6Date, global.dimension, global.isLike);
     global.dom = mod.exports;
   }
-})(this, function (_exports, _webDom, _es6Date, _dimension, _isLike) {
+})(this, function (_exports, _es6Array, _webDom, _es6Date, _dimension, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -163,9 +163,14 @@
 
         if (tag === "path") {
           var pathElement = document.createElementNS('http://www.w3.org/2000/svg', "path");
-          pathElement.setAttribute("fill", "transparent");
-          pathElement.setAttribute("stroke", "gray");
-          pathElement.setAttribute("stroke-width", "1");
+
+          if (typeof attributes !== "object") {
+            attributes = {};
+          }
+
+          pathElement.setAttribute("fill", attributes['fill'] || "transparent");
+          pathElement.setAttribute("stroke", attributes['stroke'] || "gray");
+          pathElement.setAttribute("stroke-width", attributes['strokeWidth'] || attributes['stroke-width'] || "1");
           pathElement.setAttribute("stroke-linecap", "butt");
           pathElement.setAttribute("stroke-linejoin", "miter");
           var dValue = "";
@@ -179,6 +184,7 @@
           svgTag.appendChild(pathElement);
         }
       });
+      svgTag.setAttribute("style", "overflow:visible;");
       svgTag.setAttribute("width", realMaxWidth);
       svgTag.setAttribute("height", realMaxHeigth);
       return svgTag;
