@@ -8,14 +8,25 @@ const likePoint = function(p){
 const Point = function(x=0,y=0,z=0,w=0){
   const __ref = { x,y,z,w };
   Object.defineProperties(this,{
-    x:{ enumerable:true, get(){ return __ref.x; } },
-    y:{ enumerable:true, get(){ return __ref.y; } },
-    z:{ enumerable:true, get(){ return __ref.z; } },
-    w:{ enumerable:true, get(){ return __ref.w; } },
+    x:{ enumerable:true, get(){ return __ref.x; }, set(v){ return __ref.x = v; }},
+    y:{ enumerable:true, get(){ return __ref.y; }, set(v){ return __ref.y = v; }},
+    z:{ enumerable:true, get(){ return __ref.z; }, set(v){ return __ref.z = v; }},
+    w:{ enumerable:true, get(){ return __ref.w; }, set(v){ return __ref.w = v; }},
   });
 };
 
 Point.prototype = {
+  clone (){
+    return new Point(this.x,this.y,this.z,this.w);
+  },
+  toJSON (){
+    return {
+      x:this.x,
+      y:this.y,
+      z:this.z,
+      w:this.w
+    }
+  },
   pull (width=0, angle="horizontal"){
     const { x, y, z, w } = this;
     switch(angle){
@@ -37,56 +48,53 @@ Point.prototype = {
     const [largeY, smallY] = this.y > y ? [ this.y, y ] : [ y, this.y ];
     return new Rect(smallX,smallY,largeX-smallX,largeY-smallY,0,0);
   },
-  toJSON (){
-    return {
-      x:this.x,
-      y:this.y,
-      z:this.z,
-      w:this.w
-    }
-  }
-};
-
-
-const PointArray = function(points){
-  asArray(points).forEach(point=>{
-    if(!likePoint(point)) return;
-    const {x,y,z,w} = point;
-    this.push(new Point(x,y,z,w));
-  });
-};
-
-(function(methods){
-  const prototype = [];
-  PointArray.prototype = prototype;
-  Object.keys(methods).forEach(key=>{
-    prototype[key] = methods[key]
-  });
-}({
-  eq (index){
-    return this[index];
-  },
-  join:function(fn){
-    const joins = [];
-    this.forEach((refp,i)=>{
-      joins.push(refp);
-      if(!this[i+1]) return;
-      const newp = fn(refp, this[i+1], i);
-      if(!likePoint(newp)) return;
-      const {x,y,z,w} = newp;
-      joins.push(new Point(x,y,z,w));
-    });
-    this.splice(0,this.length);
-    joins.forEach(p=>this.push(p));
+  translate ({x=0, y=0, z=0}){
+    this.x = this.x + x;
+    this.y = this.y + y;
+    this.z = this.z + z;
     return this;
   },
-  toJSON (){
-    const result = [];
-    this.points.forEach(p=>result.push(p.toJSON()));
-    return result;
-  }
-}));
+  rotate ({x:angleX=0, y:angleY=0, z:angleZ=0}){
+    let x1 = this.x,
+        y1 = this.y,
+        z1 = this.z,
 
+        cr = Math.cos(angleX),
+        cp = Math.cos(angleY),
+        cy = Math.cos(angleZ),
+        sr = Math.sin(angleX),
+        sp = Math.sin(angleY),
+        sy = Math.sin(angleZ),
+
+        w = cr * cp * cy + -sr * sp * -sy,
+        x = sr * cp * cy - -cr * sp * -sy,
+        y = cr * sp * cy + sr * cp * sy,
+        z = cr * cp * sy - -sr * sp * -cy,
+
+        m0 = 1 - 2 * ( y * y + z * z ),
+        m1 = 2 * (x * y + z * w),
+        m2 = 2 * (x * z - y * w),
+
+        m4 = 2 * ( x * y - z * w ),
+        m5 = 1 - 2 * ( x * x + z * z ),
+        m6 = 2 * (z * y + x * w ),
+
+        m8 = 2 * ( x * z + y * w ),
+        m9 = 2 * ( y * z - x * w ),
+        m10 = 1 - 2 * ( x * x + y * y );
+        
+    this.x = x1 * m0 + y1 * m4 + z1 * m8;
+    this.y = x1 * m1 + y1 * m5 + z1 * m9;
+    this.z = x1 * m2 + y1 * m6 + z1 * m10;
+    return this;
+  },
+  transform (transform){
+    const { rotate, translate } = transform;
+    this.rotate(rotate);
+    this.translate(translate);
+    return this;
+  }
+};
 
 const Line = function(pointArray){
   asArray(pointArray).forEach(point=>{
@@ -119,6 +127,14 @@ const Line = function(pointArray){
     }
   });
 }(Line, {
+  toJSON (){
+    const result = [];
+    this.forEach(p=>result.push(p.toJSON()));
+    return result;
+  },
+  clone (){
+    return new Line(this);
+  },
   eq (index){
     return this[index];
   },
@@ -158,17 +174,28 @@ const Line = function(pointArray){
       return new Point(x,y,z,w);
     }
   },
-  transform (transform){
-    const computePoints = this.map(point=>{
+  transform (transform,rect){
+    const useRect = !!rect;
+    
+    if(useRect){
+      const { left, top, width, height } = rect;;
       
-    });
-    console.log("computePoints",computePoints);
-    return computePoints;
-  },
-  toJSON (){
-    const result = [];
-    this.points.forEach(p=>result.push(p.toJSON()));
-    return result;
+      //rotateOrigin
+      const originX = left + width/2;
+      const originY = top + height/2;
+      
+      this.forEach(point=>{
+        const { left, top } = rect;
+        point.translate({ x:-originX, y:-originY });
+        point.transform(transform);
+        point.translate({ x:originX, y:originY });
+      });
+    } else {
+      this.forEach(point=>{
+        point.transform(transform)
+      });
+    }
+    return this;
   }
 }));
 

@@ -97,7 +97,7 @@
   _exports.range = range;
 
   var hashMap = function hashMap(d, f) {
-    if (typeof d === "object" && !isArray(d)) {
+    if (typeof d === "object" && !(0, _isLike.isArray)(d)) {
       for (var k in d) {
         d[k] = f(d[k], k);
       }

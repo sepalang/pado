@@ -11,7 +11,44 @@ export const isElement = function(el){
   return el instanceof Element;
 };
 
-export const getBoundingRect = function(el){
+export const getElementOffsetRect = function(el){
+  el = getNode(el);
+  
+  if(!isElement(el)){
+    return rect({
+      x:0,y:0,left:0,top:0,width:0,height:0,right:0,bottom:0,valid:false
+    });
+  }
+  
+  let offsetLeft = 0;
+  let offsetTop  = 0;
+  let offsetWidth = el.offsetWidth;
+  let offsetHeight = el.offsetHeight;
+  
+  do{
+      offsetLeft += el.offsetLeft;
+      offsetTop  += el.offsetTop;
+      el = el.offsetParent;
+      
+      if((!el.html && !el.body) && /absoute|relative|fixed/.test(window.getComputedStyle(el).getPropertyValue("position"))){
+        el = null;
+      }
+  } while( el );
+  
+  
+  return rect({
+    x:offsetLeft,
+    y:offsetTop,
+    left:offsetLeft,
+    top:offsetTop,
+    width:offsetWidth,
+    height:offsetHeight,
+    valid:true
+  });
+  
+}
+
+const getBoundingRect = function(el){
   el = getNode(el);
   
   if(!isElement(el)){
@@ -91,6 +128,7 @@ export const getElementBoundingRect = function(el){
 /* https://keithclark.co.uk/articles/calculating-element-vertex-data-from-css-transforms/ */
 const parseMatrix = (function(){
   const DEFAULT_MATRIX = {
+    
     m11: 1, m21: 0, m31: 0, m41: 0,
     m12: 0, m22: 1, m32: 0, m42: 0,
     m13: 0, m23: 0, m33: 1, m43: 0,
@@ -98,7 +136,6 @@ const parseMatrix = (function(){
   };
   
   return function(matrixParam) {
-    
     let c = matrixParam.split(/\s*[(),]\s*/).slice(1,-1);
     let matrix;
 
@@ -125,23 +162,18 @@ const parseMatrix = (function(){
     }
     return matrix;
   }
-});
+}());
 
 /* https://keithclark.co.uk/articles/calculating-element-vertex-data-from-css-transforms/ */
 export const getElementTransform = function(el){
   let computedStyle = getComputedStyle(el, null);
-  let val = computedStyle.transform || computedStyle.webkitTransform || computedStyle.MozTransform || computedStyle.msTransform;
-  let matrix = parseMatrix(val);
+  let val     = computedStyle.transform || computedStyle.webkitTransform || computedStyle.MozTransform || computedStyle.msTransform;
+  let matrix  = parseMatrix(val);
   let rotateY = Math.asin(-matrix.m13);
-  let rotateX;
-  let rotateZ;
+  let rotateX = Math.atan2(matrix.m23, matrix.m33)
+  let rotateZ = Math.atan2(matrix.m12, matrix.m11);
 
-  rotateX = Math.atan2(matrix.m23, matrix.m33);
-  rotateZ = Math.atan2(matrix.m12, matrix.m11);
-  
   return {
-    transformStyle: val,
-    matrix: matrix,
     rotate: {
       x: rotateX,
       y: rotateY,
@@ -151,7 +183,9 @@ export const getElementTransform = function(el){
       x: matrix.m41,
       y: matrix.m42,
       z: matrix.m43
-    }
+    },
+    matrix: matrix,
+    transformStyle: val
   };
 };
 
@@ -230,12 +264,9 @@ export const transformVariant = (function(){
     if(typeof rotate === "number"){
       rotate = [undefined,undefined,rotate];
     }
-    console.log("rotate3d",typeof rotate3d === "number")
     if(typeof rotate3d === "number"){
       rotate3d = [rotate3d];
     }
-    
-    console.log("rotate3d",rotate3d)
     
     const translateVars = Array(3).fill(TRANSFORM_UNDEFINED);
     const scaleVars  = Array(3).fill(TRANSFORM_UNDEFINED);
@@ -278,10 +309,10 @@ export const transformVariant = (function(){
         result.push(`rotate3d(1,0,0,${rotateVars[0]})`)
       }
       if(rotateVars[1] !== TRANSFORM_UNDEFINED){
-        result.push(`rotate3d(1,0,0,${rotateVars[1]})`)
+        result.push(`rotate3d(0,1,0,${rotateVars[1]})`)
       }
       if(rotateVars[2] !== TRANSFORM_UNDEFINED){
-        result.push(`rotate3d(1,0,0,${rotateVars[2]})`)
+        result.push(`rotate3d(0,0,1,${rotateVars[2]})`)
       }
     }
     return result.join(" ");

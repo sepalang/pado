@@ -1,14 +1,26 @@
 <template>
   <UsageLayout>
-    <PadoRect size="50" class="first-rect" :style="{transform:firstTransform,border:'1px solid red'}"></PadoRect>
-    <PadoRect size="100" :style="{transform:secondTransform}" top="100" left="100"></PadoRect>
+    <div>
+      <PadoSlider v-model="firstRectTransform.rotateX" style="width:200px;" @input="drawLine"></PadoSlider>{{ firstRectTransform.rotateX }}<br>
+      <PadoSlider v-model="firstRectTransform.rotateY" style="width:200px;" @input="drawLine"></PadoSlider>{{ firstRectTransform.rotateY }}
+    </div>
+    <div style="position:relative">
+      <PadoRect class="first-rect" size="50" :style="{transform:firstTransform}" top="50" left="50"></PadoRect>
+      <PadoRect class="seconde-rect" size="100" :style="{transform:secondTransform}" top="150" left="150"></PadoRect>
+    </div>
+    <div class="pointer-placeholder"></div>
   </UsageLayout>
 </template>
 <script>
   import UsageLayout from '../layout/UsageLayout.vue';
   import PadoSlider from '../component/pado-slider.vue';
   import PadoRect from '../component/pado-rect.vue';
-  import { transformVariant, getElementTransform, getElementBoundingRect } from '../../../../.src/web';
+  import { 
+    transformVariant, 
+    getElementTransform, 
+    getElementBoundingRect, 
+    getElementOffsetRect 
+  } from '../../../../.src/web';
   //import { rect, line, point } from '../../../../.src/modules';
   
   import { createVue, nextTick } from '../service/vue-compile'
@@ -20,13 +32,41 @@
     components:{ UsageLayout, PadoSlider, PadoRect },
     data (){
       return {
-        bounding:{},
-        rectSize:40,
-        x:0,
-        y:0
+        perspective:100,
+        firstRectTransform:{
+          rotateX:10,
+          rotateY:10
+        },
+        secondRectTransform:{
+          rotate3d:[0]
+        }
       }
     },
     methods:{
+      drawLine (){
+        const placeholder = this.$el.querySelectorAll(".pointer-placeholder")[0];
+        
+        const firstEl = this.$el.querySelectorAll(".first-rect")[0];
+        const secondEl = this.$el.querySelectorAll(".seconde-rect")[0];
+        
+        const firstRectOffset  = getElementOffsetRect(firstEl);
+        const secondRectOffset = getElementOffsetRect(secondEl);
+        
+        const firstRectTransform  = getElementTransform(firstEl);
+        //const secondRectTransform = getElementTransform(secondEl);
+        
+        //empty
+        Array.from(placeholder.children).forEach((child)=>{
+          placeholder.removeChild(child);
+        });
+        
+        firstRectOffset.vertex().transform(firstRectTransform,firstRectOffset).forEach((point)=>{
+          const pointTag = document.createElement("point");
+          pointTag.setAttribute("style",`left:${point.x}px;top:${point.y}px;`)
+          placeholder.append(pointTag);
+        });
+        
+      },
       openSampleModal (awaitTime=0){
         createVue(SampleModal,{
           props:{
@@ -39,20 +79,40 @@
     },
     computed:{
       firstTransform (){
-        const transformValue = transformVariant({ rotate3d:[20], perspective:100 });
+        const transformValue = transformVariant({ 
+          rotateX:this.firstRectTransform.rotateX, 
+          rotateY:this.firstRectTransform.rotateY, 
+          perspective:this.perspective 
+        });
+        console.log("transformValue",transformValue)
         return transformValue;
       },
       secondTransform (){
-        
+        const transformValue = transformVariant({ rotate3d:this.secondRectTransform.rotate3d, perspective:this.perspective });
+        return transformValue;
       }
     },
     mounted (){
-      
       nextTick(()=>{
-        const firstRect = this.$el.querySelectorAll(".first-rect")[0];
-        const gt = getElementTransform(firstRect);
-        const boundings = getElementBoundingRect(firstRect);
+        //this.drawLine();
       })
     }
   }
 </script>
+<style>
+  point {
+    display:block;
+    width:3px;
+    height:3px;
+    background-color:red;
+    position:absolute;
+  }
+  .pointer-placeholder {
+    position:absolute;
+    top:0;
+    left:0;
+    width:300px;
+    height:300px;
+    pointer-events:none;
+  }
+</style>

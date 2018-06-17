@@ -139,11 +139,19 @@
   var isNone = function isNone(data) {
     return isAbsoluteNaN(data) || data === undefined || data === null;
   };
-  var isArray$1 = function isArray(data) {
+  var isNumber = function isNumber(it) {
+    return typeof it === "number" && !isAbsoluteNaN(it);
+  };
+  var isArray = function isArray(data) {
     return Array.isArray(data) || data instanceof Array;
   };
   var isObject = function isObject(it) {
     return it !== null && typeof it === "object" ? true : false;
+  };
+  var likeString = function likeString(data) {
+    if (typeof data === "string") return true;
+    if (isNumber(data)) return true;
+    return false;
   };
   var likeArray = function (nodeFn, webFn) {
     var definedNodeList;
@@ -158,10 +166,10 @@
     return definedNodeList ? webFn : nodeFn;
   }( //nodeFn
   function (data) {
-    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray$1(data);
+    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray(data);
   }, //webFn
   function (data) {
-    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray$1(data) || data instanceof NodeList;
+    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray(data) || data instanceof NodeList;
   }); //TODO : native isPlainObject
 
   var isNode = function isNode(a) {
@@ -176,12 +184,12 @@
       defaultArray = undefined;
     }
 
-    if (isArray$1(data)) {
+    if (isArray(data)) {
       return data;
     }
 
     if (isNone(data)) {
-      return isArray$1(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
+      return isArray(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
     }
 
     if (typeof data === "object" && typeof data.toArray === "function") {
@@ -223,30 +231,53 @@
         enumerable: true,
         get: function get() {
           return __ref.x;
+        },
+        set: function set(v) {
+          return __ref.x = v;
         }
       },
       y: {
         enumerable: true,
         get: function get() {
           return __ref.y;
+        },
+        set: function set(v) {
+          return __ref.y = v;
         }
       },
       z: {
         enumerable: true,
         get: function get() {
           return __ref.z;
+        },
+        set: function set(v) {
+          return __ref.z = v;
         }
       },
       w: {
         enumerable: true,
         get: function get() {
           return __ref.w;
+        },
+        set: function set(v) {
+          return __ref.w = v;
         }
       }
     });
   };
 
   Point.prototype = {
+    clone: function clone$$1() {
+      return new Point(this.x, this.y, this.z, this.w);
+    },
+    toJSON: function toJSON() {
+      return {
+        x: this.x,
+        y: this.y,
+        z: this.z,
+        w: this.w
+      };
+    },
     pull: function pull(width, angle) {
       if (width === void 0) {
         width = 0;
@@ -306,57 +337,63 @@
 
       return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0);
     },
-    toJSON: function toJSON() {
-      return {
-        x: this.x,
-        y: this.y,
-        z: this.z,
-        w: this.w
-      };
+    translate: function translate(_ref5) {
+      var _ref5$x = _ref5.x,
+          x = _ref5$x === void 0 ? 0 : _ref5$x,
+          _ref5$y = _ref5.y,
+          y = _ref5$y === void 0 ? 0 : _ref5$y,
+          _ref5$z = _ref5.z,
+          z = _ref5$z === void 0 ? 0 : _ref5$z;
+      this.x = this.x + x;
+      this.y = this.y + y;
+      this.z = this.z + z;
+      return this;
+    },
+    rotate: function rotate(_ref6) {
+      var _ref6$x = _ref6.x,
+          angleX = _ref6$x === void 0 ? 0 : _ref6$x,
+          _ref6$y = _ref6.y,
+          angleY = _ref6$y === void 0 ? 0 : _ref6$y,
+          _ref6$z = _ref6.z,
+          angleZ = _ref6$z === void 0 ? 0 : _ref6$z;
+      var x1 = this.x,
+          y1 = this.y,
+          z1 = this.z,
+          cr = Math.cos(angleX),
+          cp = Math.cos(angleY),
+          cy = Math.cos(angleZ),
+          sr = Math.sin(angleX),
+          sp = Math.sin(angleY),
+          sy = Math.sin(angleZ),
+          w = cr * cp * cy + -sr * sp * -sy,
+          x = sr * cp * cy - -cr * sp * -sy,
+          y = cr * sp * cy + sr * cp * sy,
+          z = cr * cp * sy - -sr * sp * -cy,
+          m0 = 1 - 2 * (y * y + z * z),
+          m1 = 2 * (x * y + z * w),
+          m2 = 2 * (x * z - y * w),
+          m4 = 2 * (x * y - z * w),
+          m5 = 1 - 2 * (x * x + z * z),
+          m6 = 2 * (z * y + x * w),
+          m8 = 2 * (x * z + y * w),
+          m9 = 2 * (y * z - x * w),
+          m10 = 1 - 2 * (x * x + y * y);
+      this.x = x1 * m0 + y1 * m4 + z1 * m8;
+      this.y = x1 * m1 + y1 * m5 + z1 * m9;
+      this.z = x1 * m2 + y1 * m6 + z1 * m10;
+      return this;
+    },
+    transform: function transform(_transform) {
+      var rotate = _transform.rotate,
+          translate = _transform.translate;
+      this.rotate(rotate);
+      this.translate(translate);
+      return this;
     }
   };
 
-  (function (methods) {
-    var prototype = [];
-    Object.keys(methods).forEach(function (key) {
-      prototype[key] = methods[key];
-    });
-  })({
-    eq: function eq(index) {
-      return this[index];
-    },
-    join: function join(fn) {
-      var _this2 = this;
-
-      var joins = [];
-      this.forEach(function (refp, i) {
-        joins.push(refp);
-        if (!_this2[i + 1]) return;
-        var newp = fn(refp, _this2[i + 1], i);
-        if (!likePoint(newp)) return;
-        var x = newp.x,
-            y = newp.y,
-            z = newp.z,
-            w = newp.w;
-        joins.push(new Point(x, y, z, w));
-      });
-      this.splice(0, this.length);
-      joins.forEach(function (p) {
-        return _this2.push(p);
-      });
-      return this;
-    },
-    toJSON: function toJSON() {
-      var result = [];
-      this.points.forEach(function (p) {
-        return result.push(p.toJSON());
-      });
-      return result;
-    }
-  });
-
   var Line = function Line(pointArray) {
-    var _this3 = this;
+    var _this = this;
 
     asArray(pointArray).forEach(function (point) {
       if (!likePoint(point)) return;
@@ -365,7 +402,7 @@
           z = point.z,
           w = point.w;
 
-      _this3.push(new Point(x, y, z, w));
+      _this.push(new Point(x, y, z, w));
     });
   };
 
@@ -390,17 +427,27 @@
       }
     });
   })(Line, {
+    toJSON: function toJSON() {
+      var result = [];
+      this.forEach(function (p) {
+        return result.push(p.toJSON());
+      });
+      return result;
+    },
+    clone: function clone$$1() {
+      return new Line(this);
+    },
     eq: function eq(index) {
       return this[index];
     },
     join: function join(fn) {
-      var _this4 = this;
+      var _this2 = this;
 
       var joins = [];
       this.forEach(function (refp, i) {
         joins.push(refp);
-        if (!_this4[i + 1]) return;
-        var newp = fn(refp, _this4[i + 1], i);
+        if (!_this2[i + 1]) return;
+        var newp = fn(refp, _this2[i + 1], i);
         if (!likePoint(newp)) return;
         var x = newp.x,
             y = newp.y,
@@ -410,7 +457,7 @@
       });
       this.splice(0, this.length);
       joins.forEach(function (p) {
-        return _this4.push(p);
+        return _this2.push(p);
       });
       return this;
     },
@@ -460,12 +507,11 @@
           return new Point(x, y, z, w);
       }
     },
-    toJSON: function toJSON() {
-      var result = [];
-      this.points.forEach(function (p) {
-        return result.push(p.toJSON());
+    transform: function transform(_transform2) {
+      this.forEach(function (point) {
+        return point.transform(_transform2);
       });
-      return result;
+      return this;
     }
   });
 
@@ -632,11 +678,34 @@
       }
     },
     findPoint: function findPoint(findWord) {
-      var _ref5 = isArray$1(findWord) ? findWord : findWord.trim().split(/\s+/),
-          lineFind = _ref5[0],
-          pointFind = _ref5[1];
+      var _ref7 = isArray(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref7[0],
+          pointFind = _ref7[1];
 
       return this.line(lineFind).point(pointFind);
+    },
+    vertex: function vertex() {
+      return new Line([{
+        x: this.left,
+        y: this.top,
+        z: 0,
+        w: 0
+      }, {
+        x: this.left,
+        y: this.bottom,
+        z: 0,
+        w: 0
+      }, {
+        x: this.right,
+        y: this.bottom,
+        z: 0,
+        w: 0
+      }, {
+        x: this.right,
+        y: this.top,
+        z: 0,
+        w: 0
+      }]);
     },
     toJSON: function toJSON() {
       return {
@@ -663,6 +732,49 @@
   var isElement = function isElement(el) {
     return el instanceof Element;
   };
+  var getElementOffsetRect = function getElementOffsetRect(el) {
+    el = getNode(el);
+
+    if (!isElement(el)) {
+      return rect({
+        x: 0,
+        y: 0,
+        left: 0,
+        top: 0,
+        width: 0,
+        height: 0,
+        right: 0,
+        bottom: 0,
+        valid: false
+      });
+    }
+
+    var offsetLeft = 0;
+    var offsetTop = 0;
+    var offsetWidth = el.offsetWidth;
+    var offsetHeight = el.offsetHeight;
+
+    do {
+      offsetLeft += el.offsetLeft;
+      offsetTop += el.offsetTop;
+      el = el.offsetParent;
+
+      if (!el.html && !el.body && /absoute|relative|fixed/.test(window.getComputedStyle(el).getPropertyValue("position"))) {
+        el = null;
+      }
+    } while (el);
+
+    return rect({
+      x: offsetLeft,
+      y: offsetTop,
+      left: offsetLeft,
+      top: offsetTop,
+      width: offsetWidth,
+      height: offsetHeight,
+      valid: true
+    });
+  };
+
   var getBoundingRect = function getBoundingRect(el) {
     el = getNode(el);
 
@@ -709,6 +821,7 @@
       valid: true
     });
   };
+
   var getElementBoundingRect = function getElementBoundingRect(el) {
     el = getNode(el);
     var win = window;
@@ -742,6 +855,104 @@
 
     return rect(elRect);
   };
+  /* https://keithclark.co.uk/articles/calculating-element-vertex-data-from-css-transforms/ */
+
+  var parseMatrix = function () {
+    var DEFAULT_MATRIX = {
+      m11: 1,
+      m21: 0,
+      m31: 0,
+      m41: 0,
+      m12: 0,
+      m22: 1,
+      m32: 0,
+      m42: 0,
+      m13: 0,
+      m23: 0,
+      m33: 1,
+      m43: 0,
+      m14: 0,
+      m24: 0,
+      m34: 0,
+      m44: 1
+    };
+    return function (matrixParam) {
+      var c = matrixParam.split(/\s*[(),]\s*/).slice(1, -1);
+      var matrix;
+
+      if (c.length === 6) {
+        // 'matrix()' (3x2)
+        matrix = {
+          m11: +c[0],
+          m21: +c[2],
+          m31: 0,
+          m41: +c[4],
+          m12: +c[1],
+          m22: +c[3],
+          m32: 0,
+          m42: +c[5],
+          m13: 0,
+          m23: 0,
+          m33: 1,
+          m43: 0,
+          m14: 0,
+          m24: 0,
+          m34: 0,
+          m44: 1
+        };
+      } else if (c.length === 16) {
+        // matrix3d() (4x4)
+        matrix = {
+          m11: +c[0],
+          m21: +c[4],
+          m31: +c[8],
+          m41: +c[12],
+          m12: +c[1],
+          m22: +c[5],
+          m32: +c[9],
+          m42: +c[13],
+          m13: +c[2],
+          m23: +c[6],
+          m33: +c[10],
+          m43: +c[14],
+          m14: +c[3],
+          m24: +c[7],
+          m34: +c[11],
+          m44: +c[15]
+        };
+      } else {
+        // handle 'none' or invalid values.
+        matrix = Object.assign({}, DEFAULT_MATRIX);
+      }
+
+      return matrix;
+    };
+  }();
+  /* https://keithclark.co.uk/articles/calculating-element-vertex-data-from-css-transforms/ */
+
+
+  var getElementTransform = function getElementTransform(el) {
+    var computedStyle = getComputedStyle(el, null);
+    var val = computedStyle.transform || computedStyle.webkitTransform || computedStyle.MozTransform || computedStyle.msTransform;
+    var matrix = parseMatrix(val);
+    var rotateY = Math.asin(-matrix.m13);
+    var rotateX = Math.atan2(matrix.m23, matrix.m33);
+    var rotateZ = Math.atan2(matrix.m12, matrix.m11);
+    return {
+      rotate: {
+        x: rotateX,
+        y: rotateY,
+        z: rotateZ
+      },
+      translate: {
+        x: matrix.m41,
+        y: matrix.m42,
+        z: matrix.m43
+      },
+      matrix: matrix,
+      transformStyle: val
+    };
+  };
   var windowRect = function windowRect() {
     return rect({
       left: window.screenLeft || window.screenX,
@@ -758,6 +969,139 @@
       height: screen.height
     });
   };
+  var transformVariant = function () {
+    var TRANSFORM_UNDEFINED = "0";
+
+    var parseTransformValue = function parseTransformValue(value, matched) {
+      likeString(value) && matched(value);
+    };
+
+    var parseTransformMultivalue = function parseTransformMultivalue(value, matched) {
+      isArray(value) && matched(value);
+    };
+
+    var valueProcess = function valueProcess(value, unit) {
+      if (typeof value === "number") {
+        return "" + value + unit;
+      }
+
+      if (typeof value === "string" && value.trim() !== "") {
+        return value;
+      }
+
+      return undefined;
+    };
+
+    var singleValueHook = function singleValueHook(bag, unit, i) {
+      return function (value) {
+        var parseValue = valueProcess(value, unit);
+        if (parseValue === undefined) return;
+        bag[i] = parseValue;
+      };
+    };
+
+    var multiValueHook = function multiValueHook(bag, unit) {
+      return function (multiValue) {
+        multiValue.forEach(function (value, i) {
+          var parseValue = valueProcess(value, unit);
+          if (parseValue === undefined) return;
+          bag[i] = parseValue;
+        });
+      };
+    };
+
+    var oneNumberToTwoArray = function oneNumberToTwoArray(one) {
+      return typeof one === "number" ? [one, one] : one;
+    };
+
+    return function (props) {
+      if (typeof props !== "object") {
+        return "";
+      }
+
+      var translateX = props.translateX,
+          translateY = props.translateY,
+          scaleX = props.scaleX,
+          scaleY = props.scaleY,
+          scaleZ = props.scaleZ,
+          rotateX = props.rotateX,
+          rotateY = props.rotateY,
+          rotateZ = props.rotateZ;
+      var translate = props.translate,
+          translate3d = props.translate3d,
+          scale = props.scale,
+          scale3d = props.scale3d,
+          rotate = props.rotate,
+          rotate3d = props.rotate3d;
+      translate = oneNumberToTwoArray(translate);
+      translate3d = oneNumberToTwoArray(translate3d);
+      scale = oneNumberToTwoArray(scale);
+      scale3d = oneNumberToTwoArray(scale3d);
+
+      if (typeof rotate === "number") {
+        rotate = [undefined, undefined, rotate];
+      }
+
+      if (typeof rotate3d === "number") {
+        rotate3d = [rotate3d];
+      }
+
+      var translateVars = Array(3).fill(TRANSFORM_UNDEFINED);
+      var scaleVars = Array(3).fill(TRANSFORM_UNDEFINED);
+      var rotateVars = Array(4).fill(TRANSFORM_UNDEFINED);
+      var perspective = valueProcess(props.perspective, "px");
+      var result = [];
+      parseTransformMultivalue(translate, multiValueHook(translateVars, "px"));
+      parseTransformMultivalue(translate3d, multiValueHook(translateVars, "px"));
+      parseTransformMultivalue(scale, multiValueHook(scaleVars, "%"));
+      parseTransformMultivalue(scale3d, multiValueHook(scaleVars, "%"));
+      parseTransformMultivalue(rotate, multiValueHook(rotateVars, "deg"));
+      parseTransformMultivalue(rotate3d, multiValueHook(rotateVars, "deg"));
+      parseTransformValue(translateX, singleValueHook(translateVars, "px", 0));
+      parseTransformValue(translateY, singleValueHook(translateVars, "px", 1));
+      parseTransformValue(scaleX, singleValueHook(scaleVars, "%", 0));
+      parseTransformValue(scaleY, singleValueHook(scaleVars, "%", 1));
+      parseTransformValue(scaleZ, singleValueHook(scaleVars, "%", 2));
+      parseTransformValue(rotateX, singleValueHook(rotateVars, "deg", 0));
+      parseTransformValue(rotateY, singleValueHook(rotateVars, "deg", 1));
+      parseTransformValue(rotateZ, singleValueHook(rotateVars, "deg", 2));
+      perspective && result.push("perspective(" + perspective + ")");
+
+      if (translateVars.some(function (v) {
+        return v !== TRANSFORM_UNDEFINED;
+      })) {
+        translateVars[2] === TRANSFORM_UNDEFINED ? result.push("translate(" + translateVars[0] + "," + translateVars[1] + ")") : result.push("translate3d(" + translateVars[0] + "," + translateVars[1] + "," + translateVars[2] + ")");
+      }
+
+      if (scaleVars.some(function (v) {
+        return v !== TRANSFORM_UNDEFINED;
+      })) {
+        scaleVars[2] === TRANSFORM_UNDEFINED ? result.push("scale(" + scaleVars[0] + "," + scaleVars[1] + ")") : result.push("scale3d(" + scaleVars[0] + "," + scaleVars[1] + "," + scaleVars[2] + ")");
+      }
+
+      if (rotateVars.some(function (v) {
+        return v !== TRANSFORM_UNDEFINED;
+      })) {
+        if (rotateVars[0] === TRANSFORM_UNDEFINED && rotateVars[1] === TRANSFORM_UNDEFINED && rotateVars[2] !== TRANSFORM_UNDEFINED) {
+          return result.push("rotate(" + rotateVars[2] + ")");
+        }
+
+        if (rotateVars[0] !== TRANSFORM_UNDEFINED) {
+          result.push("rotate3d(1,0,0," + rotateVars[0] + ")");
+        }
+
+        if (rotateVars[1] !== TRANSFORM_UNDEFINED) {
+          result.push("rotate3d(0,1,0," + rotateVars[1] + ")");
+        }
+
+        if (rotateVars[2] !== TRANSFORM_UNDEFINED) {
+          result.push("rotate3d(0,0,1," + rotateVars[2] + ")");
+        }
+      }
+
+      return result.join(" ");
+    };
+  }();
 
   var SVGBuilder = function SVGBuilder() {
     this.drawVariants = [];
@@ -844,7 +1188,7 @@
             if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode(obj[key])) {
               result[deepKey] = obj[key];
             } else {
-              result[deepKey] = Object.assign(result[deepKey] || (isArray$1(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
+              result[deepKey] = Object.assign(result[deepKey] || (isArray(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
             }
           }
         });
@@ -950,7 +1294,7 @@
         return;
       } else if (value === null) {
         stringValue = "";
-      } else if (isArray$1(value)) {
+      } else if (isArray(value)) {
         return value.each(function (val) {
           typeof transform === "function" ? params.push(transform(key) + "=" + transform(val)) : params.push(key + "=" + val);
         });
@@ -1343,10 +1687,12 @@
     getLocalData: getLocalData,
     getNode: getNode,
     isElement: isElement,
-    getBoundingRect: getBoundingRect,
+    getElementOffsetRect: getElementOffsetRect,
     getElementBoundingRect: getElementBoundingRect,
+    getElementTransform: getElementTransform,
     windowRect: windowRect,
     screenRect: screenRect,
+    transformVariant: transformVariant,
     makeSVG: makeSVG,
     readUrl: readUrl,
     serialize: serialize,

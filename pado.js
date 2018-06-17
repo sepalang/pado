@@ -1630,7 +1630,7 @@
   }; //TODO : move to ?
 
   var hashMap = function hashMap(d, f) {
-    if (typeof d === "object" && !isArray(d)) {
+    if (typeof d === "object" && !isArray$1(d)) {
       for (var k in d) {
         d[k] = f(d[k], k);
       }
@@ -3385,30 +3385,53 @@
         enumerable: true,
         get: function get() {
           return __ref.x;
+        },
+        set: function set(v) {
+          return __ref.x = v;
         }
       },
       y: {
         enumerable: true,
         get: function get() {
           return __ref.y;
+        },
+        set: function set(v) {
+          return __ref.y = v;
         }
       },
       z: {
         enumerable: true,
         get: function get() {
           return __ref.z;
+        },
+        set: function set(v) {
+          return __ref.z = v;
         }
       },
       w: {
         enumerable: true,
         get: function get() {
           return __ref.w;
+        },
+        set: function set(v) {
+          return __ref.w = v;
         }
       }
     });
   };
 
   Point.prototype = {
+    clone: function clone$$1() {
+      return new Point(this.x, this.y, this.z, this.w);
+    },
+    toJSON: function toJSON() {
+      return {
+        x: this.x,
+        y: this.y,
+        z: this.z,
+        w: this.w
+      };
+    },
     pull: function pull(width, angle) {
       if (width === void 0) {
         width = 0;
@@ -3468,57 +3491,63 @@
 
       return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0);
     },
-    toJSON: function toJSON() {
-      return {
-        x: this.x,
-        y: this.y,
-        z: this.z,
-        w: this.w
-      };
+    translate: function translate(_ref5) {
+      var _ref5$x = _ref5.x,
+          x = _ref5$x === void 0 ? 0 : _ref5$x,
+          _ref5$y = _ref5.y,
+          y = _ref5$y === void 0 ? 0 : _ref5$y,
+          _ref5$z = _ref5.z,
+          z = _ref5$z === void 0 ? 0 : _ref5$z;
+      this.x = this.x + x;
+      this.y = this.y + y;
+      this.z = this.z + z;
+      return this;
+    },
+    rotate: function rotate(_ref6) {
+      var _ref6$x = _ref6.x,
+          angleX = _ref6$x === void 0 ? 0 : _ref6$x,
+          _ref6$y = _ref6.y,
+          angleY = _ref6$y === void 0 ? 0 : _ref6$y,
+          _ref6$z = _ref6.z,
+          angleZ = _ref6$z === void 0 ? 0 : _ref6$z;
+      var x1 = this.x,
+          y1 = this.y,
+          z1 = this.z,
+          cr = Math.cos(angleX),
+          cp = Math.cos(angleY),
+          cy = Math.cos(angleZ),
+          sr = Math.sin(angleX),
+          sp = Math.sin(angleY),
+          sy = Math.sin(angleZ),
+          w = cr * cp * cy + -sr * sp * -sy,
+          x = sr * cp * cy - -cr * sp * -sy,
+          y = cr * sp * cy + sr * cp * sy,
+          z = cr * cp * sy - -sr * sp * -cy,
+          m0 = 1 - 2 * (y * y + z * z),
+          m1 = 2 * (x * y + z * w),
+          m2 = 2 * (x * z - y * w),
+          m4 = 2 * (x * y - z * w),
+          m5 = 1 - 2 * (x * x + z * z),
+          m6 = 2 * (z * y + x * w),
+          m8 = 2 * (x * z + y * w),
+          m9 = 2 * (y * z - x * w),
+          m10 = 1 - 2 * (x * x + y * y);
+      this.x = x1 * m0 + y1 * m4 + z1 * m8;
+      this.y = x1 * m1 + y1 * m5 + z1 * m9;
+      this.z = x1 * m2 + y1 * m6 + z1 * m10;
+      return this;
+    },
+    transform: function transform(_transform) {
+      var rotate = _transform.rotate,
+          translate = _transform.translate;
+      this.rotate(rotate);
+      this.translate(translate);
+      return this;
     }
   };
 
-  (function (methods) {
-    var prototype = [];
-    Object.keys(methods).forEach(function (key) {
-      prototype[key] = methods[key];
-    });
-  })({
-    eq: function eq(index) {
-      return this[index];
-    },
-    join: function join(fn) {
-      var _this2 = this;
-
-      var joins = [];
-      this.forEach(function (refp, i) {
-        joins.push(refp);
-        if (!_this2[i + 1]) return;
-        var newp = fn(refp, _this2[i + 1], i);
-        if (!likePoint(newp)) return;
-        var x = newp.x,
-            y = newp.y,
-            z = newp.z,
-            w = newp.w;
-        joins.push(new Point(x, y, z, w));
-      });
-      this.splice(0, this.length);
-      joins.forEach(function (p) {
-        return _this2.push(p);
-      });
-      return this;
-    },
-    toJSON: function toJSON() {
-      var result = [];
-      this.points.forEach(function (p) {
-        return result.push(p.toJSON());
-      });
-      return result;
-    }
-  });
-
   var Line = function Line(pointArray) {
-    var _this3 = this;
+    var _this = this;
 
     asArray$1(pointArray).forEach(function (point) {
       if (!likePoint(point)) return;
@@ -3527,7 +3556,7 @@
           z = point.z,
           w = point.w;
 
-      _this3.push(new Point(x, y, z, w));
+      _this.push(new Point(x, y, z, w));
     });
   };
 
@@ -3552,17 +3581,27 @@
       }
     });
   })(Line, {
+    toJSON: function toJSON() {
+      var result = [];
+      this.forEach(function (p) {
+        return result.push(p.toJSON());
+      });
+      return result;
+    },
+    clone: function clone$$1() {
+      return new Line(this);
+    },
     eq: function eq(index) {
       return this[index];
     },
     join: function join(fn) {
-      var _this4 = this;
+      var _this2 = this;
 
       var joins = [];
       this.forEach(function (refp, i) {
         joins.push(refp);
-        if (!_this4[i + 1]) return;
-        var newp = fn(refp, _this4[i + 1], i);
+        if (!_this2[i + 1]) return;
+        var newp = fn(refp, _this2[i + 1], i);
         if (!likePoint(newp)) return;
         var x = newp.x,
             y = newp.y,
@@ -3572,7 +3611,7 @@
       });
       this.splice(0, this.length);
       joins.forEach(function (p) {
-        return _this4.push(p);
+        return _this2.push(p);
       });
       return this;
     },
@@ -3622,12 +3661,11 @@
           return new Point(x, y, z, w);
       }
     },
-    toJSON: function toJSON() {
-      var result = [];
-      this.points.forEach(function (p) {
-        return result.push(p.toJSON());
+    transform: function transform(_transform2) {
+      this.forEach(function (point) {
+        return point.transform(_transform2);
       });
-      return result;
+      return this;
     }
   });
 
@@ -3794,11 +3832,34 @@
       }
     },
     findPoint: function findPoint(findWord) {
-      var _ref5 = isArray$1(findWord) ? findWord : findWord.trim().split(/\s+/),
-          lineFind = _ref5[0],
-          pointFind = _ref5[1];
+      var _ref7 = isArray$1(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref7[0],
+          pointFind = _ref7[1];
 
       return this.line(lineFind).point(pointFind);
+    },
+    vertex: function vertex() {
+      return new Line([{
+        x: this.left,
+        y: this.top,
+        z: 0,
+        w: 0
+      }, {
+        x: this.left,
+        y: this.bottom,
+        z: 0,
+        w: 0
+      }, {
+        x: this.right,
+        y: this.bottom,
+        z: 0,
+        w: 0
+      }, {
+        x: this.right,
+        y: this.top,
+        z: 0,
+        w: 0
+      }]);
     },
     toJSON: function toJSON() {
       return {
