@@ -158,6 +158,13 @@ const Line = function(pointArray){
       return new Point(x,y,z,w);
     }
   },
+  transform (transform){
+    const computePoints = this.map(point=>{
+      
+    });
+    console.log("computePoints",computePoints);
+    return computePoints;
+  },
   toJSON (){
     const result = [];
     this.points.forEach(p=>result.push(p.toJSON()));
@@ -225,6 +232,9 @@ Rect.prototype = {
   findPoint (findWord){
     const [ lineFind, pointFind ] = isArray(findWord) ? findWord : findWord.trim().split(/\s+/);
     return this.line(lineFind).point(pointFind);
+  },
+  vertex (){
+    return new Line([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0},{x:this.right,y:this.bottom,z:0,w:0},{x:this.right, y:this.top, z:0, w:0}]);
   },
   toJSON (){
     return {

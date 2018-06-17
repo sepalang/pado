@@ -12,7 +12,9 @@
 </script>
 <style lang="scss">
   @import '../util/scss/layout.scss';
-  
+  .main {
+    position:relative;
+  }
   dd+dt {
     margin-top:20px;
   }
