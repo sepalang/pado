@@ -319,7 +319,7 @@ export const transformVariant = (function(){
   }
 }())
 
-const svgPathWithVertex = function(vertex, close){
+export const svgPathWithVertex = function(vertex, close){
   let dValue = "";
   
   vertex.forEach((point, index)=>{

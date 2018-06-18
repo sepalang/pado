@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.makeSVG = _exports.transformVariant = _exports.screenRect = _exports.windowRect = _exports.getElementTransform = _exports.getElementBoundingRect = _exports.getElementOffsetRect = _exports.isElement = _exports.getNode = void 0;
+  _exports.makeSVG = _exports.svgPathWithVertex = _exports.transformVariant = _exports.screenRect = _exports.windowRect = _exports.getElementTransform = _exports.getElementBoundingRect = _exports.getElementOffsetRect = _exports.isElement = _exports.getNode = void 0;
 
   var getNode = function getNode(el) {
     var select = (0, _isLike.likeArray)(el) ? el[0] : el;
@@ -432,6 +432,8 @@
 
     return dValue;
   };
+
+  _exports.svgPathWithVertex = svgPathWithVertex;
 
   var SVGBuilder = function SVGBuilder() {
     this.drawVariants = [];

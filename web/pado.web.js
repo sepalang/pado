@@ -1127,7 +1127,6 @@
       return result.join(" ");
     };
   }();
-
   var svgPathWithVertex = function svgPathWithVertex(vertex, close) {
     var dValue = "";
     vertex.forEach(function (point$$1, index) {
@@ -1730,6 +1729,7 @@
     windowRect: windowRect,
     screenRect: screenRect,
     transformVariant: transformVariant,
+    svgPathWithVertex: svgPathWithVertex,
     makeSVG: makeSVG,
     readUrl: readUrl,
     serialize: serialize,
