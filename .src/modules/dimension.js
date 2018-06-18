@@ -288,14 +288,10 @@ Rect.prototype = {
   }
 };
 
-export const pointArray = function(array){
-  return new PonintArray(array);
-};
-
 export const point = function(x,y,z,w){
   return typeof x === "object" ? 
-  new Ponint(x.x,x.y,x.z,x.w) : 
-  new Ponint(x,y,z,w);
+  new Point(x.x,x.y,x.z,x.w) : 
+  new Point(x,y,z,w);
 };
 
 export const vertex = function(start,end){
