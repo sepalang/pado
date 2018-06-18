@@ -5,8 +5,4 @@ export {
   closeWindow,
   getElementBoundingRect,
   svgPathWithVertex
- } from '../../../.src/web/env';
- 
- export { 
-   rectWithRect
- } from '../../../.src/modules/dimension';
+} from '../../../.src/web/env';
