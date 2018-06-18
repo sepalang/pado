@@ -298,7 +298,7 @@ export const point = function(x,y,z,w){
   new Ponint(x,y,z,w);
 };
 
-export const line = function(start,end){
+export const vertex = function(start,end){
   new Vertex([{x:start.x,y:start.y,z:start.z,w:start.w},{x:end.x,y:end.y,z:end.z,w:end.w}]);
 };
 

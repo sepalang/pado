@@ -1177,9 +1177,9 @@
       return result.join(" ");
     };
   }();
-  var svgPathWithVertex = function svgPathWithVertex(vertex, close) {
+  var svgPathWithVertex = function svgPathWithVertex(vertex$$1, close) {
     var dValue = "";
-    vertex.forEach(function (point$$1, index) {
+    vertex$$1.forEach(function (point$$1, index) {
       var prefix = index === 0 ? 'M' : 'L';
       dValue += "" + prefix + point$$1.x + " " + point$$1.y + " ";
     });

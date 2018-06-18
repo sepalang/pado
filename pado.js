@@ -3930,7 +3930,7 @@
   var point = function point(x, y, z, w) {
     return typeof x === "object" ? new Ponint(x.x, x.y, x.z, x.w) : new Ponint(x, y, z, w);
   };
-  var line = function line(start, end) {
+  var vertex = function vertex(start, end) {
     new Vertex([{
       x: start.x,
       y: start.y,
@@ -4056,7 +4056,7 @@
     ranger: ranger,
     pointArray: pointArray,
     point: point,
-    line: line,
+    vertex: vertex,
     rect: rect
   });
 

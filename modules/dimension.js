@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.rect = _exports.line = _exports.point = _exports.pointArray = void 0;
+  _exports.rect = _exports.vertex = _exports.point = _exports.pointArray = void 0;
 
   var likePoint = function likePoint(p) {
     return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y");
@@ -629,7 +629,7 @@
 
   _exports.point = point;
 
-  var line = function line(start, end) {
+  var vertex = function vertex(start, end) {
     new Vertex([{
       x: start.x,
       y: start.y,
@@ -643,7 +643,7 @@
     }]);
   };
 
-  _exports.line = line;
+  _exports.vertex = vertex;
 
   var rect = function rect(left, top, width, height, x, y, valid) {
     return typeof left === "object" ? new Rect(left.left, left.top, left.width, left.height, left.x, left.y, left.valid) : new Rect(left, top, width, height, x, y, valid);

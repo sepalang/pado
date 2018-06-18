@@ -4,5 +4,11 @@ export {
   openWindow,
   closeWindow,
   getElementBoundingRect,
-  svgPathWithVertex
+  svgPathWithVertex,
 } from '../../../.src/web/env';
+
+export { 
+  point,
+  vertex,
+  rect
+} from '../../../.src/modules/dimension';
