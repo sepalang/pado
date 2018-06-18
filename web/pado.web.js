@@ -732,6 +732,56 @@
           }]);
       }
     },
+    //TODO : incompleted sticky(parent, position, offset);
+    sticky: function sticky(_ref8, position) {
+      var refX = _ref8.left,
+          refY = _ref8.top,
+          refWidth = _ref8.width,
+          refHeight = _ref8.height;
+
+      if (position === void 0) {
+        position = "bottom left";
+      }
+
+      var left = this.left,
+          top = this.top,
+          width = this.width,
+          height = this.height;
+
+      switch (position) {
+        case "bl":
+        case "obl":
+        case "bottom left":
+        case "outer bottom left":
+          return rect({
+            left: refX,
+            top: refY + refHeight,
+            width: width,
+            height: height
+          });
+
+        case "c":
+        case "m":
+        case "mc":
+        case "center":
+        case "middle":
+        case "middle center":
+          return rect({
+            left: refX + refWidth / 2 - width / 2,
+            top: refY + refHeight / 2 - height / 2,
+            width: width,
+            height: height
+          });
+
+        default:
+          return rect({
+            left: left,
+            top: top,
+            width: width,
+            height: height
+          });
+      }
+    },
     toJSON: function toJSON() {
       return {
         x: this.x,

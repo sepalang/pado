@@ -1,14 +1,14 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "../../functions/isLike", "../../functions/cast"], factory);
+    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "../functions/isLike", "../functions/cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("../../functions/isLike"), require("../../functions/cast"));
+    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("../functions/isLike"), require("../functions/cast"));
   } else {
     var mod = {
       exports: {}
     };
     factory(mod.exports, global.es6Regexp, global.es6Date, global.es6Array, global.es6Object, global.webDom, global.isLike, global.cast);
-    global.baseDimenstion = mod.exports;
+    global.dimension = mod.exports;
   }
 })(this, function (_exports, _es6Regexp, _es6Date, _es6Array, _es6Object, _webDom, _isLike, _cast) {
   "use strict";
@@ -552,6 +552,56 @@
           }]);
       }
     },
+    //TODO : incompleted sticky(parent, position, offset);
+    sticky: function sticky(_ref8, position) {
+      var refX = _ref8.left,
+          refY = _ref8.top,
+          refWidth = _ref8.width,
+          refHeight = _ref8.height;
+
+      if (position === void 0) {
+        position = "bottom left";
+      }
+
+      var left = this.left,
+          top = this.top,
+          width = this.width,
+          height = this.height;
+
+      switch (position) {
+        case "bl":
+        case "obl":
+        case "bottom left":
+        case "outer bottom left":
+          return rect({
+            left: refX,
+            top: refY + refHeight,
+            width: width,
+            height: height
+          });
+
+        case "c":
+        case "m":
+        case "mc":
+        case "center":
+        case "middle":
+        case "middle center":
+          return rect({
+            left: refX + refWidth / 2 - width / 2,
+            top: refY + refHeight / 2 - height / 2,
+            width: width,
+            height: height
+          });
+
+        default:
+          return rect({
+            left: left,
+            top: top,
+            width: width,
+            height: height
+          });
+      }
+    },
     toJSON: function toJSON() {
       return {
         x: this.x,
@@ -601,4 +651,4 @@
 
   _exports.rect = rect;
 });
-//# sourceMappingURL=baseDimenstion.js.map
+//# sourceMappingURL=dimension.js.map

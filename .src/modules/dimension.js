@@ -1,5 +1,5 @@
-import { isArray } from '../../functions/isLike';
-import { asArray } from '../../functions/cast';
+import { isArray } from '../functions/isLike';
+import { asArray } from '../functions/cast';
 
 const likePoint = function(p){
   return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y");
@@ -261,18 +261,30 @@ Rect.prototype = {
       return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0},{x:this.right,y:this.bottom,z:0,w:0},{x:this.right, y:this.top, z:0, w:0}]);
     }
   },
-  toJSON (){
-    return {
-      x:this.x,
-      y:this.y,
-      width:this.width,
-      height:this.height,
-      left:this.left,
-      top:this.top,
-      right:this.right,
-      bottom:this.bottom,
-      valid:this.valid
+  //TODO : incompleted sticky(parent, position, offset);
+  sticky ({left:refX, top:refY, width:refWidth, height:refHeight}, position="bottom left"){
+    const { left, top, width, height } = this;
+    switch(position){
+    case "bl": case "obl": case "bottom left": case "outer bottom left":
+      return rect({
+        left:refX,
+        top:refY+refHeight,
+        width,
+        height
+      });
+    case "c": case "m": case "mc": case "center": case "middle": case "middle center":
+      return rect({
+        left:refX + refWidth/2 - width/2,
+        top:refY + refHeight/2 - height/2,
+        width,
+        height
+      });
+    default:
+      return rect({ left, top, width, height });
     }
+  },
+  toJSON (){
+    return { x:this.x, y:this.y, width:this.width, height:this.height, left:this.left, top:this.top, right:this.right, bottom:this.bottom, valid:this.valid };
   }
 };
 
