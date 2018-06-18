@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.rect = _exports.vertex = _exports.point = _exports.pointArray = void 0;
+  _exports.rect = _exports.vertex = _exports.point = void 0;
 
   var likePoint = function likePoint(p) {
     return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y");
@@ -133,48 +133,41 @@
     vertexWith: function vertexWith(destPoint) {
       var points = (0, _cast.asArray)(destPoint);
       points.unshift(this);
-      var pointArray = new Vertex(points.map(function (_ref) {
-        var x = _ref.x,
-            y = _ref.y,
-            z = _ref.z,
-            w = _ref.w;
-        return new Point(x, y, z, w);
-      }));
-      return pointArray;
+      return new Vertex(points);
     },
-    rectWith: function rectWith(_ref2) {
-      var x = _ref2.x,
-          y = _ref2.y;
+    rectWith: function rectWith(_ref) {
+      var x = _ref.x,
+          y = _ref.y;
 
-      var _ref3 = this.x > x ? [this.x, x] : [x, this.x],
-          largeX = _ref3[0],
-          smallX = _ref3[1];
+      var _ref2 = this.x > x ? [this.x, x] : [x, this.x],
+          largeX = _ref2[0],
+          smallX = _ref2[1];
 
-      var _ref4 = this.y > y ? [this.y, y] : [y, this.y],
-          largeY = _ref4[0],
-          smallY = _ref4[1];
+      var _ref3 = this.y > y ? [this.y, y] : [y, this.y],
+          largeY = _ref3[0],
+          smallY = _ref3[1];
 
       return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0);
     },
-    translate: function translate(_ref5) {
-      var _ref5$x = _ref5.x,
-          x = _ref5$x === void 0 ? 0 : _ref5$x,
-          _ref5$y = _ref5.y,
-          y = _ref5$y === void 0 ? 0 : _ref5$y,
-          _ref5$z = _ref5.z,
-          z = _ref5$z === void 0 ? 0 : _ref5$z;
+    translate: function translate(_ref4) {
+      var _ref4$x = _ref4.x,
+          x = _ref4$x === void 0 ? 0 : _ref4$x,
+          _ref4$y = _ref4.y,
+          y = _ref4$y === void 0 ? 0 : _ref4$y,
+          _ref4$z = _ref4.z,
+          z = _ref4$z === void 0 ? 0 : _ref4$z;
       this.x = this.x + x;
       this.y = this.y + y;
       this.z = this.z + z;
       return this;
     },
-    rotate: function rotate(_ref6) {
-      var _ref6$x = _ref6.x,
-          angleX = _ref6$x === void 0 ? 0 : _ref6$x,
-          _ref6$y = _ref6.y,
-          angleY = _ref6$y === void 0 ? 0 : _ref6$y,
-          _ref6$z = _ref6.z,
-          angleZ = _ref6$z === void 0 ? 0 : _ref6$z;
+    rotate: function rotate(_ref5) {
+      var _ref5$x = _ref5.x,
+          angleX = _ref5$x === void 0 ? 0 : _ref5$x,
+          _ref5$y = _ref5.y,
+          angleY = _ref5$y === void 0 ? 0 : _ref5$y,
+          _ref5$z = _ref5.z,
+          angleZ = _ref5$z === void 0 ? 0 : _ref5$z;
       var x1 = this.x,
           y1 = this.y,
           z1 = this.z,
@@ -464,9 +457,9 @@
 
   Rect.prototype = {
     findPoint: function findPoint(findWord) {
-      var _ref7 = (0, _isLike.isArray)(findWord) ? findWord : findWord.trim().split(/\s+/),
-          lineFind = _ref7[0],
-          pointFind = _ref7[1];
+      var _ref6 = (0, _isLike.isArray)(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref6[0],
+          pointFind = _ref6[1];
 
       return this.vertex(lineFind).point(pointFind);
     },
@@ -553,11 +546,11 @@
       }
     },
     //TODO : incompleted sticky(parent, position, offset);
-    sticky: function sticky(_ref8, position) {
-      var refX = _ref8.left,
-          refY = _ref8.top,
-          refWidth = _ref8.width,
-          refHeight = _ref8.height;
+    sticky: function sticky(_ref7, position) {
+      var refX = _ref7.left,
+          refY = _ref7.top,
+          refWidth = _ref7.width,
+          refHeight = _ref7.height;
 
       if (position === void 0) {
         position = "bottom left";
@@ -617,14 +610,8 @@
     }
   };
 
-  var pointArray = function pointArray(array) {
-    return new PonintArray(array);
-  };
-
-  _exports.pointArray = pointArray;
-
   var point = function point(x, y, z, w) {
-    return typeof x === "object" ? new Ponint(x.x, x.y, x.z, x.w) : new Ponint(x, y, z, w);
+    return typeof x === "object" ? new Point(x.x, x.y, x.z, x.w) : new Point(x, y, z, w);
   };
 
   _exports.point = point;

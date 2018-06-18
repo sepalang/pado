@@ -39,9 +39,7 @@ Point.prototype = {
   vertexWith (destPoint){
     const points = asArray(destPoint);
     points.unshift(this);
-    
-    const pointArray = new Vertex(points.map(({x,y,z,w})=>new Point(x,y,z,w)))
-    return pointArray;
+    return new Vertex(points);
   },
   rectWith ({x, y}){
     const [largeX, smallX] = this.x > x ? [ this.x, x ] : [ x, this.x ];
