@@ -39,19 +39,19 @@
         const downBoundingRect      = getElementBoundingRect( $(this.$el).find(".rect-downside") );
         const angleDownBoundingRect = getElementBoundingRect( $(this.$el).find(".rect-angledown") );
         
-        const rootTopPoint    = rootBoundingRect.line("top").point("center");
-        const rootBottomPoint = rootBoundingRect.line("bottom").point("center");
+        const rootTopPoint    = rootBoundingRect.vertex("top").point("center");
+        const rootBottomPoint = rootBoundingRect.vertex("bottom").point("center");
         const bottom2Points   = rootBottomPoint.pull(10);
         
-        //rootTopPoint.line()
+        //rootTopPoint.vertex()
         const anglePath = bottom2Points
         .eq(1)
-        .lineWith(angleDownBoundingRect.findPoint("left center"))
+        .vertexWith(angleDownBoundingRect.findPoint("left center"))
         .join((first,last)=>first.rectWith(last).findPoint("left down"));
         
         const svgTag = makeSVG()
-        .addPath([rootTopPoint,upsideBoundingRect.line("bottom").point("center")])
-        .addPath([rootTopPoint,uprightBoundingRect.line("left").point("center")])
+        .addPath([rootTopPoint,upsideBoundingRect.vertex("bottom").point("center")])
+        .addPath([rootTopPoint,uprightBoundingRect.vertex("left").point("center")])
         .addPath([bottom2Points.eq(0),downBoundingRect.findPoint("top center")])
         .addPath([bottom2Points.eq(1),downrightBoundingRect.findPoint("left center")])
         .addPath(anglePath,{ "strokeWidth":2 , "stroke":"blue"})

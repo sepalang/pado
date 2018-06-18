@@ -319,6 +319,21 @@ export const transformVariant = (function(){
   }
 }())
 
+const svgPathWithVertex = function(vertex, close){
+  let dValue = "";
+  
+  vertex.forEach((point, index)=>{
+    const prefix = index === 0 ? 'M' : 'L';
+    dValue += `${prefix}${point.x} ${point.y} `;
+  });
+  
+  if(!!dValue && close === true){
+    dValue += " Z";
+  }
+  
+  return dValue;
+}
+
 const SVGBuilder = function(){
   this.drawVariants = [];
 };
@@ -351,13 +366,10 @@ SVGBuilder.prototype = {
         pathElement.setAttribute("stroke-linecap","butt");
         pathElement.setAttribute("stroke-linejoin","miter");
         
-        let dValue = "";
-        
-        params.forEach((point, index)=>{
-          const prefix = index === 0 ? 'M' : 'L';
+        const dValue = svgPathWithVertex(params);
+        params.forEach(point=>{
           if(point.x > realMaxWidth) realMaxWidth = point.x;
           if(point.y > realMaxHeigth) realMaxHeigth = point.y;
-          dValue += `${prefix}${point.x} ${point.y} `;
         });
         
         pathElement.setAttribute("d",dValue);

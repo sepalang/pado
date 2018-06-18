@@ -1,10 +1,10 @@
 export { 
-  getElementBoundingRect,
   readUrl,
   windowRect,
   openWindow,
   closeWindow,
-  makeSVG
+  getElementBoundingRect,
+  svgPathWithVertex
  } from '../../../.src/web/env';
  
  export { 

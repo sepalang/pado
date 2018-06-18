@@ -115,7 +115,7 @@
         case "h":
         case "horizontal":
           var xHalf = width <= 0 ? 0 : width / 2;
-          return new Line([{
+          return new Vertex([{
             x: x - xHalf,
             y: y,
             z: z,
@@ -130,10 +130,10 @@
         default:
       }
     },
-    lineWith: function lineWith(destPoint) {
+    vertexWith: function vertexWith(destPoint) {
       var points = (0, _cast.asArray)(destPoint);
       points.unshift(this);
-      var pointArray = new Line(points.map(function (_ref) {
+      var pointArray = new Vertex(points.map(function (_ref) {
         var x = _ref.x,
             y = _ref.y,
             z = _ref.z,
@@ -211,7 +211,7 @@
     }
   };
 
-  var Line = function Line(pointArray) {
+  var Vertex = function Vertex(pointArray) {
     var _this = this;
 
     (0, _cast.asArray)(pointArray).forEach(function (point) {
@@ -245,7 +245,7 @@
         }
       }
     });
-  })(Line, {
+  })(Vertex, {
     toJSON: function toJSON() {
       var result = [];
       this.forEach(function (p) {
@@ -254,7 +254,7 @@
       return result;
     },
     clone: function clone() {
-      return new Line(this);
+      return new Vertex(this);
     },
     eq: function eq(index) {
       return this[index];
@@ -326,10 +326,37 @@
           return new Point(x, y, z, w);
       }
     },
-    transform: function transform(_transform2) {
-      this.forEach(function (point) {
-        return point.transform(_transform2);
-      });
+    transform: function transform(_transform2, rect) {
+      var useRect = !!rect;
+
+      if (useRect) {
+        var left = rect.left,
+            top = rect.top,
+            width = rect.width,
+            height = rect.height;
+        ; //rotateOrigin
+
+        var originX = left + width / 2;
+        var originY = top + height / 2;
+        this.forEach(function (point) {
+          var left = rect.left,
+              top = rect.top;
+          point.translate({
+            x: -originX,
+            y: -originY
+          });
+          point.transform(_transform2);
+          point.translate({
+            x: originX,
+            y: originY
+          });
+        });
+      } else {
+        this.forEach(function (point) {
+          point.transform(_transform2);
+        });
+      }
+
       return this;
     }
   });
@@ -436,11 +463,18 @@
   };
 
   Rect.prototype = {
-    line: function line(order) {
+    findPoint: function findPoint(findWord) {
+      var _ref7 = (0, _isLike.isArray)(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref7[0],
+          pointFind = _ref7[1];
+
+      return this.vertex(lineFind).point(pointFind);
+    },
+    vertex: function vertex(order) {
       switch (order) {
         case "right":
         case "r":
-          return new Line([{
+          return new Vertex([{
             x: this.right,
             y: this.top,
             z: 0,
@@ -454,7 +488,7 @@
 
         case "bottom":
         case "b":
-          return new Line([{
+          return new Vertex([{
             x: this.left,
             y: this.bottom,
             z: 0,
@@ -468,7 +502,7 @@
 
         case "left":
         case "l":
-          return new Line([{
+          return new Vertex([{
             x: this.left,
             y: this.top,
             z: 0,
@@ -482,8 +516,7 @@
 
         case "top":
         case "t":
-        default:
-          return new Line([{
+          return new Vertex([{
             x: this.left,
             y: this.top,
             z: 0,
@@ -494,37 +527,30 @@
             z: 0,
             w: 0
           }]);
-      }
-    },
-    findPoint: function findPoint(findWord) {
-      var _ref7 = (0, _isLike.isArray)(findWord) ? findWord : findWord.trim().split(/\s+/),
-          lineFind = _ref7[0],
-          pointFind = _ref7[1];
 
-      return this.line(lineFind).point(pointFind);
-    },
-    vertex: function vertex() {
-      return new Line([{
-        x: this.left,
-        y: this.top,
-        z: 0,
-        w: 0
-      }, {
-        x: this.left,
-        y: this.bottom,
-        z: 0,
-        w: 0
-      }, {
-        x: this.right,
-        y: this.bottom,
-        z: 0,
-        w: 0
-      }, {
-        x: this.right,
-        y: this.top,
-        z: 0,
-        w: 0
-      }]);
+        default:
+          return new Vertex([{
+            x: this.left,
+            y: this.top,
+            z: 0,
+            w: 0
+          }, {
+            x: this.left,
+            y: this.bottom,
+            z: 0,
+            w: 0
+          }, {
+            x: this.right,
+            y: this.bottom,
+            z: 0,
+            w: 0
+          }, {
+            x: this.right,
+            y: this.top,
+            z: 0,
+            w: 0
+          }]);
+      }
     },
     toJSON: function toJSON() {
       return {
@@ -554,7 +580,7 @@
   _exports.point = point;
 
   var line = function line(start, end) {
-    new Line([{
+    new Vertex([{
       x: start.x,
       y: start.y,
       z: start.z,

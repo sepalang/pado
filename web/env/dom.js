@@ -419,6 +419,20 @@
 
   _exports.transformVariant = transformVariant;
 
+  var svgPathWithVertex = function svgPathWithVertex(vertex, close) {
+    var dValue = "";
+    vertex.forEach(function (point, index) {
+      var prefix = index === 0 ? 'M' : 'L';
+      dValue += "" + prefix + point.x + " " + point.y + " ";
+    });
+
+    if (!!dValue && close === true) {
+      dValue += " Z";
+    }
+
+    return dValue;
+  };
+
   var SVGBuilder = function SVGBuilder() {
     this.drawVariants = [];
   };
@@ -453,12 +467,10 @@
           pathElement.setAttribute("stroke-width", attributes['strokeWidth'] || attributes['stroke-width'] || "1");
           pathElement.setAttribute("stroke-linecap", "butt");
           pathElement.setAttribute("stroke-linejoin", "miter");
-          var dValue = "";
-          params.forEach(function (point, index) {
-            var prefix = index === 0 ? 'M' : 'L';
+          var dValue = svgPathWithVertex(params);
+          params.forEach(function (point) {
             if (point.x > realMaxWidth) realMaxWidth = point.x;
             if (point.y > realMaxHeigth) realMaxHeigth = point.y;
-            dValue += "" + prefix + point.x + " " + point.y + " ";
           });
           pathElement.setAttribute("d", dValue);
           svgTag.appendChild(pathElement);
