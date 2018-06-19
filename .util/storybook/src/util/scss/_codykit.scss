@@ -1,49 +1,49 @@
 @charset "UTF-8";
-//CSS Toolkit :: Codykit version : 0.17 (1.0 alpha)
-//auther : hojung ahn (https://github.com/labeldock/codykit)
-@if global-variable-exists(codykit-hack){ $codykit-hack:$codykit-hack !global; } @else {
-	$codykit-hack:false !global;
+//remark version : 0.20.0 (1.1 alpha)
+
+@if global-variable-exists(remark-hack){ $remark-hack:$remark-hack !global; } @else {
+	$remark-hack:false !global;
 }
-@if global-variable-exists(codykit-disabled-opacity){ $codykit-disabled-opacity:$codykit-disabled-opacity !global; } @else {
-	$codykit-disabled-opacity:0.7 !global;
+@if global-variable-exists(remark-disabled-opacity){ $remark-disabled-opacity:$remark-disabled-opacity !global; } @else {
+	$remark-disabled-opacity:0.7 !global;
 }
 
 //media default option (width start)
-@if global-variable-exists(codykit-tablet-width){ $codykit-tablet-width:$codykit-tablet-width !global; } @else {
-	$codykit-tablet-width:768px !global;
+@if global-variable-exists(remark-tablet-width){ $remark-tablet-width:$remark-tablet-width !global; } @else {
+	$remark-tablet-width:768px !global;
 }
-@if global-variable-exists(codykit-desktop-width){ $codykit-desktop-width:$codykit-desktop-width !global; } @else {
-	$codykit-desktop-width:1200px !global;
+@if global-variable-exists(remark-desktop-width){ $remark-desktop-width:$remark-desktop-width !global; } @else {
+	$remark-desktop-width:1200px !global;
 }
 
 //media detail option (width start)
-@if global-variable-exists(codykit-mobile-landscape-width){ $codykit-mobile-landscape-width:$codykit-mobile-landscape-width !global; } @else {
-	$codykit-mobile-landscape-width:480px !global;
+@if global-variable-exists(remark-mobile-landscape-width){ $remark-mobile-landscape-width:$remark-mobile-landscape-width !global; } @else {
+	$remark-mobile-landscape-width:480px !global;
 }
-@if global-variable-exists(codykit-tablet-landscape-width){ $codykit-tablet-landscape-width:$codykit-tablet-landscape-width !global; } @else {
-	$codykit-tablet-landscape-width:992px !global;
+@if global-variable-exists(remark-tablet-landscape-width){ $remark-tablet-landscape-width:$remark-tablet-landscape-width !global; } @else {
+	$remark-tablet-landscape-width:992px !global;
 }
-@if global-variable-exists(codykit-desktop-landscape-width){ $codykit-desktop-landscape-width:$codykit-desktop-landscape-width !global; } @else {
-	$codykit-desktop-landscape-width:1920px !global;
+@if global-variable-exists(remark-desktop-landscape-width){ $remark-desktop-landscape-width:$remark-desktop-landscape-width !global; } @else {
+	$remark-desktop-landscape-width:1920px !global;
 }
 
-@if global-variable-exists(codykit-preload-images){ $codykit-preload-images:$codykit-preload-images !global; } @else {
-	$codykit-preload-images:"" !global;
+@if global-variable-exists(remark-preload-images){ $remark-preload-images:$remark-preload-images !global; } @else {
+	$remark-preload-images:"" !global;
 }
-@if global-variable-exists(codykit-standard-empx){ $codykit-standard-empx:$codykit-standard-empx !global; } @else {
-	$codykit-standard-empx:16px !global;
+@if global-variable-exists(remark-standard-empx){ $remark-standard-empx:$remark-standard-empx !global; } @else {
+	$remark-standard-empx:16px !global;
 }
-@if global-variable-exists(codykit-relative-empx){ $codykit-relative-empx:$codykit-relative-empx !global; } @else {
-	$codykit-relative-empx:16px !global;
+@if global-variable-exists(remark-relative-empx){ $remark-relative-empx:$remark-relative-empx !global; } @else {
+	$remark-relative-empx:16px !global;
 }
 
 //usage [$mobile-vetical-limit, $mobile-limit, $tablet-vertical-limit, $tablet-limit];
-//@include codykit-media-width(480px,768px,992px,1200px);
-@mixin codykit-media-width($mobile-vetical-limit, $mobile-limit, $tablet-vertical-limit, $tablet-limit){
-	$codykit-mobile-landscape-width:$mobile-vetical-limit !global;
-	$codykit-tablet-width:$mobile-limit !global;
-	$codykit-tablet-landscape-width:$tablet-vertical-limit !global;
-	$codykit-desktop-width:$tablet-limit !global;
+//@include remark-media-width(480px,768px,992px,1200px);
+@mixin remark-media-width($mobile-vetical-limit, $mobile-limit, $tablet-vertical-limit, $tablet-limit){
+	$remark-mobile-landscape-width:$mobile-vetical-limit !global;
+	$remark-tablet-width:$mobile-limit !global;
+	$remark-tablet-landscape-width:$tablet-vertical-limit !global;
+	$remark-desktop-width:$tablet-limit !global;
 	@content;
 }
 
@@ -78,28 +78,28 @@
 	}
 }
 
-@mixin codykit-standard-fontsize($base-size:false){
+@mixin remark-standard-fontsize($base-size:false){
 	@if $base-size != false {
-		$codykit-standard-empx:$base-size !global;
+		$remark-standard-empx:$base-size !global;
 	}
 }
 
 @mixin root-fontsize-variant($relative-size:false) {
 	@if $relative-size != false {
-		$codykit-relative-empx:$relative-size !global;
+		$remark-relative-empx:$relative-size !global;
 	}
-	font-size:$codykit-relative-empx * ($codykit-relative-empx / $codykit-standard-empx);
+	font-size:$remark-relative-empx * ($remark-relative-empx / $remark-standard-empx);
 }
 
 @mixin rem-variant($font-size:false) {
 	@if $font-size == false {
 		font-size:1rem;
 	} @else {
-		font-size:#{$font-size / $codykit-relative-empx}rem;
+		font-size:#{$font-size / $remark-relative-empx}rem;
 	}
 }
 
-//"width-height" is only use in _codykit.scss
+//"width-height" is only use in _remark.scss
 @mixin width-height($width:false,$height:false) {
     @if $width != false  { width:$width; }
     @if $height != false { height:$height; }
@@ -133,7 +133,7 @@
 }
 
 @mixin inline-block($width:false, $height:false,$vertical-align:false,$line-height:false){
-    @if $codykit-hack == true {
+    @if $remark-hack == true {
         display:inline;
 		zoom:1;
     }
@@ -179,13 +179,13 @@
 }
 
 @mixin clearfix {
-    &:after {
-        content:"";
-        display:block;
-        height:0px;
+	&:after {
+		content:"";
+		display:block;
+		height:0px;
 		width:0px;
-        clear:both;
-    }
+		clear:both;
+	}
 }
 
 @mixin white-space-variant($flag:true,$scroll:false){
@@ -202,15 +202,15 @@
 }
 
 @mixin word-break-variant($flag:true,$text-overflow:clip) {
-    @if $flag == true{
-	    white-space: normal;
+	@if $flag == true{
+		white-space: normal;
 		word-break:break-all;
-        text-overflow: initial;
-        -o-text-overflow: initial;
-        -ms-text-overflow: initial;
-    }
-    @if $flag == false{
-    	white-space: nowrap;
+		text-overflow: initial;
+		-o-text-overflow: initial;
+		-ms-text-overflow: initial;
+	}
+	@if $flag == false{
+		white-space: nowrap;
 		word-break:keep-all;
 	    text-overflow: $text-overflow;
 	    -o-text-overflow: $text-overflow;
@@ -220,18 +220,16 @@
 
 @mixin word-wrap-variant($flag:true,$overflow:false,$text-overflow:clip) {
 	@if $flag == true{
-	    white-space: normal;
+		white-space: normal;
 		word-break:keep-all;
-		//word-break:normal;
-	    //word-wrap:normal;
 		@if $overflow == false {
 			overflow: visible;
 		} @else {
 			overflow: $overflow;
 		}
-        text-overflow: initial;
-        -o-text-overflow: initial;
-        -ms-text-overflow: initial;
+		text-overflow: initial;
+		-o-text-overflow: initial;
+		-ms-text-overflow: initial;
 	}
 	@if $flag == false{
 		white-space: nowrap;
@@ -705,10 +703,10 @@
     }
 }
 
-@mixin hr-variant($color:gray,$width:1px){
+@mixin hr-variant($color:gray,$width:1px,$margin:0px){
 	display:block;
 	height:$width;
-	margin:0;
+	margin:$margin 0px;
 	padding:0;
 	border-width:0;
 	background-color:$color;
@@ -913,17 +911,16 @@
 }
 
 @mixin list-variant($list-style:none,$list-style-position:inside){
-    margin:0px;
-    padding:0px;
+	padding:0px;
 	> li{
-        margin:0px;
-        @if $list-style {
-            list-style:$list-style;
-        }
+		margin:0px;
+		@if $list-style {
+			list-style:$list-style;
+		}
 		@if $list-style-position {
 			list-style-position:$list-style-position;
 		}
-    }
+	}
 	@content;
 }
 
@@ -942,8 +939,8 @@
 	@content;
 }
 //table 크기안에서 셀크기가 결정됩니다.
-@mixin fixed-table-variant($spacing:0px,$width:100%) { @include cellbase-table-variant($spacing,$width,fixed); @content; }
-@mixin table-variant($spacing:0px,$width:100%) { @include cellbase-table-variant($spacing,$width,fixed); @content; }
+@mixin fixed-table-variant($spacing:0px,$width:99.99%) { @include cellbase-table-variant($spacing,$width,fixed); @content; }
+@mixin table-variant($spacing:0px,$width:99.99%) { @include cellbase-table-variant($spacing,$width,fixed); @content; }
 
 @mixin border-radius($dirction,$radius){
 	@if $dirction == "top" {
@@ -1248,14 +1245,29 @@
 	}
 }
 
-@mixin scrollbar-width-variant($width:17px) {
+@mixin scrollbar-width-variant($width:false, $autoHiding:false) {
 	-webkit-overflow-scrolling:touch;
-	&::-webkit-scrollbar {
-	    width: $width;
-		height:$width;
+
+	@if $width == 0px or $width == none {
+		-ms-overflow-style: none;
+
+		&::-webkit-scrollbar { 
+			display: none; 
+		}
+	} @else {
+		@if $autoHiding == true {
+			-ms-overflow-style: -ms-autohiding-scrollbar;
+		} @else {
+			-ms-overflow-style: scrollbar;
+		}
+
+		&::-webkit-scrollbar {
+			width: $width or $remark-scrollbar-width;
+			height:$width or $remark-scrollbar-width;
+		}
 	}
 	&::-webkit-scrollbar-thumb {
-		border-radius:$width;
+		border-radius:$width or $remark-scrollbar-width;
 	}
 }
 
@@ -1465,93 +1477,93 @@
 }
 @mixin media-mobile-portrait($ratio:false) {
 	@if $ratio {
-		@include media-less-width($codykit-mobile-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		@include media-less-width($remark-mobile-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		@include media-less-width($codykit-mobile-landscape-width){ @content; };
+		@include media-less-width($remark-mobile-landscape-width){ @content; };
 	}
 }
 @mixin media-mobile-landscape($ratio:false) {
 	@if $ratio {
-		@include media-inner-width($codykit-mobile-landscape-width,$codykit-tablet-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		@include media-inner-width($remark-mobile-landscape-width,$remark-tablet-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		@include media-inner-width($codykit-mobile-landscape-width,$codykit-tablet-width){ @content; };
+		@include media-inner-width($remark-mobile-landscape-width,$remark-tablet-width){ @content; };
 	}
 }
 @mixin media-mobile($ratio:false) {
 	@if $ratio {
-		@include media-less-width($codykit-tablet-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		@include media-less-width($remark-tablet-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		@include media-less-width($codykit-tablet-width){ @content; };
+		@include media-less-width($remark-tablet-width){ @content; };
 	}
 }
 @mixin media-mobile-gt($ratio:false) {
 	@if $ratio {
-		@include media-over-width($codykit-tablet-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		@include media-over-width($remark-tablet-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		@include media-over-width($codykit-tablet-width){ @content; };
+		@include media-over-width($remark-tablet-width){ @content; };
 	}
 }
 @mixin media-tablet-portrait($ratio:false) {
 	@if $ratio {
-		@include media-inner-width($codykit-tablet-width,$codykit-tablet-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		@include media-inner-width($remark-tablet-width,$remark-tablet-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		@include media-inner-width($codykit-tablet-width,$codykit-tablet-landscape-width){ @content; };
+		@include media-inner-width($remark-tablet-width,$remark-tablet-landscape-width){ @content; };
 	}
 }
 @mixin media-tablet-landscape($ratio:false) {
 	@if $ratio {
-		@include media-inner-width($codykit-tablet-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		@include media-inner-width($remark-tablet-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		@include media-inner-width($codykit-tablet-landscape-width,$codykit-desktop-width){ @content; };
+		@include media-inner-width($remark-tablet-landscape-width,$remark-desktop-width){ @content; };
 	}
 }
 @mixin media-tablet($ratio:false) {
 	@if $ratio {
-		@include media-inner-width($codykit-tablet-width,$codykit-desktop-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		@include media-inner-width($remark-tablet-width,$remark-desktop-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		@include media-inner-width($codykit-tablet-width,$codykit-desktop-width){ @content; };
+		@include media-inner-width($remark-tablet-width,$remark-desktop-width){ @content; };
 	}
 }
 @mixin media-tablet-portrait-gt($ratio:false) {
 	@if $ratio {
-		@include media-over-width($codykit-tablet-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		@include media-over-width($remark-tablet-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		@include media-over-width($codykit-tablet-landscape-width){ @content; };
+		@include media-over-width($remark-tablet-landscape-width){ @content; };
 	}
 }
 @mixin media-tablet-landscape-lt($ratio:false) {
 	@if $ratio {
-		   @include media-less-width($codykit-tablet-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		   @include media-less-width($remark-tablet-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		   @include media-less-width($codykit-tablet-landscape-width){ @content; };
+		   @include media-less-width($remark-tablet-landscape-width){ @content; };
 	}
 }
 @mixin media-desktop($ratio:false) {
 	@if $ratio {
-		@include media-over-width($codykit-desktop-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		@include media-over-width($remark-desktop-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		@include media-over-width($codykit-desktop-width){ @content; };
+		@include media-over-width($remark-desktop-width){ @content; };
 	}
 }
 @mixin media-desktop-lt($ratio:false) {
 	@if $ratio {
-		@include media-less-width($codykit-desktop-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		@include media-less-width($remark-desktop-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		@include media-less-width($codykit-desktop-width){ @content; };
+		@include media-less-width($remark-desktop-width){ @content; };
 	}
 }
 @mixin media-desktop-wide($ratio:false) {
 	@if $ratio {
-		@include media-over-width($codykit-desktop-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		@include media-over-width($remark-desktop-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		@include media-over-width($codykit-desktop-landscape-width){ @content; };
+		@include media-over-width($remark-desktop-landscape-width){ @content; };
 	}
 }
 @mixin media-desktop-wide-lt($ratio:false) {
 	@if $ratio {
-		@include media-less-width($codykit-desktop-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
+		@include media-less-width($remark-desktop-landscape-width,"(-webkit-min-device-pixel-ratio:#{$ratio}) and (min-resolution: #{96 * $ratio}dpi)"){ @content; };
 	} @else {
-		@include media-less-width($codykit-desktop-landscape-width){ @content; };
+		@include media-less-width($remark-desktop-landscape-width){ @content; };
 	}
 }
 @mixin pt-variant($photoshop-pt:0, $origin:72){
@@ -1669,7 +1681,7 @@
 		@content;
 	}
 }
-@mixin codykit-box-sizing($target:"*") {
+@mixin remark-box-sizing($target:"*") {
     #{$target}{
         &,&:before,&:after {
             -webkit-box-sizing: border-box;
@@ -1678,7 +1690,7 @@
         }
     }
 }
-@mixin codykit-font-smooth($target:"html,body") {
+@mixin remark-font-smooth($target:"html,body") {
     #{$target}{
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
@@ -1687,7 +1699,7 @@
 		//-webkit-text-stroke: 0.1px;
     }
 }
-@mixin codykit-text-basic($vertical-align:middle) {
+@mixin remark-text-basic($vertical-align:middle) {
 	@if $vertical-align == false {
 		$vertical-align:baseline;
 	}
@@ -1731,138 +1743,144 @@
 	}
 }
 
-@mixin codykit-document-basic($min-width:false) {
-	/* codykit-document-basic -- start */
-    html,body {
-		position:relative;
-        margin:0px;
-        padding:0px;
-		@if $min-width == false {
-			min-width:320px;
-		} @else {
-			min-width:$min-width;
-		}
-		font-family: Sans-Serif;
+@mixin remark-document-basic($min-width:false) {
+  /* remark-document-basic -- start */
+  html,body {
+    position:relative;
+    margin:0px;
+    padding:0px;
+    @if $min-width == false {
+      min-width:320px;
+    } @else {
+      min-width:$min-width;
     }
-    img {
-        border:none;
+    font-family: Sans-Serif;
+  }
+  img {
+    border:none;
+  }
+  section, article, header, footer, aside, details, summary, dialog, figcaption, figure, hgroup, main, nav, command, fieldset {
+    display:block;
+    margin:0;
+  }
+  section, article, header, footer, aside {
+    position:relative;
+  }
+  // chrome user agent styleseet fix
+  dialog {
+    position:static;
+    width:auto;
+    height:auto;
+    margin:initial;
+    padding:initial;
+    border:none;
+    background-color:white;
+  }
+  // media is inline-block
+  audio,canvas,progress,video {
+    @include inline-block;
+    margin:0;
+  }
+  script, style, template, [hidden] {
+    display:none !important;
+  }
+  [ghost] {
+    visibility:hidden;
+  }
+  [disabled] {
+    @include disabled-variant;
+  }
+  input,button,select,textarea {
+    font-family: inherit;  font-size: inherit;
+  }
+  input,button,select {
+    @include inline-block;
+  }
+  ul, menu, ol {
+    display:block;
+    padding:0;
+    margin:0;
+    > li {
+      list-style-position:inside;
     }
-    section, article, header, footer, aside, details, summary, dialog, figcaption, figure, hgroup, main, nav, command, fieldset {
-        display:block;
-		margin:0;
+  }
+  ol {
+    > li {
+      list-style-type:decimal;
     }
-	section, article, header, footer, aside {
-		position:relative;
-	}
-	//chrome user agent styleseet fix
-	dialog {
-		position:static;
-		width:auto;
-		height:auto;
-		margin:initial;
-		padding:initial;
-		border:none;
-		background-color:white;
-	}
+  }
+  menu {
+    > li {
+      list-style:none;
+      cursor:pointer;
+    }
+  }
+  dl,dd,dt {
+    margin:0;
+    text-indent:0;
+  }
+  label {
+    cursor:inherit;
+  }
+  .no-transition {
+    transition-duration:0.001s !important;
+    transition-delay:0.001s !important;
+    *, *:before, *:after {
+      transition-duration:0.001s !important;
+      transition-delay:0.001s !important;
+    }
+  }
+  .no-animation {
+    -webkit-animation-duration:0.001s !important;
+    animation-duration:0.001s !important;
+    *, *:before, *:after {
+      -webkit-animation-duration:0.001s !important;
+      animation-duration:0.001s !important;
+    }
+  }
+  table {
+    @include table-variant;
+    td,th{
+      font-weight:normal;
+      padding:0;
+      vertical-align:middle;
+      word-break:break-all;
+    }
+  }
+  [media-only~="mobile"]{
+    @include media-mobile-gt {
+      display:none !important;
+    }
 
-    audio,canvas,progress,video {
-        @include inline-block;
-		margin:0;
+  }
+  [media-only~="tablet"]{
+    @include media-outer-width($remark-tablet-width,$remark-desktop-width){
+      display:none !important;
     }
-	script, style, template, .hidden, [hidden] {
-		display:none !important;
-	}
-	[disabled] {
-		@include disabled-variant;
-	}
-    input,button,select,textarea {
-        font-family: inherit;  font-size: inherit;
+  }
+  [media-only~="desktop"]{
+    @include media-desktop-lt {
+      display:none !important;
     }
-	input,button,select {
-		@include inline-block;
-	}
-	ul, menu, ol {
-		display:block;
-		padding:0;
-		margin:0;
-		> li {
-			list-style-position:inside;
-		}
-	}
-	ol {
-		> li {
-			list-style-type:decimal;
-		}
-	}
-	menu > li {
-		list-style:none;
-		cursor:pointer;
-	}
-	dl,dd,dt {
-		margin:0;
-		text-indent:0;
-	}
-    label {
-        cursor:inherit;
+  }
+  [media-not~="mobile"]{
+    @include media-mobile {
+      display:none !important;
     }
-	.no-transition {
-		transition-duration:0.001s !important;
-		transition-delay:0.001s !important;
-		*, *:before, *:after {
-			transition-duration:0.001s !important;
-			transition-delay:0.001s !important;
-		}
-	}
-	.no-animation {
-		-webkit-animation-duration:0.001s !important;
-		animation-duration:0.001s !important;
-		*, *:before, *:after {
-			-webkit-animation-duration:0.001s !important;
-			animation-duration:0.001s !important;
-		}
-	}
-	table {
-		@include table-variant;
-		td,th{
-			font-weight:normal;
-			padding:0;
-			vertical-align:middle;
-			word-break:break-all;
-		}
-	}
-	[media-only~="mobile"]{
-		@include media-mobile-gt {
-			display:none !important;
-		}
-
-	}
-	[media-only~="tablet"]{
-		@include media-outer-width($codykit-tablet-width,$codykit-desktop-width){
-			display:none !important;
-		}
-	}
-	[media-only~="desktop"]{
-		@include media-desktop-lt {
-			display:none !important;
-		}
-	}
-	[media-not~="mobile"]{
-		@include media-mobile {
-			display:none !important;
-		}
-	}
-	[media-not~="tablet"]{
-		@include media-tablet {
-			display:none !important;
-		}
-	}
-	[media-not~="desktop"]{
-		@include media-desktop {
-			display:none !important;
-		}
-	}
-	/* codykit-document-basic -- end */
+  }
+  [media-not~="tablet"]{
+    @include media-tablet {
+      display:none !important;
+    }
+  }
+  [media-not~="desktop"]{
+    @include media-desktop {
+      display:none !important;
+    }
+  }
+  /* remark-document-basic -- end */
 }
+
 @mixin modal-variant($background-color:rgba(0,0,0,0.65)) {
     -ms-overflow-style: none;
     position: fixed;
@@ -1892,25 +1910,25 @@
 	height:$height;
 	background-color:white;
 }
-@mixin codykit-block-variant {
+@mixin remark-block-variant {
     display:block;
 	margin:0;
 	width:auto;
 	position:relative;
 }
-@mixin codykit-inlineblock-variant {
+@mixin remark-inlineblock-variant {
 	@include inline-block;
 	@include word-wrap-variant(false,visible);
 	position:relative;
 	margin:0;
 }
-@mixin codykit-hidden-block-variant {
+@mixin remark-hidden-block-variant {
     display:none;
 	&.active, &[active], &[ng-switch-when], &[ng-switch-default], &[ng-if], &[ng-show], &[ng-hide], &[todo] {
 		display:block;
 	}
 }
-@mixin codykit-media-trace {
+@mixin remark-media-trace {
 	body {
 		&:after {
 			content:"media trace";
@@ -1923,35 +1941,35 @@
 			padding:3px 5px;
 			z-index:10000;
 			@include media-mobile {
-				content:("media-mobile (portrait) [ lt" + $codykit-mobile-landscape-width + "]");
+				content:("media-mobile (portrait) [ lt" + $remark-mobile-landscape-width + "]");
 				background-color:#ffeda0;
 			}
 			@include media-mobile-landscape {
-				content:("media-mobile (landscape) [" $codykit-mobile-landscape-width + " ~ " + $codykit-tablet-width + "]");
+				content:("media-mobile (landscape) [" $remark-mobile-landscape-width + " ~ " + $remark-tablet-width + "]");
 				background-color:#feb24c;
 			}
 			@include media-tablet {
-				content:("media-tablet (portrait) [" + $codykit-tablet-width + " ~ " + $codykit-tablet-landscape-width + "]");
+				content:("media-tablet (portrait) [" + $remark-tablet-width + " ~ " + $remark-tablet-landscape-width + "]");
 				background-color:#addd8e;
 
 			}
 			@include media-tablet-landscape {
-				content:("media-tablet (landscape) [" + $codykit-tablet-landscape-width + "~" + $codykit-desktop-width + "]");
+				content:("media-tablet (landscape) [" + $remark-tablet-landscape-width + "~" + $remark-desktop-width + "]");
 				background-color:#31a354;
 			}
 			@include media-desktop {
-				content:("media-desktop (normal) [ gt " + $codykit-desktop-width + "]");
+				content:("media-desktop (normal) [ gt " + $remark-desktop-width + "]");
 				background-color:#7fcdbb;
 			}
 			@include media-desktop-wide {
-				content:("media-desktop (wide) [ gt " + $codykit-desktop-landscape-width + "]");
+				content:("media-desktop (wide) [ gt " + $remark-desktop-landscape-width + "]");
 				background-color:#bcbddc;
 			}
 		}
 	}
 }
-@mixin codykit-extend-tag($custom-block-elements:false,$custom-inlineblock-elements:false,$codykit-setup:false){
-	@if $codykit-setup {
+@mixin remark-extend-tag($custom-block-elements:false,$custom-inlineblock-elements:false,$remark-setup:false){
+	@if $remark-setup {
 		//content : header,footer외의 컨텐츠 요소의 부족한 정의 보충
 		//frieze : 섹션이나 컨텐츠의 동질적이거나 연속적인 구간을 나누기 위한 장식 또는 구간
 		//bar   : 섹션의 유틸리티 그룹
@@ -1967,7 +1985,7 @@
 		//message : 평소에 보이지 않다가 특정상황에 사용자에게 강조하는 부가적인 내용
 
 		content,cover,frieze,bar,group,context,controls,inventory,flow,item,part,message,band,sign,switch,case,modal,detail,screen,noscreen,nocontent {
-			@include codykit-block-variant;
+			@include remark-block-variant;
 		}
 
 		detail {
@@ -1975,11 +1993,11 @@
 		}
 
 		message {
-			@include codykit-hidden-block-variant;
+			@include remark-hidden-block-variant;
 		}
 
 		detail {
-			@include codykit-hidden-block-variant;
+			@include remark-hidden-block-variant;
 		}
 
 		[open] > detail {
@@ -1996,7 +2014,7 @@
 
 		switch {
 			> case {
-				@include codykit-hidden-block-variant;
+				@include remark-hidden-block-variant;
 			}
 		}
 
@@ -2034,7 +2052,7 @@
 
 		// format : inline-text-group
 		badge,unit,om{
-			@include codykit-inlineblock-variant;
+			@include remark-inlineblock-variant;
 		}
 		
 		format {
@@ -2053,35 +2071,35 @@
 
 	@if $custom-block-elements {
 		#{$custom-block-elements} {
-	        @include codykit-block-variant;
+	        @include remark-block-variant;
 	    }
 	}
 
 	@if $custom-inlineblock-elements {
 		#{$custom-inlineblock-elements} {
-			@include codykit-inlineblock-variant;
+			@include remark-inlineblock-variant;
 		}
 	}
 }
-@mixin codykit-document-basic-config($hack:true, $min-width:false, $font-smooth:false){
-    @include codykit-document-basic($min-width);
-    @include codykit-text-basic;
-    @include codykit-box-sizing;
-	@include codykit-extend-tag(false,false,true);
-    $codykit-hack:$hack !global;
+@mixin remark-document-basic-config($hack:true, $min-width:false, $font-smooth:false){
+    @include remark-document-basic($min-width);
+    @include remark-text-basic;
+    @include remark-box-sizing;
+	@include remark-extend-tag(false,false,true);
+    $remark-hack:$hack !global;
 	@if $font-smooth == true {
-		@include codykit-font-smooth;
+		@include remark-font-smooth;
 	}
 }
 //deprecated
-@mixin codykit-document-basic-all($hack:true, $min-width:false) {
-	@include codykit-document-basic-config($hack,$min-width);
+@mixin remark-document-basic-all($hack:true, $min-width:false) {
+	@include remark-document-basic-config($hack,$min-width);
 }
 //deprecated
-@mixin codykit-document-basic-advence($hack:true, $min-width:false, $font-smooth:true) {
-	@include codykit-document-basic-config($hack,$min-width,$font-smooth);
+@mixin remark-document-basic-advence($hack:true, $min-width:false, $font-smooth:true) {
+	@include remark-document-basic-config($hack,$min-width,$font-smooth);
 }
-@mixin codykit-document-fullscreen($main-wrapper:false) {
+@mixin remark-document-fullscreen($main-wrapper:false) {
 	html,body {
 		@include scroll-variant(false,false);
         width:100%;
@@ -2105,12 +2123,12 @@
 }
 
 @function preload-url($url){
-	$codykit-preload-images:#{$codykit-preload-images} url(#{$url}) !global;
+	$remark-preload-images:#{$remark-preload-images} url(#{$url}) !global;
 	@return url($url);
 }
-@mixin codykit-preload-image {
+@mixin remark-preload-image {
 	body:after {
-		content:$codykit-preload-images;
+		content:$remark-preload-images;
 		display:block;
 		visibility:hidden;
 		overflow:hidden;

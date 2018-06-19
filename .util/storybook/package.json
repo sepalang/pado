@@ -3,14 +3,19 @@
   "version": "0.2.6",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
+    "dev": "parcel ./public/index.html --open",
+    "build:web": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "build": "build-storybook -s public -o ../../docs",
     "storybook": "start-storybook -p 9009 -s public",
     "start": "npm run storybook"
   },
   "dependencies": {
     "vue": "^2.5.16",
+    "vue-router": "^3.0.1",
     "vuex": "^3.0.0"
+  },
+  "alias": {
+    "@\\/": "./src/"
   },
   "devDependencies": {
     "@storybook/addon-actions": "4.0.0-alpha.9",
@@ -22,6 +27,7 @@
     "@storybook/addon-viewport": "4.0.0-alpha.9",
     "@storybook/addons": "4.0.0-alpha.9",
     "@storybook/vue": "4.0.0-alpha.9",
+    "@vue/component-compiler-utils": "^2.0.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-polyfill": "^6.26.0",
@@ -30,11 +36,10 @@
     "cross-env": "^5.1.6",
     "file-loader": "^1.1.11",
     "node-sass": "^4.9.0",
+    "parcel": "^1.9.2",
     "sass-loader": "^7.0.3",
     "svg-url-loader": "^2.3.2",
     "vue-loader": "^14.2.3",
-    "vue-template-compiler": "^2.5.16",
-    "webpack": "^4.10.2",
-    "webpack-dev-server": "^3.1.4"
+    "vue-template-compiler": "^2.5.16"
   }
 }
