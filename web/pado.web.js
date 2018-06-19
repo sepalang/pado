@@ -296,7 +296,7 @@
         case "h":
         case "horizontal":
           var xHalf = width <= 0 ? 0 : width / 2;
-          return new Line([{
+          return new Vertex([{
             x: x - xHalf,
             y: y,
             z: z,
@@ -311,51 +311,44 @@
         default:
       }
     },
-    lineWith: function lineWith(destPoint) {
+    vertexWith: function vertexWith(destPoint) {
       var points = asArray(destPoint);
       points.unshift(this);
-      var pointArray = new Line(points.map(function (_ref) {
-        var x = _ref.x,
-            y = _ref.y,
-            z = _ref.z,
-            w = _ref.w;
-        return new Point(x, y, z, w);
-      }));
-      return pointArray;
+      return new Vertex(points);
     },
-    rectWith: function rectWith(_ref2) {
-      var x = _ref2.x,
-          y = _ref2.y;
+    rectWith: function rectWith(_ref) {
+      var x = _ref.x,
+          y = _ref.y;
 
-      var _ref3 = this.x > x ? [this.x, x] : [x, this.x],
-          largeX = _ref3[0],
-          smallX = _ref3[1];
+      var _ref2 = this.x > x ? [this.x, x] : [x, this.x],
+          largeX = _ref2[0],
+          smallX = _ref2[1];
 
-      var _ref4 = this.y > y ? [this.y, y] : [y, this.y],
-          largeY = _ref4[0],
-          smallY = _ref4[1];
+      var _ref3 = this.y > y ? [this.y, y] : [y, this.y],
+          largeY = _ref3[0],
+          smallY = _ref3[1];
 
       return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0);
     },
-    translate: function translate(_ref5) {
-      var _ref5$x = _ref5.x,
-          x = _ref5$x === void 0 ? 0 : _ref5$x,
-          _ref5$y = _ref5.y,
-          y = _ref5$y === void 0 ? 0 : _ref5$y,
-          _ref5$z = _ref5.z,
-          z = _ref5$z === void 0 ? 0 : _ref5$z;
+    translate: function translate(_ref4) {
+      var _ref4$x = _ref4.x,
+          x = _ref4$x === void 0 ? 0 : _ref4$x,
+          _ref4$y = _ref4.y,
+          y = _ref4$y === void 0 ? 0 : _ref4$y,
+          _ref4$z = _ref4.z,
+          z = _ref4$z === void 0 ? 0 : _ref4$z;
       this.x = this.x + x;
       this.y = this.y + y;
       this.z = this.z + z;
       return this;
     },
-    rotate: function rotate(_ref6) {
-      var _ref6$x = _ref6.x,
-          angleX = _ref6$x === void 0 ? 0 : _ref6$x,
-          _ref6$y = _ref6.y,
-          angleY = _ref6$y === void 0 ? 0 : _ref6$y,
-          _ref6$z = _ref6.z,
-          angleZ = _ref6$z === void 0 ? 0 : _ref6$z;
+    rotate: function rotate(_ref5) {
+      var _ref5$x = _ref5.x,
+          angleX = _ref5$x === void 0 ? 0 : _ref5$x,
+          _ref5$y = _ref5.y,
+          angleY = _ref5$y === void 0 ? 0 : _ref5$y,
+          _ref5$z = _ref5.z,
+          angleZ = _ref5$z === void 0 ? 0 : _ref5$z;
       var x1 = this.x,
           y1 = this.y,
           z1 = this.z,
@@ -392,7 +385,7 @@
     }
   };
 
-  var Line = function Line(pointArray) {
+  var Vertex = function Vertex(pointArray) {
     var _this = this;
 
     asArray(pointArray).forEach(function (point) {
@@ -426,7 +419,7 @@
         }
       }
     });
-  })(Line, {
+  })(Vertex, {
     toJSON: function toJSON() {
       var result = [];
       this.forEach(function (p) {
@@ -435,7 +428,7 @@
       return result;
     },
     clone: function clone$$1() {
-      return new Line(this);
+      return new Vertex(this);
     },
     eq: function eq(index) {
       return this[index];
@@ -507,10 +500,36 @@
           return new Point(x, y, z, w);
       }
     },
-    transform: function transform(_transform2) {
-      this.forEach(function (point) {
-        return point.transform(_transform2);
-      });
+    transform: function transform(_transform2, rect) {
+      var useRect = !!rect;
+
+      if (useRect) {
+        var left = rect.left,
+            top = rect.top,
+            width = rect.width,
+            height = rect.height;
+
+        var originX = left + width / 2;
+        var originY = top + height / 2;
+        this.forEach(function (point) {
+          var left = rect.left,
+              top = rect.top;
+          point.translate({
+            x: -originX,
+            y: -originY
+          });
+          point.transform(_transform2);
+          point.translate({
+            x: originX,
+            y: originY
+          });
+        });
+      } else {
+        this.forEach(function (point) {
+          point.transform(_transform2);
+        });
+      }
+
       return this;
     }
   });
@@ -617,11 +636,18 @@
   };
 
   Rect.prototype = {
-    line: function line(order) {
+    findPoint: function findPoint(findWord) {
+      var _ref6 = isArray(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref6[0],
+          pointFind = _ref6[1];
+
+      return this.vertex(lineFind).point(pointFind);
+    },
+    vertex: function vertex(order) {
       switch (order) {
         case "right":
         case "r":
-          return new Line([{
+          return new Vertex([{
             x: this.right,
             y: this.top,
             z: 0,
@@ -635,7 +661,7 @@
 
         case "bottom":
         case "b":
-          return new Line([{
+          return new Vertex([{
             x: this.left,
             y: this.bottom,
             z: 0,
@@ -649,7 +675,7 @@
 
         case "left":
         case "l":
-          return new Line([{
+          return new Vertex([{
             x: this.left,
             y: this.top,
             z: 0,
@@ -663,8 +689,7 @@
 
         case "top":
         case "t":
-        default:
-          return new Line([{
+          return new Vertex([{
             x: this.left,
             y: this.top,
             z: 0,
@@ -675,37 +700,80 @@
             z: 0,
             w: 0
           }]);
+
+        default:
+          return new Vertex([{
+            x: this.left,
+            y: this.top,
+            z: 0,
+            w: 0
+          }, {
+            x: this.left,
+            y: this.bottom,
+            z: 0,
+            w: 0
+          }, {
+            x: this.right,
+            y: this.bottom,
+            z: 0,
+            w: 0
+          }, {
+            x: this.right,
+            y: this.top,
+            z: 0,
+            w: 0
+          }]);
       }
     },
-    findPoint: function findPoint(findWord) {
-      var _ref7 = isArray(findWord) ? findWord : findWord.trim().split(/\s+/),
-          lineFind = _ref7[0],
-          pointFind = _ref7[1];
+    //TODO : incompleted sticky(parent, position, offset);
+    sticky: function sticky(_ref7, position) {
+      var refX = _ref7.left,
+          refY = _ref7.top,
+          refWidth = _ref7.width,
+          refHeight = _ref7.height;
 
-      return this.line(lineFind).point(pointFind);
-    },
-    vertex: function vertex() {
-      return new Line([{
-        x: this.left,
-        y: this.top,
-        z: 0,
-        w: 0
-      }, {
-        x: this.left,
-        y: this.bottom,
-        z: 0,
-        w: 0
-      }, {
-        x: this.right,
-        y: this.bottom,
-        z: 0,
-        w: 0
-      }, {
-        x: this.right,
-        y: this.top,
-        z: 0,
-        w: 0
-      }]);
+      if (position === void 0) {
+        position = "bottom left";
+      }
+
+      var left = this.left,
+          top = this.top,
+          width = this.width,
+          height = this.height;
+
+      switch (position) {
+        case "bl":
+        case "obl":
+        case "bottom left":
+        case "outer bottom left":
+          return rect({
+            left: refX,
+            top: refY + refHeight,
+            width: width,
+            height: height
+          });
+
+        case "c":
+        case "m":
+        case "mc":
+        case "center":
+        case "middle":
+        case "middle center":
+          return rect({
+            left: refX + refWidth / 2 - width / 2,
+            top: refY + refHeight / 2 - height / 2,
+            width: width,
+            height: height
+          });
+
+        default:
+          return rect({
+            left: left,
+            top: top,
+            width: width,
+            height: height
+          });
+      }
     },
     toJSON: function toJSON() {
       return {
@@ -1102,6 +1170,19 @@
       return result.join(" ");
     };
   }();
+  var svgPathWithVertex = function svgPathWithVertex(vertex$$1, close) {
+    var dValue = "";
+    vertex$$1.forEach(function (point$$1, index) {
+      var prefix = index === 0 ? 'M' : 'L';
+      dValue += "" + prefix + point$$1.x + " " + point$$1.y + " ";
+    });
+
+    if (!!dValue && close === true) {
+      dValue += " Z";
+    }
+
+    return dValue;
+  };
 
   var SVGBuilder = function SVGBuilder() {
     this.drawVariants = [];
@@ -1137,12 +1218,10 @@
           pathElement.setAttribute("stroke-width", attributes['strokeWidth'] || attributes['stroke-width'] || "1");
           pathElement.setAttribute("stroke-linecap", "butt");
           pathElement.setAttribute("stroke-linejoin", "miter");
-          var dValue = "";
-          params.forEach(function (point$$1, index) {
-            var prefix = index === 0 ? 'M' : 'L';
+          var dValue = svgPathWithVertex(params);
+          params.forEach(function (point$$1) {
             if (point$$1.x > realMaxWidth) realMaxWidth = point$$1.x;
             if (point$$1.y > realMaxHeigth) realMaxHeigth = point$$1.y;
-            dValue += "" + prefix + point$$1.x + " " + point$$1.y + " ";
           });
           pathElement.setAttribute("d", dValue);
           svgTag.appendChild(pathElement);
@@ -1693,6 +1772,7 @@
     windowRect: windowRect,
     screenRect: screenRect,
     transformVariant: transformVariant,
+    svgPathWithVertex: svgPathWithVertex,
     makeSVG: makeSVG,
     readUrl: readUrl,
     serialize: serialize,

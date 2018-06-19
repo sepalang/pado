@@ -1,14 +1,14 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "../../functions/isLike", "../../functions/cast"], factory);
+    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "../functions/isLike", "../functions/cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("../../functions/isLike"), require("../../functions/cast"));
+    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("../functions/isLike"), require("../functions/cast"));
   } else {
     var mod = {
       exports: {}
     };
     factory(mod.exports, global.es6Regexp, global.es6Date, global.es6Array, global.es6Object, global.webDom, global.isLike, global.cast);
-    global.baseDimenstion = mod.exports;
+    global.dimension = mod.exports;
   }
 })(this, function (_exports, _es6Regexp, _es6Date, _es6Array, _es6Object, _webDom, _isLike, _cast) {
   "use strict";
@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.rect = _exports.line = _exports.point = _exports.pointArray = void 0;
+  _exports.rect = _exports.vertex = _exports.point = void 0;
 
   var likePoint = function likePoint(p) {
     return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y");
@@ -115,7 +115,7 @@
         case "h":
         case "horizontal":
           var xHalf = width <= 0 ? 0 : width / 2;
-          return new Line([{
+          return new Vertex([{
             x: x - xHalf,
             y: y,
             z: z,
@@ -130,51 +130,44 @@
         default:
       }
     },
-    lineWith: function lineWith(destPoint) {
+    vertexWith: function vertexWith(destPoint) {
       var points = (0, _cast.asArray)(destPoint);
       points.unshift(this);
-      var pointArray = new Line(points.map(function (_ref) {
-        var x = _ref.x,
-            y = _ref.y,
-            z = _ref.z,
-            w = _ref.w;
-        return new Point(x, y, z, w);
-      }));
-      return pointArray;
+      return new Vertex(points);
     },
-    rectWith: function rectWith(_ref2) {
-      var x = _ref2.x,
-          y = _ref2.y;
+    rectWith: function rectWith(_ref) {
+      var x = _ref.x,
+          y = _ref.y;
 
-      var _ref3 = this.x > x ? [this.x, x] : [x, this.x],
-          largeX = _ref3[0],
-          smallX = _ref3[1];
+      var _ref2 = this.x > x ? [this.x, x] : [x, this.x],
+          largeX = _ref2[0],
+          smallX = _ref2[1];
 
-      var _ref4 = this.y > y ? [this.y, y] : [y, this.y],
-          largeY = _ref4[0],
-          smallY = _ref4[1];
+      var _ref3 = this.y > y ? [this.y, y] : [y, this.y],
+          largeY = _ref3[0],
+          smallY = _ref3[1];
 
       return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0);
     },
-    translate: function translate(_ref5) {
-      var _ref5$x = _ref5.x,
-          x = _ref5$x === void 0 ? 0 : _ref5$x,
-          _ref5$y = _ref5.y,
-          y = _ref5$y === void 0 ? 0 : _ref5$y,
-          _ref5$z = _ref5.z,
-          z = _ref5$z === void 0 ? 0 : _ref5$z;
+    translate: function translate(_ref4) {
+      var _ref4$x = _ref4.x,
+          x = _ref4$x === void 0 ? 0 : _ref4$x,
+          _ref4$y = _ref4.y,
+          y = _ref4$y === void 0 ? 0 : _ref4$y,
+          _ref4$z = _ref4.z,
+          z = _ref4$z === void 0 ? 0 : _ref4$z;
       this.x = this.x + x;
       this.y = this.y + y;
       this.z = this.z + z;
       return this;
     },
-    rotate: function rotate(_ref6) {
-      var _ref6$x = _ref6.x,
-          angleX = _ref6$x === void 0 ? 0 : _ref6$x,
-          _ref6$y = _ref6.y,
-          angleY = _ref6$y === void 0 ? 0 : _ref6$y,
-          _ref6$z = _ref6.z,
-          angleZ = _ref6$z === void 0 ? 0 : _ref6$z;
+    rotate: function rotate(_ref5) {
+      var _ref5$x = _ref5.x,
+          angleX = _ref5$x === void 0 ? 0 : _ref5$x,
+          _ref5$y = _ref5.y,
+          angleY = _ref5$y === void 0 ? 0 : _ref5$y,
+          _ref5$z = _ref5.z,
+          angleZ = _ref5$z === void 0 ? 0 : _ref5$z;
       var x1 = this.x,
           y1 = this.y,
           z1 = this.z,
@@ -211,7 +204,7 @@
     }
   };
 
-  var Line = function Line(pointArray) {
+  var Vertex = function Vertex(pointArray) {
     var _this = this;
 
     (0, _cast.asArray)(pointArray).forEach(function (point) {
@@ -245,7 +238,7 @@
         }
       }
     });
-  })(Line, {
+  })(Vertex, {
     toJSON: function toJSON() {
       var result = [];
       this.forEach(function (p) {
@@ -254,7 +247,7 @@
       return result;
     },
     clone: function clone() {
-      return new Line(this);
+      return new Vertex(this);
     },
     eq: function eq(index) {
       return this[index];
@@ -326,10 +319,37 @@
           return new Point(x, y, z, w);
       }
     },
-    transform: function transform(_transform2) {
-      this.forEach(function (point) {
-        return point.transform(_transform2);
-      });
+    transform: function transform(_transform2, rect) {
+      var useRect = !!rect;
+
+      if (useRect) {
+        var left = rect.left,
+            top = rect.top,
+            width = rect.width,
+            height = rect.height;
+        ; //rotateOrigin
+
+        var originX = left + width / 2;
+        var originY = top + height / 2;
+        this.forEach(function (point) {
+          var left = rect.left,
+              top = rect.top;
+          point.translate({
+            x: -originX,
+            y: -originY
+          });
+          point.transform(_transform2);
+          point.translate({
+            x: originX,
+            y: originY
+          });
+        });
+      } else {
+        this.forEach(function (point) {
+          point.transform(_transform2);
+        });
+      }
+
       return this;
     }
   });
@@ -436,11 +456,18 @@
   };
 
   Rect.prototype = {
-    line: function line(order) {
+    findPoint: function findPoint(findWord) {
+      var _ref6 = (0, _isLike.isArray)(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref6[0],
+          pointFind = _ref6[1];
+
+      return this.vertex(lineFind).point(pointFind);
+    },
+    vertex: function vertex(order) {
       switch (order) {
         case "right":
         case "r":
-          return new Line([{
+          return new Vertex([{
             x: this.right,
             y: this.top,
             z: 0,
@@ -454,7 +481,7 @@
 
         case "bottom":
         case "b":
-          return new Line([{
+          return new Vertex([{
             x: this.left,
             y: this.bottom,
             z: 0,
@@ -468,7 +495,7 @@
 
         case "left":
         case "l":
-          return new Line([{
+          return new Vertex([{
             x: this.left,
             y: this.top,
             z: 0,
@@ -482,8 +509,7 @@
 
         case "top":
         case "t":
-        default:
-          return new Line([{
+          return new Vertex([{
             x: this.left,
             y: this.top,
             z: 0,
@@ -494,37 +520,80 @@
             z: 0,
             w: 0
           }]);
+
+        default:
+          return new Vertex([{
+            x: this.left,
+            y: this.top,
+            z: 0,
+            w: 0
+          }, {
+            x: this.left,
+            y: this.bottom,
+            z: 0,
+            w: 0
+          }, {
+            x: this.right,
+            y: this.bottom,
+            z: 0,
+            w: 0
+          }, {
+            x: this.right,
+            y: this.top,
+            z: 0,
+            w: 0
+          }]);
       }
     },
-    findPoint: function findPoint(findWord) {
-      var _ref7 = (0, _isLike.isArray)(findWord) ? findWord : findWord.trim().split(/\s+/),
-          lineFind = _ref7[0],
-          pointFind = _ref7[1];
+    //TODO : incompleted sticky(parent, position, offset);
+    sticky: function sticky(_ref7, position) {
+      var refX = _ref7.left,
+          refY = _ref7.top,
+          refWidth = _ref7.width,
+          refHeight = _ref7.height;
 
-      return this.line(lineFind).point(pointFind);
-    },
-    vertex: function vertex() {
-      return new Line([{
-        x: this.left,
-        y: this.top,
-        z: 0,
-        w: 0
-      }, {
-        x: this.left,
-        y: this.bottom,
-        z: 0,
-        w: 0
-      }, {
-        x: this.right,
-        y: this.bottom,
-        z: 0,
-        w: 0
-      }, {
-        x: this.right,
-        y: this.top,
-        z: 0,
-        w: 0
-      }]);
+      if (position === void 0) {
+        position = "bottom left";
+      }
+
+      var left = this.left,
+          top = this.top,
+          width = this.width,
+          height = this.height;
+
+      switch (position) {
+        case "bl":
+        case "obl":
+        case "bottom left":
+        case "outer bottom left":
+          return rect({
+            left: refX,
+            top: refY + refHeight,
+            width: width,
+            height: height
+          });
+
+        case "c":
+        case "m":
+        case "mc":
+        case "center":
+        case "middle":
+        case "middle center":
+          return rect({
+            left: refX + refWidth / 2 - width / 2,
+            top: refY + refHeight / 2 - height / 2,
+            width: width,
+            height: height
+          });
+
+        default:
+          return rect({
+            left: left,
+            top: top,
+            width: width,
+            height: height
+          });
+      }
     },
     toJSON: function toJSON() {
       return {
@@ -541,20 +610,14 @@
     }
   };
 
-  var pointArray = function pointArray(array) {
-    return new PonintArray(array);
-  };
-
-  _exports.pointArray = pointArray;
-
   var point = function point(x, y, z, w) {
-    return typeof x === "object" ? new Ponint(x.x, x.y, x.z, x.w) : new Ponint(x, y, z, w);
+    return typeof x === "object" ? new Point(x.x, x.y, x.z, x.w) : new Point(x, y, z, w);
   };
 
   _exports.point = point;
 
-  var line = function line(start, end) {
-    new Line([{
+  var vertex = function vertex(start, end) {
+    new Vertex([{
       x: start.x,
       y: start.y,
       z: start.z,
@@ -567,7 +630,7 @@
     }]);
   };
 
-  _exports.line = line;
+  _exports.vertex = vertex;
 
   var rect = function rect(left, top, width, height, x, y, valid) {
     return typeof left === "object" ? new Rect(left.left, left.top, left.width, left.height, left.x, left.y, left.valid) : new Rect(left, top, width, height, x, y, valid);
@@ -575,4 +638,4 @@
 
   _exports.rect = rect;
 });
-//# sourceMappingURL=baseDimenstion.js.map
+//# sourceMappingURL=dimension.js.map

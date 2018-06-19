@@ -1,5 +1,5 @@
-import { isArray } from '../../functions/isLike';
-import { asArray } from '../../functions/cast';
+import { isArray } from '../functions/isLike';
+import { asArray } from '../functions/cast';
 
 const likePoint = function(p){
   return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y");
@@ -32,16 +32,14 @@ Point.prototype = {
     switch(angle){
       case "h": case "horizontal":
         const xHalf = width <= 0 ? 0 : width/2;
-        return new Line([{x:x-xHalf, y, z, w}, {x:x+xHalf, y, z, w}]);
+        return new Vertex([{x:x-xHalf, y, z, w}, {x:x+xHalf, y, z, w}]);
       default:
     }
   },
-  lineWith (destPoint){
-    const points = asArray(destPoint)
+  vertexWith (destPoint){
+    const points = asArray(destPoint);
     points.unshift(this);
-    
-    const pointArray = new Line(points.map(({x,y,z,w})=>new Point(x,y,z,w)))
-    return pointArray;
+    return new Vertex(points);
   },
   rectWith ({x, y}){
     const [largeX, smallX] = this.x > x ? [ this.x, x ] : [ x, this.x ];
@@ -96,7 +94,7 @@ Point.prototype = {
   }
 };
 
-const Line = function(pointArray){
+const Vertex = function(pointArray){
   asArray(pointArray).forEach(point=>{
     if(!likePoint(point)) return;
     const {x,y,z,w} = point;
@@ -126,14 +124,14 @@ const Line = function(pointArray){
       }
     }
   });
-}(Line, {
+}(Vertex, {
   toJSON (){
     const result = [];
     this.forEach(p=>result.push(p.toJSON()));
     return result;
   },
   clone (){
-    return new Line(this);
+    return new Vertex(this);
   },
   eq (index){
     return this[index];
@@ -243,53 +241,59 @@ const Rect = function(left=0,top=0,width=0,height=0,x,y,valid=true){
 };
 
 Rect.prototype = {
-  line (order){
-    switch(order){
-    case "right": case "r":
-      return new Line([{x:this.right, y:this.top, z:0, w:0},{x:this.right,y:this.bottom,z:0,w:0}]);
-    case "bottom": case "b":
-      return new Line([{x:this.left, y:this.bottom, z:0, w:0},{x:this.right,y:this.bottom,z:0,w:0}]);
-    case "left": case "l":
-      return new Line([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0}]);
-    case "top": case "t":
-    default:
-      return new Line([{x:this.left, y:this.top, z:0, w:0},{x:this.right,y:this.top,z:0,w:0}]);
-    }
-  },
   findPoint (findWord){
     const [ lineFind, pointFind ] = isArray(findWord) ? findWord : findWord.trim().split(/\s+/);
-    return this.line(lineFind).point(pointFind);
+    return this.vertex(lineFind).point(pointFind);
   },
-  vertex (){
-    return new Line([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0},{x:this.right,y:this.bottom,z:0,w:0},{x:this.right, y:this.top, z:0, w:0}]);
+  vertex (order){
+    switch(order){
+    case "right": case "r":
+      return new Vertex([{x:this.right, y:this.top, z:0, w:0},{x:this.right,y:this.bottom,z:0,w:0}]);
+    case "bottom": case "b":
+      return new Vertex([{x:this.left, y:this.bottom, z:0, w:0},{x:this.right,y:this.bottom,z:0,w:0}]);
+    case "left": case "l":
+      return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0}]);
+    case "top": case "t":
+      return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.right,y:this.top,z:0,w:0}]);
+    default:
+      return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0},{x:this.right,y:this.bottom,z:0,w:0},{x:this.right, y:this.top, z:0, w:0}]);
+    }
+  },
+  //TODO : incompleted sticky(parent, position, offset);
+  sticky ({left:refX, top:refY, width:refWidth, height:refHeight}, position="bottom left"){
+    const { left, top, width, height } = this;
+    switch(position){
+    case "bl": case "obl": case "bottom left": case "outer bottom left":
+      return rect({
+        left:refX,
+        top:refY+refHeight,
+        width,
+        height
+      });
+    case "c": case "m": case "mc": case "center": case "middle": case "middle center":
+      return rect({
+        left:refX + refWidth/2 - width/2,
+        top:refY + refHeight/2 - height/2,
+        width,
+        height
+      });
+    default:
+      return rect({ left, top, width, height });
+    }
   },
   toJSON (){
-    return {
-      x:this.x,
-      y:this.y,
-      width:this.width,
-      height:this.height,
-      left:this.left,
-      top:this.top,
-      right:this.right,
-      bottom:this.bottom,
-      valid:this.valid
-    }
+    return { x:this.x, y:this.y, width:this.width, height:this.height, left:this.left, top:this.top, right:this.right, bottom:this.bottom, valid:this.valid };
   }
-};
-
-export const pointArray = function(array){
-  return new PonintArray(array);
 };
 
 export const point = function(x,y,z,w){
   return typeof x === "object" ? 
-  new Ponint(x.x,x.y,x.z,x.w) : 
-  new Ponint(x,y,z,w);
+  new Point(x.x,x.y,x.z,x.w) : 
+  new Point(x,y,z,w);
 };
 
-export const line = function(start,end){
-  new Line([{x:start.x,y:start.y,z:start.z,w:start.w},{x:end.x,y:end.y,z:end.z,w:end.w}]);
+export const vertex = function(start,end){
+  new Vertex([{x:start.x,y:start.y,z:start.z,w:start.w},{x:end.x,y:end.y,z:end.z,w:end.w}]);
 };
 
 export const rect = function(left,top,width,height,x,y,valid){

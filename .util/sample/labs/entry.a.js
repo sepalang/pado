@@ -1,12 +1,14 @@
 export { 
-  getElementBoundingRect,
   readUrl,
   windowRect,
   openWindow,
   closeWindow,
-  makeSVG
- } from '../../../.src/web/env';
- 
- export { 
-   rectWithRect
- } from '../../../.src/modules/dimension';
+  getElementBoundingRect,
+  svgPathWithVertex,
+} from '../../../.src/web/env';
+
+export { 
+  point,
+  vertex,
+  rect
+} from '../../../.src/modules/dimension';
