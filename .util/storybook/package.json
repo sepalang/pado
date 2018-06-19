@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "parcel ./public/index.html --open",
-    "build:web": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "build": "build-storybook -s public -o ../../docs",
+    "parcel": "parcel ./public/index.html -d ../../docs/post",
+    "build": "build-storybook -s public -o ../../docs && npm run parcel",
     "storybook": "start-storybook -p 9009 -s public",
     "start": "npm run storybook"
   },
