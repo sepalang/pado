@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "parcel ./public/index.html --open",
-    "parcel": "parcel ./public/index.html -d ../../docs/post",
+    "parcel": "rimraf ../../docs/post && parcel build ./public/index.html -d ../../docs/post --public-url '/pado/post'",
     "build": "build-storybook -s public -o ../../docs && npm run parcel",
     "storybook": "start-storybook -p 9009 -s public",
     "start": "npm run storybook"
@@ -37,6 +37,7 @@
     "file-loader": "^1.1.11",
     "node-sass": "^4.9.0",
     "parcel": "^1.9.2",
+    "rimraf": "^2.6.2",
     "sass-loader": "^7.0.3",
     "svg-url-loader": "^2.3.2",
     "vue-loader": "^14.2.3",
