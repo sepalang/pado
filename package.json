@@ -22,7 +22,7 @@
     "report": "npm run report:index & npm run report:pado & npm run report:modules & npm run report:functions",
     "test:web": "padoc --test .util/test/web --verbose",
     "test": "padoc --test .util/test --verbose",
-    "labp:a":"padoc --pack .util/sample/labs/entry.a.js .util/sample/labs/pack.acj.sample.js && padoc --pack .util/sample/labs/entry.a.js .util/sample/labs/pack.aes.sample.js -m es",
+    "labp:a": "padoc --pack .util/sample/labs/entry.a.js .util/sample/labs/pack.acj.sample.js && padoc --pack .util/sample/labs/entry.a.js .util/sample/labs/pack.aes.sample.js -m es",
     "labp": "padoc --pack .util/sample/labs/entry.a.js .util/sample/labs/pack.a.sample.js && padoc --pack .util/sample/labs/entry.b.js .util/sample/labs/pack.b.sample.js",
     "t": "padoc --exec .util/sample/use/cast.use.js"
   },
@@ -34,6 +34,10 @@
   ],
   "devDependencies": {
     "@sepalang/padoc": "^0.7.20",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-3": "^6.24.1",
+    "babel-preset-vue": "^2.0.2",
     "jquery": "^3.3.1",
     "jsdom": "^11.11.0",
     "madge": "^3.1.1",

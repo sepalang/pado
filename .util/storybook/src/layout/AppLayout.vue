@@ -12,11 +12,11 @@
   </div>
 </template>
 <script>
-  export default {
-    props: {
-      
-    }
+export default {
+  props: {
+    
   }
+}
 </script>
 <style lang="scss">
   #master-layout {

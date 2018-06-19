@@ -3,6 +3,7 @@
   "version": "0.2.6",
   "private": true,
   "scripts": {
+    "pado:link": "npm link ../../",
     "dev": "parcel ./public/index.html --open",
     "parcel": "rimraf ../../docs/post && parcel build ./public/index.html -d ../../docs/post --public-url '/pado/post'",
     "build": "build-storybook -s public -o ../../docs && npm run parcel",
@@ -14,10 +15,8 @@
     "vue-router": "^3.0.1",
     "vuex": "^3.0.0"
   },
-  "alias": {
-    "@\\/": "./src/"
-  },
   "devDependencies": {
+    "@sepalang/pado":"*",
     "@storybook/addon-actions": "4.0.0-alpha.9",
     "@storybook/addon-knobs": "4.0.0-alpha.9",
     "@storybook/addon-links": "4.0.0-alpha.9",
