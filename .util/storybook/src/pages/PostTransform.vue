@@ -5,7 +5,9 @@
     <section>
       <PadoRect size="150" :style="{transform:boxTransform01,opacity:.7,'pointer-events':none}"></PadoRect>
       <br>
-      rotateX <PadoSlider v-model="box01.rotateX" min-value="-100" style="width:200px;"></PadoSlider> {{ box01.rotateX }}
+      {{ boxTransform01 }}
+      <br>
+      rotateX <PadoSlider v-model="box01.rotateX" min-value="-100" style="width:200px;" contiunu></PadoSlider> {{ box01.rotateX }}
       <br>
       rotateY <PadoSlider v-model="box01.rotateY" min-value="-100" style="width:200px;"></PadoSlider> {{ box01.rotateY }}
       <br>
