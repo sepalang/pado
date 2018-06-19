@@ -7,8 +7,8 @@
     <div style="position:relative">
       <PadoRect class="first-rect" size="50" :style="{transform:firstTransform}" top="50" left="50"></PadoRect>
       <PadoRect class="seconde-rect" size="100" :style="{transform:secondTransform}" top="150" left="150"></PadoRect>
+      <div class="pointer-placeholder"></div>
     </div>
-    <div class="pointer-placeholder"></div>
   </UsageLayout>
 </template>
 <script>
@@ -35,7 +35,7 @@
         perspective:100,
         firstRectTransform:{
           rotateX:10,
-          rotateY:10
+          rotateY:0
         },
         secondRectTransform:{
           rotate3d:[0]
@@ -44,28 +44,27 @@
     },
     methods:{
       drawLine (){
-        const placeholder = this.$el.querySelectorAll(".pointer-placeholder")[0];
+        nextTick(()=>{
+          const placeholder = this.$el.querySelectorAll(".pointer-placeholder")[0];
         
-        const firstEl = this.$el.querySelectorAll(".first-rect")[0];
-        const secondEl = this.$el.querySelectorAll(".seconde-rect")[0];
+          const firstEl = this.$el.querySelectorAll(".first-rect")[0];
+          const secondEl = this.$el.querySelectorAll(".seconde-rect")[0];
         
-        const firstRectOffset  = getElementOffsetRect(firstEl);
-        const secondRectOffset = getElementOffsetRect(secondEl);
+          const firstRectOffset  = getElementOffsetRect(firstEl);
+          const secondRectOffset = getElementOffsetRect(secondEl);
         
-        const firstRectTransform  = getElementTransform(firstEl);
-        //const secondRectTransform = getElementTransform(secondEl);
+          const firstRectTransform  = getElementTransform(firstEl);
+          //const secondRectTransform = getElementTransform(secondEl);
         
-        //empty
-        Array.from(placeholder.children).forEach((child)=>{
-          placeholder.removeChild(child);
-        });
+          //empty
+          Array.from(placeholder.children).forEach(child=>placeholder.removeChild(child));
         
-        firstRectOffset.vertex().transform(firstRectTransform,firstRectOffset).forEach((point)=>{
-          const pointTag = document.createElement("point");
-          pointTag.setAttribute("style",`left:${point.x}px;top:${point.y}px;`)
-          placeholder.append(pointTag);
-        });
-        
+          firstRectOffset.vertex().transform(firstRectTransform,firstRectOffset).forEach((point)=>{
+            const pointTag = document.createElement("point");
+            pointTag.setAttribute("style",`left:${point.x}px;top:${point.y}px;`)
+            placeholder.append(pointTag);
+          });
+        })
       },
       openSampleModal (awaitTime=0){
         createVue(SampleModal,{
@@ -88,14 +87,12 @@
         return transformValue;
       },
       secondTransform (){
-        const transformValue = transformVariant({ rotate3d:this.secondRectTransform.rotate3d, perspective:this.perspective });
+        const transformValue = transformVariant({ rotate3d:this.secondRectTransform.rotate3d });
         return transformValue;
       }
     },
     mounted (){
-      nextTick(()=>{
-        //this.drawLine();
-      })
+      this.drawLine();
     }
   }
 </script>
@@ -106,6 +103,7 @@
     height:3px;
     background-color:red;
     position:absolute;
+    
   }
   .pointer-placeholder {
     position:absolute;
@@ -114,5 +112,9 @@
     width:300px;
     height:300px;
     pointer-events:none;
+    transform:translateZ(10000px);
+    > point {
+      transform:translateZ(-50%,-50%);
+    }
   }
 </style>

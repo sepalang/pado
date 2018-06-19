@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const configAlias = require('./.storybook/config.alias.js')(__dirname);
 
 module.exports = {
   entry: './src/index.js',
@@ -41,7 +40,9 @@ module.exports = {
     ],
   },
   resolve: {
-    alias: configAlias
+    alias: {
+      vue$: 'vue/dist/vue.esm.js',
+    },
   },
   devServer: {
     historyApiFallback: true,

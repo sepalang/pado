@@ -1,19 +1,12 @@
 const path = require('path');
-const configAlias = require('./config.alias.js').module(path.resolve(__dirname,"../"));
 
 module.exports = (storybookBaseConfig, configType, defaultConfig) => {
-  
-  storybookBaseConfig.resolve.alias = Object.assign(
-    {},
-    storybookBaseConfig.resolve.alias,
-    configAlias
-  );
-  
-  defaultConfig.resolve.alias = Object.assign(
-    {},
-    defaultConfig.resolve.alias,
-    configAlias
-  );
-  
+  defaultConfig.module.rules.push({
+    test: [/\.stories\.js$/, /index\.js$/],
+    loaders: [require.resolve('@storybook/addon-storysource/loader')],
+    include: [path.resolve(__dirname, '../src')],
+    enforce: 'pre',
+  });
+
   return defaultConfig;
 };

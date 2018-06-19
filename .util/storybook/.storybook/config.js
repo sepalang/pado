@@ -1,13 +1,10 @@
-import 'babel-polyfill'
+import 'babel-polyfill';
 
 import { configure } from '@storybook/vue';
 import { setOptions } from '@storybook/addon-options';
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import MyButton from '../src/util/Button.vue';
-
-Vue.component('my-button', MyButton);
 Vue.use(Vuex);
 
 setOptions({

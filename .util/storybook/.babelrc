@@ -1,12 +1,13 @@
 {
   "presets": [
-    ["env"],
+    ["env", { "modules": false }],
     "stage-0",
     "vue"
   ],
   "env": {
     "test": {
-      "presets": ["env"]
+      "presets": ["env"],
+      "plugins": ["require-context-hook"]
     }
   }
 }
