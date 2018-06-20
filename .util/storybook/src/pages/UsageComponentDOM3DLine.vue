@@ -1,8 +1,8 @@
 <template>
   <UsageLayout>
     <div>
-      <PadoSlider v-model="firstRectTransform.rotateX" style="width:200px;" @input="drawLine"></PadoSlider>{{ firstRectTransform.rotateX }}<br>
-      <PadoSlider v-model="firstRectTransform.rotateY" style="width:200px;" @input="drawLine"></PadoSlider>{{ firstRectTransform.rotateY }}
+      <PadoSlider v-model="firstRectTransform.rotateX" input-cycle="enter" @enter="drawLine" min-value="-360" max-value="360" style="width:300px;"></PadoSlider>{{ firstRectTransform.rotateX }}<br>
+      <PadoSlider v-model="firstRectTransform.rotateY" input-cycle="enter" @enter="drawLine" min-value="-360" max-value="360" style="width:300px;"></PadoSlider>{{ firstRectTransform.rotateY }}
     </div>
     <div style="position:relative">
       <PadoRect class="first-rect" size="50" :style="{transform:firstTransform}" top="50" left="50"></PadoRect>
@@ -34,7 +34,7 @@
       return {
         perspective:100,
         firstRectTransform:{
-          rotateX:10,
+          rotateX:0,
           rotateY:0
         },
         secondRectTransform:{
