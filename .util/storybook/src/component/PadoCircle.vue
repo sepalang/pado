@@ -1,5 +1,5 @@
 <template>
-  <span class="pado-circle" style="display:inline-block;" :style="{width:size,height:size}">
+  <span class="v-pado-circle" style="display:inline-block;" :style="{width:size,height:size}">
     <svg :width="size" :height="size">
       <path :d="dValue" :stroke-dasharray="dashArrayValue" :stroke-width="stroke" :stroke="value==0?'transparent':'#7AD1F8'" fill="transparent"></path>
     </svg>

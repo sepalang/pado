@@ -13,8 +13,8 @@
 </template>
 <script>
   import UsageLayout from '../layout/UsageLayout.vue';
-  import PadoSlider from '../component/pado-slider.vue';
-  import PadoRect from '../component/pado-rect.vue';
+  import PadoSlider from '../component/PadoSlider.vue';
+  import PadoRect from '../component/PadoRect.vue';
   import { 
     transformVariant, 
     getElementTransform, 

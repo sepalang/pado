@@ -2,20 +2,20 @@
   <UsageLayout>
     <h1>DOMLine</h1>
     <div class="yaaa" style="position:relative;">
-      <pado-rect class="root-rect" size="40" left="100" top="100"></pado-rect>
-      <pado-rect class="rect-upside" size="40" left="100" top="0" @drawPoint="drawLine" dragmove></pado-rect>
-      <pado-rect class="rect-upright" size="40" left="200" top="50" @drawPoint="drawLine" dragmove></pado-rect>
-      <pado-rect class="rect-downright" size="40" left="150" top="150" @drawPoint="drawLine" dragmove></pado-rect>
-      <pado-rect class="rect-downside" size="40" left="50" top="200" @drawPoint="drawLine" dragmove></pado-rect>
-      <pado-rect class="rect-angledown" size="40" left="200" top="200" @drawPoint="drawLine" dragmove></pado-rect>
+      <PadoRect class="root-rect" size="40" left="100" top="100"></PadoRect>
+      <PadoRect class="rect-upside" size="40" left="100" top="0" @drawPoint="drawLine" dragmove></PadoRect>
+      <PadoRect class="rect-upright" size="40" left="200" top="50" @drawPoint="drawLine" dragmove></PadoRect>
+      <PadoRect class="rect-downright" size="40" left="150" top="150" @drawPoint="drawLine" dragmove></PadoRect>
+      <PadoRect class="rect-downside" size="40" left="50" top="200" @drawPoint="drawLine" dragmove></PadoRect>
+      <PadoRect class="rect-angledown" size="40" left="200" top="200" @drawPoint="drawLine" dragmove></PadoRect>
       <div class="path-placeholder"></div>
     </div>
   </UsageLayout>
 </template>
 <script>
   import UsageLayout from '../layout/UsageLayout.vue';
-  import PadoSlider from '../component/pado-slider.vue';
-  import PadoRect from '../component/pado-rect.vue';
+  import PadoSlider from '../component/PadoSlider.vue';
+  import PadoRect from '../component/PadoRect.vue';
   import { dragHelper, getElementBoundingRect, makeSVG } from '../../../../.src/web';
   import $ from 'jquery';
   

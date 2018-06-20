@@ -1,6 +1,6 @@
 <template>
-  <span class="pado-rect" :style="styleValue">
-    <span class="pado-rect-description">{{ contentValue }}</span>
+  <span class="v-pado-rect" :style="styleValue">
+    <span class="PadoRect-description">{{ contentValue }}</span>
   </span>
 </template>
 <script>
@@ -87,7 +87,7 @@
   </script>
 </script>
 <style lang="scss">
-  .pado-rect {
+  .v-pado-rect {
     display:inline-block;
     background-color:#eee;
     position:relative;

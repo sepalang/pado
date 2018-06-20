@@ -1,11 +1,11 @@
 <template>
-  <div class="pado-slider">
-    <div class="pado-slider-scrollbar"></div>
-    <div class="pado-slider-scroller"></div>
+  <div class="v-pado-slider">
+    <div class="v-pado-slider-scrollbar"></div>
+    <div class="v-pado-slider-scroller"></div>
   </div>
 </template>
 <script>
-import PadoSlider from '../component/pado-slider.vue';
+import PadoSlider from '../component/PadoSlider.vue';
 import $ from '../../../../.src/web/plugins/jquery';
 import { dragHelper } from '../../../../.src/web';
 import { limitOf, domainRangeValue } from '../../../../.src/functions';
@@ -39,8 +39,8 @@ export default {
   },
   mounted (){
     const $element = $(this.$el);
-    const $scrollbar = $element.find('.pado-slider-scrollbar');
-    const $scroller  = $element.find('.pado-slider-scroller');
+    const $scrollbar = $element.find('.v-pado-slider-scrollbar');
+    const $scroller  = $element.find('.v-pado-slider-scroller');
     
     this.$on("drawInput",(value)=>{
       const modelValue   = typeof value === "number" ? value : this.bindValue;

@@ -2,17 +2,17 @@
   <UsageLayout>
     <h1>Rect</h1>
     <div>
-      <pado-slider v-model="rectSize" min-value="20" max-value="800" style="width:150px"></pado-slider> {{ rectSize }}
+      <PadoSlider v-model="rectSize" min-value="20" max-value="800" style="width:150px"></PadoSlider> {{ rectSize }}
     </div>
     <div>
-      <pado-rect :size="rectSize"></pado-rect>
+      <PadoRect :size="rectSize"></PadoRect>
     </div>
   </UsageLayout>
 </template>
 <script>
   import UsageLayout from '../layout/UsageLayout.vue';
-  import PadoSlider from '../component/pado-slider.vue';
-  import PadoRect from '../component/pado-rect.vue';
+  import PadoSlider from '../component/PadoSlider.vue';
+  import PadoRect from '../component/PadoRect.vue';
   import { times } from '../../../../.src/functions';
   
   export default {

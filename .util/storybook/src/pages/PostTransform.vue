@@ -18,8 +18,8 @@
 </template>
 <script>
 import AppLayout from "../layout/AppLayout.vue";
-import PadoRect from '../component/pado-rect.vue';
-import PadoSlider from '../component/pado-slider.vue';
+import PadoRect from '../component/PadoRect.vue';
+import PadoSlider from '../component/PadoSlider.vue';
 import { transformVariant } from '../../../../.src/web';
 
 export default {

@@ -2,20 +2,20 @@
   <UsageLayout>
     <h1>Slider</h1>
     <div>
-      <pado-slider v-model="sliderValue" @input="s2Value=$event" style="width:40%"></pado-slider>
+      <PadoSlider v-model="sliderValue" @input="s2Value=$event" style="width:40%"></PadoSlider>
     </div>
     <div>
-      <pado-slider v-model="sliderValue" @input="s2Value=$event" style="width:100px"></pado-slider>
+      <PadoSlider v-model="sliderValue" @input="s2Value=$event" style="width:100px"></PadoSlider>
     </div>
     <div>
-      <pado-slider v-model="s2Value" @drawInput="sliderValue=$event" style="width:150px"></pado-slider>
+      <PadoSlider v-model="s2Value" @drawInput="sliderValue=$event" style="width:150px"></PadoSlider>
     </div>
     <div>
       {{ sliderValue }}
     </div>
     
     <div>
-      <pado-slider @drawInput="nomodelValue=$event"></pado-slider>
+      <PadoSlider @drawInput="nomodelValue=$event"></PadoSlider>
       <br>
       {{ nomodelValue }}
     </div>
@@ -23,7 +23,7 @@
 </template>
 <script>
   import UsageLayout from '../layout/UsageLayout.vue';
-  import PadoSlider from '../component/pado-slider.vue';
+  import PadoSlider from '../component/PadoSlider.vue';
   
   export default {
     components:{ UsageLayout, PadoSlider },

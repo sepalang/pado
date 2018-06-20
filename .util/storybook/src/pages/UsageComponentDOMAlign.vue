@@ -7,8 +7,8 @@
 </template>
 <script>
   import UsageLayout from '../layout/UsageLayout.vue';
-  import PadoSlider from '../component/pado-slider.vue';
-  import PadoRect from '../component/pado-rect.vue';
+  import PadoSlider from '../component/PadoSlider.vue';
+  import PadoRect from '../component/PadoRect.vue';
   import { rect, line, point } from '../../../../.src/modules';
   
   import { createVue } from '../service/vue-compile'
