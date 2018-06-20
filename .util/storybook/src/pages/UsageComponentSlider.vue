@@ -8,14 +8,14 @@
       <PadoSlider v-model="sliderValue" @input="s2Value=$event" style="width:100px"></PadoSlider>
     </div>
     <div>
-      <PadoSlider v-model="s2Value" @drawInput="sliderValue=$event" style="width:150px"></PadoSlider>
+      <PadoSlider v-model="s2Value" @enter="sliderValue=$event" style="width:150px"></PadoSlider>
     </div>
     <div>
       {{ sliderValue }}
     </div>
     
     <div>
-      <PadoSlider @drawInput="nomodelValue=$event"></PadoSlider>
+      <PadoSlider @enter="nomodelValue=$event"></PadoSlider>
       <br>
       {{ nomodelValue }}
     </div>

@@ -6,11 +6,11 @@
       {{ circleSize }}
     </div>
     <div>
-      <PadoSlider style="width:150px" v-bind:value="repeatCount" @drawInput="repeatCount=$event" min-value="1"></PadoSlider>
+      <PadoSlider style="width:150px" v-bind:value="repeatCount" @enter="repeatCount=$event" min-value="1"></PadoSlider>
       {{ repeatCount }}
     </div>
     <div>
-      <PadoSlider style="width:150px" v-bind:value="circleValue" @drawInput="circleValue=$event"></PadoSlider>
+      <PadoSlider style="width:150px" v-bind:value="circleValue" @enter="circleValue=$event"></PadoSlider>
       {{ circleValue }}
     </div>
     <div>
