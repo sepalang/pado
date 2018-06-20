@@ -1,13 +1,35 @@
 import $ from '../plugins/jquery';
 import { rebase } from '../../functions';
 
+
 //드래그
-const pointerParse = ({ clientX, clientY })=>{
+let touchFixX;
+let touchFixY;
+const pointerParse = ({ clientX, clientY, touches })=>{
+  if(touches){
+    if(!touches[0]){
+      return {
+        x:touchFixX,
+        y:touchFixY
+      }
+    };
+    
+    const { clientX:touchClientX, clientY:touchClientY } = touches[0];
+    touchFixX = touchClientX;
+    touchFixY = touchClientY;
+    
+    return {
+      x:touchClientX,
+      y:touchClientY
+    };
+  }
   return {
     x:clientX,
     y:clientY
   };
 };
+
+const preventDefaultFn = (e)=>e.preventDefault();
 
 export default function DragHelper(element,option){
   const $element = $(element).eq(0);
@@ -64,13 +86,16 @@ export default function DragHelper(element,option){
     startFn && startFn(dragParams);
     
     $(document)
-    .on("mousemove",dragMove)
-    .on("mouseup",dragExit);
+    .on("mousemove touchmove",dragMove)
+    .on("mouseup touchend",dragExit);
     
-    $("body").attr("dragging", "");
+    $(document.body)
+    .on("mousemove touchmove",preventDefaultFn)
+    .attr("dragging", "");
   };
   
-  const dragMove = function({ originalEvent }){
+  const dragMove = function({ originalEvent, preventDefault }){
+    
     const pointerDrag = pointerParse(originalEvent);
     if(!moveFn){
       lastDrag = pointerDrag;
@@ -90,13 +115,15 @@ export default function DragHelper(element,option){
     dragParams = undefined;
     
     $(document)
-    .off("mousemove",dragMove)
-    .off("mouseup",dragExit);
+    .off("mousemove touchmove",dragMove)
+    .off("mouseup touchend",dragExit);
     
-    $("body").removeAttr("dragging");
+    $(document.body)
+    .off("mousemove touchmove",preventDefaultFn)
+    .removeAttr("dragging");
   };
   
-  $element.on("mousedown",dragEnter);
+  $element.on("mousedown touchstart",dragEnter);
   
   return $element;
 }
