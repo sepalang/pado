@@ -1,12 +1,19 @@
 <template>
-  <span></span>
+  <span :style="rectStyle"></span>
 </template>
 <script>
+import HighOrderRect from './mixins/HighOrderRect';
+
 export default {
+  mixins:[ HighOrderRect() ],
   props: {
-    width:{default:20},
-    height:{default:20},
-    size:{}
+  },
+  computed: {
+    rectStyle:function(){
+      console.log("xy this.rectValue",this.rectValue,this.sizeValue);
+      
+      return {};
+    }
   }
 }
 </script>

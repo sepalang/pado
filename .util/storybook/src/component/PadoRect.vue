@@ -1,90 +1,74 @@
 <template>
-  <span class="v-pado-rect" :style="styleValue">
+  <span class="v-pado-rect" :style="rectStyle">
     <span class="PadoRect-description">{{ contentValue }}</span>
   </span>
 </template>
 <script>
-  import $ from '../../../../.src/web/plugins/jquery';
-  import { domainRangeValue, drawCircleVars, likeNumber, isPresence } from '../../../../.src/functions';
-  import { dragHelper, getElementBoundingRect } from '../../../../.src/web';
+import $ from '../../../../.src/web/plugins/jquery';
+import { domainRangeValue, drawCircleVars, isPresence } from '../../../../.src/functions';
+import { dragHelper, getElementBoundingRect } from '../../../../.src/web';
+import HighOrderRect from './mixins/HighOrderRect';
+import HighOrderPoint from './mixins/HighOrderPoint';
 
-  export default {
-    props: {
-      width:{default:20},
-      height:{default:20},
-      size:{},
-      left:{default:0},
-      top:{default:0},
-      dragmove:{}
+export default {
+  mixins:[ HighOrderRect([["width","height","size","rect"],[20,20]]), HighOrderPoint([["left","top","point"],[0,0]]) ],
+  props: {
+    label:{},
+    dragmove:{}
+  },
+  computed:{
+    contentValue (){
+      const { width, height } = this.rectValue;
+      return typeof this.label === "string" ? this.label : `${width}x${height}`;
     },
-    computed:{
-      pointValue (){
-        return {
-          left:parseInt(this.left, 10),
-          top:parseInt(this.top, 10)
+    rectStyle (){
+      const { width, height } = this.rectValue;
+      const position = (this.left > 0 || this.top > 0) ? "absolute" : "relative";
+      const [left, top] = [this.left+"px", this.top+"px"];
+      return { width:width + "px", height:height + "px", position,left,top};
+    },
+    changeBoundsWatchGroup (){
+      this.$el && setTimeout(()=>{
+        const boundingRect = getElementBoundingRect(this.$el);
+        if(boundingRect.valid !== false) this.$emit("bounding",boundingRect);
+      });
+      return [this.size, this.left, this.top].length;
+    }
+  },
+  watch: {
+    changeBoundsWatchGroup (newValue){}
+  },
+  mounted (){
+    const boundingRect = getElementBoundingRect(this.$el);
+    if(boundingRect.valid !== false) this.$emit("bounding",getElementBoundingRect(this.$el));
+    
+    if(isPresence(this.dragmove)){
+      dragHelper(this.$el,({ element })=>{
+        
+        const startOffset = this.pointValue;
+        const positionWithOffset = function(x, y){
+          const result = {
+            left:startOffset.left + x,
+            top:startOffset.top  + y
+          };
+          element.css(result);
+          return result;
         }
-      },
-      sizeValue (){
-        return likeNumber(this.size) ? parseFloat(this.size) : undefined;
-      },
-      rectValue (){
-        const width  = typeof this.sizeValue === "number" ? this.sizeValue : parseInt(this.width, 10);
-        const height = typeof this.sizeValue === "number" ? this.sizeValue : parseInt(this.height, 10);
-        return { width, height };
-      },
-      contentValue (){
-        const { width, height } = this.rectValue;
-        return `${width}x${height}`
-      },
-      styleValue (){
-        const { width, height } = this.rectValue;
-        const position = (this.left > 0 || this.top > 0) ? "absolute" : "relative";
-        const [left, top] = [this.left+"px", this.top+"px"];
-        return { width:width + "px", height:height + "px", position,left,top};
-      },
-      changeBoundsWatchGroup (){
-        this.$el && setTimeout(()=>{
-          const boundingRect = getElementBoundingRect(this.$el);
-          if(boundingRect.valid !== false) this.$emit("bounding",boundingRect);
-        });
-        return [this.size, this.left, this.top].length;
-      }
-    },
-    watch: {
-      changeBoundsWatchGroup (newValue){}
-    },
-    mounted (){
-      const boundingRect = getElementBoundingRect(this.$el);
-      if(boundingRect.valid !== false) this.$emit("bounding",getElementBoundingRect(this.$el));
-      
-      if(isPresence(this.dragmove)){
-        dragHelper(this.$el,({ element })=>{
-          
-          const startOffset = this.pointValue;
-          const positionWithOffset = function(x, y){
-            const result = {
-              left:startOffset.left + x,
-              top:startOffset.top  + y
-            };
-            element.css(result);
-            return result;
+        
+        return {
+          move:({ pointer:{ offsetX, offsetY } })=>{
+            const result = positionWithOffset(offsetX, offsetY)
+            this.$emit("drawPoint",result);
+          },
+          end:({ pointer:{ offsetX, offsetY } })=>{
+            const result = positionWithOffset(offsetX, offsetY);
+            this.$emit("inputPoint",result);
           }
-          
-          return {
-            move:({ pointer:{ offsetX, offsetY } })=>{
-              const result = positionWithOffset(offsetX, offsetY)
-              this.$emit("drawPoint",result);
-            },
-            end:({ pointer:{ offsetX, offsetY } })=>{
-              const result = positionWithOffset(offsetX, offsetY);
-              this.$emit("inputPoint",result);
-            }
-          }
-        });
-      }
+        }
+      });
     }
   }
-  </script>
+}
 </script>
 <style lang="scss">
   .v-pado-rect {
