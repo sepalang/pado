@@ -1,4 +1,4 @@
-import Vue from 'vue/dist/vue.esm.js';
+import Vue from 'vue';
 
 Vue.config.productionTip = false
 

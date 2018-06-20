@@ -3,7 +3,7 @@ import PadoCircle from './PadoCircle.vue';
 import PadoPoint from './PadoPoint.vue';
 import PadoRect from './PadoRect.vue';
 import PadoSlider from './PadoSlider.vue';
-import PadoXYSlider from './PadoXYSlider.vue';
+import PadoPointSlider from './PadoPointSlider.vue';
 
 export {
   Layer,
@@ -11,5 +11,5 @@ export {
   PadoPoint,
   PadoRect,
   PadoSlider,
-  PadoXYSlider
+  PadoPointSlider
 }

@@ -44,7 +44,5 @@ export default function(...options){
   });
   
   const highOrderMixins = { props, computed };
-  console.log("highOrderMixins",highOrderMixins)
-  
   return highOrderMixins;
 }

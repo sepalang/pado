@@ -32,3 +32,16 @@ li {
 a {
   color: #42b983;
 }
+table {
+  max-width:100%;
+}
+
+table > * > tr {
+  > th {
+    text-align:left;
+  }
+  > th, td {
+    border:1px solid #eee;
+    padding:10px;
+  }
+}
