@@ -42,8 +42,14 @@ const getPointerPosition = $.getPointerPosition = function(e, root){
   
   if(!pos) return;
   
-  pos.x = e.touches ? e.touches[0].pageX : e.clientX - pos.x;
-  pos.y = e.touches ? e.touches[0].pageY : e.clientY - pos.y;
+  pos.x = (e.touches ? e.targetTouches[0].pageX : e.pageX) - pos.x;
+  pos.y = (e.touches ? e.targetTouches[0].pageY : e.pageY) - pos.y;
+  
+  if(e.touches){
+    var rect = e.target.getBoundingClientRect();
+    var x = e.targetTouches[0].pageX - rect.left;
+    var y = e.targetTouches[0].pageY - rect.top;
+  }
   return pos;
 }
 
@@ -100,6 +106,7 @@ $.fn.extend({
     //}
       
     if(isPlainObject(option)){
+      //console.log("option,",option)
       const allProps = ["top", "left", "width", "height", "right", "bottom", "center", "middle"].filter(key=>option.hasOwnProperty(key));
       
       //event option
@@ -171,9 +178,6 @@ $.fn.extend({
     }
     
     return result;
-  },
-  flash (){
-    
   }
 });
 

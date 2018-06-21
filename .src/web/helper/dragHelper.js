@@ -1,6 +1,18 @@
 import $ from '../plugins/jquery';
 import { rebase } from '../../functions';
 
+//
+const DEVICE_EVENT = (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) ?
+{
+  START:'touchstart',
+  MOVE:'touchmove',
+  END:'touchend'
+}:
+{
+  START:'mousedown',
+  MOVE:'mousemove',
+  END:'mouseup'
+};
 
 //드래그
 let touchFixX;
@@ -86,17 +98,17 @@ export default function DragHelper(element,option){
     startFn && startFn(dragParams);
     
     $(document)
-    .on("mousemove touchmove",dragMove)
-    .on("mouseup touchend",dragExit);
+    .on(DEVICE_EVENT.MOVE,dragMove)
+    .on(DEVICE_EVENT.END,dragExit);
     
     $(document.body)
-    .on("mousemove touchmove",preventDefaultFn)
+    .on(DEVICE_EVENT.MOVE,preventDefaultFn)
     .attr("dragging", "");
   };
   
   const dragMove = function({ originalEvent, preventDefault }){
-    
     const pointerDrag = pointerParse(originalEvent);
+    
     if(!moveFn){
       lastDrag = pointerDrag;
       return;
@@ -115,15 +127,15 @@ export default function DragHelper(element,option){
     dragParams = undefined;
     
     $(document)
-    .off("mousemove touchmove",dragMove)
-    .off("mouseup touchend",dragExit);
+    .off(DEVICE_EVENT.MOVE,dragMove)
+    .off(DEVICE_EVENT.END,dragExit);
     
     $(document.body)
-    .off("mousemove touchmove",preventDefaultFn)
+    .off(DEVICE_EVENT.MOVE,preventDefaultFn)
     .removeAttr("dragging");
   };
   
-  $element.on("mousedown touchstart",dragEnter);
+  $element.on(DEVICE_EVENT.START,dragEnter);
   
   return $element;
 }

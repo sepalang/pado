@@ -1433,8 +1433,15 @@
     var evt = getOriginalEvent(e);
     var pos = getElementPosition(root);
     if (!pos) return;
-    pos.x = e.touches ? e.touches[0].pageX : e.clientX - pos.x;
-    pos.y = e.touches ? e.touches[0].pageY : e.clientY - pos.y;
+    pos.x = (e.touches ? e.targetTouches[0].pageX : e.pageX) - pos.x;
+    pos.y = (e.touches ? e.targetTouches[0].pageY : e.pageY) - pos.y;
+
+    if (e.touches) {
+      var rect = e.target.getBoundingClientRect();
+      var x = e.targetTouches[0].pageX - rect.left;
+      var y = e.targetTouches[0].pageY - rect.top;
+    }
+
     return pos;
   };
 
@@ -1497,6 +1504,7 @@
       //}
 
       if (isPlainObject(option)) {
+        //console.log("option,",option)
         var allProps = ["top", "left", "width", "height", "right", "bottom", "center", "middle"].filter(function (key) {
           return option.hasOwnProperty(key);
         }); //event option
@@ -1575,17 +1583,53 @@
       }
 
       return result;
-    },
-    flash: function flash() {}
+    }
   });
+
+  var DEVICE_EVENT = 'ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch ? {
+    START: 'touchstart',
+    MOVE: 'touchmove',
+    END: 'touchend'
+  } : {
+    START: 'mousedown',
+    MOVE: 'mousemove',
+    END: 'mouseup'
+  }; //드래그
+
+  var touchFixX;
+  var touchFixY;
 
   var pointerParse = function pointerParse(_ref) {
     var clientX = _ref.clientX,
-        clientY = _ref.clientY;
+        clientY = _ref.clientY,
+        touches = _ref.touches;
+
+    if (touches) {
+      if (!touches[0]) {
+        return {
+          x: touchFixX,
+          y: touchFixY
+        };
+      }
+      var _touches$ = touches[0],
+          touchClientX = _touches$.clientX,
+          touchClientY = _touches$.clientY;
+      touchFixX = touchClientX;
+      touchFixY = touchClientY;
+      return {
+        x: touchClientX,
+        y: touchClientY
+      };
+    }
+
     return {
       x: clientX,
       y: clientY
     };
+  };
+
+  var preventDefaultFn = function preventDefaultFn(e) {
+    return e.preventDefault();
   };
 
   function DragHelper(element, option) {
@@ -1638,12 +1682,13 @@
       };
       dragParams.pointer = getCurrentPointerDrag(originalEvent);
       startFn && startFn(dragParams);
-      $(document).on("mousemove", dragMove).on("mouseup", dragExit);
-      $("body").attr("dragging", "");
+      $(document).on(DEVICE_EVENT.MOVE, dragMove).on(DEVICE_EVENT.END, dragExit);
+      $(document.body).on(DEVICE_EVENT.MOVE, preventDefaultFn).attr("dragging", "");
     };
 
     var dragMove = function dragMove(_ref3) {
-      var originalEvent = _ref3.originalEvent;
+      var originalEvent = _ref3.originalEvent,
+          preventDefault = _ref3.preventDefault;
       var pointerDrag = pointerParse(originalEvent);
 
       if (!moveFn) {
@@ -1663,11 +1708,11 @@
       dragParams.event = originalEvent;
       endFn && endFn(dragParams);
       dragParams = undefined;
-      $(document).off("mousemove", dragMove).off("mouseup", dragExit);
-      $("body").removeAttr("dragging");
+      $(document).off(DEVICE_EVENT.MOVE, dragMove).off(DEVICE_EVENT.END, dragExit);
+      $(document.body).off(DEVICE_EVENT.MOVE, preventDefaultFn).removeAttr("dragging");
     };
 
-    $element.on("mousedown", dragEnter);
+    $element.on(DEVICE_EVENT.START, dragEnter);
     return $element;
   }
 

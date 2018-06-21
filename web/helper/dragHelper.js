@@ -21,14 +21,53 @@
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  //드래그
+  //
+  var DEVICE_EVENT = 'ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch ? {
+    START: 'touchstart',
+    MOVE: 'touchmove',
+    END: 'touchend'
+  } : {
+    START: 'mousedown',
+    MOVE: 'mousemove',
+    END: 'mouseup'
+  }; //드래그
+
+  var touchFixX;
+  var touchFixY;
+
   var pointerParse = function pointerParse(_ref) {
     var clientX = _ref.clientX,
-        clientY = _ref.clientY;
+        clientY = _ref.clientY,
+        touches = _ref.touches;
+
+    if (touches) {
+      if (!touches[0]) {
+        return {
+          x: touchFixX,
+          y: touchFixY
+        };
+      }
+
+      ;
+      var _touches$ = touches[0],
+          touchClientX = _touches$.clientX,
+          touchClientY = _touches$.clientY;
+      touchFixX = touchClientX;
+      touchFixY = touchClientY;
+      return {
+        x: touchClientX,
+        y: touchClientY
+      };
+    }
+
     return {
       x: clientX,
       y: clientY
     };
+  };
+
+  var preventDefaultFn = function preventDefaultFn(e) {
+    return e.preventDefault();
   };
 
   function DragHelper(element, option) {
@@ -81,12 +120,13 @@
       };
       dragParams.pointer = getCurrentPointerDrag(originalEvent);
       startFn && startFn(dragParams);
-      (0, _jquery.default)(document).on("mousemove", dragMove).on("mouseup", dragExit);
-      (0, _jquery.default)("body").attr("dragging", "");
+      (0, _jquery.default)(document).on(DEVICE_EVENT.MOVE, dragMove).on(DEVICE_EVENT.END, dragExit);
+      (0, _jquery.default)(document.body).on(DEVICE_EVENT.MOVE, preventDefaultFn).attr("dragging", "");
     };
 
     var dragMove = function dragMove(_ref3) {
-      var originalEvent = _ref3.originalEvent;
+      var originalEvent = _ref3.originalEvent,
+          preventDefault = _ref3.preventDefault;
       var pointerDrag = pointerParse(originalEvent);
 
       if (!moveFn) {
@@ -106,11 +146,11 @@
       dragParams.event = originalEvent;
       endFn && endFn(dragParams);
       dragParams = undefined;
-      (0, _jquery.default)(document).off("mousemove", dragMove).off("mouseup", dragExit);
-      (0, _jquery.default)("body").removeAttr("dragging");
+      (0, _jquery.default)(document).off(DEVICE_EVENT.MOVE, dragMove).off(DEVICE_EVENT.END, dragExit);
+      (0, _jquery.default)(document.body).off(DEVICE_EVENT.MOVE, preventDefaultFn).removeAttr("dragging");
     };
 
-    $element.on("mousedown", dragEnter);
+    $element.on(DEVICE_EVENT.START, dragEnter);
     return $element;
   }
 });

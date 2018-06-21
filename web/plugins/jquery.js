@@ -58,8 +58,15 @@
     var evt = getOriginalEvent(e);
     var pos = getElementPosition(root);
     if (!pos) return;
-    pos.x = e.touches ? e.touches[0].pageX : e.clientX - pos.x;
-    pos.y = e.touches ? e.touches[0].pageY : e.clientY - pos.y;
+    pos.x = (e.touches ? e.targetTouches[0].pageX : e.pageX) - pos.x;
+    pos.y = (e.touches ? e.targetTouches[0].pageY : e.pageY) - pos.y;
+
+    if (e.touches) {
+      var rect = e.target.getBoundingClientRect();
+      var x = e.targetTouches[0].pageX - rect.left;
+      var y = e.targetTouches[0].pageY - rect.top;
+    }
+
     return pos;
   };
 
@@ -122,6 +129,7 @@
       //}
 
       if ((0, _functions.isPlainObject)(option)) {
+        //console.log("option,",option)
         var allProps = ["top", "left", "width", "height", "right", "bottom", "center", "middle"].filter(function (key) {
           return option.hasOwnProperty(key);
         }); //event option
@@ -200,8 +208,7 @@
       }
 
       return result;
-    },
-    flash: function flash() {}
+    }
   });
   var _default = $;
   _exports.default = _default;
