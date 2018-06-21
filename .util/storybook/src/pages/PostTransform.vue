@@ -52,6 +52,7 @@
 <script>
 import AppLayout from "../layout/AppLayout.vue";
 import { Layer, PadoRect, PadoSlider, PadoPoint, PadoPointSlider } from '../component';
+import { matrix } from '../../../../.src/functions';
 import { transformVariant } from '../../../../.src/web';
 
 export default {

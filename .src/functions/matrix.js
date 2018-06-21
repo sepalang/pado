@@ -1,5 +1,5 @@
 import { asArray, cloneDeep } from './cast'
-import { isArray, isAbsoluteNaN } from './isLike'
+import { isArray, likeArray, isNumber, isAbsoluteNaN } from './isLike'
 import { top } from './reduce';
 import { turn, limitOf } from './nice';
 import { times } from './enumerable';
@@ -147,3 +147,70 @@ export const matrixRange = function(start,end,step,sizeBase){
     
   return result;
 };
+
+//validate matrix format
+export const validMatrix = function(arr){
+  // Matrix must be array
+  if(!likeArray(arr)){
+    return false;
+  }
+  
+  // Empty is valid
+  if(arr.length === 0){
+    return true;
+  }
+  
+  const colLength = arr[0].length;
+  
+  //find some error ( return true => false)
+  return Array.from(arr).some((v,i)=>{
+    if(likeArray(v)){
+      //length check
+      if(v.length !== arr.length) return true;
+      //type check
+      return v.some(likeError=>!(likeError == undefined || isNumber(likeError)));
+    }
+    return true;
+  }) ? false : true;
+};
+
+// real matrix model
+export const asMatrix = function(arr,columnSize){
+  const result = [];
+  if(typeof columnSize === "number" && columnSize > 0){
+    const rowCount = Math.ceil(arr.length / columnSize);
+    times(rowCount,i=>{
+      const column = [];
+      times(columnSize,ci=>{ column.push(arr[i*columnSize+ci]); })
+      result.push(column);
+    });
+  } else {
+    return [arr];
+  }
+  return result;
+};
+
+export const multiplyMatrix = function(aMatrix,bMatrix){
+  if(!validMatrix(aMatrix) && validMatrix(bMatrix)){
+    return null;
+  }
+  if(aMatrix[0].length !== bMatrix.length){
+    return null;
+  }
+  const result = [];
+  times(bMatrix.length, rRowIndex=>{
+    const columnLength = bMatrix[rRowIndex].length;
+    const columnResult = [];
+    times(columnLength, rColumnIndex=>{
+      //var calcLog = [];
+      const multiplied = aMatrix[rRowIndex].reduce((dist,num,index)=>{
+        //calcLog.push(`${num} * ${bMatrix[index][rColumnIndex]}`)
+        return num * bMatrix[index][rColumnIndex] + dist;
+      },0);
+      //console.log("calcLog",calcLog.join(" + "))
+      columnResult.push(multiplied);
+    });
+    result.push(columnResult);
+  });
+  return result;
+}
