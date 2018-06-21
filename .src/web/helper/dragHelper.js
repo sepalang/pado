@@ -4,13 +4,13 @@ import { rebase } from '../../functions';
 //
 const DEVICE_EVENT = (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) ?
 {
-  TOUCH_DEVICE:false,
+  TOUCH_DEVICE:true,
   START:'touchstart',
   MOVE:'touchmove',
   END:'touchend'
 }:
 {
-  TOUCH_DEVICE:true,
+  TOUCH_DEVICE:false,
   START:'mousedown',
   MOVE:'mousemove',
   END:'mouseup'
@@ -29,9 +29,9 @@ const bindDraggingAttribute = function(){
 };
 
 //
-DEVICE_EVENT.TOUCH_DEVICE && window.addEventListener("scroll",(e)=>{
+DEVICE_EVENT.TOUCH_DEVICE && window.addEventListener("touchmove",(e)=>{
   dragRetainCount > 0 && e.preventDefault();
-});
+},{passive: false});
 
 
 //드래그
