@@ -29,7 +29,7 @@ const bindDraggingAttribute = function(){
 };
 
 //
-DEVICE_EVENT.TOUCH_DEVICE && document.body.addEventListener("scroll",(e)=>{
+DEVICE_EVENT.TOUCH_DEVICE && window.addEventListener("scroll",(e)=>{
   dragRetainCount > 0 && e.preventDefault();
 });
 
