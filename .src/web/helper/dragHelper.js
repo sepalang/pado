@@ -4,15 +4,35 @@ import { rebase } from '../../functions';
 //
 const DEVICE_EVENT = (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) ?
 {
+  TOUCH_DEVICE:false,
   START:'touchstart',
   MOVE:'touchmove',
   END:'touchend'
 }:
 {
+  TOUCH_DEVICE:true,
   START:'mousedown',
   MOVE:'mousemove',
   END:'mouseup'
 };
+
+//
+let dragRetainCount=0;
+
+//
+const bindDraggingAttribute = function(){
+  if(dragRetainCount > 0){
+    document.body.setAttribute("dragging","");
+  } else {
+    document.body.removeAttribute("dragging");
+  }
+};
+
+//
+DEVICE_EVENT.TOUCH_DEVICE && document.body.addEventListener("touchmove",(e)=>{
+  dragRetainCount > 0 && e.preventDefault();
+});
+
 
 //드래그
 let touchFixX;
@@ -41,10 +61,9 @@ const pointerParse = ({ clientX, clientY, touches })=>{
   };
 };
 
-const preventDefaultFn = (e)=>e.preventDefault();
-
 export default function DragHelper(element,option){
   const $element = $(element).eq(0);
+  const [ dragElement ] = $element;
   let startFn;
   let moveFn;
   let endFn;
@@ -81,7 +100,7 @@ export default function DragHelper(element,option){
     return pointerDrag;
   }
   
-  const dragEnter = function({ originalEvent }){
+  const dragEnter = function(originalEvent){
     //init
     resetOptions();
     
@@ -97,16 +116,14 @@ export default function DragHelper(element,option){
     
     startFn && startFn(dragParams);
     
-    $(document)
-    .on(DEVICE_EVENT.MOVE,dragMove)
-    .on(DEVICE_EVENT.END,dragExit);
+    document.addEventListener(DEVICE_EVENT.MOVE,dragMove);
+    document.addEventListener(DEVICE_EVENT.END,dragExit);
     
-    $(document.body)
-    .on(DEVICE_EVENT.MOVE,preventDefaultFn)
-    .attr("dragging", "");
+    dragRetainCount+=1;
+    bindDraggingAttribute();
   };
   
-  const dragMove = function({ originalEvent, preventDefault }){
+  const dragMove = function(originalEvent){
     const pointerDrag = pointerParse(originalEvent);
     
     if(!moveFn){
@@ -120,22 +137,20 @@ export default function DragHelper(element,option){
     }
   };
   
-  const dragExit = function({ originalEvent }){
+  const dragExit = function(originalEvent){
     dragParams.pointer = getCurrentPointerDrag(originalEvent);
     dragParams.event   = originalEvent;
     endFn && endFn(dragParams);
     dragParams = undefined;
     
-    $(document)
-    .off(DEVICE_EVENT.MOVE,dragMove)
-    .off(DEVICE_EVENT.END,dragExit);
+    document.removeEventListener(DEVICE_EVENT.MOVE,dragMove);
+    document.removeEventListener(DEVICE_EVENT.END,dragExit);
     
-    $(document.body)
-    .off(DEVICE_EVENT.MOVE,preventDefaultFn)
-    .removeAttr("dragging");
+    dragRetainCount-=1;
+    bindDraggingAttribute();
   };
   
-  $element.on(DEVICE_EVENT.START,dragEnter);
+  dragElement.addEventListener(DEVICE_EVENT.START,dragEnter);
   
   return $element;
 }
