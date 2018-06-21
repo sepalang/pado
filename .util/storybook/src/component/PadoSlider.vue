@@ -76,6 +76,7 @@ export default {
           }
           
           let { left, width } = $scroller.predict({center:event}, element);
+          
           const barLength     = element.width() - width;
           const leftValue     = limitOf(left,barLength);
           finalValue = Math.round(domainRangeValue([0, barLength],[this.xMin,this.xMax],leftValue));
