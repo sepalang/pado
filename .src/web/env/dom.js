@@ -125,6 +125,28 @@ export const getElementBoundingRect = function(el){
   return rect(elRect);
 }
 
+export const getElementTransformMatrix = function(el){
+  const computedStyle       = getComputedStyle(el, null);
+  const computedMatrixParam = computedStyle.transform || computedStyle.webkitTransform || computedStyle.MozTransform || computedStyle.msTransform;
+  const c = computedMatrixParam.split(/\s*[(),]\s*/).slice(1,-1);
+  if (c.length === 6) {
+    return [
+      [+c[0],+c[2],0,+c[4]],
+      [+c[1],+c[3],0,+c[5]],
+      [0,0,1,0],
+      [0,0,0,1]
+    ];
+  } else if (c.length === 16) {
+    return [
+      [+c[0],+c[4],+c[8],+c[12]],
+      [+c[1],+c[5],+c[9],+c[13]],
+      [+c[2],+c[6],+c[10],+c[14]],
+      [+c[3],+c[7],+c[11],+c[15]]
+    ];
+  }
+  return null;
+};
+
 /* https://keithclark.co.uk/articles/calculating-element-vertex-data-from-css-transforms/ */
 const parseMatrix = (function(){
   const DEFAULT_MATRIX = {
@@ -172,7 +194,7 @@ export const getElementTransform = function(el){
   let rotateY = Math.asin(-matrix.m13);
   let rotateX = Math.atan2(matrix.m23, matrix.m33)
   let rotateZ = Math.atan2(matrix.m12, matrix.m11);
-
+  
   return {
     rotate: {
       x: rotateX,

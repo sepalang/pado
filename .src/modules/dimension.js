@@ -1,31 +1,99 @@
 import { isArray } from '../functions/isLike';
 import { asArray } from '../functions/cast';
+import { asMatrix, validMatrix, multiplyMatrix } from '../functions/matrix';
+
 
 const likePoint = function(p){
   return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y");
 }
 
-const Point = function(x=0,y=0,z=0,w=0){
+
+const Point = function(x=0,y=0,z=0,w=1,meta){
+  // base point config
   const __ref = { x,y,z,w };
+  let __meta;
+  
+  // compute matrix
+  const __matrix   = [];
+  const __computed = {
+    matrixVersion:0,
+    computedVersion:0,
+    memoizeRef:null,
+    memoizeOutput:null
+  };
+  
+  const compute = (key)=>{
+    const { matrixVersion, computedVersion, memoizeRef } = __computed;
+    let needCompute = !__computed.memoizeRef || matrixVersion !== computedVersion || !(
+      __computed.memoizeRef.x === __ref.x &&
+      __computed.memoizeRef.y === __ref.y &&
+      __computed.memoizeRef.z === __ref.z &&
+      __computed.memoizeRef.w === __ref.w 
+    );
+    
+    if(needCompute){
+      const newMemoizeRef = {
+        x:__ref.x,
+        y:__ref.y,
+        z:__ref.z,
+        w:__ref.w
+      };
+      const newComputedMatrix = __matrix.reduce(
+        (dest, matrix)=>multiplyMatrix(matrix,dest),
+        asMatrix([newMemoizeRef.x,newMemoizeRef.y,newMemoizeRef.z,newMemoizeRef.w],1)
+      );
+      //
+      __computed.memoizeOutput   = {
+        x:newComputedMatrix[0][0],
+        y:newComputedMatrix[0][1],
+        z:newComputedMatrix[0][2],
+        w:newComputedMatrix[0][3]
+      };
+      __computed.memoizeRef      = newMemoizeRef;
+      __computed.computedVersion = matrixVersion;
+    } 
+    //else {
+    //  console.log(`compute cache ${key}`);
+    //}
+    return key && __computed.memoizeOutput[key] || __computed.memoizeOutput;
+  };
+  
   Object.defineProperties(this,{
-    x:{ enumerable:true, get(){ return __ref.x; }, set(v){ return __ref.x = v; }},
-    y:{ enumerable:true, get(){ return __ref.y; }, set(v){ return __ref.y = v; }},
-    z:{ enumerable:true, get(){ return __ref.z; }, set(v){ return __ref.z = v; }},
-    w:{ enumerable:true, get(){ return __ref.w; }, set(v){ return __ref.w = v; }},
+    x:{ enumerable:true, get:()=>(__matrix.length &&  compute('x') || __ref.x), set:v=>__ref.x = v},
+    y:{ enumerable:true, get:()=>(__matrix.length &&  compute('y') || __ref.y), set:v=>__ref.y = v},
+    z:{ enumerable:true, get:()=>(__matrix.length &&  compute('z') || __ref.z), set:v=>__ref.z = v},
+    w:{ enumerable:true, get:()=>(__matrix.length &&  compute('w') || __ref.w), set:v=>__ref.w = v},
+    meta:{
+      enumerable:false, 
+      get(){ return __meta },
+      set(it){ this.__meta = typeof it === "object" ? it : null; return this.__meta; }
+    },
+    addMatrix: {
+      enumerable:false,
+      value:function(matrix){
+        if(!validMatrix(matrix)) throw new Error("invalid addMatrix param");
+        __matrix.push(matrix);
+        __computed.matrixVersion+=1;
+        return this;
+      }
+    }
   });
+  
+  this.meta = meta;
 };
 
 Point.prototype = {
+  addMeta (obj){
+    if(typeof obj === "object") this.meta = Object.assign(this.meta&&this.meta||{},obj);
+    return this;
+  },
   clone (){
     return new Point(this.x,this.y,this.z,this.w);
   },
-  toJSON (){
-    return {
-      x:this.x,
-      y:this.y,
-      z:this.z,
-      w:this.w
-    }
+  toJSON (withMeta){
+    const json = { x:this.x, y:this.y, z:this.z, w:this.w };
+    if(withMeta === true && this.meta) json.meta = meta;
+    return json;
   },
   pull (width=0, angle="horizontal"){
     const { x, y, z, w } = this;
@@ -45,60 +113,26 @@ Point.prototype = {
     const [largeX, smallX] = this.x > x ? [ this.x, x ] : [ x, this.x ];
     const [largeY, smallY] = this.y > y ? [ this.y, y ] : [ y, this.y ];
     return new Rect(smallX,smallY,largeX-smallX,largeY-smallY,0,0);
-  },
-  translate ({x=0, y=0, z=0}){
-    this.x = this.x + x;
-    this.y = this.y + y;
-    this.z = this.z + z;
-    return this;
-  },
-  rotate ({x:angleX=0, y:angleY=0, z:angleZ=0}){
-    let x1 = this.x,
-        y1 = this.y,
-        z1 = this.z,
-
-        cr = Math.cos(angleX),
-        cp = Math.cos(angleY),
-        cy = Math.cos(angleZ),
-        sr = Math.sin(angleX),
-        sp = Math.sin(angleY),
-        sy = Math.sin(angleZ),
-
-        w = cr * cp * cy + -sr * sp * -sy,
-        x = sr * cp * cy - -cr * sp * -sy,
-        y = cr * sp * cy + sr * cp * sy,
-        z = cr * cp * sy - -sr * sp * -cy,
-
-        m0 = 1 - 2 * ( y * y + z * z ),
-        m1 = 2 * (x * y + z * w),
-        m2 = 2 * (x * z - y * w),
-
-        m4 = 2 * ( x * y - z * w ),
-        m5 = 1 - 2 * ( x * x + z * z ),
-        m6 = 2 * (z * y + x * w ),
-
-        m8 = 2 * ( x * z + y * w ),
-        m9 = 2 * ( y * z - x * w ),
-        m10 = 1 - 2 * ( x * x + y * y );
-        
-    this.x = x1 * m0 + y1 * m4 + z1 * m8;
-    this.y = x1 * m1 + y1 * m5 + z1 * m9;
-    this.z = x1 * m2 + y1 * m6 + z1 * m10;
-    return this;
-  },
-  transform (transform){
-    const { rotate, translate } = transform;
-    this.rotate(rotate);
-    this.translate(translate);
-    return this;
   }
 };
 
-const Vertex = function(pointArray){
+const Vertex = function(pointArray,meta){
+  let __meta;
+  
+  Object.defineProperties(this,{
+    meta:{
+      enumerable:false, 
+      get(){ return __meta },
+      set(it){ this.__meta = typeof it === "object" ? it : null; return this.__meta; }
+    }
+  });
+  
+  this.meta = meta;
+  
   asArray(pointArray).forEach(point=>{
     if(!likePoint(point)) return;
     const {x,y,z,w} = point;
-    this.push(new Point(x,y,z,w));
+    this.push(new Point(x,y,z,w,__meta));
   });
 };
 
@@ -106,6 +140,7 @@ const Vertex = function(pointArray){
   const prototype = [];
   
   classFunction.prototype = prototype;
+  
   Object.keys(methods).forEach(key=>{
     prototype[key] = methods[key]
   });
@@ -125,9 +160,13 @@ const Vertex = function(pointArray){
     }
   });
 }(Vertex, {
-  toJSON (){
+  addMeta (obj){
+    if(typeof obj === "object") this.meta = Object.assign(this.meta&&this.meta||{},obj);
+    return this;
+  },
+  toJSON (withMeta){
     const result = [];
-    this.forEach(p=>result.push(p.toJSON()));
+    this.forEach(p=>result.push(p.toJSON(withMeta)));
     return result;
   },
   clone (){
@@ -143,8 +182,8 @@ const Vertex = function(pointArray){
       if(!this[i+1]) return;
       const newp = fn(refp, this[i+1], i);
       if(!likePoint(newp)) return;
-      const {x,y,z,w} = newp;
-      joins.push(new Point(x,y,z,w));
+      const {x,y,z,w,meta} = newp;
+      joins.push(new Point(x,y,z,w,meta));
     });
     this.splice(0,this.length);
     joins.forEach(p=>this.push(p));
@@ -169,7 +208,7 @@ const Vertex = function(pointArray){
     case "u": case "up": case "l": case "left":
     default:
       const { x,y,z,w } = this.start;
-      return new Point(x,y,z,w);
+      return new Point(x,y,z,w,this.meta);
     }
   },
   transform (transform,rect){
@@ -199,12 +238,10 @@ const Vertex = function(pointArray){
 
 
 
-const Rect = function(left=0,top=0,width=0,height=0,x,y,valid=true){
-  const __ref = { left,top,width,height,x,y,valid }
-  
+const Rect = function(left=0,top=0,width=0,height=0,meta=null){
+  const __ref = { left,top,width,height }
+  let __meta;
   Object.defineProperties(this,{
-    x:{ enumerable:true, get(){ return typeof __ref.x === "number" ? __ref.x : __ref.left; } },
-    y:{ enumerable:true, get(){ return typeof __ref.y === "number" ? __ref.y : __ref.top; } },
     width:{ 
         enumerable:true, 
         get(){ return __ref.width; },
@@ -231,32 +268,51 @@ const Rect = function(left=0,top=0,width=0,height=0,x,y,valid=true){
     top:{ enumerable:true, get(){ return __ref.top; } },
     right:{ enumerable:true, get(){ return this.left + this.width; } },
     bottom:{ enumerable:true, get(){ return this.top + this.height; } },
-    valid:{ get(){ return typeof __ref.valid === "boolean" ? __ref.valid : (
-      typeof __ref.left === "number" &&
-      typeof __ref.top === "number" &&
-      __ref.width >= 0 &&
-      __ref.height >= 0
-    ) } }
+    meta:{
+      enumerable:false, 
+      get(){ return __meta },
+      set(it){ this.__meta = typeof it === "object" ? it : null; return this.__meta; }
+    }
   });
+  
+  this.meta = meta;
 };
 
 Rect.prototype = {
+  addMeta (obj){
+    if(typeof obj === "object") this.meta = Object.assign(this.meta&&this.meta||{},obj);
+    return this;
+  },
+  toJSON (withMeta){
+    const json = {width:this.width, height:this.height, left:this.left, top:this.top, right:this.right, bottom:this.bottom };
+    if(withMeta === true && this.meta) json.meta = meta;
+    return json;
+  },
   findPoint (findWord){
     const [ lineFind, pointFind ] = isArray(findWord) ? findWord : findWord.trim().split(/\s+/);
     return this.vertex(lineFind).point(pointFind);
   },
   vertex (order){
+    const inheritMeta = Object.assign({
+      perspective:0,
+      perspectiveOrigin:{
+        x:this.left + (this.width / 2),
+        y:this.top  + (this.top / 2),
+        z:0
+      }
+    },this.meta);
+    
     switch(order){
     case "right": case "r":
-      return new Vertex([{x:this.right, y:this.top, z:0, w:0},{x:this.right,y:this.bottom,z:0,w:0}]);
+      return new Vertex([{x:this.right, y:this.top, z:0, w:0},{x:this.right,y:this.bottom,z:0,w:0}],inheritMeta);
     case "bottom": case "b":
-      return new Vertex([{x:this.left, y:this.bottom, z:0, w:0},{x:this.right,y:this.bottom,z:0,w:0}]);
+      return new Vertex([{x:this.left, y:this.bottom, z:0, w:0},{x:this.right,y:this.bottom,z:0,w:0}],inheritMeta);
     case "left": case "l":
-      return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0}]);
+      return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0}],inheritMeta);
     case "top": case "t":
-      return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.right,y:this.top,z:0,w:0}]);
+      return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.right,y:this.top,z:0,w:0}],inheritMeta);
     default:
-      return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0},{x:this.right,y:this.bottom,z:0,w:0},{x:this.right, y:this.top, z:0, w:0}]);
+      return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0},{x:this.right,y:this.bottom,z:0,w:0},{x:this.right, y:this.top, z:0, w:0}],inheritMeta);
     }
   },
   //TODO : incompleted sticky(parent, position, offset);
@@ -280,9 +336,6 @@ Rect.prototype = {
     default:
       return rect({ left, top, width, height });
     }
-  },
-  toJSON (){
-    return { x:this.x, y:this.y, width:this.width, height:this.height, left:this.left, top:this.top, right:this.right, bottom:this.bottom, valid:this.valid };
   }
 };
 
