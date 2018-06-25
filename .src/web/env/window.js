@@ -1,3 +1,75 @@
+const { windowServiceReserveSession, getOpenerPresenceProperties } = (function(){
+  //to children
+  const reservedSessionStorage = {};
+  
+  //my window
+  let pulledWindowToken;
+  let pulledWindowSession;
+  let openerPresenceProps;
+  
+  //(부모) 윈도우의 정보를 저장
+  const windowServiceReserveSession = function(name,data,listenHandshake){
+    if(listenHandshake === true){
+      window.windowServiceHandshake = function(){
+        delete window.windowServiceHandshake;
+        return name;
+      };
+    }
+    reservedSessionStorage[name] = data;
+    console.log('reservedSessionStorage',reservedSessionStorage);
+    return reservedSessionStorage[name];
+  };
+
+  //자식에게 세션을 당겨올수 있도록 지원
+  const windowServicePullSession = function(name){
+    //console.log("windowServicePullSession",name);
+    var data = reservedSessionStorage[name];
+    delete reservedSessionStorage[name];
+    return data;
+  };
+  
+  //
+  const getOpenerPresenceProperties = function(){
+    console.log("openerPresenceProps",openerPresenceProps);
+    if(typeof openerPresenceProps === "function"){
+      return openerPresenceProps()
+    }
+    return openerPresenceProps;
+  };
+  
+  window.windowServiceReserveSession = windowServiceReserveSession;
+  window.windowServicePullSession    = windowServicePullSession;
+
+  try {
+    if(window.opener && window.opener.windowServiceHandshake){
+      pulledWindowToken = window.opener.windowServiceHandshake();
+    }
+  } catch(e){
+    console.warn("window.opener.windowServiceHandshake error");
+  }
+    
+  if(pulledWindowToken && window.opener && window.opener.windowServicePullSession){
+    pulledWindowSession  = window.opener.windowServicePullSession(pulledWindowToken);
+    openerPresenceProps = pulledWindowSession;
+    
+    //임의로 언로드 됐을때 세션을 임시 저장
+    var saveSessionFn = function(){
+      try {
+        window.opener &&
+        window.opener.windowServiceReserveSession &&
+        window.opener.windowServiceReserveSession(pulledWindowSession.token,pulledWindowSession,true);
+      } catch(e) {
+        console.warn("Parent window not found.",e);
+      }
+    };
+    
+    window.addEventListener("beforeunload",saveSessionFn);
+  }
+  
+  return { windowServiceReserveSession, getOpenerPresenceProperties };
+}());
+
+
 const WINDOW_POPUP_DEFAULT_WIDTH = 1100;
 const WINDOW_POPUP_DEFAULT_HEIGHT = 900;
 
@@ -21,7 +93,9 @@ export const openWindow = function(href, windowParam) {
 
   if(destWindowWidth > availMaxWidth) destWindowWidth = availMaxWidth;
   if(destWindowHeight > availMaxHeight) destWindowHeight = availMaxHeight;
-
+  
+  windowServiceReserveSession(windowName,windowProps,true);
+  
   const newWindow = window.open(
     href,
     windowName,
