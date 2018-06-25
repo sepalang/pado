@@ -179,13 +179,13 @@
 }
 
 @mixin clearfix {
-	&:after {
-		content:"";
-		display:block;
-		height:0px;
-		width:0px;
-		clear:both;
-	}
+  &:after {
+    content:"";
+    display:block;
+    height:0px;
+    width:0px;
+    clear:both;
+  }
 }
 
 @mixin white-space-variant($flag:true,$scroll:false){

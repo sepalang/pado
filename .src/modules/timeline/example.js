@@ -1,4 +1,30 @@
 /*
+const timeline = timeline({ fps:60 })
+
+timeline.into(
+  projection([],{
+    begin (){
+      
+    },
+    reach (){
+      
+    },
+    enter (){
+      
+    },
+    update (self,time){
+      
+    },
+    exit (){
+      
+    }
+  })
+);
+
+projection($(".ds")[0]).update();
+*/
+
+/*
 import { randRange } from '../../functions/random'
 
 import { timeline, timeProperties } from './'
