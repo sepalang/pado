@@ -4,9 +4,10 @@
   </ul>
 </template>
 <script>
-import SelectInterface from './mixins/SelectInterface';
+import HighOrderSelect from './mixins/HighOrderSelect';
+
 export default {
-  mixins:[ SelectInterface ]
+  mixins:[ HighOrderSelect() ]
 }
 </script>
 <style lang="scss">

@@ -4,8 +4,8 @@
   </li>
 </template>
 <script>
-import SelectItemInterface from './mixins/SelectItemInterface';
+import HighOrderSelectItem from './mixins/HighOrderSelectItem';
 export default {
-  mixins:[ SelectItemInterface ]
+  mixins:[ HighOrderSelectItem() ]
 }
 </script>

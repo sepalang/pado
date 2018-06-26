@@ -2,10 +2,10 @@
   <UsageLayout>
     <h1></h1>
     <div>
-      <PadoTab>
-        <PadoTabItem>아이템</PadoTabItem>
-        <PadoTabItem>아이템</PadoTabItem>
-        <PadoTabItem>아이템</PadoTabItem>
+      <PadoTab v-model="nativeTab.model">
+        <PadoTabItem value="1">아이템</PadoTabItem>
+        <PadoTabItem value="2">아이템</PadoTabItem>
+        <PadoTabItem :value="3">아이템</PadoTabItem>
       </PadoTab>
     </div>
     <div>
@@ -37,7 +37,7 @@
     data (){
       return {
         nativeTab:{
-          model:undefined
+          model:3
         },
         indexedTab:{
           model:undefined

@@ -15,7 +15,7 @@ ManualReactive.prototype = {
   },
   digest (...args){
     const watchResult = this.watch.apply(this,args);
-    return this.judgeOfEqual(this.oldValue, watchResult) ? false : (beginAffect(watchResult), true);
+    return this.judgeOfEqual(this.oldValue, watchResult) ? false : (this.beginAffect(watchResult), true);
   }
 }
 
