@@ -59,11 +59,11 @@
           //empty
           Array.from(placeholder.children).forEach(child=>placeholder.removeChild(child));
         
-          firstRectOffset.vertex().transform(firstRectTransform,firstRectOffset).forEach((point)=>{
-            const pointTag = document.createElement("point");
-            pointTag.setAttribute("style",`left:${point.x}px;top:${point.y}px;`)
-            placeholder.append(pointTag);
-          });
+          //firstRectOffset.vertex().transform(firstRectTransform,firstRectOffset).forEach((point)=>{
+          //  const pointTag = document.createElement("point");
+          //  pointTag.setAttribute("style",`left:${point.x}px;top:${point.y}px;`)
+          //  placeholder.append(pointTag);
+          //});
         })
       },
       openSampleModal (awaitTime=0){

@@ -3,11 +3,12 @@
     <h1></h1>
     <div>
       <PadoTab v-model="nativeTab.model">
-        <PadoTabItem value="1">아이템</PadoTabItem>
-        <PadoTabItem value="2">아이템</PadoTabItem>
-        <PadoTabItem :value="3">아이템</PadoTabItem>
+        <PadoTabItem value="1">tab1</PadoTabItem>
+        <PadoTabItem value="2">tab2</PadoTabItem>
+        <PadoTabItem :value="3">tab3</PadoTabItem>
       </PadoTab>
     </div>
+    <!--
     <div>
       <PadoTab>
         <PadoTabItem>아이템</PadoTabItem>
@@ -23,6 +24,7 @@
         <PadoTabItem>아이템</PadoTabItem>
       </PadoTab>
     </div>
+    -->
   </UsageLayout>
 </template>
 <script>

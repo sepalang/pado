@@ -27,7 +27,7 @@ storiesOf('Usage|component', module)
     render: h => h(UsageComponentCircle, { props: {} })
   };
 })
-.add('select+item',() => {
+.add('select+option',() => {
   return {
     render: h => h(UsageComponentSelectOption, { props: {} })
   };
