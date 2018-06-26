@@ -30,15 +30,12 @@ export default function({ name='' }={}){
     },
     mounted (){
       this.$el.addEventListener("click",({ currentTarget })=>{
-        return (
-          typeof currentTarget.getAttribute("readOnly") === "string" ||
-          typeof currentTarget.getAttribute("disabled") === "string"
-        ) ? undefined : this.selectItem();
+        if(typeof currentTarget.getAttribute("disabled") === "string") return;
+        if(typeof currentTarget.getAttribute("readOnly") === "string") return;
+        this.selectItem();
       });
     
       this.$parent && this.$parent.$emit('select-item-mounted',this);
-    
-    
     }
   }
   

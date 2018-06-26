@@ -1,15 +1,8 @@
 import { asArray } from '../../../../../.src/functions';
 
 export default function({
-  canMultiple=true,
-  canMultiselect=false,
-  multiselectCombination="ctrl"
+  canMultiple=true
 }={}){
-  //
-  if(canMultiselect === false){
-    canMultiple = true;
-  }
-  
   //
   const HighOrderMixins = {
     props: (()=>{

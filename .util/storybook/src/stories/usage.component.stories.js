@@ -8,7 +8,7 @@ import {
 import UsageComponentSlider from '../pages/UsageComponentSlider.vue';
 import UsageComponentRect from '../pages/UsageComponentRect.vue';
 import UsageComponentCircle from '../pages/UsageComponentCircle.vue';
-import UsageComponentSelectItem from '../pages/UsageComponentSelectItem.vue';
+import UsageComponentSelectOption from '../pages/UsageComponentSelectOption.vue';
 
 
 storiesOf('Usage|component', module)
@@ -29,6 +29,6 @@ storiesOf('Usage|component', module)
 })
 .add('select+item',() => {
   return {
-    render: h => h(UsageComponentSelectItem, { props: {} })
+    render: h => h(UsageComponentSelectOption, { props: {} })
   };
 })
