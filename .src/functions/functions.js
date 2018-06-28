@@ -31,6 +31,20 @@ export const unique = function(array){
   return result;
 }
 
+export const unique2 = function(array,findKey){
+  const result    = [];
+  const uniqueSet = new Set();
+  if(typeof findKey === "undefined") { findKey=(v)=>v; }
+  if(typeof findKey === "string")    {  const keyPath = findKey; findKey=(v)=>v[keyPath]; }
+  array.forEach((v)=>{
+    const key = findKey(v);
+    if(uniqueSet.has(key)) return;
+    uniqueSet.add(key);
+    result.push(v);
+  })
+  return result;
+}
+
 export const getKeyBy = function(object,value){
   if(isFunction(value)){
     if(isArray(object)) for(var i=0,l=object.length;i<l;i++) if(value(object[i],i)===true) return i;

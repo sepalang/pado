@@ -7,25 +7,17 @@ export default function({ name='' }={}){
     data : ()=>({ selected:false }),
     methods: {
       inheritValue (inherit){
-        this.selected = this.value === null ? false : (this.value === inherit);
-      },
-      selectItem () {
-        const value = this.value;
-        this.$parent && this.$parent.$emit('select-item-select-action',value);
-        this.$emit('input',value);
-      }
+        selectItem () {
+            this.$parent.$emit('select-item-select-action',this.value);
+        }
     },
     created (){
-      const affectSelectedAttribute = affect(value=>{
-        if(value){
-          this.$el.setAttribute("selected","");
-        } else {
-          this.$el.removeAttribute("selected");
-        }
+      const affectSelectedAttribute = affect(selectedValue=>{
+        this.selected = selectedValue;
       });
-    
+      
       this.$on("inherit-select-state",({ isSelectedValue })=>{
-        affectSelectedAttribute(isSelectedValue(this.value))
+        affectSelectedAttribute(isSelectedValue(this.value));
       });
     },
     mounted (){
