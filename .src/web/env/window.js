@@ -74,10 +74,11 @@ const WINDOW_POPUP_DEFAULT_WIDTH = 1100;
 const WINDOW_POPUP_DEFAULT_HEIGHT = 900;
 
 export const openWindow = function(href, windowParam) {
-  const hasParam   = typeof windowParam === "object";
-  const windowName = hasParam && windowParam["name"] || "_blank";
-  const useResize  = (hasParam && windowParam["resize"]+"") !== "false";
-
+  const hasParam    = typeof windowParam === "object";
+  const windowName  = hasParam && windowParam["name"] || "_blank";
+  const useResize   = (hasParam && windowParam["resize"]+"") !== "false";
+  const windowProps = hasParam ? windowParam["props"] : undefined;
+  
   let destWindowWidth  = (hasParam && windowParam["width"] || WINDOW_POPUP_DEFAULT_WIDTH);
   let destWindowHeight = (hasParam && windowParam["height"] || WINDOW_POPUP_DEFAULT_HEIGHT);
   let destWindowTop    = (hasParam && windowParam["top"] || windowParam["y"] || 0);
