@@ -117,6 +117,7 @@
     var hasParam = typeof windowParam === "object";
     var windowName = hasParam && windowParam["name"] || "_blank";
     var useResize = (hasParam && windowParam["resize"] + "") !== "false";
+    var windowProps = hasParam ? windowParam["props"] : undefined;
     var destWindowWidth = hasParam && windowParam["width"] || WINDOW_POPUP_DEFAULT_WIDTH;
     var destWindowHeight = hasParam && windowParam["height"] || WINDOW_POPUP_DEFAULT_HEIGHT;
     var destWindowTop = hasParam && windowParam["top"] || windowParam["y"] || 0;
