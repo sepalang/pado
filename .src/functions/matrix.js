@@ -160,10 +160,8 @@ export const validMatrix = function(arr){
     return true;
   }
   
-  const colLength = arr[0].length;
-  
   //find some error ( return true => false)
-  return Array.from(arr).some((v,i)=>{
+  return Array.from(arr).some((v)=>{
     if(likeArray(v)){
       //length check
       if(v.length !== arr.length) return true;

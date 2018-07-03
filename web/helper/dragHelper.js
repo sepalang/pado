@@ -23,14 +23,33 @@
 
   //
   var DEVICE_EVENT = 'ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch ? {
+    TOUCH_DEVICE: true,
     START: 'touchstart',
     MOVE: 'touchmove',
     END: 'touchend'
   } : {
+    TOUCH_DEVICE: false,
     START: 'mousedown',
     MOVE: 'mousemove',
     END: 'mouseup'
-  }; //드래그
+  }; //
+
+  var dragRetainCount = 0; //
+
+  var bindDraggingAttribute = function bindDraggingAttribute() {
+    if (dragRetainCount > 0) {
+      document.body.setAttribute("dragging", "");
+    } else {
+      document.body.removeAttribute("dragging");
+    }
+  }; //
+
+
+  DEVICE_EVENT.TOUCH_DEVICE && window.addEventListener("touchmove", function (e) {
+    dragRetainCount > 0 && e.preventDefault();
+  }, {
+    passive: false
+  }); //드래그
 
   var touchFixX;
   var touchFixY;
@@ -66,12 +85,9 @@
     };
   };
 
-  var preventDefaultFn = function preventDefaultFn(e) {
-    return e.preventDefault();
-  };
-
   function DragHelper(element, option) {
     var $element = (0, _jquery.default)(element).eq(0);
+    var dragElement = $element[0];
     var startFn;
     var moveFn;
     var endFn;
@@ -104,8 +120,7 @@
       return pointerDrag;
     };
 
-    var dragEnter = function dragEnter(_ref2) {
-      var originalEvent = _ref2.originalEvent;
+    var dragEnter = function dragEnter(originalEvent) {
       //init
       resetOptions(); //
 
@@ -120,13 +135,13 @@
       };
       dragParams.pointer = getCurrentPointerDrag(originalEvent);
       startFn && startFn(dragParams);
-      (0, _jquery.default)(document).on(DEVICE_EVENT.MOVE, dragMove).on(DEVICE_EVENT.END, dragExit);
-      (0, _jquery.default)(document.body).on(DEVICE_EVENT.MOVE, preventDefaultFn).attr("dragging", "");
+      document.addEventListener(DEVICE_EVENT.MOVE, dragMove);
+      document.addEventListener(DEVICE_EVENT.END, dragExit);
+      dragRetainCount += 1;
+      bindDraggingAttribute();
     };
 
-    var dragMove = function dragMove(_ref3) {
-      var originalEvent = _ref3.originalEvent,
-          preventDefault = _ref3.preventDefault;
+    var dragMove = function dragMove(originalEvent) {
       var pointerDrag = pointerParse(originalEvent);
 
       if (!moveFn) {
@@ -140,17 +155,18 @@
       }
     };
 
-    var dragExit = function dragExit(_ref4) {
-      var originalEvent = _ref4.originalEvent;
+    var dragExit = function dragExit(originalEvent) {
       dragParams.pointer = getCurrentPointerDrag(originalEvent);
       dragParams.event = originalEvent;
       endFn && endFn(dragParams);
       dragParams = undefined;
-      (0, _jquery.default)(document).off(DEVICE_EVENT.MOVE, dragMove).off(DEVICE_EVENT.END, dragExit);
-      (0, _jquery.default)(document.body).off(DEVICE_EVENT.MOVE, preventDefaultFn).removeAttr("dragging");
+      document.removeEventListener(DEVICE_EVENT.MOVE, dragMove);
+      document.removeEventListener(DEVICE_EVENT.END, dragExit);
+      dragRetainCount -= 1;
+      bindDraggingAttribute();
     };
 
-    $element.on(DEVICE_EVENT.START, dragEnter);
+    dragElement.addEventListener(DEVICE_EVENT.START, dragEnter);
     return $element;
   }
 });

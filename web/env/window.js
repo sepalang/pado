@@ -16,7 +16,82 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.historyBack = _exports.openTab = _exports.closeWindow = _exports.openWindow = void 0;
+  _exports.historyBack = _exports.openTab = _exports.closeWindow = _exports.openWindow = _exports.windowProps = void 0;
+
+  var _ref = function () {
+    //to children
+    var reservedSessionStorage = {}; //my window
+
+    var pulledWindowToken;
+    var pulledWindowSession;
+    var openerPresenceProps; //(부모) 윈도우의 정보를 저장
+
+    var windowServiceReserveSession = function windowServiceReserveSession(name, data, listenHandshake) {
+      if (listenHandshake === true) {
+        window.windowServiceHandshake = function () {
+          delete window.windowServiceHandshake;
+          return name;
+        };
+      }
+
+      reservedSessionStorage[name] = data;
+      console.log('reservedSessionStorage', reservedSessionStorage);
+      return reservedSessionStorage[name];
+    }; //자식에게 세션을 당겨올수 있도록 지원
+
+
+    var windowServicePullSession = function windowServicePullSession(name) {
+      //console.log("windowServicePullSession",name);
+      var data = reservedSessionStorage[name];
+      delete reservedSessionStorage[name];
+      return data;
+    }; //
+
+
+    var getOpenerPresenceProperties = function getOpenerPresenceProperties() {
+      if (typeof openerPresenceProps === "function") {
+        return openerPresenceProps();
+      }
+
+      return openerPresenceProps;
+    };
+
+    window.windowServiceReserveSession = windowServiceReserveSession;
+    window.windowServicePullSession = windowServicePullSession;
+
+    try {
+      if (window.opener && window.opener.windowServiceHandshake) {
+        pulledWindowToken = window.opener.windowServiceHandshake();
+      }
+    } catch (e) {
+      console.warn("window.opener.windowServiceHandshake error");
+    }
+
+    if (pulledWindowToken && window.opener && window.opener.windowServicePullSession) {
+      pulledWindowSession = window.opener.windowServicePullSession(pulledWindowToken);
+      openerPresenceProps = pulledWindowSession; //임의로 언로드 됐을때 세션을 임시 저장
+
+      var saveSessionFn = function saveSessionFn() {
+        try {
+          window.opener && window.opener.windowServiceReserveSession && window.opener.windowServiceReserveSession(pulledWindowSession.token, pulledWindowSession, true);
+        } catch (e) {
+          console.warn("Parent window not found.", e);
+        }
+      };
+
+      window.addEventListener("beforeunload", saveSessionFn);
+    }
+
+    return {
+      windowServiceReserveSession: windowServiceReserveSession,
+      getOpenerPresenceProperties: getOpenerPresenceProperties
+    };
+  }(),
+      windowServiceReserveSession = _ref.windowServiceReserveSession,
+      getOpenerPresenceProperties = _ref.getOpenerPresenceProperties;
+
+  var windowProps = getOpenerPresenceProperties;
+  _exports.windowProps = windowProps;
   var WINDOW_POPUP_DEFAULT_WIDTH = 1100;
   var WINDOW_POPUP_DEFAULT_HEIGHT = 900;
 
@@ -37,6 +112,7 @@
 
     if (destWindowWidth > availMaxWidth) destWindowWidth = availMaxWidth;
     if (destWindowHeight > availMaxHeight) destWindowHeight = availMaxHeight;
+    windowServiceReserveSession(windowName, windowProps, true);
     var newWindow = window.open(href, windowName, "top=" + destWindowTop + ",left=" + destWindowLeft + ",width=" + destWindowWidth + ",height=" + destWindowHeight + (useResize ? ",resizable=1" : ",resizable=0") + ",scrollbars=yes,status=1");
     return newWindow;
   };
@@ -57,8 +133,8 @@
 
   _exports.openTab = openTab;
 
-  var historyBack = function historyBack(_ref) {
-    var catchFallback = _ref.catchFallback;
+  var historyBack = function historyBack(_ref2) {
+    var catchFallback = _ref2.catchFallback;
 
     try {
       var history = window.history;

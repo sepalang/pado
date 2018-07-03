@@ -245,7 +245,7 @@
         return defer.promise.catch(fn);
       }); //
 
-      defer.stop = function (resetTick) {
+      defer.stop = function () {
         finished = null;
         resetScope += 1;
       };

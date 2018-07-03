@@ -1,14 +1,18 @@
 export { 
   readUrl,
   windowRect,
+  windowProps,
   openWindow,
   closeWindow,
   getElementBoundingRect,
-  svgPathWithVertex,
+  svgPathWithVertex
 } from '../../../.src/web/env';
 
 export { 
-  point,
-  vertex,
   rect
 } from '../../../.src/modules/dimension';
+
+export { 
+  until,
+  timeout
+} from '../../../.src/modules/promise';

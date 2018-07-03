@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "./cast", "./isLike", "./reduce", "./nice", "./enumerable"], factory);
+    define(["exports", "core-js/modules/es6.array.from", "core-js/modules/web.dom.iterable", "./cast", "./isLike", "./reduce", "./nice", "./enumerable"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("./cast"), require("./isLike"), require("./reduce"), require("./nice"), require("./enumerable"));
+    factory(exports, require("core-js/modules/es6.array.from"), require("core-js/modules/web.dom.iterable"), require("./cast"), require("./isLike"), require("./reduce"), require("./nice"), require("./enumerable"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.cast, global.isLike, global.reduce, global.nice, global.enumerable);
+    factory(mod.exports, global.es6Array, global.webDom, global.cast, global.isLike, global.reduce, global.nice, global.enumerable);
     global.matrix = mod.exports;
   }
-})(this, function (_exports, _webDom, _cast, _isLike, _reduce, _nice2, _enumerable) {
+})(this, function (_exports, _es6Array, _webDom, _cast, _isLike, _reduce, _nice2, _enumerable) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.matrixRange = _exports.domainRangeInterpolate = _exports.domainRangeValue = _exports.hashMap = _exports.range = _exports.rangeModel = void 0;
+  _exports.multiplyMatrix = _exports.asMatrix = _exports.validMatrix = _exports.matrixRange = _exports.domainRangeInterpolate = _exports.domainRangeValue = _exports.hashMap = _exports.range = _exports.rangeModel = void 0;
 
   var rangeModel = function rangeModel(value, step, sizeBase) {
     var start, end, reverse;
@@ -183,8 +183,88 @@
       turnSize = turnSize * scaleCaseLength;
     });
     return result;
-  };
+  }; //validate matrix format
+
 
   _exports.matrixRange = matrixRange;
+
+  var validMatrix = function validMatrix(arr) {
+    // Matrix must be array
+    if (!(0, _isLike.likeArray)(arr)) {
+      return false;
+    } // Empty is valid
+
+
+    if (arr.length === 0) {
+      return true;
+    } //find some error ( return true => false)
+
+
+    return Array.from(arr).some(function (v) {
+      if ((0, _isLike.likeArray)(v)) {
+        //length check
+        if (v.length !== arr.length) return true; //type check
+
+        return v.some(function (likeError) {
+          return !(likeError == undefined || (0, _isLike.isNumber)(likeError));
+        });
+      }
+
+      return true;
+    }) ? false : true;
+  }; // real matrix model
+
+
+  _exports.validMatrix = validMatrix;
+
+  var asMatrix = function asMatrix(arr, columnSize) {
+    var result = [];
+
+    if (typeof columnSize === "number" && columnSize > 0) {
+      var rowCount = Math.ceil(arr.length / columnSize);
+      (0, _enumerable.times)(rowCount, function (i) {
+        var column = [];
+        (0, _enumerable.times)(columnSize, function (ci) {
+          column.push(arr[i * columnSize + ci]);
+        });
+        result.push(column);
+      });
+    } else {
+      return [arr];
+    }
+
+    return result;
+  };
+
+  _exports.asMatrix = asMatrix;
+
+  var multiplyMatrix = function multiplyMatrix(aMatrix, bMatrix) {
+    if (!validMatrix(aMatrix) && validMatrix(bMatrix)) {
+      return null;
+    }
+
+    if (aMatrix[0].length !== bMatrix.length) {
+      return null;
+    }
+
+    var result = [];
+    (0, _enumerable.times)(bMatrix.length, function (rRowIndex) {
+      var columnLength = bMatrix[rRowIndex].length;
+      var columnResult = [];
+      (0, _enumerable.times)(columnLength, function (rColumnIndex) {
+        //var calcLog = [];
+        var multiplied = aMatrix[rRowIndex].reduce(function (dist, num, index) {
+          //calcLog.push(`${num} * ${bMatrix[index][rColumnIndex]}`)
+          return num * bMatrix[index][rColumnIndex] + dist;
+        }, 0); //console.log("calcLog",calcLog.join(" + "))
+
+        columnResult.push(multiplied);
+      });
+      result.push(columnResult);
+    });
+    return result;
+  };
+
+  _exports.multiplyMatrix = multiplyMatrix;
 });
 //# sourceMappingURL=matrix.js.map

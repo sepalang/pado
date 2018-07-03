@@ -30,7 +30,6 @@ const { windowServiceReserveSession, getOpenerPresenceProperties } = (function()
   
   //
   const getOpenerPresenceProperties = function(){
-    console.log("openerPresenceProps",openerPresenceProps);
     if(typeof openerPresenceProps === "function"){
       return openerPresenceProps()
     }
@@ -69,6 +68,7 @@ const { windowServiceReserveSession, getOpenerPresenceProperties } = (function()
   return { windowServiceReserveSession, getOpenerPresenceProperties };
 }());
 
+export const windowProps = getOpenerPresenceProperties;
 
 const WINDOW_POPUP_DEFAULT_WIDTH = 1100;
 const WINDOW_POPUP_DEFAULT_HEIGHT = 900;

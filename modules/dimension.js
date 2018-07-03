@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "../functions/isLike", "../functions/cast"], factory);
+    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.object.assign", "../functions/isLike", "../functions/cast", "../functions/matrix"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("../functions/isLike"), require("../functions/cast"));
+    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.object.assign"), require("../functions/isLike"), require("../functions/cast"), require("../functions/matrix"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.es6Date, global.es6Array, global.es6Object, global.webDom, global.isLike, global.cast);
+    factory(mod.exports, global.es6Regexp, global.es6Date, global.es6Array, global.es6Object, global.webDom, global.es6Object, global.isLike, global.cast, global.matrix);
     global.dimension = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _es6Date, _es6Array, _es6Object, _webDom, _isLike, _cast) {
+})(this, function (_exports, _es6Regexp, _es6Date, _es6Array, _es6Object, _webDom, _es6Object2, _isLike, _cast, _matrix) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -22,7 +22,7 @@
     return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y");
   };
 
-  var Point = function Point(x, y, z, w) {
+  var Point = function Point(x, y, z, w, meta) {
     if (x === void 0) {
       x = 0;
     }
@@ -36,20 +36,69 @@
     }
 
     if (w === void 0) {
-      w = 0;
+      w = 1;
     }
 
+    // base point config
     var __ref = {
       x: x,
       y: y,
       z: z,
       w: w
     };
+
+    var __meta; // compute matrix
+
+
+    var __matrix = [];
+    var __computed = {
+      matrixVersion: 0,
+      computedVersion: 0,
+      memoizeRef: null,
+      memoizeOutput: null
+    };
+
+    var compute = function compute(key) {
+      var matrixVersion = __computed.matrixVersion,
+          computedVersion = __computed.computedVersion; //why un used?
+      //const { memoizeRef } = __computed;
+
+      var needCompute = !__computed.memoizeRef || matrixVersion !== computedVersion || !(__computed.memoizeRef.x === __ref.x && __computed.memoizeRef.y === __ref.y && __computed.memoizeRef.z === __ref.z && __computed.memoizeRef.w === __ref.w);
+
+      if (needCompute) {
+        var newMemoizeRef = {
+          x: __ref.x,
+          y: __ref.y,
+          z: __ref.z,
+          w: __ref.w
+        };
+
+        var newComputedMatrix = __matrix.reduce(function (dest, matrix) {
+          return (0, _matrix.multiplyMatrix)(matrix, dest);
+        }, (0, _matrix.asMatrix)([newMemoizeRef.x, newMemoizeRef.y, newMemoizeRef.z, newMemoizeRef.w], 1)); //
+
+
+        __computed.memoizeOutput = {
+          x: newComputedMatrix[0][0],
+          y: newComputedMatrix[0][1],
+          z: newComputedMatrix[0][2],
+          w: newComputedMatrix[0][3]
+        };
+        __computed.memoizeRef = newMemoizeRef;
+        __computed.computedVersion = matrixVersion;
+      } //else {
+      //  console.log(`compute cache ${key}`);
+      //}
+
+
+      return key && __computed.memoizeOutput[key] || __computed.memoizeOutput;
+    };
+
     Object.defineProperties(this, {
       x: {
         enumerable: true,
         get: function get() {
-          return __ref.x;
+          return __matrix.length && compute('x') || __ref.x;
         },
         set: function set(v) {
           return __ref.x = v;
@@ -58,7 +107,7 @@
       y: {
         enumerable: true,
         get: function get() {
-          return __ref.y;
+          return __matrix.length && compute('y') || __ref.y;
         },
         set: function set(v) {
           return __ref.y = v;
@@ -67,7 +116,7 @@
       z: {
         enumerable: true,
         get: function get() {
-          return __ref.z;
+          return __matrix.length && compute('z') || __ref.z;
         },
         set: function set(v) {
           return __ref.z = v;
@@ -76,26 +125,54 @@
       w: {
         enumerable: true,
         get: function get() {
-          return __ref.w;
+          return __matrix.length && compute('w') || __ref.w;
         },
         set: function set(v) {
           return __ref.w = v;
         }
+      },
+      meta: {
+        enumerable: false,
+        get: function get() {
+          return __meta;
+        },
+        set: function set(it) {
+          this.__meta = typeof it === "object" ? it : null;
+          return this.__meta;
+        }
+      },
+      addMatrix: {
+        enumerable: false,
+        value: function value(matrix) {
+          if (!(0, _matrix.validMatrix)(matrix)) throw new Error("invalid addMatrix param");
+
+          __matrix.push(matrix);
+
+          __computed.matrixVersion += 1;
+          return this;
+        }
       }
     });
+    this.meta = meta;
   };
 
   Point.prototype = {
+    addMeta: function addMeta(obj) {
+      if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
+      return this;
+    },
     clone: function clone() {
       return new Point(this.x, this.y, this.z, this.w);
     },
-    toJSON: function toJSON() {
-      return {
+    toJSON: function toJSON(withMeta) {
+      var json = {
         x: this.x,
         y: this.y,
         z: this.z,
         w: this.w
       };
+      if (withMeta === true && this.meta) json.meta = this.meta;
+      return json;
     },
     pull: function pull(width, angle) {
       if (width === void 0) {
@@ -148,65 +225,27 @@
           smallY = _ref3[1];
 
       return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0);
-    },
-    translate: function translate(_ref4) {
-      var _ref4$x = _ref4.x,
-          x = _ref4$x === void 0 ? 0 : _ref4$x,
-          _ref4$y = _ref4.y,
-          y = _ref4$y === void 0 ? 0 : _ref4$y,
-          _ref4$z = _ref4.z,
-          z = _ref4$z === void 0 ? 0 : _ref4$z;
-      this.x = this.x + x;
-      this.y = this.y + y;
-      this.z = this.z + z;
-      return this;
-    },
-    rotate: function rotate(_ref5) {
-      var _ref5$x = _ref5.x,
-          angleX = _ref5$x === void 0 ? 0 : _ref5$x,
-          _ref5$y = _ref5.y,
-          angleY = _ref5$y === void 0 ? 0 : _ref5$y,
-          _ref5$z = _ref5.z,
-          angleZ = _ref5$z === void 0 ? 0 : _ref5$z;
-      var x1 = this.x,
-          y1 = this.y,
-          z1 = this.z,
-          cr = Math.cos(angleX),
-          cp = Math.cos(angleY),
-          cy = Math.cos(angleZ),
-          sr = Math.sin(angleX),
-          sp = Math.sin(angleY),
-          sy = Math.sin(angleZ),
-          w = cr * cp * cy + -sr * sp * -sy,
-          x = sr * cp * cy - -cr * sp * -sy,
-          y = cr * sp * cy + sr * cp * sy,
-          z = cr * cp * sy - -sr * sp * -cy,
-          m0 = 1 - 2 * (y * y + z * z),
-          m1 = 2 * (x * y + z * w),
-          m2 = 2 * (x * z - y * w),
-          m4 = 2 * (x * y - z * w),
-          m5 = 1 - 2 * (x * x + z * z),
-          m6 = 2 * (z * y + x * w),
-          m8 = 2 * (x * z + y * w),
-          m9 = 2 * (y * z - x * w),
-          m10 = 1 - 2 * (x * x + y * y);
-      this.x = x1 * m0 + y1 * m4 + z1 * m8;
-      this.y = x1 * m1 + y1 * m5 + z1 * m9;
-      this.z = x1 * m2 + y1 * m6 + z1 * m10;
-      return this;
-    },
-    transform: function transform(_transform) {
-      var rotate = _transform.rotate,
-          translate = _transform.translate;
-      this.rotate(rotate);
-      this.translate(translate);
-      return this;
     }
   };
 
-  var Vertex = function Vertex(pointArray) {
+  var Vertex = function Vertex(pointArray, meta) {
     var _this = this;
 
+    var __meta;
+
+    Object.defineProperties(this, {
+      meta: {
+        enumerable: false,
+        get: function get() {
+          return __meta;
+        },
+        set: function set(it) {
+          this.__meta = typeof it === "object" ? it : null;
+          return this.__meta;
+        }
+      }
+    });
+    this.meta = meta;
     (0, _cast.asArray)(pointArray).forEach(function (point) {
       if (!likePoint(point)) return;
       var x = point.x,
@@ -214,7 +253,7 @@
           z = point.z,
           w = point.w;
 
-      _this.push(new Point(x, y, z, w));
+      _this.push(new Point(x, y, z, w, __meta));
     });
   };
 
@@ -239,10 +278,14 @@
       }
     });
   })(Vertex, {
-    toJSON: function toJSON() {
+    addMeta: function addMeta(obj) {
+      if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
+      return this;
+    },
+    toJSON: function toJSON(withMeta) {
       var result = [];
       this.forEach(function (p) {
-        return result.push(p.toJSON());
+        return result.push(p.toJSON(withMeta));
       });
       return result;
     },
@@ -264,8 +307,9 @@
         var x = newp.x,
             y = newp.y,
             z = newp.z,
-            w = newp.w;
-        joins.push(new Point(x, y, z, w));
+            w = newp.w,
+            meta = newp.meta;
+        joins.push(new Point(x, y, z, w, meta));
       });
       this.splice(0, this.length);
       joins.forEach(function (p) {
@@ -316,10 +360,10 @@
               y = _this$start2.y,
               z = _this$start2.z,
               w = _this$start2.w;
-          return new Point(x, y, z, w);
+          return new Point(x, y, z, w, this.meta);
       }
     },
-    transform: function transform(_transform2, rect) {
+    transform: function transform(_transform, rect) {
       var useRect = !!rect;
 
       if (useRect) {
@@ -338,7 +382,7 @@
             x: -originX,
             y: -originY
           });
-          point.transform(_transform2);
+          point.transform(_transform);
           point.translate({
             x: originX,
             y: originY
@@ -346,7 +390,7 @@
         });
       } else {
         this.forEach(function (point) {
-          point.transform(_transform2);
+          point.transform(_transform);
         });
       }
 
@@ -354,7 +398,7 @@
     }
   });
 
-  var Rect = function Rect(left, top, width, height, x, y, valid) {
+  var Rect = function Rect(left, top, width, height, meta) {
     if (left === void 0) {
       left = 0;
     }
@@ -371,32 +415,20 @@
       height = 0;
     }
 
-    if (valid === void 0) {
-      valid = true;
+    if (meta === void 0) {
+      meta = null;
     }
 
     var __ref = {
       left: left,
       top: top,
       width: width,
-      height: height,
-      x: x,
-      y: y,
-      valid: valid
+      height: height
     };
+
+    var __meta;
+
     Object.defineProperties(this, {
-      x: {
-        enumerable: true,
-        get: function get() {
-          return typeof __ref.x === "number" ? __ref.x : __ref.left;
-        }
-      },
-      y: {
-        enumerable: true,
-        get: function get() {
-          return typeof __ref.y === "number" ? __ref.y : __ref.top;
-        }
-      },
       width: {
         enumerable: true,
         get: function get() {
@@ -447,23 +479,54 @@
           return this.top + this.height;
         }
       },
-      valid: {
+      meta: {
+        enumerable: false,
         get: function get() {
-          return typeof __ref.valid === "boolean" ? __ref.valid : typeof __ref.left === "number" && typeof __ref.top === "number" && __ref.width >= 0 && __ref.height >= 0;
+          return __meta;
+        },
+        set: function set(it) {
+          this.__meta = typeof it === "object" ? it : null;
+          return this.__meta;
         }
       }
     });
+    this.meta = meta;
   };
 
   Rect.prototype = {
+    addMeta: function addMeta(obj) {
+      if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
+      return this;
+    },
+    toJSON: function toJSON(withMeta) {
+      var json = {
+        width: this.width,
+        height: this.height,
+        left: this.left,
+        top: this.top,
+        right: this.right,
+        bottom: this.bottom
+      };
+      if (withMeta === true && this.meta) json.meta = this.meta;
+      return json;
+    },
     findPoint: function findPoint(findWord) {
-      var _ref6 = (0, _isLike.isArray)(findWord) ? findWord : findWord.trim().split(/\s+/),
-          lineFind = _ref6[0],
-          pointFind = _ref6[1];
+      var _ref4 = (0, _isLike.isArray)(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref4[0],
+          pointFind = _ref4[1];
 
       return this.vertex(lineFind).point(pointFind);
     },
     vertex: function vertex(order) {
+      var inheritMeta = Object.assign({
+        perspective: 0,
+        perspectiveOrigin: {
+          x: this.left + this.width / 2,
+          y: this.top + this.top / 2,
+          z: 0
+        }
+      }, this.meta);
+
       switch (order) {
         case "right":
         case "r":
@@ -477,7 +540,7 @@
             y: this.bottom,
             z: 0,
             w: 0
-          }]);
+          }], inheritMeta);
 
         case "bottom":
         case "b":
@@ -491,7 +554,7 @@
             y: this.bottom,
             z: 0,
             w: 0
-          }]);
+          }], inheritMeta);
 
         case "left":
         case "l":
@@ -505,7 +568,7 @@
             y: this.bottom,
             z: 0,
             w: 0
-          }]);
+          }], inheritMeta);
 
         case "top":
         case "t":
@@ -519,7 +582,7 @@
             y: this.top,
             z: 0,
             w: 0
-          }]);
+          }], inheritMeta);
 
         default:
           return new Vertex([{
@@ -542,15 +605,15 @@
             y: this.top,
             z: 0,
             w: 0
-          }]);
+          }], inheritMeta);
       }
     },
     //TODO : incompleted sticky(parent, position, offset);
-    sticky: function sticky(_ref7, position) {
-      var refX = _ref7.left,
-          refY = _ref7.top,
-          refWidth = _ref7.width,
-          refHeight = _ref7.height;
+    sticky: function sticky(_ref5, position) {
+      var refX = _ref5.left,
+          refY = _ref5.top,
+          refWidth = _ref5.width,
+          refHeight = _ref5.height;
 
       if (position === void 0) {
         position = "bottom left";
@@ -594,19 +657,6 @@
             height: height
           });
       }
-    },
-    toJSON: function toJSON() {
-      return {
-        x: this.x,
-        y: this.y,
-        width: this.width,
-        height: this.height,
-        left: this.left,
-        top: this.top,
-        right: this.right,
-        bottom: this.bottom,
-        valid: this.valid
-      };
     }
   };
 

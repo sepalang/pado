@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "./isLike", "./cast", "./read"], factory);
+    define(["exports", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.split", "core-js/modules/es6.object.assign", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.set", "./isLike", "./cast", "./read"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("./isLike"), require("./cast"), require("./read"));
+    factory(exports, require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.set"), require("./isLike"), require("./cast"), require("./read"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Array, global.es6Object, global.webDom, global.isLike, global.cast, global.read);
+    factory(mod.exports, global.es6Regexp, global.es6Regexp, global.es6Object, global.es6Object, global.webDom, global.es6Array, global.es6, global.isLike, global.cast, global.read);
     global.functions = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _es6Regexp2, _es6Object, _es6Array, _es6Object2, _webDom, _isLike, _cast, _read) {
+})(this, function (_exports, _es6Regexp, _es6Regexp2, _es6Object, _es6Object2, _webDom, _es6Array, _es, _isLike, _cast, _read) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.toggle = _exports.diffStructure = _exports.apart = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.unique = void 0;
+  _exports.toggle = _exports.diffStructure = _exports.apart = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.unique2 = _exports.unique = void 0;
 
   var unique = function unique(array) {
     var value = [],
@@ -40,6 +40,35 @@
   };
 
   _exports.unique = unique;
+
+  var unique2 = function unique2(array, findKey) {
+    var result = [];
+    var uniqueSet = new Set();
+
+    if (typeof findKey === "undefined") {
+      findKey = function findKey(v) {
+        return v;
+      };
+    }
+
+    if (typeof findKey === "string") {
+      var keyPath = findKey;
+
+      findKey = function findKey(v) {
+        return v[keyPath];
+      };
+    }
+
+    array.forEach(function (v) {
+      var key = findKey(v);
+      if (uniqueSet.has(key)) return;
+      uniqueSet.add(key);
+      result.push(v);
+    });
+    return result;
+  };
+
+  _exports.unique2 = unique2;
 
   var getKeyBy = function getKeyBy(object, value) {
     if ((0, _isLike.isFunction)(value)) {

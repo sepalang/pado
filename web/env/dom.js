@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.makeSVG = _exports.svgPathWithVertex = _exports.transformVariant = _exports.screenRect = _exports.windowRect = _exports.getElementTransform = _exports.getElementBoundingRect = _exports.getElementOffsetRect = _exports.isElement = _exports.getNode = void 0;
+  _exports.makeSVG = _exports.svgPathWithVertex = _exports.transformVariant = _exports.screenRect = _exports.windowRect = _exports.getElementTransform = _exports.getElementTransformMatrix = _exports.getElementBoundingRect = _exports.getElementOffsetRect = _exports.isElement = _exports.getNode = void 0;
 
   var getNode = function getNode(el) {
     var select = (0, _isLike.likeArray)(el) ? el[0] : el;
@@ -157,10 +157,26 @@
 
     return (0, _dimension.rect)(elRect);
   };
+
+  _exports.getElementBoundingRect = getElementBoundingRect;
+
+  var getElementTransformMatrix = function getElementTransformMatrix(el) {
+    var computedStyle = getComputedStyle(el, null);
+    var computedMatrixParam = computedStyle.transform || computedStyle.webkitTransform || computedStyle.MozTransform || computedStyle.msTransform;
+    var c = computedMatrixParam.split(/\s*[(),]\s*/).slice(1, -1);
+
+    if (c.length === 6) {
+      return [[+c[0], +c[2], 0, +c[4]], [+c[1], +c[3], 0, +c[5]], [0, 0, 1, 0], [0, 0, 0, 1]];
+    } else if (c.length === 16) {
+      return [[+c[0], +c[4], +c[8], +c[12]], [+c[1], +c[5], +c[9], +c[13]], [+c[2], +c[6], +c[10], +c[14]], [+c[3], +c[7], +c[11], +c[15]]];
+    }
+
+    return null;
+  };
   /* https://keithclark.co.uk/articles/calculating-element-vertex-data-from-css-transforms/ */
 
 
-  _exports.getElementBoundingRect = getElementBoundingRect;
+  _exports.getElementTransformMatrix = getElementTransformMatrix;
 
   var parseMatrix = function () {
     var DEFAULT_MATRIX = {

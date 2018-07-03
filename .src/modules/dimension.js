@@ -23,7 +23,10 @@ const Point = function(x=0,y=0,z=0,w=1,meta){
   };
   
   const compute = (key)=>{
-    const { matrixVersion, computedVersion, memoizeRef } = __computed;
+    const { matrixVersion, computedVersion } = __computed;
+    //why un used?
+    //const { memoizeRef } = __computed;
+    
     let needCompute = !__computed.memoizeRef || matrixVersion !== computedVersion || !(
       __computed.memoizeRef.x === __ref.x &&
       __computed.memoizeRef.y === __ref.y &&
@@ -92,7 +95,7 @@ Point.prototype = {
   },
   toJSON (withMeta){
     const json = { x:this.x, y:this.y, z:this.z, w:this.w };
-    if(withMeta === true && this.meta) json.meta = meta;
+    if(withMeta === true && this.meta) json.meta = this.meta;
     return json;
   },
   pull (width=0, angle="horizontal"){
@@ -285,7 +288,7 @@ Rect.prototype = {
   },
   toJSON (withMeta){
     const json = {width:this.width, height:this.height, left:this.left, top:this.top, right:this.right, bottom:this.bottom };
-    if(withMeta === true && this.meta) json.meta = meta;
+    if(withMeta === true && this.meta) json.meta = this.meta;
     return json;
   },
   findPoint (findWord){

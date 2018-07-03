@@ -181,7 +181,7 @@ export const until = function(tasks, option) {
     catchStack.forEach(fn=>defer.promise.catch(fn));
     
     //
-    defer.stop = (resetTick)=>{
+    defer.stop = ()=>{
       finished = null;
       resetScope += 1;
     };

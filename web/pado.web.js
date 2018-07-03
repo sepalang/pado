@@ -38,6 +38,79 @@
     return target;
   }
 
+  var _ref = function () {
+    //to children
+    var reservedSessionStorage = {}; //my window
+
+    var pulledWindowToken;
+    var pulledWindowSession;
+    var openerPresenceProps; //(부모) 윈도우의 정보를 저장
+
+    var windowServiceReserveSession = function windowServiceReserveSession(name, data, listenHandshake) {
+      if (listenHandshake === true) {
+        window.windowServiceHandshake = function () {
+          delete window.windowServiceHandshake;
+          return name;
+        };
+      }
+
+      reservedSessionStorage[name] = data;
+      console.log('reservedSessionStorage', reservedSessionStorage);
+      return reservedSessionStorage[name];
+    }; //자식에게 세션을 당겨올수 있도록 지원
+
+
+    var windowServicePullSession = function windowServicePullSession(name) {
+      //console.log("windowServicePullSession",name);
+      var data = reservedSessionStorage[name];
+      delete reservedSessionStorage[name];
+      return data;
+    }; //
+
+
+    var getOpenerPresenceProperties = function getOpenerPresenceProperties() {
+      if (typeof openerPresenceProps === "function") {
+        return openerPresenceProps();
+      }
+
+      return openerPresenceProps;
+    };
+
+    window.windowServiceReserveSession = windowServiceReserveSession;
+    window.windowServicePullSession = windowServicePullSession;
+
+    try {
+      if (window.opener && window.opener.windowServiceHandshake) {
+        pulledWindowToken = window.opener.windowServiceHandshake();
+      }
+    } catch (e) {
+      console.warn("window.opener.windowServiceHandshake error");
+    }
+
+    if (pulledWindowToken && window.opener && window.opener.windowServicePullSession) {
+      pulledWindowSession = window.opener.windowServicePullSession(pulledWindowToken);
+      openerPresenceProps = pulledWindowSession; //임의로 언로드 됐을때 세션을 임시 저장
+
+      var saveSessionFn = function saveSessionFn() {
+        try {
+          window.opener && window.opener.windowServiceReserveSession && window.opener.windowServiceReserveSession(pulledWindowSession.token, pulledWindowSession, true);
+        } catch (e) {
+          console.warn("Parent window not found.", e);
+        }
+      };
+
+      window.addEventListener("beforeunload", saveSessionFn);
+    }
+
+    return {
+      windowServiceReserveSession: windowServiceReserveSession,
+      getOpenerPresenceProperties: getOpenerPresenceProperties
+    };
+  }(),
+      windowServiceReserveSession = _ref.windowServiceReserveSession,
+      getOpenerPresenceProperties = _ref.getOpenerPresenceProperties;
+
+  var windowProps = getOpenerPresenceProperties;
   var WINDOW_POPUP_DEFAULT_WIDTH = 1100;
   var WINDOW_POPUP_DEFAULT_HEIGHT = 900;
   var openWindow = function openWindow(href, windowParam) {
@@ -57,6 +130,7 @@
 
     if (destWindowWidth > availMaxWidth) destWindowWidth = availMaxWidth;
     if (destWindowHeight > availMaxHeight) destWindowHeight = availMaxHeight;
+    windowServiceReserveSession(windowName, windowProps, true);
     var newWindow = window.open(href, windowName, "top=" + destWindowTop + ",left=" + destWindowLeft + ",width=" + destWindowWidth + ",height=" + destWindowHeight + (useResize ? ",resizable=1" : ",resizable=0") + ",scrollbars=yes,status=1");
     return newWindow;
   };
@@ -68,8 +142,8 @@
     newWindow.focus();
     return newWindow;
   };
-  var historyBack = function historyBack(_ref) {
-    var catchFallback = _ref.catchFallback;
+  var historyBack = function historyBack(_ref2) {
+    var catchFallback = _ref2.catchFallback;
 
     try {
       var history = window.history;
@@ -199,11 +273,92 @@
     return [data];
   };
 
+  var times = function times(length, fn) {
+    var result = [];
+
+    for (var i = 0, l = length; i < l; i++) {
+      result.push(fn(i));
+    }
+
+    return result;
+  };
+
+  var validMatrix = function validMatrix(arr) {
+    // Matrix must be array
+    if (!likeArray(arr)) {
+      return false;
+    } // Empty is valid
+
+
+    if (arr.length === 0) {
+      return true;
+    } //find some error ( return true => false)
+
+
+    return Array.from(arr).some(function (v) {
+      if (likeArray(v)) {
+        //length check
+        if (v.length !== arr.length) return true; //type check
+
+        return v.some(function (likeError) {
+          return !(likeError == undefined || isNumber(likeError));
+        });
+      }
+
+      return true;
+    }) ? false : true;
+  }; // real matrix model
+
+  var asMatrix = function asMatrix(arr, columnSize) {
+    var result = [];
+
+    if (typeof columnSize === "number" && columnSize > 0) {
+      var rowCount = Math.ceil(arr.length / columnSize);
+      times(rowCount, function (i) {
+        var column = [];
+        times(columnSize, function (ci) {
+          column.push(arr[i * columnSize + ci]);
+        });
+        result.push(column);
+      });
+    } else {
+      return [arr];
+    }
+
+    return result;
+  };
+  var multiplyMatrix = function multiplyMatrix(aMatrix, bMatrix) {
+    if (!validMatrix(aMatrix) && validMatrix(bMatrix)) {
+      return null;
+    }
+
+    if (aMatrix[0].length !== bMatrix.length) {
+      return null;
+    }
+
+    var result = [];
+    times(bMatrix.length, function (rRowIndex) {
+      var columnLength = bMatrix[rRowIndex].length;
+      var columnResult = [];
+      times(columnLength, function (rColumnIndex) {
+        //var calcLog = [];
+        var multiplied = aMatrix[rRowIndex].reduce(function (dist, num, index) {
+          //calcLog.push(`${num} * ${bMatrix[index][rColumnIndex]}`)
+          return num * bMatrix[index][rColumnIndex] + dist;
+        }, 0); //console.log("calcLog",calcLog.join(" + "))
+
+        columnResult.push(multiplied);
+      });
+      result.push(columnResult);
+    });
+    return result;
+  };
+
   var likePoint = function likePoint(p) {
     return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y");
   };
 
-  var Point = function Point(x, y, z, w) {
+  var Point = function Point(x, y, z, w, meta) {
     if (x === void 0) {
       x = 0;
     }
@@ -217,20 +372,69 @@
     }
 
     if (w === void 0) {
-      w = 0;
+      w = 1;
     }
 
+    // base point config
     var __ref = {
       x: x,
       y: y,
       z: z,
       w: w
     };
+
+    var __meta; // compute matrix
+
+
+    var __matrix = [];
+    var __computed = {
+      matrixVersion: 0,
+      computedVersion: 0,
+      memoizeRef: null,
+      memoizeOutput: null
+    };
+
+    var compute = function compute(key) {
+      var matrixVersion = __computed.matrixVersion,
+          computedVersion = __computed.computedVersion; //why un used?
+      //const { memoizeRef } = __computed;
+
+      var needCompute = !__computed.memoizeRef || matrixVersion !== computedVersion || !(__computed.memoizeRef.x === __ref.x && __computed.memoizeRef.y === __ref.y && __computed.memoizeRef.z === __ref.z && __computed.memoizeRef.w === __ref.w);
+
+      if (needCompute) {
+        var newMemoizeRef = {
+          x: __ref.x,
+          y: __ref.y,
+          z: __ref.z,
+          w: __ref.w
+        };
+
+        var newComputedMatrix = __matrix.reduce(function (dest, matrix) {
+          return multiplyMatrix(matrix, dest);
+        }, asMatrix([newMemoizeRef.x, newMemoizeRef.y, newMemoizeRef.z, newMemoizeRef.w], 1)); //
+
+
+        __computed.memoizeOutput = {
+          x: newComputedMatrix[0][0],
+          y: newComputedMatrix[0][1],
+          z: newComputedMatrix[0][2],
+          w: newComputedMatrix[0][3]
+        };
+        __computed.memoizeRef = newMemoizeRef;
+        __computed.computedVersion = matrixVersion;
+      } //else {
+      //  console.log(`compute cache ${key}`);
+      //}
+
+
+      return key && __computed.memoizeOutput[key] || __computed.memoizeOutput;
+    };
+
     Object.defineProperties(this, {
       x: {
         enumerable: true,
         get: function get() {
-          return __ref.x;
+          return __matrix.length && compute('x') || __ref.x;
         },
         set: function set(v) {
           return __ref.x = v;
@@ -239,7 +443,7 @@
       y: {
         enumerable: true,
         get: function get() {
-          return __ref.y;
+          return __matrix.length && compute('y') || __ref.y;
         },
         set: function set(v) {
           return __ref.y = v;
@@ -248,7 +452,7 @@
       z: {
         enumerable: true,
         get: function get() {
-          return __ref.z;
+          return __matrix.length && compute('z') || __ref.z;
         },
         set: function set(v) {
           return __ref.z = v;
@@ -257,26 +461,54 @@
       w: {
         enumerable: true,
         get: function get() {
-          return __ref.w;
+          return __matrix.length && compute('w') || __ref.w;
         },
         set: function set(v) {
           return __ref.w = v;
         }
+      },
+      meta: {
+        enumerable: false,
+        get: function get() {
+          return __meta;
+        },
+        set: function set(it) {
+          this.__meta = typeof it === "object" ? it : null;
+          return this.__meta;
+        }
+      },
+      addMatrix: {
+        enumerable: false,
+        value: function value(matrix) {
+          if (!validMatrix(matrix)) throw new Error("invalid addMatrix param");
+
+          __matrix.push(matrix);
+
+          __computed.matrixVersion += 1;
+          return this;
+        }
       }
     });
+    this.meta = meta;
   };
 
   Point.prototype = {
+    addMeta: function addMeta(obj) {
+      if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
+      return this;
+    },
     clone: function clone$$1() {
       return new Point(this.x, this.y, this.z, this.w);
     },
-    toJSON: function toJSON() {
-      return {
+    toJSON: function toJSON(withMeta) {
+      var json = {
         x: this.x,
         y: this.y,
         z: this.z,
         w: this.w
       };
+      if (withMeta === true && this.meta) json.meta = this.meta;
+      return json;
     },
     pull: function pull(width, angle) {
       if (width === void 0) {
@@ -329,65 +561,27 @@
           smallY = _ref3[1];
 
       return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0);
-    },
-    translate: function translate(_ref4) {
-      var _ref4$x = _ref4.x,
-          x = _ref4$x === void 0 ? 0 : _ref4$x,
-          _ref4$y = _ref4.y,
-          y = _ref4$y === void 0 ? 0 : _ref4$y,
-          _ref4$z = _ref4.z,
-          z = _ref4$z === void 0 ? 0 : _ref4$z;
-      this.x = this.x + x;
-      this.y = this.y + y;
-      this.z = this.z + z;
-      return this;
-    },
-    rotate: function rotate(_ref5) {
-      var _ref5$x = _ref5.x,
-          angleX = _ref5$x === void 0 ? 0 : _ref5$x,
-          _ref5$y = _ref5.y,
-          angleY = _ref5$y === void 0 ? 0 : _ref5$y,
-          _ref5$z = _ref5.z,
-          angleZ = _ref5$z === void 0 ? 0 : _ref5$z;
-      var x1 = this.x,
-          y1 = this.y,
-          z1 = this.z,
-          cr = Math.cos(angleX),
-          cp = Math.cos(angleY),
-          cy = Math.cos(angleZ),
-          sr = Math.sin(angleX),
-          sp = Math.sin(angleY),
-          sy = Math.sin(angleZ),
-          w = cr * cp * cy + -sr * sp * -sy,
-          x = sr * cp * cy - -cr * sp * -sy,
-          y = cr * sp * cy + sr * cp * sy,
-          z = cr * cp * sy - -sr * sp * -cy,
-          m0 = 1 - 2 * (y * y + z * z),
-          m1 = 2 * (x * y + z * w),
-          m2 = 2 * (x * z - y * w),
-          m4 = 2 * (x * y - z * w),
-          m5 = 1 - 2 * (x * x + z * z),
-          m6 = 2 * (z * y + x * w),
-          m8 = 2 * (x * z + y * w),
-          m9 = 2 * (y * z - x * w),
-          m10 = 1 - 2 * (x * x + y * y);
-      this.x = x1 * m0 + y1 * m4 + z1 * m8;
-      this.y = x1 * m1 + y1 * m5 + z1 * m9;
-      this.z = x1 * m2 + y1 * m6 + z1 * m10;
-      return this;
-    },
-    transform: function transform(_transform) {
-      var rotate = _transform.rotate,
-          translate = _transform.translate;
-      this.rotate(rotate);
-      this.translate(translate);
-      return this;
     }
   };
 
-  var Vertex = function Vertex(pointArray) {
+  var Vertex = function Vertex(pointArray, meta) {
     var _this = this;
 
+    var __meta;
+
+    Object.defineProperties(this, {
+      meta: {
+        enumerable: false,
+        get: function get() {
+          return __meta;
+        },
+        set: function set(it) {
+          this.__meta = typeof it === "object" ? it : null;
+          return this.__meta;
+        }
+      }
+    });
+    this.meta = meta;
     asArray(pointArray).forEach(function (point) {
       if (!likePoint(point)) return;
       var x = point.x,
@@ -395,7 +589,7 @@
           z = point.z,
           w = point.w;
 
-      _this.push(new Point(x, y, z, w));
+      _this.push(new Point(x, y, z, w, __meta));
     });
   };
 
@@ -420,10 +614,14 @@
       }
     });
   })(Vertex, {
-    toJSON: function toJSON() {
+    addMeta: function addMeta(obj) {
+      if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
+      return this;
+    },
+    toJSON: function toJSON(withMeta) {
       var result = [];
       this.forEach(function (p) {
-        return result.push(p.toJSON());
+        return result.push(p.toJSON(withMeta));
       });
       return result;
     },
@@ -445,8 +643,9 @@
         var x = newp.x,
             y = newp.y,
             z = newp.z,
-            w = newp.w;
-        joins.push(new Point(x, y, z, w));
+            w = newp.w,
+            meta = newp.meta;
+        joins.push(new Point(x, y, z, w, meta));
       });
       this.splice(0, this.length);
       joins.forEach(function (p) {
@@ -497,10 +696,10 @@
               y = _this$start2.y,
               z = _this$start2.z,
               w = _this$start2.w;
-          return new Point(x, y, z, w);
+          return new Point(x, y, z, w, this.meta);
       }
     },
-    transform: function transform(_transform2, rect) {
+    transform: function transform(_transform, rect) {
       var useRect = !!rect;
 
       if (useRect) {
@@ -518,7 +717,7 @@
             x: -originX,
             y: -originY
           });
-          point.transform(_transform2);
+          point.transform(_transform);
           point.translate({
             x: originX,
             y: originY
@@ -526,7 +725,7 @@
         });
       } else {
         this.forEach(function (point) {
-          point.transform(_transform2);
+          point.transform(_transform);
         });
       }
 
@@ -534,7 +733,7 @@
     }
   });
 
-  var Rect = function Rect(left, top, width, height, x, y, valid) {
+  var Rect = function Rect(left, top, width, height, meta) {
     if (left === void 0) {
       left = 0;
     }
@@ -551,32 +750,20 @@
       height = 0;
     }
 
-    if (valid === void 0) {
-      valid = true;
+    if (meta === void 0) {
+      meta = null;
     }
 
     var __ref = {
       left: left,
       top: top,
       width: width,
-      height: height,
-      x: x,
-      y: y,
-      valid: valid
+      height: height
     };
+
+    var __meta;
+
     Object.defineProperties(this, {
-      x: {
-        enumerable: true,
-        get: function get() {
-          return typeof __ref.x === "number" ? __ref.x : __ref.left;
-        }
-      },
-      y: {
-        enumerable: true,
-        get: function get() {
-          return typeof __ref.y === "number" ? __ref.y : __ref.top;
-        }
-      },
       width: {
         enumerable: true,
         get: function get() {
@@ -627,23 +814,54 @@
           return this.top + this.height;
         }
       },
-      valid: {
+      meta: {
+        enumerable: false,
         get: function get() {
-          return typeof __ref.valid === "boolean" ? __ref.valid : typeof __ref.left === "number" && typeof __ref.top === "number" && __ref.width >= 0 && __ref.height >= 0;
+          return __meta;
+        },
+        set: function set(it) {
+          this.__meta = typeof it === "object" ? it : null;
+          return this.__meta;
         }
       }
     });
+    this.meta = meta;
   };
 
   Rect.prototype = {
+    addMeta: function addMeta(obj) {
+      if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
+      return this;
+    },
+    toJSON: function toJSON(withMeta) {
+      var json = {
+        width: this.width,
+        height: this.height,
+        left: this.left,
+        top: this.top,
+        right: this.right,
+        bottom: this.bottom
+      };
+      if (withMeta === true && this.meta) json.meta = this.meta;
+      return json;
+    },
     findPoint: function findPoint(findWord) {
-      var _ref6 = isArray(findWord) ? findWord : findWord.trim().split(/\s+/),
-          lineFind = _ref6[0],
-          pointFind = _ref6[1];
+      var _ref4 = isArray(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref4[0],
+          pointFind = _ref4[1];
 
       return this.vertex(lineFind).point(pointFind);
     },
     vertex: function vertex(order) {
+      var inheritMeta = Object.assign({
+        perspective: 0,
+        perspectiveOrigin: {
+          x: this.left + this.width / 2,
+          y: this.top + this.top / 2,
+          z: 0
+        }
+      }, this.meta);
+
       switch (order) {
         case "right":
         case "r":
@@ -657,7 +875,7 @@
             y: this.bottom,
             z: 0,
             w: 0
-          }]);
+          }], inheritMeta);
 
         case "bottom":
         case "b":
@@ -671,7 +889,7 @@
             y: this.bottom,
             z: 0,
             w: 0
-          }]);
+          }], inheritMeta);
 
         case "left":
         case "l":
@@ -685,7 +903,7 @@
             y: this.bottom,
             z: 0,
             w: 0
-          }]);
+          }], inheritMeta);
 
         case "top":
         case "t":
@@ -699,7 +917,7 @@
             y: this.top,
             z: 0,
             w: 0
-          }]);
+          }], inheritMeta);
 
         default:
           return new Vertex([{
@@ -722,15 +940,15 @@
             y: this.top,
             z: 0,
             w: 0
-          }]);
+          }], inheritMeta);
       }
     },
     //TODO : incompleted sticky(parent, position, offset);
-    sticky: function sticky(_ref7, position) {
-      var refX = _ref7.left,
-          refY = _ref7.top,
-          refWidth = _ref7.width,
-          refHeight = _ref7.height;
+    sticky: function sticky(_ref5, position) {
+      var refX = _ref5.left,
+          refY = _ref5.top,
+          refWidth = _ref5.width,
+          refHeight = _ref5.height;
 
       if (position === void 0) {
         position = "bottom left";
@@ -774,19 +992,6 @@
             height: height
           });
       }
-    },
-    toJSON: function toJSON() {
-      return {
-        x: this.x,
-        y: this.y,
-        width: this.width,
-        height: this.height,
-        left: this.left,
-        top: this.top,
-        right: this.right,
-        bottom: this.bottom,
-        valid: this.valid
-      };
     }
   };
   var rect = function rect(left, top, width, height, x, y, valid) {
@@ -922,6 +1127,19 @@
     } while (!!parent);
 
     return rect(elRect);
+  };
+  var getElementTransformMatrix = function getElementTransformMatrix(el) {
+    var computedStyle = getComputedStyle(el, null);
+    var computedMatrixParam = computedStyle.transform || computedStyle.webkitTransform || computedStyle.MozTransform || computedStyle.msTransform;
+    var c = computedMatrixParam.split(/\s*[(),]\s*/).slice(1, -1);
+
+    if (c.length === 6) {
+      return [[+c[0], +c[2], 0, +c[4]], [+c[1], +c[3], 0, +c[5]], [0, 0, 1, 0], [0, 0, 0, 1]];
+    } else if (c.length === 16) {
+      return [[+c[0], +c[4], +c[8], +c[12]], [+c[1], +c[5], +c[9], +c[13]], [+c[2], +c[6], +c[10], +c[14]], [+c[3], +c[7], +c[11], +c[15]]];
+    }
+
+    return null;
   };
   /* https://keithclark.co.uk/articles/calculating-element-vertex-data-from-css-transforms/ */
 
@@ -1587,14 +1805,33 @@
   });
 
   var DEVICE_EVENT = 'ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch ? {
+    TOUCH_DEVICE: true,
     START: 'touchstart',
     MOVE: 'touchmove',
     END: 'touchend'
   } : {
+    TOUCH_DEVICE: false,
     START: 'mousedown',
     MOVE: 'mousemove',
     END: 'mouseup'
-  }; //드래그
+  }; //
+
+  var dragRetainCount = 0; //
+
+  var bindDraggingAttribute = function bindDraggingAttribute() {
+    if (dragRetainCount > 0) {
+      document.body.setAttribute("dragging", "");
+    } else {
+      document.body.removeAttribute("dragging");
+    }
+  }; //
+
+
+  DEVICE_EVENT.TOUCH_DEVICE && window.addEventListener("touchmove", function (e) {
+    dragRetainCount > 0 && e.preventDefault();
+  }, {
+    passive: false
+  }); //드래그
 
   var touchFixX;
   var touchFixY;
@@ -1628,12 +1865,9 @@
     };
   };
 
-  var preventDefaultFn = function preventDefaultFn(e) {
-    return e.preventDefault();
-  };
-
   function DragHelper(element, option) {
     var $element = $(element).eq(0);
+    var dragElement = $element[0];
     var startFn;
     var moveFn;
     var endFn;
@@ -1666,8 +1900,7 @@
       return pointerDrag;
     };
 
-    var dragEnter = function dragEnter(_ref2) {
-      var originalEvent = _ref2.originalEvent;
+    var dragEnter = function dragEnter(originalEvent) {
       //init
       resetOptions(); //
 
@@ -1682,13 +1915,13 @@
       };
       dragParams.pointer = getCurrentPointerDrag(originalEvent);
       startFn && startFn(dragParams);
-      $(document).on(DEVICE_EVENT.MOVE, dragMove).on(DEVICE_EVENT.END, dragExit);
-      $(document.body).on(DEVICE_EVENT.MOVE, preventDefaultFn).attr("dragging", "");
+      document.addEventListener(DEVICE_EVENT.MOVE, dragMove);
+      document.addEventListener(DEVICE_EVENT.END, dragExit);
+      dragRetainCount += 1;
+      bindDraggingAttribute();
     };
 
-    var dragMove = function dragMove(_ref3) {
-      var originalEvent = _ref3.originalEvent,
-          preventDefault = _ref3.preventDefault;
+    var dragMove = function dragMove(originalEvent) {
       var pointerDrag = pointerParse(originalEvent);
 
       if (!moveFn) {
@@ -1702,17 +1935,18 @@
       }
     };
 
-    var dragExit = function dragExit(_ref4) {
-      var originalEvent = _ref4.originalEvent;
+    var dragExit = function dragExit(originalEvent) {
       dragParams.pointer = getCurrentPointerDrag(originalEvent);
       dragParams.event = originalEvent;
       endFn && endFn(dragParams);
       dragParams = undefined;
-      $(document).off(DEVICE_EVENT.MOVE, dragMove).off(DEVICE_EVENT.END, dragExit);
-      $(document.body).off(DEVICE_EVENT.MOVE, preventDefaultFn).removeAttr("dragging");
+      document.removeEventListener(DEVICE_EVENT.MOVE, dragMove);
+      document.removeEventListener(DEVICE_EVENT.END, dragExit);
+      dragRetainCount -= 1;
+      bindDraggingAttribute();
     };
 
-    $element.on(DEVICE_EVENT.START, dragEnter);
+    dragElement.addEventListener(DEVICE_EVENT.START, dragEnter);
     return $element;
   }
 
@@ -1803,6 +2037,7 @@
 
 
   var helpers = /*#__PURE__*/Object.freeze({
+    windowProps: windowProps,
     openWindow: openWindow,
     closeWindow: closeWindow,
     openTab: openTab,
@@ -1813,6 +2048,7 @@
     isElement: isElement,
     getElementOffsetRect: getElementOffsetRect,
     getElementBoundingRect: getElementBoundingRect,
+    getElementTransformMatrix: getElementTransformMatrix,
     getElementTransform: getElementTransform,
     windowRect: windowRect,
     screenRect: screenRect,
