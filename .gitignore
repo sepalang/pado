@@ -2,6 +2,6 @@
 /.cache
 node_modules
 */**/package-lock.json
-*.sample.js
+.util/sample/labs/packed
 .util/report/*
 !.util/report/*.md

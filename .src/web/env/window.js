@@ -16,7 +16,6 @@ const { windowServiceReserveSession, getOpenerPresenceProperties } = (function()
       };
     }
     reservedSessionStorage[name] = data;
-    console.log('reservedSessionStorage',reservedSessionStorage);
     return reservedSessionStorage[name];
   };
 
