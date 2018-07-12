@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/pado",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -32,11 +32,7 @@
     "functions"
   ],
   "devDependencies": {
-    "@sepalang/padoc": "^0.8.5",
-    "babel-core": "^6.26.3",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-stage-3": "^6.24.1",
-    "babel-preset-vue": "^2.0.2",
+    "@sepalang/padoc": "^0.8.6",
     "jquery": "^3.3.1",
     "jsdom": "^11.11.0",
     "madge": "^3.1.1",

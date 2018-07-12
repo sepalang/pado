@@ -79,7 +79,10 @@ export const likeArray = (function(nodeFn,webFn){
   }
 ))
 
-//TODO : native isPlainObject
+export const isPlainObject = data => typeof data === "object" && data.constructor === Object
+
+export const isEnumerableObject = data => isPlainObject(data) || isArray(data)
+
 export const isNode = (a)=>isObject(a) && typeof a.nodeType === "number"
 
 export const isEmpty = function(it){
@@ -109,10 +112,6 @@ export const isPresence = function(it){
 }
 
 export const likeRegexp = (s)=> (typeof s === "string") || (s instanceof RegExp)
-
-export const isPlainObject = data => typeof data === "object" && data.constructor === Object
-
-export const isEnumerableObject = data => isPlainObject(data) || isArray(data)
 
 // none(undfinec, null, NaN), value(1,"1"), hash({}), array([]), node, object(new, Date), function, boolean
 export const eqof = function(it){
