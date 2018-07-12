@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <div></div>
+    <div>SVG Page</div>
   </AppLayout>
 </template>
 <script>
