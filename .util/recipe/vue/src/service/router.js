@@ -17,6 +17,14 @@ export default new Router({
       component: MainPage
     },
     {
+      path: '/tree',
+      component: TreePage
+    },
+    {
+      path: '/grid',
+      component: GridPage
+    },
+    {
       path: '/transform',
       component: PostTransform
     },
@@ -25,20 +33,12 @@ export default new Router({
       component: PostSVG
     },
     {
-      path: '/grid',
-      component: GridPage
-    },
-    {
       path: '/panel',
       component: PanelPage
     },
     {
       path: '/tab',
       component: TabPage
-    },
-    {
-      path: '/tree',
-      component: TreePage
     },
     {
       path: '*',
