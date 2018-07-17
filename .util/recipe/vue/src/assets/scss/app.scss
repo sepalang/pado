@@ -7,6 +7,22 @@
   color: #2c3e50;
 }
 
+header, stage, footer, section, article ,aside, controls {
+  position:relative;
+  @include clearfix;
+  > controls {
+    float:right;
+  }
+}
+
+stage, controls {
+  display:block;
+}
+
+p {
+  margin:0;
+}
+
 .no-break {
   @include word-break-variant(false);
 }
@@ -30,8 +46,10 @@ li {
 }
 
 a {
+  cursor:pointer;
   color: #42b983;
 }
+
 table {
   max-width:100%;
 }

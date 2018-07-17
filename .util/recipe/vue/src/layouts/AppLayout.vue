@@ -4,6 +4,7 @@
       <menu>
         <li><router-link to="/main">Main</router-link></li>
         <li><router-link to="/tree">Tree</router-link></li>
+        <li><router-link to="/modal">Modal</router-link></li>
         <li><router-link to="/rotate-map">RotateMap</router-link></li>
         <li><router-link to="/navigate-map">NavigateMap</router-link></li>
         <li><router-link to="/grid">Grid</router-link></li>

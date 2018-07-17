@@ -78,6 +78,30 @@ export default {
       min-height:40px;
       background-color:white;
       border:none;
+      border-radius:5px;
+      
+      > header {
+        padding:10px;
+        > b {
+          font-size:14px;
+        }
+      }
+      
+      > stage {
+        font-size:12px;
+        padding:10px;
+      }
+      
+      > footer {
+        min-height:20px;
+        padding:10px;
+        font-size:12px;
+        > p {
+          display:inline-block;
+          line-height:20px;
+          color:#888;
+        }
+      } 
     }
   }
 </style>

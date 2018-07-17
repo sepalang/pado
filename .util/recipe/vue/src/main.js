@@ -4,6 +4,7 @@ import router from './service/router';
 import store from './service/store';
 
 Vue.config.productionTip = false;
+Vue.config.ignoredElements = ['stage', 'controls'];
 
 new Vue({
   router,

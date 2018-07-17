@@ -7,6 +7,7 @@ import MainPage from '@/pages/MainPage.vue';
 import PanelPage from '@/pages/PanelPage.vue';
 import TabPage from '@/pages/TabPage.vue';
 import TreePage from '@/pages/TreePage.vue';
+import ModalPage from '@/pages/ModalPage.vue';
 import NavigateMapPage from '@/pages/NavigateMapPage.vue';
 import RotateMapPage from '@/pages/RotateMapPage.vue';
 
@@ -21,6 +22,10 @@ export default new Router({
     {
       path: '/tree',
       component: TreePage
+    },
+    {
+      path: '/modal',
+      component: ModalPage
     },
     {
       path: '/rotate-map',
