@@ -2,6 +2,6 @@
 /.cache
 node_modules
 */**/package-lock.json
-.util/sample/labs/packed
+.util/fnpack/*/packed
 .util/report/*
 !.util/report/*.md

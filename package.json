@@ -22,7 +22,8 @@
     "report": "npm run report:index & npm run report:pado & npm run report:modules & npm run report:functions",
     "test:web": "padoc --test .util/test/web --verbose",
     "test": "padoc --test .util/test --verbose",
-    "labp": "padoc --pack '.util/sample/labs/*.js' .util/sample/labs/packed -m es",
+    "pack:a": "padoc --pack '.util/fnpack/case-a/*.js' .util/fnpack/case-a/packed -m es",
+    "pack:b": "padoc --pack '.util/fnpack/case-b/*.js' .util/fnpack/case-b/packed -m es",
     "t": "padoc --exec .util/sample/use/cast.use.js"
   },
   "author": "AHN HO JUNG",
