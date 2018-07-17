@@ -21,7 +21,7 @@ export default {
   props: {
 
   }
-}
+};
 </script>
 <style lang="scss">
 @import '@/assets/scss/app.scss'

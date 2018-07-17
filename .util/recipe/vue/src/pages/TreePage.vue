@@ -49,8 +49,8 @@
   </AppLayout>
 </template>
 <script>
-import AppLayout from '../layouts/AppLayout.vue'
-import PadoNode from '../components/PadoNode.vue'
+import AppLayout from '../layouts/AppLayout.vue';
+import PadoNode from '../components/PadoNode.vue';
 export default {
   components: {
     AppLayout,
@@ -74,5 +74,5 @@ export default {
       {name: 'bar'}
     ]
   })
-}
+};
 </script>

@@ -1,4 +1,4 @@
-import { asArray } from '../../../../../../.src/functions'
+import { asArray } from '../../../../../../.src/functions';
 
 export default function ({
   canMultiple = true
@@ -7,9 +7,9 @@ export default function ({
   const HighOrderMixins = {
     props: (() => {
       if (canMultiple) {
-        return ['multiple', 'selected']
+        return ['multiple', 'selected'];
       } else {
-        return ['selected']
+        return ['selected'];
       }
     })(),
     model: {
@@ -19,31 +19,31 @@ export default function ({
     data: () => ({ SelectInterfaceMode: 'default' }),
     watch: {
       selected (selected) {
-        this.$children.forEach(selectItemVM => selectItemVM.$emit('inherit-select-state', this.$inheritSelectState()))
+        this.$children.forEach(selectItemVM => selectItemVM.$emit('inherit-select-state', this.$inheritSelectState()));
       }
     },
     created () {
-      const useMultiple = typeof this.multiple === 'string'
+      const useMultiple = typeof this.multiple === 'string';
 
       this.$isSelectedValue = (selectValue) => {
-        return this.selected === undefined ? false : useMultiple ? asArray(this.selected).some(val => val === selectValue) : this.selected === selectValue
-      }
+        return this.selected === undefined ? false : useMultiple ? asArray(this.selected).some(val => val === selectValue) : this.selected === selectValue;
+      };
 
       this.$inheritSelectState = () => {
-        return { model: this.selected, isSelectedValue: this.$isSelectedValue }
-      }
+        return { model: this.selected, isSelectedValue: this.$isSelectedValue };
+      };
 
       //
       this.$on('select-item-select-action', item => {
-        if (typeof this.$el.getAttribute('disabled') === 'string') return
-        if (typeof this.$el.getAttribute('readOnly') === 'string') return
-        this.$emit('input', item)
-      })
+        if (typeof this.$el.getAttribute('disabled') === 'string') return;
+        if (typeof this.$el.getAttribute('readOnly') === 'string') return;
+        this.$emit('input', item);
+      });
 
       //
-      this.$on('select-item-mounted', selectItemVM => selectItemVM.$emit('inherit-select-state', this.$inheritSelectState()))
+      this.$on('select-item-mounted', selectItemVM => selectItemVM.$emit('inherit-select-state', this.$inheritSelectState()));
     }
-  }
+  };
 
-  return HighOrderMixins
+  return HighOrderMixins;
 }

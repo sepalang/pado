@@ -66,14 +66,14 @@
   </AppLayout>
 </template>
 <script>
-import AppLayout from '../layouts/AppLayout.vue'
-import { Layer, PadoRect, PadoSlider, PadoPoint, PadoPointSlider } from '../components'
+import AppLayout from '../layouts/AppLayout.vue';
+import { Layer, PadoRect, PadoSlider, PadoPoint, PadoPointSlider } from '../components';
 import {
   transformVariant,
   getElementBoundingRect,
   getElementTransformMatrix
-} from '../../../../../.src/web'
-import { nextTick } from '../service'
+} from '../../../../../.src/web';
+import { nextTick } from '../service';
 
 export default {
   components: {
@@ -89,15 +89,15 @@ export default {
       return {
         transform: transformVariant(this.box01),
         opacity: 0.7
-      }
+      };
     },
     box01Element () {
-      return this.$el.querySelectorAll('.box01')[0]
+      return this.$el.querySelectorAll('.box01')[0];
     },
     $drawVertexHandle () {
       return [this.box01, this.box01.rotateX, this.box01.rotateY] &&
       this.$el &&
-      this.drawVertex()
+      this.drawVertex();
     }
   },
   watch: {
@@ -105,17 +105,17 @@ export default {
   },
   methods: {
     drawVertex () {
-      const box01 = this.$el.querySelectorAll('.box01')[0]
-      const perspectiveOrigin = getElementBoundingRect(box01).findPoint('center')
-      const box01VertexOriginal = getElementBoundingRect(box01).vertex()
-      const transformMatrix = getElementTransformMatrix(box01)
+      const box01 = this.$el.querySelectorAll('.box01')[0];
+      const perspectiveOrigin = getElementBoundingRect(box01).findPoint('center');
+      const box01VertexOriginal = getElementBoundingRect(box01).vertex();
+      const transformMatrix = getElementTransformMatrix(box01);
 
       this.box01VertexTransform = box01VertexOriginal.map((vertex, index) => {
         return Object.assign(
           vertex.addMatrix(transformMatrix, perspectiveOrigin, 400).toJSON(),
           { key: index }
-        )
-      })
+        );
+      });
     }
   },
   data () {
@@ -124,13 +124,13 @@ export default {
       box01VertexOriginal: [],
       box01VertexTransform: [],
       box01MoveDistance: 0
-    }
+    };
   },
   mounted () {
     nextTick(() => {
-      console.log(this.$el)
-      this.drawVertex()
-    })
+      console.log(this.$el);
+      this.drawVertex();
+    });
   }
-}
+};
 </script>

@@ -8,5 +8,5 @@ export default {
   mounted () {
 
   }
-}
+};
 </script>

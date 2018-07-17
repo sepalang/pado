@@ -1,4 +1,4 @@
-import { affect } from '../../../../../../.src/modules'
+import { affect } from '../../../../../../.src/modules';
 
 export default function ({ name = '' } = {}) {
   const HighOrderMixins = {
@@ -6,28 +6,28 @@ export default function ({ name = '' } = {}) {
     data: () => ({ selected: false }),
     methods: {
       selectItem () {
-        this.$parent.$emit('select-item-select-action', this.value)
+        this.$parent.$emit('select-item-select-action', this.value);
       }
     },
     created () {
       const affectSelectedAttribute = affect(selectedValue => {
-        this.selected = selectedValue
-      })
+        this.selected = selectedValue;
+      });
 
       this.$on('inherit-select-state', ({ isSelectedValue }) => {
-        affectSelectedAttribute(isSelectedValue(this.value))
-      })
+        affectSelectedAttribute(isSelectedValue(this.value));
+      });
     },
     mounted () {
       this.$el.addEventListener('click', ({ currentTarget }) => {
-        if (typeof currentTarget.getAttribute('disabled') === 'string') return
-        if (typeof currentTarget.getAttribute('readOnly') === 'string') return
-        this.selectItem()
-      })
+        if (typeof currentTarget.getAttribute('disabled') === 'string') return;
+        if (typeof currentTarget.getAttribute('readOnly') === 'string') return;
+        this.selectItem();
+      });
 
-      this.$parent && this.$parent.$emit('select-item-mounted', this)
+      this.$parent && this.$parent.$emit('select-item-mounted', this);
     }
-  }
+  };
 
-  return HighOrderMixins
+  return HighOrderMixins;
 }

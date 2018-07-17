@@ -5,9 +5,9 @@
   </div>
 </template>
 <script>
-import $ from '../../../../../.src/web/plugins/jquery'
-import { dragHelper } from '../../../../../.src/web'
-import { limitOf, domainRangeValue } from '../../../../../.src/functions'
+import $ from '../../../../../.src/web/plugins/jquery';
+import { dragHelper } from '../../../../../.src/web';
+import { limitOf, domainRangeValue } from '../../../../../.src/functions';
 
 export default {
   props: {
@@ -29,70 +29,70 @@ export default {
   },
   computed: {
     xValue () {
-      return parseInt(this.value, 10)
+      return parseInt(this.value, 10);
     },
     xMax () {
-      return parseInt(this.maxValue, 10)
+      return parseInt(this.maxValue, 10);
     },
     xMin () {
-      return parseInt(this.minValue, 10)
+      return parseInt(this.minValue, 10);
     },
     readOnly () {
-      return typeof this.$el.getAttribute('readOnly') === 'string'
+      return typeof this.$el.getAttribute('readOnly') === 'string';
     }
   },
   mounted () {
-    const $element = $(this.$el)
+    const $element = $(this.$el);
     // const $scrollbar = $element.find('.v-pado-slider-scrollbar')
-    const $scroller = $element.find('.v-pado-slider-scroller')
+    const $scroller = $element.find('.v-pado-slider-scroller');
 
     this.$on('enter', (value) => {
-      const modelValue = typeof value === 'number' ? value : this.xValue
-      const barLength = $element.width() - $scroller.width()
-      const leftPosition = domainRangeValue([this.xMin, this.xMax], [0, barLength], modelValue)
-      $scroller.css('left', leftPosition)
+      const modelValue = typeof value === 'number' ? value : this.xValue;
+      const barLength = $element.width() - $scroller.width();
+      const leftPosition = domainRangeValue([this.xMin, this.xMax], [0, barLength], modelValue);
+      $scroller.css('left', leftPosition);
     });
 
-    (typeof this.xValue !== 'undefined' || !this.xValue === 0) && this.$emit('enter', parseInt(this.xValue, 10))
+    (typeof this.xValue !== 'undefined' || !this.xValue === 0) && this.$emit('enter', parseInt(this.xValue, 10));
 
     this.$watch('value', (newValue) => {
-      this.$emit('enter', newValue)
-    })
+      this.$emit('enter', newValue);
+    });
 
     this.windowResizeHandle = () => {
-      this.$emit('enter')
-    }
+      this.$emit('enter');
+    };
 
-    $(window).on('resize', this.windowResizeHandle)
+    $(window).on('resize', this.windowResizeHandle);
 
     dragHelper(this.$el, ({ element }) => {
-      $scroller.css('pointer-events', 'none')
-      let finalValue
+      $scroller.css('pointer-events', 'none');
+      let finalValue;
       return {
         'start, move': ({ event }) => {
           if (this.readOnly) {
-            event.preventDefault()
+            event.preventDefault();
           }
 
-          let { left, width } = $scroller.predict({center: event}, element)
+          let { left, width } = $scroller.predict({center: event}, element);
 
-          const barLength = element.width() - width
-          const leftValue = limitOf(left, barLength)
-          finalValue = Math.round(domainRangeValue([0, barLength], [this.xMin, this.xMax], leftValue))
-          this.$emit('enter', finalValue)
+          const barLength = element.width() - width;
+          const leftValue = limitOf(left, barLength);
+          finalValue = Math.round(domainRangeValue([0, barLength], [this.xMin, this.xMax], leftValue));
+          this.$emit('enter', finalValue);
           if (this.inputCycle === 'enter') {
-            this.$emit('input', finalValue)
+            this.$emit('input', finalValue);
           }
         },
         end: ({ pointer }) => {
-          const endValue = Math.round(typeof finalValue === 'number' ? finalValue : this.xValue)
-          this.$emit('input', endValue)
+          const endValue = Math.round(typeof finalValue === 'number' ? finalValue : this.xValue);
+          this.$emit('input', endValue);
         }
-      }
-    })
+      };
+    });
   },
   destroyed () {
-    $(window).off('resize', this.windowResizeHandle)
+    $(window).off('resize', this.windowResizeHandle);
   }
-}
+};
 </script>

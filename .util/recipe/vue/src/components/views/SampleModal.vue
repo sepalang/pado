@@ -6,8 +6,8 @@
   </ModalComponent>
 </template>
 <script>
-import ModalComponent from '../interface/ModalComponent.vue'
-import { timeout } from '../../../../../../.src/modules/promise'
+import ModalComponent from '../interface/ModalComponent.vue';
+import { timeout } from '../../../../../../.src/modules/promise';
 
 // destroy 하면 모달이 자동으로 제거됨
 export default {
@@ -25,16 +25,16 @@ export default {
       link.on({
         close: (other) => {
           if (this.awaitTime) {
-            return timeout(this.awaitTime).then(() => `wait ${this.awaitTime} ms`)
+            return timeout(this.awaitTime).then(() => `wait ${this.awaitTime} ms`);
           } else {
-            return true
+            return true;
           }
         }
-      })
-      this.modal = link
+      });
+      this.modal = link;
     }
   }
-}
+};
 </script>
 <style lang="scss">
 

@@ -4,11 +4,11 @@
   </ul>
 </template>
 <script>
-import HighOrderSelect from './mixins/HighOrderSelect'
+import HighOrderSelect from './mixins/HighOrderSelect';
 
 export default {
   mixins: [ HighOrderSelect() ]
-}
+};
 </script>
 <style lang="scss">
   .v-tab {

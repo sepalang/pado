@@ -6,7 +6,7 @@
   </span>
 </template>
 <script>
-import { domainRangeValue, drawCircleVars } from '../../../../../.src/functions'
+import { domainRangeValue, drawCircleVars } from '../../../../../.src/functions';
 
 export default {
   props: {
@@ -28,15 +28,15 @@ export default {
   },
   computed: {
     dValue () {
-      const { x, y, radius, diameter } = drawCircleVars(this.size, this.stroke)
+      const { x, y, radius, diameter } = drawCircleVars(this.size, this.stroke);
       return `M${x} ${y} 
       a ${radius} ${radius} 0 0 1 0 ${diameter}
-      a ${radius} ${radius} 0 0 1 0 -${diameter}`
+      a ${radius} ${radius} 0 0 1 0 -${diameter}`;
     },
     dashArrayValue () {
-      const { circumference } = drawCircleVars(this.size, this.stroke)
-      const circumferenceRatio = domainRangeValue([this.minValue, this.maxValue], [0, circumference], this.value)
-      return `${circumferenceRatio}, ${circumference}`
+      const { circumference } = drawCircleVars(this.size, this.stroke);
+      const circumferenceRatio = domainRangeValue([this.minValue, this.maxValue], [0, circumference], this.value);
+      return `${circumferenceRatio}, ${circumference}`;
     }
   },
   data: () => ({
@@ -49,5 +49,5 @@ export default {
   destroyed () {
 
   }
-}
+};
 </script>

@@ -1,1 +1,1 @@
-export * from './vue-compile'
+export * from './vue-compile';

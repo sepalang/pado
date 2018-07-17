@@ -39,6 +39,7 @@
       "no-trailing-spaces":0,
       "standard/object-curly-even-spacing":0,
       "quotes":0,
+      "semi":[1, "always"],
       "no-multiple-empty-lines":[1,{
         "max":2
       }]
