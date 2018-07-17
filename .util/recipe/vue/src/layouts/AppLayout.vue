@@ -4,6 +4,8 @@
       <menu>
         <li><router-link to="/main">Main</router-link></li>
         <li><router-link to="/tree">Tree</router-link></li>
+        <li><router-link to="/rotate-map">RotateMap</router-link></li>
+        <li><router-link to="/navigate-map">NavigateMap</router-link></li>
         <li><router-link to="/grid">Grid</router-link></li>
         <li><router-link to="/transform">Transform</router-link></li>
         <li><router-link to="/svg">SVG</router-link></li>
