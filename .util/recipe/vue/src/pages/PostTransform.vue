@@ -85,32 +85,32 @@ export default {
     PadoPointSlider
   },
   computed: {
-    boxTransform01 () {
+    boxTransform01 (){
       return {
         transform: transformVariant(this.box01),
-        opacity: 0.7
+        opacity  : 0.7
       };
     },
-    box01Element () {
+    box01Element (){
       return this.$el.querySelectorAll('.box01')[0];
     },
-    $drawVertexHandle () {
+    $drawVertexHandle (){
       return [this.box01, this.box01.rotateX, this.box01.rotateY] &&
       this.$el &&
       this.drawVertex();
     }
   },
   watch: {
-    $drawVertexHandle () {}
+    $drawVertexHandle (){}
   },
   methods: {
-    drawVertex () {
+    drawVertex (){
       const box01 = this.$el.querySelectorAll('.box01')[0];
       const perspectiveOrigin = getElementBoundingRect(box01).findPoint('center');
       const box01VertexOriginal = getElementBoundingRect(box01).vertex();
       const transformMatrix = getElementTransformMatrix(box01);
 
-      this.box01VertexTransform = box01VertexOriginal.map((vertex, index) => {
+      this.box01VertexTransform = box01VertexOriginal.map((vertex, index)=>{
         return Object.assign(
           vertex.addMatrix(transformMatrix, perspectiveOrigin, 400).toJSON(),
           { key: index }
@@ -118,16 +118,16 @@ export default {
       });
     }
   },
-  data () {
+  data (){
     return {
-      box01: { rotateX: 0, rotateY: 0, perspective: 0, perspectiveOrigin: {x: 75, y: 75} },
-      box01VertexOriginal: [],
+      box01               : { rotateX: 0, rotateY: 0, perspective: 0, perspectiveOrigin: {x: 75, y: 75} },
+      box01VertexOriginal : [],
       box01VertexTransform: [],
-      box01MoveDistance: 0
+      box01MoveDistance   : 0
     };
   },
-  mounted () {
-    nextTick(() => {
+  mounted (){
+    nextTick(()=>{
       console.log(this.$el);
       this.drawVertex();
     });

@@ -13,13 +13,13 @@ export default {
   components: {
     AppLayout
   },
-  data () {
+  data (){
     return {
       modalIndex: 0
     };
   },
   methods: {
-    openSampleModal (awaitTime = 0) {
+    openSampleModal (awaitTime = 0){
       createVue(SampleModal, {
         props: {
           no: this.modalIndex++,

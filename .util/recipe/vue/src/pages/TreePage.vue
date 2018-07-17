@@ -56,13 +56,13 @@ export default {
     AppLayout,
     PadoNode
   },
-  data: () => ({
+  data: ()=>({
     treeModel: [
       {
-        name: 'foo',
+        name    : 'foo',
         children: [
           {
-            name: "kim",
+            name    : "kim",
             children: [
               { name: "김치" },
               { name: "김밥" }

@@ -11,31 +11,31 @@ import { likeNumber } from '../../../../../../.src/functions';
 //
 //
 const DEFAULT_RECT_SIZE_VALUE = 20;
-export default function (...options) {
-  if (!options.length) {
+export default function (...options){
+  if (!options.length){
     options = [[[], []]];
   }
   const props = {};
   const computed = {};
 
-  options.forEach(([ keys = [], defaultValues = [] ]) => {
+  options.forEach(([ keys = [], defaultValues = [] ])=>{
     const [widthKey = 'width', heightKey = 'height', sizeKey = 'size', rectKey = 'rect'] = keys;
     const [widthParam = DEFAULT_RECT_SIZE_VALUE, heightParam = DEFAULT_RECT_SIZE_VALUE] = defaultValues;
 
     Object.assign(props, {
-      [ widthKey ]: { default: widthParam },
+      [ widthKey ] : { default: widthParam },
       [ heightKey ]: { default: heightParam },
-      [ sizeKey ]: {}
+      [ sizeKey ]  : {}
     });
 
     const sizeValueKey = sizeKey + 'Value';
     const rectValueKey = rectKey + 'Value';
 
     Object.assign(computed, {
-      [ sizeValueKey ]: function () {
+      [ sizeValueKey ]: function (){
         return likeNumber(this[sizeKey]) ? parseFloat(this[sizeKey]) : undefined;
       },
-      [ rectValueKey ]: function () {
+      [ rectValueKey ]: function (){
         const width = typeof this[sizeValueKey] === 'number' ? this[sizeValueKey] : parseInt(this[widthKey], 10);
         const height = typeof this[sizeValueKey] === 'number' ? this[sizeValueKey] : parseInt(this[heightKey], 10);
         return { width, height };

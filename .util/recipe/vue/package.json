@@ -35,14 +35,21 @@
       "@vue/standard"
     ],
     "rules": {
-      "no-unreachable":0,
-      "no-trailing-spaces":0,
-      "standard/object-curly-even-spacing":0,
       "quotes":0,
       "semi":[1, "always"],
+      "eqeqeq":0,
+      "space-before-blocks":["error",{ "functions": "never", "keywords": "never", "classes": "always" }],
+      "arrow-spacing":["error",{ "before": false, "after": false }],
+      "key-spacing":["error", { "beforeColon": false, "afterColon": true, "align": "colon" }],
+      "no-mixed-operators":0,
+      "no-return-assign":0,
+      "no-unreachable":0,
+      "no-trailing-spaces":0,
+      "no-return-await":0,
       "no-multiple-empty-lines":[1,{
         "max":2
-      }]
+      }],
+      "standard/object-curly-even-spacing":0
     },
     "parserOptions": {
       "parser": "babel-eslint"

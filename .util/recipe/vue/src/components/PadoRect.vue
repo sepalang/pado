@@ -12,23 +12,23 @@ import HighOrderPoint from './mixins/HighOrderPoint';
 
 export default {
   mixins: [ HighOrderRect([['width', 'height', 'size', 'rect'], [20, 20]]), HighOrderPoint([['left', 'top', 'point'], [0, 0]]) ],
-  props: {
-    label: {},
+  props : {
+    label   : {},
     dragmove: {}
   },
   computed: {
-    contentValue () {
+    contentValue (){
       const { width, height } = this.rectValue;
       return typeof this.label === 'string' ? this.label : `${width}x${height}`;
     },
-    rectStyle () {
+    rectStyle (){
       const { width, height } = this.rectValue;
       const position = (this.left > 0 || this.top > 0) ? 'absolute' : 'relative';
       const [left, top] = [this.left + 'px', this.top + 'px'];
       return { width: width + 'px', height: height + 'px', position, left, top};
     },
-    changeBoundsWatchGroup () {
-      this.$el && nextQueue(() => {
+    changeBoundsWatchGroup (){
+      this.$el && nextQueue(()=>{
         const boundingRect = getElementBoundingRect(this.$el);
         if (boundingRect.valid !== false) this.$emit('bounding', boundingRect);
       });
@@ -36,30 +36,30 @@ export default {
     }
   },
   watch: {
-    changeBoundsWatchGroup (newValue) {}
+    changeBoundsWatchGroup (newValue){}
   },
-  mounted () {
+  mounted (){
     const boundingRect = getElementBoundingRect(this.$el);
     if (boundingRect.valid !== false) this.$emit('bounding', getElementBoundingRect(this.$el));
 
-    if (isPresence(this.dragmove)) {
-      dragHelper(this.$el, ({ element }) => {
+    if (isPresence(this.dragmove)){
+      dragHelper(this.$el, ({ element })=>{
         const startOffset = this.pointValue;
-        const positionWithOffset = function (x, y) {
+        const positionWithOffset = function (x, y){
           const result = {
             left: startOffset.left + x,
-            top: startOffset.top + y
+            top : startOffset.top + y
           };
           element.css(result);
           return result;
         };
 
         return {
-          move: ({ pointer: { offsetX, offsetY } }) => {
+          move: ({ pointer: { offsetX, offsetY } })=>{
             const result = positionWithOffset(offsetX, offsetY);
             this.$emit('drawPoint', result);
           },
-          end: ({ pointer: { offsetX, offsetY } }) => {
+          end: ({ pointer: { offsetX, offsetY } })=>{
             const result = positionWithOffset(offsetX, offsetY);
             this.$emit('inputPoint', result);
           }

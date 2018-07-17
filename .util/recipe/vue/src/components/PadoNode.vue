@@ -35,7 +35,7 @@ const NodeComponent = {
       type: Array
     },
     nested: {
-      type: Boolean,
+      type   : Boolean,
       default: false
     },
     id: {
@@ -50,18 +50,18 @@ const NodeComponent = {
     }
   },
   computed: {
-    __vnodecomponent () {
+    __vnodecomponent (){
       return true;
     },
-    isListStyled () {
+    isListStyled (){
       return !!this.listStyle;
     },
-    depth () {
+    depth (){
       return this.parentNodeComponents().length;
     }
   },
   methods: {
-    parentNodeComponents () {
+    parentNodeComponents (){
       let result = [];
       let target = this;
       do {
@@ -70,14 +70,14 @@ const NodeComponent = {
       } while (target);
       return result;
     },
-    findRootComponent () {
+    findRootComponent (){
       const parents = this.parentNodeComponents();
       return parents[parents.length - 1] || this;
     },
-    getId (item, depth) {
+    getId (item, depth){
       return item[this.id];
     },
-    triggerOpen (item) {
+    triggerOpen (item){
       const destOpenValue = !item.$open;
       this.$set(item, '$open', destOpenValue);
       this.$emit('open', {

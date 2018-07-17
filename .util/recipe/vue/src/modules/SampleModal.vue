@@ -31,17 +31,17 @@ export default {
     BaseModal
   },
   props: {
-    no: {},
+    no       : {},
     awaitTime: {
       default: 0
     }
   },
   methods: {
-    linkModal (link) {
+    linkModal (link){
       link.on({
-        close: (other) => {
-          if (this.awaitTime) {
-            return timeout(this.awaitTime).then(() => `wait ${this.awaitTime} ms`);
+        close: (other)=>{
+          if (this.awaitTime){
+            return timeout(this.awaitTime).then(()=>`wait ${this.awaitTime} ms`);
           } else {
             return true;
           }

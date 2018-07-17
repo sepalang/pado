@@ -16,47 +16,47 @@ Vue.use(Router);
 export default new Router({
   routes: [
     {
-      path: '/main',
+      path     : '/main',
       component: MainPage
     },
     {
-      path: '/tree',
+      path     : '/tree',
       component: TreePage
     },
     {
-      path: '/modal',
+      path     : '/modal',
       component: ModalPage
     },
     {
-      path: '/rotate-map',
+      path     : '/rotate-map',
       component: RotateMapPage
     },
     {
-      path: '/navigate-map',
+      path     : '/navigate-map',
       component: NavigateMapPage
     },
     {
-      path: '/grid',
+      path     : '/grid',
       component: GridPage
     },
     {
-      path: '/transform',
+      path     : '/transform',
       component: PostTransform
     },
     {
-      path: '/svg',
+      path     : '/svg',
       component: PostSVG
     },
     {
-      path: '/panel',
+      path     : '/panel',
       component: PanelPage
     },
     {
-      path: '/tab',
+      path     : '/tab',
       component: TabPage
     },
     {
-      path: '*',
+      path    : '*',
       redirect: '/main'
     }
   ]

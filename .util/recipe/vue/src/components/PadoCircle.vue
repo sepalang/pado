@@ -27,26 +27,26 @@ export default {
     }
   },
   computed: {
-    dValue () {
+    dValue (){
       const { x, y, radius, diameter } = drawCircleVars(this.size, this.stroke);
       return `M${x} ${y} 
       a ${radius} ${radius} 0 0 1 0 ${diameter}
       a ${radius} ${radius} 0 0 1 0 -${diameter}`;
     },
-    dashArrayValue () {
+    dashArrayValue (){
       const { circumference } = drawCircleVars(this.size, this.stroke);
       const circumferenceRatio = domainRangeValue([this.minValue, this.maxValue], [0, circumference], this.value);
       return `${circumferenceRatio}, ${circumference}`;
     }
   },
-  data: () => ({
+  data: ()=>({
     showValue: '',
-    rate: ''
+    rate     : ''
   }),
-  mounted () {
+  mounted (){
 
   },
-  destroyed () {
+  destroyed (){
 
   }
 };

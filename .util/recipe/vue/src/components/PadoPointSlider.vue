@@ -12,23 +12,23 @@ import { limitOf, domainRangeValue } from '../../../../../.src/functions';
 export default {
   props: {
     value: {
-      type: Object,
-      default: () => ({x: 50, y: 50})
+      type   : Object,
+      default: ()=>({x: 50, y: 50})
     },
     xMaxValue: {
-      type: [String, Number],
+      type   : [String, Number],
       default: 100
     },
     xMinValue: {
-      type: [String, Number],
+      type   : [String, Number],
       default: 0
     },
     yMaxValue: {
-      type: [String, Number],
+      type   : [String, Number],
       default: 100
     },
     yMinValue: {
-      type: [String, Number],
+      type   : [String, Number],
       default: 0
     },
     inputCycle: {
@@ -36,34 +36,34 @@ export default {
     }
   },
   computed: {
-    xValue () {
+    xValue (){
       return parseInt(this.value['x'], 10);
     },
-    yValue () {
+    yValue (){
       return parseInt(this.value['y'], 10);
     },
-    xMax () {
+    xMax (){
       return parseInt(this.xMaxValue, 10);
     },
-    xMin () {
+    xMin (){
       return parseInt(this.xMinValue, 10);
     },
-    yMax () {
+    yMax (){
       return parseInt(this.yMaxValue, 10);
     },
-    yMin () {
+    yMin (){
       return parseInt(this.yMinValue, 10);
     },
-    readOnly () {
+    readOnly (){
       return typeof this.$el.getAttribute('readOnly') === 'string';
     }
   },
-  mounted () {
+  mounted (){
     const $element = $(this.$el);
     // const $scrollbar = $element.find('.v-pado-slider-scrollbar')
     const $scroller = $element.find('.v-pado-slider-scroller');
 
-    this.$on('enter', ({ x: xValue, y: yValue }) => {
+    this.$on('enter', ({ x: xValue, y: yValue })=>{
       const xModelValue = typeof xValue === 'number' ? xValue : this.xValue;
       const yModelValue = typeof yValue === 'number' ? yValue : this.yValue;
       const barWidth = $element.width() - $scroller.width();
@@ -73,32 +73,32 @@ export default {
 
       $scroller.css({
         'left': `${leftPosition}px`,
-        'top': `${topPosition}px`
+        'top' : `${topPosition}px`
       });
     });
 
     (typeof this.xValue !== 'undefined' || !this.xValue === 0) && this.$emit('enter', parseInt(this.xValue, 10));
 
-    this.$watch('value', (newValue) => {
+    this.$watch('value', (newValue)=>{
       this.$emit('enter', {
         x: this.xValue,
         y: this.yValue
       });
     });
 
-    this.windowResizeHandle = () => {
+    this.windowResizeHandle = ()=>{
       this.$emit('enter');
     };
 
     $(window).on('resize', this.windowResizeHandle);
 
-    dragHelper(this.$el, ({ element }) => {
+    dragHelper(this.$el, ({ element })=>{
       $scroller.css('pointer-events', 'none');
       let xFinalValue;
       let yFinalValue;
       return {
-        'start, move': ({ event }) => {
-          if (this.readOnly) {
+        'start, move': ({ event })=>{
+          if (this.readOnly){
             event.preventDefault();
           }
 
@@ -113,11 +113,11 @@ export default {
           yFinalValue = Math.round(domainRangeValue([0, barHeight], [this.yMin, this.yMax], topValue));
 
           this.$emit('enter', {x: xFinalValue, y: yFinalValue});
-          if (this.inputCycle === 'enter') {
+          if (this.inputCycle === 'enter'){
             this.$emit('input', {x: xFinalValue, y: yFinalValue});
           }
         },
-        end: ({ pointer }) => {
+        end: ({ pointer })=>{
           this.$emit('input', {
             x: Math.round(typeof xFinalValue === 'number' ? xFinalValue : this.xValue),
             y: Math.round(typeof yFinalValue === 'number' ? yFinalValue : this.yValue)
@@ -126,7 +126,7 @@ export default {
       };
     });
   },
-  destroyed () {
+  destroyed (){
     $(window).off('resize', this.windowResizeHandle);
   }
 };

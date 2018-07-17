@@ -10,7 +10,7 @@ export default {
   components: {
     AppLayout
   },
-  mounted () {
+  mounted (){
     console.log('multiplyMatrix', multiplyMatrix(
       asMatrix([1, 2, 3, 4], 2),
       asMatrix([5, 6, 7, 8], 2)

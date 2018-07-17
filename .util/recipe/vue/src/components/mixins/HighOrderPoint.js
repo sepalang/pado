@@ -4,15 +4,15 @@
 */
 
 const DEFAULT_POINT_SIZE_VALUE = 20;
-export default function (...options) {
-  if (!options.length) {
+export default function (...options){
+  if (!options.length){
     options = [[[], []]];
   }
 
   const props = {};
   const computed = {};
 
-  options.forEach(([ keys = [], defaultValues = [] ]) => {
+  options.forEach(([ keys = [], defaultValues = [] ])=>{
     const [xKey = 'x', yKey = 'y', pointKey = 'point'] = keys;
     const [xParam = DEFAULT_POINT_SIZE_VALUE, yParam = DEFAULT_POINT_SIZE_VALUE] = defaultValues;
 
@@ -24,7 +24,7 @@ export default function (...options) {
     const pointValueKey = pointKey + 'Value';
 
     Object.assign(computed, {
-      [ pointValueKey ]: function () {
+      [ pointValueKey ]: function (){
         return {
           [ xKey ]: parseInt(this[xKey], 10),
           [ yKey ]: parseInt(this[yKey], 10)
