@@ -1,4 +1,5 @@
 export const isAbsoluteNaN = function(it){
+  // eslint-disable-next-line no-self-compare
   return it!==it && typeof it === "number"
 }
 
