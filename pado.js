@@ -4,6 +4,22 @@
   (global.pado = factory());
 }(this, (function () { 'use strict';
 
+  function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+      var info = gen[key](arg);
+      var value = info.value;
+    } catch (error) {
+      reject(error);
+      return;
+    }
+
+    if (info.done) {
+      resolve(value);
+    } else {
+      Promise.resolve(value).then(_next, _throw);
+    }
+  }
+
   function _asyncToGenerator(fn) {
     return function () {
       var self = this,
@@ -11,31 +27,15 @@
       return new Promise(function (resolve, reject) {
         var gen = fn.apply(self, args);
 
-        function step(key, arg) {
-          try {
-            var info = gen[key](arg);
-            var value = info.value;
-          } catch (error) {
-            reject(error);
-            return;
-          }
-
-          if (info.done) {
-            resolve(value);
-          } else {
-            Promise.resolve(value).then(_next, _throw);
-          }
-        }
-
         function _next(value) {
-          step("next", value);
+          asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
         }
 
         function _throw(err) {
-          step("throw", err);
+          asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
         }
 
-        _next();
+        _next(undefined);
       });
     };
   }
@@ -75,6 +75,7 @@
   }
 
   var isAbsoluteNaN = function isAbsoluteNaN(it) {
+    // eslint-disable-next-line no-self-compare
     return it !== it && typeof it === "number";
   };
   var isNone = function isNone(data) {
@@ -143,8 +144,13 @@
   }, //webFn
   function (data) {
     return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray$1(data) || data instanceof NodeList;
-  }); //TODO : native isPlainObject
-
+  });
+  var isPlainObject = function isPlainObject(data) {
+    return typeof data === "object" && data.constructor === Object;
+  };
+  var isEnumerableObject = function isEnumerableObject(data) {
+    return isPlainObject(data) || isArray$1(data);
+  };
   var isNode = function isNode(a) {
     return isObject(a) && typeof a.nodeType === "number";
   };
@@ -182,12 +188,6 @@
   };
   var likeRegexp = function likeRegexp(s) {
     return typeof s === "string" || s instanceof RegExp;
-  };
-  var isPlainObject = function isPlainObject(data) {
-    return typeof data === "object" && data.constructor === Object;
-  };
-  var isEnumerableObject = function isEnumerableObject(data) {
-    return isPlainObject(data) || isArray$1(data);
   }; // none(undfinec, null, NaN), value(1,"1"), hash({}), array([]), node, object(new, Date), function, boolean
 
   var eqof = function eqof(it) {
@@ -4146,12 +4146,12 @@
     likeString: likeString,
     likeNumber: likeNumber,
     likeArray: likeArray,
+    isPlainObject: isPlainObject,
+    isEnumerableObject: isEnumerableObject,
     isNode: isNode,
     isEmpty: isEmpty$1,
     isPresence: isPresence,
     likeRegexp: likeRegexp,
-    isPlainObject: isPlainObject,
-    isEnumerableObject: isEnumerableObject,
     eqof: eqof,
     isEqual: isEqual,
     likeEqual: likeEqual,

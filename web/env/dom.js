@@ -103,7 +103,7 @@
     if (el !== body) {
       var parent = el.parentNode;
 
-      while (parent !== body) {
+      while (parent && parent !== body) {
         offsetX += parent.scrollLeft;
         offsetY += parent.scrollTop;
         parent = parent.parentNode;

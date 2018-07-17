@@ -35,7 +35,6 @@
       }
 
       reservedSessionStorage[name] = data;
-      console.log('reservedSessionStorage', reservedSessionStorage);
       return reservedSessionStorage[name];
     }; //자식에게 세션을 당겨올수 있도록 지원
 

@@ -69,9 +69,8 @@ const getBoundingRect = function(el){
   const boundingRect = el.getBoundingClientRect();
 
   if (el !== body) {
-    var parent = el.parentNode;
-
-    while (parent !== body) {
+    let parent = el.parentNode;
+    while (parent && parent !== body) {
       offsetX += parent.scrollLeft;
       offsetY += parent.scrollTop;
       parent   = parent.parentNode;

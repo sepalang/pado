@@ -16,9 +16,10 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.likePromise = _exports.notExsist = _exports.isExsist = _exports.eqeq = _exports.likeEqual = _exports.isEqual = _exports.eqof = _exports.isEnumerableObject = _exports.isPlainObject = _exports.likeRegexp = _exports.isPresence = _exports.isEmpty = _exports.isNode = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isInfinity = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
+  _exports.likePromise = _exports.notExsist = _exports.isExsist = _exports.eqeq = _exports.likeEqual = _exports.isEqual = _exports.eqof = _exports.likeRegexp = _exports.isPresence = _exports.isEmpty = _exports.isNode = _exports.isEnumerableObject = _exports.isPlainObject = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isInfinity = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
 
   var isAbsoluteNaN = function isAbsoluteNaN(it) {
+    // eslint-disable-next-line no-self-compare
     return it !== it && typeof it === "number";
   };
 
@@ -120,10 +121,21 @@
   }, //webFn
   function (data) {
     return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray(data) || data instanceof NodeList;
-  }); //TODO : native isPlainObject
-
+  });
 
   _exports.likeArray = likeArray;
+
+  var isPlainObject = function isPlainObject(data) {
+    return typeof data === "object" && data.constructor === Object;
+  };
+
+  _exports.isPlainObject = isPlainObject;
+
+  var isEnumerableObject = function isEnumerableObject(data) {
+    return isPlainObject(data) || isArray(data);
+  };
+
+  _exports.isEnumerableObject = isEnumerableObject;
 
   var isNode = function isNode(a) {
     return isObject(a) && typeof a.nodeType === "number";
@@ -171,22 +183,10 @@
 
   var likeRegexp = function likeRegexp(s) {
     return typeof s === "string" || s instanceof RegExp;
-  };
-
-  _exports.likeRegexp = likeRegexp;
-
-  var isPlainObject = function isPlainObject(data) {
-    return typeof data === "object" && data.constructor === Object;
-  };
-
-  _exports.isPlainObject = isPlainObject;
-
-  var isEnumerableObject = function isEnumerableObject(data) {
-    return isPlainObject(data) || isArray(data);
   }; // none(undfinec, null, NaN), value(1,"1"), hash({}), array([]), node, object(new, Date), function, boolean
 
 
-  _exports.isEnumerableObject = isEnumerableObject;
+  _exports.likeRegexp = likeRegexp;
 
   var eqof = function eqof(it) {
     var typeIt = typeof it;

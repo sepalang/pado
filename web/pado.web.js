@@ -55,7 +55,6 @@
       }
 
       reservedSessionStorage[name] = data;
-      console.log('reservedSessionStorage', reservedSessionStorage);
       return reservedSessionStorage[name];
     }; //자식에게 세션을 당겨올수 있도록 지원
 
@@ -209,6 +208,7 @@
   };
 
   var isAbsoluteNaN = function isAbsoluteNaN(it) {
+    // eslint-disable-next-line no-self-compare
     return it !== it && typeof it === "number";
   };
   var isNone = function isNone(data) {
@@ -245,13 +245,12 @@
   }, //webFn
   function (data) {
     return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray(data) || data instanceof NodeList;
-  }); //TODO : native isPlainObject
-
-  var isNode = function isNode(a) {
-    return isObject(a) && typeof a.nodeType === "number";
-  };
+  });
   var isPlainObject = function isPlainObject(data) {
     return typeof data === "object" && data.constructor === Object;
+  };
+  var isNode = function isNode(a) {
+    return isObject(a) && typeof a.nodeType === "number";
   };
 
   var asArray = function asArray(data, defaultArray) {
@@ -1076,7 +1075,7 @@
     if (el !== body) {
       var parent = el.parentNode;
 
-      while (parent !== body) {
+      while (parent && parent !== body) {
         offsetX += parent.scrollLeft;
         offsetY += parent.scrollTop;
         parent = parent.parentNode;
