@@ -10,6 +10,7 @@ import TreePage from '@/pages/TreePage.vue';
 import ModalPage from '@/pages/ModalPage.vue';
 import NavigateMapPage from '@/pages/NavigateMapPage.vue';
 import RotateMapPage from '@/pages/RotateMapPage.vue';
+import SliderPage from '@/pages/SliderPage.vue';
 
 Vue.use(Router);
 
@@ -26,6 +27,10 @@ export default new Router({
     {
       path     : '/modal',
       component: ModalPage
+    },
+    {
+      path     : '/slider',
+      component: SliderPage
     },
     {
       path     : '/rotate-map',

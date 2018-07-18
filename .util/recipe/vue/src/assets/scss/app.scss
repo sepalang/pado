@@ -63,3 +63,17 @@ table > * > tr {
     padding:10px;
   }
 }
+
+.form-table {
+  @include table-variant;
+  * > tr {
+    > th {
+      text-align:left;
+      vertical-align:top;
+    }
+    > td {
+      text-align:left;
+      vertical-align:top;
+    }
+  }
+}
