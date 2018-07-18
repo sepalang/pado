@@ -52,26 +52,26 @@
 import AppLayout from '../layouts/AppLayout.vue';
 import PadoNode from '../components/PadoNode.vue';
 export default {
-  components:{
+  components: {
     AppLayout,
     PadoNode
   },
-  data:()=>({
-    treeModel:[
+  data: ()=>({
+    treeModel: [
       {
-        name    :'foo',
-        children:[
+        name    : 'foo',
+        children: [
           {
-            name    :"kim",
-            children:[
-              { name:"김치" },
-              { name:"김밥" }
+            name    : "kim",
+            children: [
+              { name: "김치" },
+              { name: "김밥" }
             ]
           },
-          {name:"chi"}
+          {name: "chi"}
         ]
       },
-      {name:'bar'}
+      {name: 'bar'}
     ]
   })
 };

@@ -14,50 +14,50 @@ import RotateMapPage from '@/pages/RotateMapPage.vue';
 Vue.use(Router);
 
 export default new Router({
-  routes:[
+  routes: [
     {
-      path     :'/main',
-      component:MainPage
+      path     : '/main',
+      component: MainPage
     },
     {
-      path     :'/tree',
-      component:TreePage
+      path     : '/tree',
+      component: TreePage
     },
     {
-      path     :'/modal',
-      component:ModalPage
+      path     : '/modal',
+      component: ModalPage
     },
     {
-      path     :'/rotate-map',
-      component:RotateMapPage
+      path     : '/rotate-map',
+      component: RotateMapPage
     },
     {
-      path     :'/navigate-map',
-      component:NavigateMapPage
+      path     : '/navigate-map',
+      component: NavigateMapPage
     },
     {
-      path     :'/grid',
-      component:GridPage
+      path     : '/grid',
+      component: GridPage
     },
     {
-      path     :'/transform',
-      component:PostTransform
+      path     : '/transform',
+      component: PostTransform
     },
     {
-      path     :'/svg',
-      component:PostSVG
+      path     : '/svg',
+      component: PostSVG
     },
     {
-      path     :'/panel',
-      component:PanelPage
+      path     : '/panel',
+      component: PanelPage
     },
     {
-      path     :'/tab',
-      component:TabPage
+      path     : '/tab',
+      component: TabPage
     },
     {
-      path    :'*',
-      redirect:'/main'
+      path    : '*',
+      redirect: '/main'
     }
   ]
 });

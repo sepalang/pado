@@ -10,22 +10,22 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { createVue } from '@/service';
 import SampleModal from '@/modules/SampleModal.vue';
 export default {
-  components:{
+  components: {
     AppLayout
   },
   data (){
     return {
-      modalIndex:0
+      modalIndex: 0
     };
   },
-  methods:{
+  methods: {
     openSampleModal (awaitTime = 0){
       createVue(SampleModal, {
-        props:{
-          no:this.modalIndex++,
+        props: {
+          no: this.modalIndex++,
           awaitTime
         },
-        appendTo:document.body
+        appendTo: document.body
       });
     }
   }

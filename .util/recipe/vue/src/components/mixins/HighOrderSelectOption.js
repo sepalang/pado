@@ -2,9 +2,9 @@ import { affect } from '../../../../../../.src/modules';
 
 export default function ({ name = '' } = {}){
   const HighOrderMixins = {
-    props  :['value'],
-    data   :()=>({ selected:false }),
-    methods:{
+    props  : ['value'],
+    data   : ()=>({ selected: false }),
+    methods: {
       selectItem (){
         this.$parent.$emit('select-item-select-action', this.value);
       }
@@ -20,8 +20,8 @@ export default function ({ name = '' } = {}){
     },
     mounted (){
       this.$el.addEventListener('click', ({ currentTarget })=>{
-        if (typeof currentTarget.getAttribute('disabled') === 'string') return;
-        if (typeof currentTarget.getAttribute('readOnly') === 'string') return;
+        if(typeof currentTarget.getAttribute('disabled') === 'string') return;
+        if(typeof currentTarget.getAttribute('readOnly') === 'string') return;
         this.selectItem();
       });
 

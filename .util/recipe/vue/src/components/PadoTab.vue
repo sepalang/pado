@@ -7,7 +7,7 @@
 import HighOrderSelect from './mixins/HighOrderSelect';
 
 export default {
-  mixins:[ HighOrderSelect() ]
+  mixins: [ HighOrderSelect() ]
 };
 </script>
 <style lang="scss">

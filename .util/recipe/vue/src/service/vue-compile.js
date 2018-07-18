@@ -4,17 +4,17 @@ const vueCompileWithFile = function (vueFile, delegates){
   const vueInstance = (function (){
     const renderOptions = {};
     const compileOptions = {
-      mixins:[],
-      render:h=>h(vueFile, renderOptions)
+      mixins: [],
+      render: h=>h(vueFile, renderOptions)
     };
 
-    if (typeof delegates === 'object'){
-      for (const key in delegates){
-        if (delegates.hasOwnProperty(key)){
+    if(typeof delegates === 'object'){
+      for(const key in delegates){
+        if(delegates.hasOwnProperty(key)){
           switch (key){
             case 'props':
             case 'on':
-              if (typeof delegates[key] === 'object'){
+              if(typeof delegates[key] === 'object'){
                 renderOptions[key] = delegates[key];
               }
               break;
@@ -38,16 +38,16 @@ const vueCompileWithFile = function (vueFile, delegates){
   }());
 
   let appendToParam = delegates.appendTo;
-  if (typeof appendToParam === 'object'){
+  if(typeof appendToParam === 'object'){
     let mountElement = document.createElement('div');
     vueInstance.$mount(mountElement);
     mountElement = vueInstance.$el || mountElement;
 
     // jquery
-    if (appendToParam.eq){
+    if(appendToParam.eq){
       appendToParam = appendToParam.eq(0);
       appendToParam.append(mountElement);
-    } else if (appendToParam.appendChild){
+    } else if(appendToParam.appendChild){
       appendToParam.appendChild(mountElement);
     } else {
       console.error('appendToParam is worng', appendToParam);

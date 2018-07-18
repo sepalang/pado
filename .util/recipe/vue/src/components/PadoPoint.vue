@@ -7,19 +7,19 @@
 <script>
 import HighOrderPoint from './mixins/HighOrderPoint';
 export default {
-  mixins:[ HighOrderPoint([['x', 'y', 'point'], [0, 0]]) ],
-  props :{
-    size      :{default:5},
-    label     :{},
-    labelWidth:{default:40}
+  mixins: [ HighOrderPoint([['x', 'y', 'point'], [0, 0]]) ],
+  props : {
+    size      : {default: 5},
+    label     : {},
+    labelWidth: {default: 40}
   },
-  computed:{
+  computed: {
     rectStyle (){
-      return {width:`${this.size}px`, height:`${this.size}px`};
+      return {width: `${this.size}px`, height: `${this.size}px`};
     },
     pointStyle (){
       const { x, y } = this.pointValue;
-      return Object.assign({left:`${x}px`, top:`${y}px`}, this.rectStyle);
+      return Object.assign({left: `${x}px`, top: `${y}px`}, this.rectStyle);
     },
     labelValue (){
       return typeof this.label === 'string' ? this.label : undefined;

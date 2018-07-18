@@ -30,26 +30,26 @@
 </template>
 <script>
 const NodeComponent = {
-  props:{
-    model:{
-      type:Array
+  props: {
+    model: {
+      type: Array
     },
-    nested:{
-      type   :Boolean,
-      default:false
+    nested: {
+      type   : Boolean,
+      default: false
     },
-    id:{
-      default:'id'
+    id: {
+      default: 'id'
     },
-    listStyle:{
-      default:false
+    listStyle: {
+      default: false
     },
     // only use nested mode.
-    children:{
-      default:'children'
+    children: {
+      default: 'children'
     }
   },
-  computed:{
+  computed: {
     __vnodecomponent (){
       return true;
     },
@@ -60,14 +60,14 @@ const NodeComponent = {
       return this.parentNodeComponents().length;
     }
   },
-  methods:{
+  methods: {
     parentNodeComponents (){
       let result = [];
       let target = this;
       do {
         target = target.$parent;
         target && target.__vnodecomponent && result.push(target);
-      } while (target);
+      } while(target);
       return result;
     },
     findRootComponent (){
@@ -81,8 +81,8 @@ const NodeComponent = {
       const destOpenValue = !item.$open;
       this.$set(item, '$open', destOpenValue);
       this.$emit('open', {
-        value:destOpenValue,
-        model:item
+        value: destOpenValue,
+        model: item
       });
     }
   }

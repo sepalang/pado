@@ -12,8 +12,8 @@
 
 <script>
 export default {
-  props:{
-    msg:String
+  props: {
+    msg: String
   }
 };
 </script>

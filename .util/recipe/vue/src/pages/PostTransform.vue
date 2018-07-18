@@ -76,7 +76,7 @@ import {
 import { nextTick } from '../service';
 
 export default {
-  components:{
+  components: {
     AppLayout,
     Layer,
     PadoPoint,
@@ -84,11 +84,11 @@ export default {
     PadoSlider,
     PadoPointSlider
   },
-  computed:{
+  computed: {
     boxTransform01 (){
       return {
-        transform:transformVariant(this.box01),
-        opacity  :0.7
+        transform: transformVariant(this.box01),
+        opacity  : 0.7
       };
     },
     box01Element (){
@@ -100,10 +100,10 @@ export default {
       this.drawVertex();
     }
   },
-  watch:{
+  watch: {
     $drawVertexHandle (){}
   },
-  methods:{
+  methods: {
     drawVertex (){
       const box01 = this.$el.querySelectorAll('.box01')[0];
       const perspectiveOrigin = getElementBoundingRect(box01).findPoint('center');
@@ -113,17 +113,17 @@ export default {
       this.box01VertexTransform = box01VertexOriginal.map((vertex, index)=>{
         return Object.assign(
           vertex.addMatrix(transformMatrix, perspectiveOrigin, 400).toJSON(),
-          { key:index }
+          { key: index }
         );
       });
     }
   },
   data (){
     return {
-      box01               :{ rotateX:0, rotateY:0, perspective:0, perspectiveOrigin:{x:75, y:75} },
-      box01VertexOriginal :[],
-      box01VertexTransform:[],
-      box01MoveDistance   :0
+      box01               : { rotateX: 0, rotateY: 0, perspective: 0, perspectiveOrigin: {x: 75, y: 75} },
+      box01VertexOriginal : [],
+      box01VertexTransform: [],
+      box01MoveDistance   : 0
     };
   },
   mounted (){

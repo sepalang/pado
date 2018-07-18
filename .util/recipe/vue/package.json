@@ -41,19 +41,33 @@
         "always"
       ],
       "eqeqeq": 0,
-      "indent": ["error", 2, {
-        "SwitchCase": 1,
-        "VariableDeclarator": { "var": 2, "let": 2, "const": 3 },
-        "MemberExpression": 0,
-        "FunctionDeclaration": {"parameters": "first"},
-        "FunctionExpression": {"parameters": "first"},
-        "CallExpression": {"arguments": "first"},
-        "ArrayExpression": 1,
-        "ObjectExpression": 1,
-        "ImportDeclaration": 1,
-        "flatTernaryExpressions": true,
-        "ignoreComments": true
-      }],
+      "indent": [
+        "error",
+        2,
+        {
+          "SwitchCase": 1,
+          "VariableDeclarator": {
+            "var": 2,
+            "let": 2,
+            "const": 3
+          },
+          "MemberExpression": 0,
+          "FunctionDeclaration": {
+            "parameters": "first"
+          },
+          "FunctionExpression": {
+            "parameters": "first"
+          },
+          "CallExpression": {
+            "arguments": "first"
+          },
+          "ArrayExpression": 1,
+          "ObjectExpression": 1,
+          "ImportDeclaration": 1,
+          "flatTernaryExpressions": true,
+          "ignoreComments": true
+        }
+      ],
       "space-before-blocks": [
         "error",
         {
@@ -73,12 +87,22 @@
         "error",
         {
           "beforeColon": false,
-          "afterColon": false,
+          "afterColon": true,
           "align": "colon"
         }
       ],
+      "keyword-spacing":["error", {
+        "before": true,
+        "after": true,
+        "overrides":{
+          "if": { "after": false },
+          "for": { "after": false },
+          "while": { "after": false }
+        }
+      }],
       "no-mixed-operators": 0,
       "no-return-assign": 0,
+      "no-useless-return": 0,
       "no-unreachable": 0,
       "no-trailing-spaces": 0,
       "no-return-await": 0,

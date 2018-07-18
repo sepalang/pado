@@ -4,7 +4,7 @@ const LinkClass = (function (){
     this._events = {};
     this.methods = {};
     Object.defineProperty(this, 'vue', {
-      get:()=>vueInstance
+      get: ()=>vueInstance
     });
     Object.defineProperties(this.methods, Object.keys(vueInstance.$options.methods).reduce((dest, fnName)=>{
       dest[fnName] = {
@@ -19,15 +19,15 @@ const LinkClass = (function (){
   };
 
   const addOn = function (link, eventName, fn){
-    if (!link._events[eventName]){
+    if(!link._events[eventName]){
       link._events[eventName] = [];
     }
     link._events[eventName].push(fn);
   };
 
   const LinkPrototype = {
-    on:function (event, fn){
-      if (typeof event === 'object'){
+    on: function (event, fn){
+      if(typeof event === 'object'){
         Object.keys(event).forEach(eventName=>{
           addOn(this, eventName, event[eventName]);
         });
@@ -35,8 +35,8 @@ const LinkClass = (function (){
         addOn(this, event, fn);
       }
     },
-    dispatch:async function (event, send){
-      if (!this._events[event]){
+    dispatch: async function (event, send){
+      if(!this._events[event]){
         return [];
       }
       return Promise.all(this._events[event].map(fn=>{
