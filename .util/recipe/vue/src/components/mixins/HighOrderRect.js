@@ -23,19 +23,19 @@ export default function (...options){
     const [widthParam = DEFAULT_RECT_SIZE_VALUE, heightParam = DEFAULT_RECT_SIZE_VALUE] = defaultValues;
 
     Object.assign(props, {
-      [ widthKey ] : { default: widthParam },
-      [ heightKey ]: { default: heightParam },
-      [ sizeKey ]  : {}
+      [ widthKey ] :{ default:widthParam },
+      [ heightKey ]:{ default:heightParam },
+      [ sizeKey ]  :{}
     });
 
     const sizeValueKey = sizeKey + 'Value';
     const rectValueKey = rectKey + 'Value';
 
     Object.assign(computed, {
-      [ sizeValueKey ]: function (){
+      [ sizeValueKey ]:function (){
         return likeNumber(this[sizeKey]) ? parseFloat(this[sizeKey]) : undefined;
       },
-      [ rectValueKey ]: function (){
+      [ rectValueKey ]:function (){
         const width = typeof this[sizeValueKey] === 'number' ? this[sizeValueKey] : parseInt(this[widthKey], 10);
         const height = typeof this[sizeValueKey] === 'number' ? this[sizeValueKey] : parseInt(this[heightKey], 10);
         return { width, height };

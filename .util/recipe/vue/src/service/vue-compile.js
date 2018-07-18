@@ -4,8 +4,8 @@ const vueCompileWithFile = function (vueFile, delegates){
   const vueInstance = (function (){
     const renderOptions = {};
     const compileOptions = {
-      mixins: [],
-      render: h=>h(vueFile, renderOptions)
+      mixins:[],
+      render:h=>h(vueFile, renderOptions)
     };
 
     if (typeof delegates === 'object'){

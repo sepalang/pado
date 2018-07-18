@@ -17,17 +17,17 @@ export default function (...options){
     const [xParam = DEFAULT_POINT_SIZE_VALUE, yParam = DEFAULT_POINT_SIZE_VALUE] = defaultValues;
 
     Object.assign(props, {
-      [ xKey ]: { default: xParam },
-      [ yKey ]: { default: yParam }
+      [ xKey ]:{ default:xParam },
+      [ yKey ]:{ default:yParam }
     });
 
     const pointValueKey = pointKey + 'Value';
 
     Object.assign(computed, {
-      [ pointValueKey ]: function (){
+      [ pointValueKey ]:function (){
         return {
-          [ xKey ]: parseInt(this[xKey], 10),
-          [ yKey ]: parseInt(this[yKey], 10)
+          [ xKey ]:parseInt(this[xKey], 10),
+          [ yKey ]:parseInt(this[yKey], 10)
         };
       }
     });

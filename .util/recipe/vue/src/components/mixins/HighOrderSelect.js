@@ -5,19 +5,19 @@ export default function ({
 } = {}){
   //
   const HighOrderMixins = {
-    props: (()=>{
+    props:(()=>{
       if (canMultiple){
         return ['multiple', 'selected'];
       } else {
         return ['selected'];
       }
     })(),
-    model: {
-      prop : 'selected',
-      event: 'input'
+    model:{
+      prop :'selected',
+      event:'input'
     },
-    data : ()=>({ SelectInterfaceMode: 'default' }),
-    watch: {
+    data :()=>({ SelectInterfaceMode:'default' }),
+    watch:{
       selected (selected){
         this.$children.forEach(selectItemVM=>selectItemVM.$emit('inherit-select-state', this.$inheritSelectState()));
       }
@@ -30,7 +30,7 @@ export default function ({
       };
 
       this.$inheritSelectState = ()=>{
-        return { model: this.selected, isSelectedValue: this.$isSelectedValue };
+        return { model:this.selected, isSelectedValue:this.$isSelectedValue };
       };
 
       //

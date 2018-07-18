@@ -10,32 +10,32 @@ import { dragHelper } from '../../../../../.src/web';
 import { limitOf, domainRangeValue } from '../../../../../.src/functions';
 
 export default {
-  props: {
-    value: {
-      type   : Object,
-      default: ()=>({x: 50, y: 50})
+  props:{
+    value:{
+      type   :Object,
+      default:()=>({x:50, y:50})
     },
-    xMaxValue: {
-      type   : [String, Number],
-      default: 100
+    xMaxValue:{
+      type   :[String, Number],
+      default:100
     },
-    xMinValue: {
-      type   : [String, Number],
-      default: 0
+    xMinValue:{
+      type   :[String, Number],
+      default:0
     },
-    yMaxValue: {
-      type   : [String, Number],
-      default: 100
+    yMaxValue:{
+      type   :[String, Number],
+      default:100
     },
-    yMinValue: {
-      type   : [String, Number],
-      default: 0
+    yMinValue:{
+      type   :[String, Number],
+      default:0
     },
-    inputCycle: {
-      default: 'change'
+    inputCycle:{
+      default:'change'
     }
   },
-  computed: {
+  computed:{
     xValue (){
       return parseInt(this.value['x'], 10);
     },
@@ -72,8 +72,8 @@ export default {
       const topPosition = domainRangeValue([this.yMin, this.yMax], [0, barHeight], yModelValue);
 
       $scroller.css({
-        'left': `${leftPosition}px`,
-        'top' : `${topPosition}px`
+        'left':`${leftPosition}px`,
+        'top' :`${topPosition}px`
       });
     });
 
@@ -81,8 +81,8 @@ export default {
 
     this.$watch('value', (newValue)=>{
       this.$emit('enter', {
-        x: this.xValue,
-        y: this.yValue
+        x:this.xValue,
+        y:this.yValue
       });
     });
 
@@ -97,30 +97,30 @@ export default {
       let xFinalValue;
       let yFinalValue;
       return {
-        'start, move': ({ event })=>{
+        'start, move':({ event })=>{
           if (this.readOnly){
             event.preventDefault();
           }
 
-          let { left, width } = $scroller.predict({center: event}, element);
+          let { left, width } = $scroller.predict({center:event}, element);
           const barWidth = element.width() - width;
           const leftValue = limitOf(left, barWidth);
           xFinalValue = Math.round(domainRangeValue([0, barWidth], [this.xMin, this.xMax], leftValue));
 
-          let { top, height } = $scroller.predict({middle: event}, element);
+          let { top, height } = $scroller.predict({middle:event}, element);
           const barHeight = element.height() - height;
           const topValue = limitOf(top, barHeight);
           yFinalValue = Math.round(domainRangeValue([0, barHeight], [this.yMin, this.yMax], topValue));
 
-          this.$emit('enter', {x: xFinalValue, y: yFinalValue});
+          this.$emit('enter', {x:xFinalValue, y:yFinalValue});
           if (this.inputCycle === 'enter'){
-            this.$emit('input', {x: xFinalValue, y: yFinalValue});
+            this.$emit('input', {x:xFinalValue, y:yFinalValue});
           }
         },
-        end: ({ pointer })=>{
+        end:({ pointer })=>{
           this.$emit('input', {
-            x: Math.round(typeof xFinalValue === 'number' ? xFinalValue : this.xValue),
-            y: Math.round(typeof yFinalValue === 'number' ? yFinalValue : this.yValue)
+            x:Math.round(typeof xFinalValue === 'number' ? xFinalValue : this.xValue),
+            y:Math.round(typeof yFinalValue === 'number' ? yFinalValue : this.yValue)
           });
         }
       };

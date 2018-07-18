@@ -11,12 +11,12 @@ import HighOrderRect from './mixins/HighOrderRect';
 import HighOrderPoint from './mixins/HighOrderPoint';
 
 export default {
-  mixins: [ HighOrderRect([['width', 'height', 'size', 'rect'], [20, 20]]), HighOrderPoint([['left', 'top', 'point'], [0, 0]]) ],
-  props : {
-    label   : {},
-    dragmove: {}
+  mixins:[ HighOrderRect([['width', 'height', 'size', 'rect'], [20, 20]]), HighOrderPoint([['left', 'top', 'point'], [0, 0]]) ],
+  props :{
+    label   :{},
+    dragmove:{}
   },
-  computed: {
+  computed:{
     contentValue (){
       const { width, height } = this.rectValue;
       return typeof this.label === 'string' ? this.label : `${width}x${height}`;
@@ -25,7 +25,7 @@ export default {
       const { width, height } = this.rectValue;
       const position = (this.left > 0 || this.top > 0) ? 'absolute' : 'relative';
       const [left, top] = [this.left + 'px', this.top + 'px'];
-      return { width: width + 'px', height: height + 'px', position, left, top};
+      return { width:width + 'px', height:height + 'px', position, left, top};
     },
     changeBoundsWatchGroup (){
       this.$el && nextQueue(()=>{
@@ -35,7 +35,7 @@ export default {
       return [this.size, this.left, this.top].length;
     }
   },
-  watch: {
+  watch:{
     changeBoundsWatchGroup (newValue){}
   },
   mounted (){
@@ -47,19 +47,19 @@ export default {
         const startOffset = this.pointValue;
         const positionWithOffset = function (x, y){
           const result = {
-            left: startOffset.left + x,
-            top : startOffset.top + y
+            left:startOffset.left + x,
+            top :startOffset.top + y
           };
           element.css(result);
           return result;
         };
 
         return {
-          move: ({ pointer: { offsetX, offsetY } })=>{
+          move:({ pointer: { offsetX, offsetY } })=>{
             const result = positionWithOffset(offsetX, offsetY);
             this.$emit('drawPoint', result);
           },
-          end: ({ pointer: { offsetX, offsetY } })=>{
+          end:({ pointer: { offsetX, offsetY } })=>{
             const result = positionWithOffset(offsetX, offsetY);
             this.$emit('inputPoint', result);
           }

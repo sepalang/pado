@@ -10,24 +10,24 @@ import { dragHelper } from '../../../../../.src/web';
 import { limitOf, domainRangeValue } from '../../../../../.src/functions';
 
 export default {
-  props: {
-    value: {
-      type   : [String, Number],
-      default: 0
+  props:{
+    value:{
+      type   :[String, Number],
+      default:0
     },
-    maxValue: {
-      type   : [String, Number],
-      default: 100
+    maxValue:{
+      type   :[String, Number],
+      default:100
     },
-    minValue: {
-      type   : [String, Number],
-      default: 0
+    minValue:{
+      type   :[String, Number],
+      default:0
     },
-    inputCycle: {
-      default: 'change'
+    inputCycle:{
+      default:'change'
     }
   },
-  computed: {
+  computed:{
     xValue (){
       return parseInt(this.value, 10);
     },
@@ -69,12 +69,12 @@ export default {
       $scroller.css('pointer-events', 'none');
       let finalValue;
       return {
-        'start, move': ({ event })=>{
+        'start, move':({ event })=>{
           if (this.readOnly){
             event.preventDefault();
           }
 
-          let { left, width } = $scroller.predict({center: event}, element);
+          let { left, width } = $scroller.predict({center:event}, element);
 
           const barLength = element.width() - width;
           const leftValue = limitOf(left, barLength);
@@ -84,7 +84,7 @@ export default {
             this.$emit('input', finalValue);
           }
         },
-        end: ({ pointer })=>{
+        end:({ pointer })=>{
           const endValue = Math.round(typeof finalValue === 'number' ? finalValue : this.xValue);
           this.$emit('input', endValue);
         }

@@ -2,9 +2,9 @@ import { affect } from '../../../../../../.src/modules';
 
 export default function ({ name = '' } = {}){
   const HighOrderMixins = {
-    props  : ['value'],
-    data   : ()=>({ selected: false }),
-    methods: {
+    props  :['value'],
+    data   :()=>({ selected:false }),
+    methods:{
       selectItem (){
         this.$parent.$emit('select-item-select-action', this.value);
       }

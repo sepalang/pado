@@ -7,7 +7,7 @@
 import AppLayout from '../layouts/AppLayout.vue';
 import { asMatrix, multiplyMatrix } from '../../../../../.src/functions';
 export default {
-  components: {
+  components:{
     AppLayout
   },
   mounted (){

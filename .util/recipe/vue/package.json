@@ -35,21 +35,60 @@
       "@vue/standard"
     ],
     "rules": {
-      "quotes":0,
-      "semi":[1, "always"],
-      "eqeqeq":0,
-      "space-before-blocks":["error",{ "functions": "never", "keywords": "never", "classes": "always" }],
-      "arrow-spacing":["error",{ "before": false, "after": false }],
-      "key-spacing":["error", { "beforeColon": false, "afterColon": true, "align": "colon" }],
-      "no-mixed-operators":0,
-      "no-return-assign":0,
-      "no-unreachable":0,
-      "no-trailing-spaces":0,
-      "no-return-await":0,
-      "no-multiple-empty-lines":[1,{
-        "max":2
+      "quotes": 0,
+      "semi": [
+        1,
+        "always"
+      ],
+      "eqeqeq": 0,
+      "indent": ["error", 2, {
+        "SwitchCase": 1,
+        "VariableDeclarator": { "var": 2, "let": 2, "const": 3 },
+        "MemberExpression": 0,
+        "FunctionDeclaration": {"parameters": "first"},
+        "FunctionExpression": {"parameters": "first"},
+        "CallExpression": {"arguments": "first"},
+        "ArrayExpression": 1,
+        "ObjectExpression": 1,
+        "ImportDeclaration": 1,
+        "flatTernaryExpressions": true,
+        "ignoreComments": true
       }],
-      "standard/object-curly-even-spacing":0
+      "space-before-blocks": [
+        "error",
+        {
+          "functions": "never",
+          "keywords": "never",
+          "classes": "always"
+        }
+      ],
+      "arrow-spacing": [
+        "error",
+        {
+          "before": false,
+          "after": false
+        }
+      ],
+      "key-spacing": [
+        "error",
+        {
+          "beforeColon": false,
+          "afterColon": false,
+          "align": "colon"
+        }
+      ],
+      "no-mixed-operators": 0,
+      "no-return-assign": 0,
+      "no-unreachable": 0,
+      "no-trailing-spaces": 0,
+      "no-return-await": 0,
+      "no-multiple-empty-lines": [
+        1,
+        {
+          "max": 2
+        }
+      ],
+      "standard/object-curly-even-spacing": 0
     },
     "parserOptions": {
       "parser": "babel-eslint"

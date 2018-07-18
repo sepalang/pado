@@ -27,19 +27,19 @@ import { timeout } from '../../../../../.src/modules/promise';
 
 // destroy 하면 모달이 자동으로 제거됨  
 export default {
-  components: {
+  components:{
     BaseModal
   },
-  props: {
-    no       : {},
-    awaitTime: {
-      default: 0
+  props:{
+    no       :{},
+    awaitTime:{
+      default:0
     }
   },
-  methods: {
+  methods:{
     linkModal (link){
       link.on({
-        close: (other)=>{
+        close:(other)=>{
           if (this.awaitTime){
             return timeout(this.awaitTime).then(()=>`wait ${this.awaitTime} ms`);
           } else {

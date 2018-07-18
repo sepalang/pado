@@ -9,24 +9,24 @@
 import { domainRangeValue, drawCircleVars } from '../../../../../.src/functions';
 
 export default {
-  props: {
-    value: {
-      default: 0
+  props:{
+    value:{
+      default:0
     },
-    maxValue: {
-      default: 100
+    maxValue:{
+      default:100
     },
-    minValue: {
-      default: 0
+    minValue:{
+      default:0
     },
-    size: {
-      default: 50
+    size:{
+      default:50
     },
-    stroke: {
-      default: 1
+    stroke:{
+      default:1
     }
   },
-  computed: {
+  computed:{
     dValue (){
       const { x, y, radius, diameter } = drawCircleVars(this.size, this.stroke);
       return `M${x} ${y} 
@@ -39,9 +39,9 @@ export default {
       return `${circumferenceRatio}, ${circumference}`;
     }
   },
-  data: ()=>({
-    showValue: '',
-    rate     : ''
+  data:()=>({
+    showValue:'',
+    rate     :''
   }),
   mounted (){
 

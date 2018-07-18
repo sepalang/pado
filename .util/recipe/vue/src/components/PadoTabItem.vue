@@ -6,6 +6,6 @@
 <script>
 import HighOrderSelectOption from './mixins/HighOrderSelectOption';
 export default {
-  mixins: [ HighOrderSelectOption() ]
+  mixins:[ HighOrderSelectOption() ]
 };
 </script>
