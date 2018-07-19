@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/pado",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -24,7 +24,7 @@
     "test": "padoc --test .util/test --verbose",
     "pack:a": "padoc --pack '.util/fnpack/case-a/*.js' .util/fnpack/case-a/packed -m es",
     "pack:b": "padoc --pack '.util/fnpack/case-b/*.js' .util/fnpack/case-b/packed -m es",
-    "t": "padoc --exec .util/sample/use/cast.use.js"
+    "repl": "padoc --exec .util/repl/index.js -i -g"
   },
   "author": "AHN HO JUNG",
   "license": "MIT",
@@ -33,7 +33,7 @@
     "functions"
   ],
   "devDependencies": {
-    "@sepalang/padoc": "^0.8.6",
+    "@sepalang/padoc": "^0.8.11",
     "jquery": "^3.3.1",
     "jsdom": "^11.11.0",
     "madge": "^3.1.1",

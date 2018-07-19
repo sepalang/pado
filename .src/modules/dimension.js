@@ -1,6 +1,7 @@
 import { isArray, isNumber } from '../functions/isLike';
 import { asArray } from '../functions/cast';
 import { asMatrix, validMatrix, multiplyMatrix } from '../functions/matrix';
+import { turn } from '../functions/nice';
 
 
 const likePoint = function(p){
@@ -281,8 +282,8 @@ const Rect = function(left=0,top=0,width=0,height=0,meta=null){
   this.meta = meta;
 };
 
-const splitOrderParser = (split)=>{
-    //splitOrder [ horizental, vertical ]
+const splitCountParser = (split)=>{
+    //splitCount [ horizental, vertical ]
     //1 = [ 1 ]
     //[1, 2] = [1, 2]
   const [ columnOrder, rowOrder ] = asArray(split);
@@ -329,23 +330,25 @@ Rect.prototype = {
       return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0},{x:this.right,y:this.bottom,z:0,w:0},{x:this.right, y:this.top, z:0, w:0}],inheritMeta);
     }
   },
-  splitRects (splitOrder){
-    const { column, row } = splitOrderParser(splitOrder);
+  piecesAsCount (splitCount, outputForm){
+    const { column, row } = splitCountParser(splitCount);
     const result = Array(column*row)
     .fill({
       width:this.width / column,
       height:this.height / row
     })
     .map(({ width, height }, index)=>{
+      const columnInMatrix = turn(index, column);
       return index;
-    })
+      //const rowInMatrix    = 
+      //return [columnAsRow, ];
+    });
     
     return result;
-  },
-  splitMatrix (splitOrder){
-    const { column, row } = splitOrderParser(splitOrder);
     
-    this.splitRects([column, row]);
+    if(typeof outputForm === "matrix"){
+      
+    }
   },
   //TODO : incompleted sticky(parent, position, offset);
   sticky ({left:refX, top:refY, width:refWidth, height:refHeight}, position="bottom left"){

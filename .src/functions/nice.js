@@ -87,9 +87,19 @@ export const accurateTimeout = (function(originalTimeout){
   }
 }(setTimeout));
 
+export const turn = function(i, limit, ts, resultHook){
+  if(i < 0) { 
+    let abs = Math.abs(i / ts); 
+    i = limit - (abs > limit ? abs % limit : abs);
+  }
+  ts = typeof ts === "number" ? ts : 1;
+  i  = Math.floor(i / ts);
+  const r = (limit > i) ? i : i % limit;
+  return typeof resultHook === "function" ? resultHook(r,i,limit,ts) : i;
+}
 
-export const turn = function(i, p, ts) {
-  if(i < 0) { var abs = Math.abs(i / ts); i = p - (abs > p ? abs % p : abs); }
-  ts = ts || 1; i = Math.floor(i / ts);
-  return (p > i) ? i : i % p;
-};
+export const turnTimes = function (i, limit, ts){
+  return turn(i, limit, ts, (r, i, limit, ts)=>{
+    return [r, limit*ts/i];
+  });
+}

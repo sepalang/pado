@@ -1,4 +1,4 @@
-import { limitNumber, turn } from '../../.src/functions/nice';
+import { limitNumber, turn, turnTimes } from '../../.src/functions/nice';
 
 describe('Functions nice', () => {
   
@@ -25,6 +25,20 @@ describe('Functions nice', () => {
     expect( turn(3,2,2) ).toEqual( 1 );
     expect( turn(4,2,2) ).toEqual( 0 );
     expect( turn(5,2,2) ).toEqual( 0 );
+  });
+  
+  it('turnTimes', ()=>{
+    expect( turnTimes(0,3)   ).toEqual( [0, 0] );
+    expect( turnTimes(1,3)   ).toEqual( [1, 0] );
+    expect( turnTimes(2,3)   ).toEqual( [2, 0] );
+    expect( turnTimes(3,3)   ).toEqual( [0, 1] );
+    expect( turnTimes(4,3)   ).toEqual( [1, 1] );
+    expect( turnTimes(0,2,2) ).toEqual( [0, 0] );
+    expect( turnTimes(1,2,2) ).toEqual( [0, 0] );
+    expect( turnTimes(2,2,2) ).toEqual( [1, 0] );
+    expect( turnTimes(3,2,2) ).toEqual( [1, 0] );
+    expect( turnTimes(4,2,2) ).toEqual( [0, 1] );
+    expect( turnTimes(5,2,2) ).toEqual( [0, 1] );
   });
   
 })
