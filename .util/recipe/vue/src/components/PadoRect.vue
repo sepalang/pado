@@ -1,6 +1,6 @@
 <template>
   <span class="v-pado-rect" :style="rectStyle">
-    <span class="PadoRect-description">{{ contentValue }}</span>
+    <span><slot :rect="rectStyle">{{ contentValue }}</slot></span>
   </span>
 </template>
 <script>

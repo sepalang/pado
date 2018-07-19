@@ -1,4 +1,4 @@
-import { isArray } from '../functions/isLike';
+import { isArray, isNumber } from '../functions/isLike';
 import { asArray } from '../functions/cast';
 import { asMatrix, validMatrix, multiplyMatrix } from '../functions/matrix';
 
@@ -281,6 +281,17 @@ const Rect = function(left=0,top=0,width=0,height=0,meta=null){
   this.meta = meta;
 };
 
+const splitOrderParser = (split)=>{
+    //splitOrder [ horizental, vertical ]
+    //1 = [ 1 ]
+    //[1, 2] = [1, 2]
+  const [ columnOrder, rowOrder ] = asArray(split);
+  return {
+    column: isNumber(columnOrder) && columnOrder > 0 ? parseInt(columnOrder,10) : 1,
+    row   : isNumber(rowOrder)    && rowOrder > 0    ? parseInt(rowOrder,10)    : 1
+  }
+}
+
 Rect.prototype = {
   addMeta (obj){
     if(typeof obj === "object") this.meta = Object.assign(this.meta&&this.meta||{},obj);
@@ -317,6 +328,24 @@ Rect.prototype = {
     default:
       return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0},{x:this.right,y:this.bottom,z:0,w:0},{x:this.right, y:this.top, z:0, w:0}],inheritMeta);
     }
+  },
+  splitRects (splitOrder){
+    const { column, row } = splitOrderParser(splitOrder);
+    const result = Array(column*row)
+    .fill({
+      width:this.width / column,
+      height:this.height / row
+    })
+    .map(({ width, height }, index)=>{
+      return index;
+    })
+    
+    return result;
+  },
+  splitMatrix (splitOrder){
+    const { column, row } = splitOrderParser(splitOrder);
+    
+    this.splitRects([column, row]);
   },
   //TODO : incompleted sticky(parent, position, offset);
   sticky ({left:refX, top:refY, width:refWidth, height:refHeight}, position="bottom left"){
