@@ -1,7 +1,7 @@
 import { isNumber, isArray, isAbsoluteNaN } from './isLike';
 
-export const limitOf = (function() {
-  const limitNumber = function(number, max, min) {
+export const limitNumber = (function() {
+  const limitOf = function(number, max, min) {
     if(typeof number == "number") {
       if(isAbsoluteNaN(number) || number === Infinity) {
         return min;
@@ -15,7 +15,7 @@ export const limitOf = (function() {
     }
     return number;
   };
-  const limitOf = function(numbers, max, min) {
+  const limitNumber = function(numbers, max, min) {
     if(typeof max !== "number") { max = Number.POSITIVE_INFINITY; }
     if(typeof min !== "number") {
       if(min === null || isAbsoluteNaN(min)) {
@@ -26,14 +26,14 @@ export const limitOf = (function() {
     }
     if(isArray(numbers)) {
       for(var d = numbers, i = 0, l = d.length; i < l; i++) {
-        d[i] = limitNumber(d[i], max, min);
+        d[i] = limitOf(d[i], max, min);
       }
       return numbers;
     } else {
-      return limitNumber(numbers, max, min);
+      return limitOf(numbers, max, min);
     }
   };
-  return limitOf;
+  return limitNumber;
 }());
 
 export const accurateTimeout = (function(originalTimeout){

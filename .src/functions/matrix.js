@@ -1,7 +1,7 @@
 import { asArray, cloneDeep } from './cast'
 import { isArray, likeArray, isNumber, isAbsoluteNaN } from './isLike'
 import { top } from './reduce';
-import { turn, limitOf } from './nice';
+import { turn, limitNumber } from './nice';
 import { times } from './enumerable';
 
 export const rangeModel = function(value,step,sizeBase){
@@ -88,8 +88,8 @@ export const domainRangeValue = function(domain,range,vs,nice,limit){
     
     return limit ? 
     $range[1] > $range[0] ? 
-    limitOf(result,$range[1],$range[0]) :
-    limitOf(result,$range[0],$range[1]) :
+    limitNumber(result,$range[1],$range[0]) :
+    limitNumber(result,$range[0],$range[1]) :
     result;
   });
 };

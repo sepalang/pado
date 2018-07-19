@@ -1,4 +1,4 @@
-import { isNumber, limitOf, isAbsoluteNaN } from "../functions";
+import { isNumber, limitNumber, isAbsoluteNaN } from "../functions";
 
 export const Limitter = function(max,min){
   this.value = 0;
@@ -16,18 +16,18 @@ export const Limitter = function(max,min){
 
 const LimitterPrototype = {
   expectIn (setValue){
-    return setValue === limitOf(setValue,this.maximum,this.minimum);
+    return setValue === limitNumber(setValue,this.maximum,this.minimum);
   },
   expectOut(setValue){
-    return setValue !== limitOf(setValue,this.maximum,this.minimum);
+    return setValue !== limitNumber(setValue,this.maximum,this.minimum);
   },
   addExpectIn:function(addValue){
     const destValue = this.value + addValue;
-    return destValue === limitOf(destValue,this.maximum,this.minimum);
+    return destValue === limitNumber(destValue,this.maximum,this.minimum);
   },
   addExpectOut:function(addValue){
     const destValue = this.value + addValue;
-    return destValue !== limitOf(destValue,this.maximum,this.minimum);
+    return destValue !== limitNumber(destValue,this.maximum,this.minimum);
   },
   set:function(setValue){
     this.value = setValue;
@@ -42,7 +42,7 @@ const LimitterPrototype = {
 Object.defineProperties(LimitterPrototype,{
   done:{
     get (){
-      return this.value === limitOf(this.value,this.maximum,this.minimum);
+      return this.value === limitNumber(this.value,this.maximum,this.minimum);
     }
   }
 });
