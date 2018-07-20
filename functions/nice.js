@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.turnTimes = _exports.turn = _exports.accurateTimeout = _exports.limitNumber = void 0;
+  _exports.turnTime = _exports.turn = _exports.accurateTimeout = _exports.limitNumber = void 0;
 
   var limitNumber = function () {
     var limitOf = function limitOf(number, max, min) {
@@ -139,18 +139,18 @@
 
     ts = typeof ts === "number" ? ts : 1;
     var fixIndex = Math.floor(i / ts);
-    var r = limit > fixIndex ? fixIndex : fixIndex % limit;
-    return typeof resultHook === "function" ? resultHook(r, i, limit, ts) : r;
+    var result = limit > fixIndex ? fixIndex : fixIndex % limit;
+    return typeof resultHook === "function" ? resultHook(result, i, limit, ts) : result;
   };
 
   _exports.turn = turn;
 
-  var turnTimes = function turnTimes(i, limit, ts) {
-    return turn(i, limit, ts, function (r, i, limit, ts) {
-      return [r, Math.floor(i / (limit * ts))];
+  var turnTime = function turnTime(i, limit, ts) {
+    return turn(i, limit, ts, function (result, i, limit, ts) {
+      return [result, Math.floor(i / (limit * ts))];
     });
   };
 
-  _exports.turnTimes = turnTimes;
+  _exports.turnTime = turnTime;
 });
 //# sourceMappingURL=nice.js.map

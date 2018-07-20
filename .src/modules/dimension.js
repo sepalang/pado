@@ -1,7 +1,7 @@
 import { isArray, isNumber } from '../functions/isLike';
 import { asArray } from '../functions/cast';
 import { asMatrix, validMatrix, multiplyMatrix } from '../functions/matrix';
-import { turnTimes } from '../functions/nice';
+import { turnTime } from '../functions/nice';
 
 
 const likePoint = function(p){
@@ -338,8 +338,8 @@ Rect.prototype = {
       height:this.height / row
     })
     .map(({ width, height }, index)=>{
-      const columnInMatrix = turnTimes(index, column);
-      return index;
+      const [ colIndex, rowIndex ] = turnTime(index, column);
+      
       //const rowInMatrix    = 
       //return [columnAsRow, ];
     });

@@ -1556,12 +1556,12 @@
 
     ts = typeof ts === "number" ? ts : 1;
     var fixIndex = Math.floor(i / ts);
-    var r = limit > fixIndex ? fixIndex : fixIndex % limit;
-    return typeof resultHook === "function" ? resultHook(r, i, limit, ts) : r;
+    var result = limit > fixIndex ? fixIndex : fixIndex % limit;
+    return typeof resultHook === "function" ? resultHook(result, i, limit, ts) : result;
   };
-  var turnTimes = function turnTimes(i, limit, ts) {
-    return turn(i, limit, ts, function (r, i, limit, ts) {
-      return [r, Math.floor(i / (limit * ts))];
+  var turnTime = function turnTime(i, limit, ts) {
+    return turn(i, limit, ts, function (result, i, limit, ts) {
+      return [result, Math.floor(i / (limit * ts))];
     });
   };
 
@@ -4044,9 +4044,12 @@
       }).map(function (_ref5, index) {
         var width = _ref5.width,
             height = _ref5.height;
-        var columnInMatrix = turn(index, column);
-        return index; //const rowInMatrix    = 
+
+        var _turnTime = turnTime(index, column),
+            colIndex = _turnTime[0],
+            rowIndex = _turnTime[1]; //const rowInMatrix    = 
         //return [columnAsRow, ];
+
       });
       return result;
     },
@@ -4231,7 +4234,7 @@
     limitNumber: limitNumber,
     accurateTimeout: accurateTimeout,
     turn: turn,
-    turnTimes: turnTimes,
+    turnTime: turnTime,
     keys: keys,
     entries: entries,
     deepKeys: deepKeys,

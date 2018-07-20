@@ -98,6 +98,6 @@ export const turn = function(i, limit, ts, resultHook){
   return typeof resultHook === "function" ? resultHook(result,i,limit,ts) : result;
 }
 
-export const turnTimes = function (i, limit, ts){
+export const turnTime = function (i, limit, ts){
   return turn(i, limit, ts, (result, i, limit, ts)=>[result, Math.floor(i/(limit*ts))]);
 }

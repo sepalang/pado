@@ -633,9 +633,12 @@
       }).map(function (_ref5, index) {
         var width = _ref5.width,
             height = _ref5.height;
-        var columnInMatrix = (0, _nice.turn)(index, column);
-        return index; //const rowInMatrix    = 
+
+        var _turnTime = (0, _nice.turnTime)(index, column),
+            colIndex = _turnTime[0],
+            rowIndex = _turnTime[1]; //const rowInMatrix    = 
         //return [columnAsRow, ];
+
       });
       return result;
 
