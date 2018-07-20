@@ -1,4 +1,4 @@
-import { limitNumber, turn, turnTime } from '../../.src/functions/nice';
+import { limitNumber, turn, turnTime } from './nice';
 
 describe('Functions nice', () => {
   

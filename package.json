@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/pado",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -20,8 +20,8 @@
     "report:modules": "madge .src/modules/index.js --image .util/report/modules.report.png",
     "report:functions": "madge .src/functions/index.js --image .util/report/functions.report.png",
     "report": "npm run report:index & npm run report:pado & npm run report:modules & npm run report:functions",
-    "test:web": "padoc --test .util/test/web --verbose",
-    "test": "padoc --test .util/test --verbose",
+    "test:web": "padoc --test .src/web --verbose",
+    "test": "padoc --test .src --verbose",
     "pack:a": "padoc --pack '.util/fnpack/case-a/*.js' .util/fnpack/case-a/packed -m es",
     "pack:b": "padoc --pack '.util/fnpack/case-b/*.js' .util/fnpack/case-b/packed -m es",
     "repl": "padoc --exec .util/repl/index.js -i -g"
@@ -33,7 +33,7 @@
     "functions"
   ],
   "devDependencies": {
-    "@sepalang/padoc": "^0.8.11",
+    "@sepalang/padoc": "^0.8.12",
     "jquery": "^3.3.1",
     "jsdom": "^11.11.0",
     "madge": "^3.1.1",

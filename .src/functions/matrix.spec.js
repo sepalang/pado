@@ -1,4 +1,4 @@
-import { domainRangeValue, domainRangeInterpolate } from '../../.src/functions/matrix';
+import { domainRangeValue, domainRangeInterpolate } from './matrix';
 
 describe('Functions matrix', () => {
 

@@ -1,4 +1,4 @@
-import { promisify } from '../../../.src/modules/promise';
+import { promisify } from './promise';
 import fs from 'fs';
 import path from 'path';
 
@@ -11,7 +11,7 @@ describe('Modules promise', () => {
     const _readFile = promisify(fs.readFile);
     
     //normal promisify
-    const testContent = await _readFile(f('usetest.md'),'utf-8');
+    const testContent = await _readFile(f('promise.test.md'),'utf-8');
     expect(testContent).toEqual('Hello world');
     
     //error test

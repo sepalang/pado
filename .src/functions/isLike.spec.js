@@ -8,7 +8,7 @@ import {
   isEqual,
   likeEqual,
   isPresence
-} from '../../.src/functions/isLike';
+} from './isLike';
 describe('Functions isLike', () => {
   
   it('select', () => {

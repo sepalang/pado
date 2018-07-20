@@ -1,4 +1,4 @@
-import { cut, top } from '../../.src/functions/reduce';
+import { cut, top } from './reduce';
 describe('Functions reducer', () => {
   
   it('cut', () => {

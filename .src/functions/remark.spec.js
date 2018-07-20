@@ -1,4 +1,4 @@
-import { entries, keys, deepKeys, matchString, findIndex, findIndexes } from '../../.src/functions/remark';
+import { entries, keys, deepKeys, matchString, findIndex, findIndexes } from './remark';
 
 describe('Functions remark', () => {
   

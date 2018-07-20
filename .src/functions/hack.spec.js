@@ -1,4 +1,4 @@
-import { argumentNamesBy, scopelizeBy } from '../../.src/functions/hack';
+import { argumentNamesBy, scopelizeBy } from './hack';
 
 
 describe('Functions hack', () => {

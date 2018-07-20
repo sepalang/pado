@@ -1,4 +1,4 @@
-import { readUrl, serialize } from '../../../.src/web/env/url';
+import { readUrl, serialize } from './url';
 
 describe('Dom::env url', () => {
   it("readUrl - base", ()=>{
