@@ -7,7 +7,7 @@
 <script>
 import $ from '../../../../../.src/web/plugins/jquery';
 import { dragHelper } from '../../../../../.src/web';
-import { limitOf, domainRangeValue } from '../../../../../.src/functions';
+import { limitNumber, domainRangeValue } from '../../../../../.src/functions';
 
 export default {
   props: {
@@ -77,7 +77,7 @@ export default {
           let { left, width } = $scroller.predict({center: event}, element);
 
           const barLength = element.width() - width;
-          const leftValue = limitOf(left, barLength);
+          const leftValue = limitNumber(left, barLength);
           finalValue = Math.round(domainRangeValue([0, barLength], [this.xMin, this.xMax], leftValue));
           this.$emit('enter', finalValue);
           if(this.inputCycle === 'enter'){

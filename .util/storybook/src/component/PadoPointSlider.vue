@@ -8,7 +8,7 @@
 import PadoSlider from '../component/PadoSlider.vue';
 import $ from '../../../../.src/web/plugins/jquery';
 import { dragHelper } from '../../../../.src/web';
-import { limitOf, domainRangeValue } from '../../../../.src/functions';
+import { limitNumber, domainRangeValue } from '../../../../.src/functions';
 
 export default {
   props: {
@@ -105,12 +105,12 @@ export default {
           
           let { left, width } = $scroller.predict({center:event}, element);
           const barWidth      = element.width() - width;
-          const leftValue     = limitOf(left,barWidth);
+          const leftValue     = limitNumber(left,barWidth);
           xFinalValue = Math.round(domainRangeValue([0, barWidth],[this.xMin,this.xMax],leftValue));
           
           let { top, height } = $scroller.predict({middle:event}, element);
           const barHeight     = element.height() - height;
-          const topValue      = limitOf(top,barHeight);
+          const topValue      = limitNumber(top,barHeight);
           yFinalValue = Math.round(domainRangeValue([0, barHeight],[this.yMin,this.yMax],topValue));
           
           this.$emit("enter",{x:xFinalValue, y:yFinalValue});

@@ -68,9 +68,9 @@ export default {
   methods: {
     drawRect (){
       console.log("drawrect", this.colCount, this.rowCount);
-      const rootRect = rect(0,0,this.rectSize,this.rectSize);
+      const rootRect = rect(0, 0, this.rectSize, this.rectSize);
       
-      console.log("rootRect",rootRect.piecesAsCount([this.colCount, this.rowCount]))
+      console.log("rootRect", rootRect.piecesAsCount([this.colCount, this.rowCount]));
     }
   },
   mounted (){
