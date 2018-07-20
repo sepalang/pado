@@ -1,7 +1,11 @@
 <template>
   <div class="v-point" :style="pointStyle">
-    <div class="v-point-ghost" :style="rectStyle"></div>
-    <div v-if="label" class="v-point-label" :style="{width:labelWidth+'px'}">{{label}}</div>
+    <div class="v-point-placeholder">
+      <slot>
+        <div class="v-point-ghost" :style="rectStyle"></div>
+        <div v-if="label" class="v-point-label" :style="{width:labelWidth+'px'}">{{label}}</div>
+      </slot>
+    </div>
   </div>
 </template>
 <script>

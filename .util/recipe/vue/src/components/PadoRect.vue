@@ -11,8 +11,11 @@ import HighOrderRect from './mixins/HighOrderRect';
 import HighOrderPoint from './mixins/HighOrderPoint';
 
 export default {
-  mixins: [ HighOrderRect([['width', 'height', 'size', 'rect'], [20, 20]]), HighOrderPoint([['left', 'top', 'point'], [0, 0]]) ],
-  props : {
+  mixins: [
+    HighOrderRect([['width', 'height', 'size', 'rect'], [20, 20]]),
+    HighOrderPoint([['left', 'top', 'point'], [0, 0]])
+  ],
+  props: {
     label   : {},
     dragmove: {}
   },

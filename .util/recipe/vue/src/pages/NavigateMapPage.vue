@@ -12,7 +12,7 @@
           <tr>
             <th>root size</th>
             <td>
-              <PadoSlider v-model="rectSize" input-cycle="enter" min-value="100" max-value="250"></PadoSlider>
+              <PadoSlider v-model="rectSize" input-cycle="enter" min-value="100" max-value="250" @input="drawRect"></PadoSlider>
             </td>
             <td>{{ rectSize }}</td>
           </tr>
@@ -32,16 +32,51 @@
           </tr>
         </tbody>
       </table>
-      <Layer root>
-        <Layer>
-          <PadoRect :size="rectSize">
-            <template slot-scope="scope">Root Size<br>{{scope.rect.width}}</template>
-          </PadoRect>
-        </Layer>
-        <Layer opacity=".5">
-          <PadoRect size="100" style="border:1px solid silver"></PadoRect>
-        </Layer>
-      </Layer>
+      <table class="cell-table">
+        <tbody>
+          <tr>
+            <td>
+              <Layer root :size="rectSize">
+                <Layer>
+                  <PadoRect :size="rectSize">
+                    <template slot-scope="scope">Root Size<br>{{scope.rect.width}}</template>
+                  </PadoRect>
+                </Layer>
+                <Layer opacity=".5">
+                  <PadoRect 
+                    v-for="rect in piecesRects"
+                    :key="rect.key"
+                    :left="rect.left"
+                    :top="rect.top"
+                    :width="rect.width"
+                    :height="rect.height"
+                    style="border:1px solid silver"
+                  >
+                  </PadoRect>
+                </Layer>
+              </Layer>
+            </td>
+            <td>
+              <Layer root :size="rectSize">
+                <Layer>
+                  <PadoRect :size="rectSize">
+                    <template slot-scope="scope">Root Size<br>{{scope.rect.width}}</template>
+                  </PadoRect>
+                </Layer>
+                <Layer>
+                  <PadoPoint
+                    v-for="point in piecesPoints"
+                    :key="point.key"
+                    :x="point.x"
+                    :y="point.y"
+                  ></PadoPoint>
+                </Layer>
+              </Layer>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
     </div>
   </AppLayout>
 </template>
@@ -50,27 +85,41 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import Layer from '@/components/Layer.vue';
 import PadoSlider from '@/components/PadoSlider.vue';
 import PadoRect from '@/components/PadoRect.vue';
+import PadoPoint from '@/components/PadoPoint.vue';
 import { rect } from '@sepalang/pado/.src/modules/dimension';
-import { getElementBoundingRect } from '@sepalang/pado/.src/web/env/dom';
 
 export default {
   components: {
     AppLayout,
     Layer,
     PadoSlider,
-    PadoRect
+    PadoRect,
+    PadoPoint
   },
   data: ()=>({
-    rectSize: 150,
-    colCount: 1,
-    rowCount: 1
+    rectSize    : 150,
+    colCount    : 1,
+    rowCount    : 1,
+    piecesRects : [],
+    piecesPoints: []
   }),
   methods: {
     drawRect (){
-      console.log("drawrect", this.colCount, this.rowCount);
       const rootRect = rect(0, 0, this.rectSize, this.rectSize);
       
-      console.log("rootRect", rootRect.piecesAsCount([this.colCount, this.rowCount]));
+      this.piecesRects = rootRect.piecesAsCount([this.colCount, this.rowCount], (rect, i, c, r)=>{
+        return {
+          key: [c, r] + "",
+          ...rect.toJSON()
+        };
+      });
+      
+      this.piecesPoints = rootRect.piecesAsCount([this.colCount, this.rowCount], (rect, i, c, r)=>{
+        return {
+          key: [c, r] + "",
+          ...rect.findPoint("middle center").toJSON()
+        };
+      });
     }
   },
   mounted (){

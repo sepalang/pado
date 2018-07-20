@@ -16,6 +16,7 @@
           :y="vertex.y"
           :label="vertex.key"
         >
+          비비
         </PadoPoint>
       </layer>
       <layer class="no-pointer-events" >

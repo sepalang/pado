@@ -77,3 +77,18 @@ table > * > tr {
     }
   }
 }
+
+.cell-table {
+  @include cellbase-table-variant(0px, auto);
+  
+  * > tr {
+    > th {
+      text-align:left;
+      vertical-align:top;
+    }
+    > td {
+      text-align:left;
+      vertical-align:top;
+    }
+  }
+}

@@ -4,15 +4,29 @@
   </div>
 </template>
 <script>
+import HighOrderRect from './mixins/HighOrderRect';
+import HighOrderPoint from './mixins/HighOrderPoint';
+
 export default {
+  mixins: [
+    HighOrderRect([['width', 'height', 'size', 'rect'], ['auto', 'auto']]),
+    HighOrderPoint([['left', 'top', 'point'], [0, 0]])
+  ],
   props   : ["root", "opacity"],
   computed: {
     layerStyle (){
-      let positionStyle = typeof this.root !== "undefined" ? "position:relative;" : "position:absolute;left:0px;top:0px;";
+      const isRootLayer = typeof this.root !== "undefined";
+      const layerStyle = isRootLayer ? {position: "relative"} : {position: "absolute"};
+      
+      const { width, height } = this.rectValue;
+      const [left, top] = [this.left + 'px', this.top + 'px'];
+      
+      Object.assign(layerStyle, { width: width + 'px', height: height + 'px', left, top});
+      
       if(/number|string/.test(typeof this.opacity)){
-        positionStyle += `opacity:${parseFloat(this.opacity, 10)};`;
+        layerStyle.opacity = parseFloat(this.opacity, 10);
       }
-      return positionStyle;
+      return layerStyle;
     }
   },
   mounted (){
