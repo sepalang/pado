@@ -598,6 +598,36 @@
             w: 0
           }], inheritMeta);
 
+        case "middle":
+        case "m":
+          var middleY = this.height / 2 + this.top;
+          return new Vertex([{
+            x: this.left,
+            y: middleY,
+            z: 0,
+            w: 0
+          }, {
+            x: this.right,
+            y: middleY,
+            z: 0,
+            w: 0
+          }], inheritMeta);
+
+        case "center":
+        case "c":
+          var centerX = this.width / 2 + this.x;
+          return new Vertex([{
+            x: centerX,
+            y: this.top,
+            z: 0,
+            w: 0
+          }, {
+            x: centerX,
+            y: this.bottom,
+            z: 0,
+            w: 0
+          }], inheritMeta);
+
         default:
           return new Vertex([{
             x: this.left,
@@ -622,12 +652,13 @@
           }], inheritMeta);
       }
     },
-    piecesAsCount: function piecesAsCount(splitCount, outputForm) {
+    piecesAsCount: function piecesAsCount(splitCount, eachResultHook) {
       var _splitCountParser = splitCountParser(splitCount),
           column = _splitCountParser.column,
           row = _splitCountParser.row;
 
-      var result = Array(column * row).fill({
+      eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
+      return Array(column * row).fill({
         width: this.width / column,
         height: this.height / row
       }).map(function (_ref5, index) {
@@ -636,13 +667,21 @@
 
         var _turnTime = (0, _nice.turnTime)(index, column),
             colIndex = _turnTime[0],
-            rowIndex = _turnTime[1]; //const rowInMatrix    = 
-        //return [columnAsRow, ];
+            rowIndex = _turnTime[1];
 
+        var result = new Rect(colIndex * width, rowIndex * height, width, height);
+        return eachResultHook ? eachResultHook(result, index, colIndex, rowIndex) : result;
+      });
+    },
+    matrixAsCount: function matrixAsCount(splitCount, eachResultHook) {
+      var result = [];
+      eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
+      this.piecesAsCount(splitCount, function (data, index, colIndex, rowIndex) {
+        if (!result[rowIndex]) result.push([]);
+        var dataResult = eachResultHook ? eachResultHook(data, index, colIndex, rowIndex) : data;
+        result[rowIndex].push(dataResult);
       });
       return result;
-
-      if (typeof outputForm === "matrix") {}
     },
     //TODO : incompleted sticky(parent, position, offset);
     sticky: function sticky(_ref6, position) {

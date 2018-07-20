@@ -33,7 +33,7 @@
     "functions"
   ],
   "devDependencies": {
-    "@sepalang/padoc": "^0.8.12",
+    "@sepalang/padoc": "^0.8.15",
     "jquery": "^3.3.1",
     "jsdom": "^11.11.0",
     "madge": "^3.1.1",

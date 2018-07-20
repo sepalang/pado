@@ -326,29 +326,61 @@ Rect.prototype = {
       return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0}],inheritMeta);
     case "top": case "t":
       return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.right,y:this.top,z:0,w:0}],inheritMeta);
+    case "middle": case "m":
+      const middleY = this.height/2+this.top;
+      return new Vertex(
+        [
+          {x:this.left,  y:middleY, z:0, w:0},
+          {x:this.right, y:middleY, z:0, w:0}
+        ],
+        inheritMeta
+      );
+    case "center": case "c":
+      const centerX = this.width/2+this.x;
+      return new Vertex(
+        [
+          {x:centerX, y:this.top,   z:0, w:0},
+          {x:centerX, y:this.bottom, z:0,w:0}
+        ],
+        inheritMeta
+      );
     default:
-      return new Vertex([{x:this.left, y:this.top, z:0, w:0},{x:this.left,y:this.bottom,z:0,w:0},{x:this.right,y:this.bottom,z:0,w:0},{x:this.right, y:this.top, z:0, w:0}],inheritMeta);
+      return new Vertex(
+        [
+          {x:this.left,  y:this.top, z:0, w:0},
+          {x:this.left,  y:this.bottom,z:0,w:0},
+          {x:this.right, y:this.bottom,z:0,w:0},
+          {x:this.right, y:this.top, z:0, w:0}
+        ],
+        inheritMeta
+      );
     }
   },
-  piecesAsCount (splitCount, outputForm){
+  piecesAsCount (splitCount, eachResultHook){
     const { column, row } = splitCountParser(splitCount);
-    const result = Array(column*row)
+    eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
+    
+    return Array(column*row)
     .fill({
       width:this.width / column,
       height:this.height / row
     })
     .map(({ width, height }, index)=>{
       const [ colIndex, rowIndex ] = turnTime(index, column);
-      
-      //const rowInMatrix    = 
-      //return [columnAsRow, ];
+      const result = new Rect(colIndex*width,rowIndex*height,width,height);
+      return eachResultHook ? eachResultHook(result,index,colIndex,rowIndex) : result;
     });
+  },
+  matrixAsCount (splitCount, eachResultHook){
+    const result = [];
+    eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
     
+    this.piecesAsCount(splitCount,(data,index,colIndex,rowIndex)=>{
+      if(!result[rowIndex]) result.push([]);
+      const dataResult = eachResultHook ? eachResultHook(data,index,colIndex,rowIndex) : data;
+      result[rowIndex].push(dataResult);
+    });
     return result;
-    
-    if(typeof outputForm === "matrix"){
-      
-    }
   },
   //TODO : incompleted sticky(parent, position, offset);
   sticky ({left:refX, top:refY, width:refWidth, height:refHeight}, position="bottom left"){
