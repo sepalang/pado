@@ -94,10 +94,10 @@ export const turn = function(i, limit, ts, resultHook){
   }
   ts = typeof ts === "number" ? ts : 1;
   const fixIndex = Math.floor(i / ts);
-  const r = (limit > fixIndex) ? fixIndex : fixIndex % limit;
-  return typeof resultHook === "function" ? resultHook(r,i,limit,ts) : r;
+  const result = (limit > fixIndex) ? fixIndex : fixIndex % limit;
+  return typeof resultHook === "function" ? resultHook(result,i,limit,ts) : result;
 }
 
 export const turnTimes = function (i, limit, ts){
-  return turn(i, limit, ts, (r, i, limit, ts)=>[r, Math.floor(i/(limit*ts))]);
+  return turn(i, limit, ts, (result, i, limit, ts)=>[result, Math.floor(i/(limit*ts))]);
 }
