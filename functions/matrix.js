@@ -124,7 +124,7 @@
       var dRate = (v - $domain[0]) / dSize;
       var calc = $range[0] + sSize * dRate;
       var result = nice ? Math.floor(calc) : calc;
-      return limit ? $range[1] > $range[0] ? (0, _nice2.limitOf)(result, $range[1], $range[0]) : (0, _nice2.limitOf)(result, $range[0], $range[1]) : result;
+      return limit ? $range[1] > $range[0] ? (0, _nice2.limitNumber)(result, $range[1], $range[0]) : (0, _nice2.limitNumber)(result, $range[0], $range[1]) : result;
     });
   };
 

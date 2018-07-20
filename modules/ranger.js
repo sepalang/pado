@@ -37,18 +37,18 @@
   _exports.Limitter = Limitter;
   var LimitterPrototype = {
     expectIn: function expectIn(setValue) {
-      return setValue === (0, _functions.limitOf)(setValue, this.maximum, this.minimum);
+      return setValue === (0, _functions.limitNumber)(setValue, this.maximum, this.minimum);
     },
     expectOut: function expectOut(setValue) {
-      return setValue !== (0, _functions.limitOf)(setValue, this.maximum, this.minimum);
+      return setValue !== (0, _functions.limitNumber)(setValue, this.maximum, this.minimum);
     },
     addExpectIn: function addExpectIn(addValue) {
       var destValue = this.value + addValue;
-      return destValue === (0, _functions.limitOf)(destValue, this.maximum, this.minimum);
+      return destValue === (0, _functions.limitNumber)(destValue, this.maximum, this.minimum);
     },
     addExpectOut: function addExpectOut(addValue) {
       var destValue = this.value + addValue;
-      return destValue !== (0, _functions.limitOf)(destValue, this.maximum, this.minimum);
+      return destValue !== (0, _functions.limitNumber)(destValue, this.maximum, this.minimum);
     },
     set: function set(setValue) {
       this.value = setValue;
@@ -62,7 +62,7 @@
   Object.defineProperties(LimitterPrototype, {
     done: {
       get: function get() {
-        return this.value === (0, _functions.limitOf)(this.value, this.maximum, this.minimum);
+        return this.value === (0, _functions.limitNumber)(this.value, this.maximum, this.minimum);
       }
     }
   });

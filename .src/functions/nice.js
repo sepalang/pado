@@ -1,4 +1,4 @@
-import { isNumber, isArray, isAbsoluteNaN } from './isLike';
+import { isNumber, isArray, isInfinity, isAbsoluteNaN } from './isLike';
 
 export const limitNumber = (function() {
   const limitOf = function(number, max, min) {
@@ -93,13 +93,11 @@ export const turn = function(i, limit, ts, resultHook){
     i = limit - (abs > limit ? abs % limit : abs);
   }
   ts = typeof ts === "number" ? ts : 1;
-  i  = Math.floor(i / ts);
-  const r = (limit > i) ? i : i % limit;
-  return typeof resultHook === "function" ? resultHook(r,i,limit,ts) : i;
+  const fixIndex = Math.floor(i / ts);
+  const r = (limit > fixIndex) ? fixIndex : fixIndex % limit;
+  return typeof resultHook === "function" ? resultHook(r,i,limit,ts) : r;
 }
 
 export const turnTimes = function (i, limit, ts){
-  return turn(i, limit, ts, (r, i, limit, ts)=>{
-    return [r, limit*ts/i];
-  });
+  return turn(i, limit, ts, (r, i, limit, ts)=>[r, Math.floor(i/(limit*ts))]);
 }

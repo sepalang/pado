@@ -283,6 +283,18 @@
     return result;
   };
 
+  var turn = function turn(i, limit, ts, resultHook) {
+    if (i < 0) {
+      var abs = Math.abs(i / ts);
+      i = limit - (abs > limit ? abs % limit : abs);
+    }
+
+    ts = typeof ts === "number" ? ts : 1;
+    var fixIndex = Math.floor(i / ts);
+    var r = limit > fixIndex ? fixIndex : fixIndex % limit;
+    return typeof resultHook === "function" ? resultHook(r, i, limit, ts) : r;
+  };
+
   var validMatrix = function validMatrix(arr) {
     // Matrix must be array
     if (!likeArray(arr)) {
@@ -828,6 +840,20 @@
     this.meta = meta;
   };
 
+  var splitCountParser = function splitCountParser(split) {
+    //splitCount [ horizental, vertical ]
+    //1 = [ 1 ]
+    //[1, 2] = [1, 2]
+    var _asArray = asArray(split),
+        columnOrder = _asArray[0],
+        rowOrder = _asArray[1];
+
+    return {
+      column: isNumber(columnOrder) && columnOrder > 0 ? parseInt(columnOrder, 10) : 1,
+      row: isNumber(rowOrder) && rowOrder > 0 ? parseInt(rowOrder, 10) : 1
+    };
+  };
+
   Rect.prototype = {
     addMeta: function addMeta(obj) {
       if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
@@ -943,12 +969,29 @@
           }], inheritMeta);
       }
     },
+    piecesAsCount: function piecesAsCount(splitCount, outputForm) {
+      var _splitCountParser = splitCountParser(splitCount),
+          column = _splitCountParser.column,
+          row = _splitCountParser.row;
+
+      var result = Array(column * row).fill({
+        width: this.width / column,
+        height: this.height / row
+      }).map(function (_ref5, index) {
+        var width = _ref5.width,
+            height = _ref5.height;
+        var columnInMatrix = turn(index, column);
+        return index; //const rowInMatrix    = 
+        //return [columnAsRow, ];
+      });
+      return result;
+    },
     //TODO : incompleted sticky(parent, position, offset);
-    sticky: function sticky(_ref5, position) {
-      var refX = _ref5.left,
-          refY = _ref5.top,
-          refWidth = _ref5.width,
-          refHeight = _ref5.height;
+    sticky: function sticky(_ref6, position) {
+      var refX = _ref6.left,
+          refY = _ref6.top,
+          refWidth = _ref6.width,
+          refHeight = _ref6.height;
 
       if (position === void 0) {
         position = "bottom left";

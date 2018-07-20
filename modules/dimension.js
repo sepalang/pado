@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.object.assign", "../functions/isLike", "../functions/cast", "../functions/matrix"], factory);
+    define(["exports", "core-js/modules/es6.array.fill", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.object.assign", "../functions/isLike", "../functions/cast", "../functions/matrix", "../functions/nice"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.object.assign"), require("../functions/isLike"), require("../functions/cast"), require("../functions/matrix"));
+    factory(exports, require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.object.assign"), require("../functions/isLike"), require("../functions/cast"), require("../functions/matrix"), require("../functions/nice"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.es6Date, global.es6Array, global.es6Object, global.webDom, global.es6Object, global.isLike, global.cast, global.matrix);
+    factory(mod.exports, global.es6Array, global.es6Regexp, global.es6Date, global.es6Array, global.es6Object, global.webDom, global.es6Object, global.isLike, global.cast, global.matrix, global.nice);
     global.dimension = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _es6Date, _es6Array, _es6Object, _webDom, _es6Object2, _isLike, _cast, _matrix) {
+})(this, function (_exports, _es6Array, _es6Regexp, _es6Date, _es6Array2, _es6Object, _webDom, _es6Object2, _isLike, _cast, _matrix, _nice) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -493,6 +493,20 @@
     this.meta = meta;
   };
 
+  var splitCountParser = function splitCountParser(split) {
+    //splitCount [ horizental, vertical ]
+    //1 = [ 1 ]
+    //[1, 2] = [1, 2]
+    var _asArray = (0, _cast.asArray)(split),
+        columnOrder = _asArray[0],
+        rowOrder = _asArray[1];
+
+    return {
+      column: (0, _isLike.isNumber)(columnOrder) && columnOrder > 0 ? parseInt(columnOrder, 10) : 1,
+      row: (0, _isLike.isNumber)(rowOrder) && rowOrder > 0 ? parseInt(rowOrder, 10) : 1
+    };
+  };
+
   Rect.prototype = {
     addMeta: function addMeta(obj) {
       if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
@@ -608,12 +622,31 @@
           }], inheritMeta);
       }
     },
+    piecesAsCount: function piecesAsCount(splitCount, outputForm) {
+      var _splitCountParser = splitCountParser(splitCount),
+          column = _splitCountParser.column,
+          row = _splitCountParser.row;
+
+      var result = Array(column * row).fill({
+        width: this.width / column,
+        height: this.height / row
+      }).map(function (_ref5, index) {
+        var width = _ref5.width,
+            height = _ref5.height;
+        var columnInMatrix = (0, _nice.turn)(index, column);
+        return index; //const rowInMatrix    = 
+        //return [columnAsRow, ];
+      });
+      return result;
+
+      if (typeof outputForm === "matrix") {}
+    },
     //TODO : incompleted sticky(parent, position, offset);
-    sticky: function sticky(_ref5, position) {
-      var refX = _ref5.left,
-          refY = _ref5.top,
-          refWidth = _ref5.width,
-          refHeight = _ref5.height;
+    sticky: function sticky(_ref6, position) {
+      var refX = _ref6.left,
+          refY = _ref6.top,
+          refWidth = _ref6.width,
+          refHeight = _ref6.height;
 
       if (position === void 0) {
         position = "bottom left";

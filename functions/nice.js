@@ -16,10 +16,10 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.turn = _exports.accurateTimeout = _exports.limitOf = void 0;
+  _exports.turnTimes = _exports.turn = _exports.accurateTimeout = _exports.limitNumber = void 0;
 
-  var limitOf = function () {
-    var limitNumber = function limitNumber(number, max, min) {
+  var limitNumber = function () {
+    var limitOf = function limitOf(number, max, min) {
       if (typeof number == "number") {
         if ((0, _isLike.isAbsoluteNaN)(number) || number === Infinity) {
           return min;
@@ -37,7 +37,7 @@
       return number;
     };
 
-    var limitOf = function limitOf(numbers, max, min) {
+    var limitNumber = function limitNumber(numbers, max, min) {
       if (typeof max !== "number") {
         max = Number.POSITIVE_INFINITY;
       }
@@ -52,19 +52,19 @@
 
       if ((0, _isLike.isArray)(numbers)) {
         for (var d = numbers, i = 0, l = d.length; i < l; i++) {
-          d[i] = limitNumber(d[i], max, min);
+          d[i] = limitOf(d[i], max, min);
         }
 
         return numbers;
       } else {
-        return limitNumber(numbers, max, min);
+        return limitOf(numbers, max, min);
       }
     };
 
-    return limitOf;
+    return limitNumber;
   }();
 
-  _exports.limitOf = limitOf;
+  _exports.limitNumber = limitNumber;
 
   var accurateTimeout = function (originalTimeout) {
     return function (trigger, time, resolutionRatio, coverage) {
@@ -131,17 +131,26 @@
 
   _exports.accurateTimeout = accurateTimeout;
 
-  var turn = function turn(i, p, ts) {
+  var turn = function turn(i, limit, ts, resultHook) {
     if (i < 0) {
       var abs = Math.abs(i / ts);
-      i = p - (abs > p ? abs % p : abs);
+      i = limit - (abs > limit ? abs % limit : abs);
     }
 
-    ts = ts || 1;
-    i = Math.floor(i / ts);
-    return p > i ? i : i % p;
+    ts = typeof ts === "number" ? ts : 1;
+    var fixIndex = Math.floor(i / ts);
+    var r = limit > fixIndex ? fixIndex : fixIndex % limit;
+    return typeof resultHook === "function" ? resultHook(r, i, limit, ts) : r;
   };
 
   _exports.turn = turn;
+
+  var turnTimes = function turnTimes(i, limit, ts) {
+    return turn(i, limit, ts, function (r, i, limit, ts) {
+      return [r, Math.floor(i / (limit * ts))];
+    });
+  };
+
+  _exports.turnTimes = turnTimes;
 });
 //# sourceMappingURL=nice.js.map
