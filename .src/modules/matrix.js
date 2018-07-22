@@ -1,5 +1,5 @@
 import { asArray } from '../functions/cast';
-import { times } from './enumerable';
+import { times } from '../functions/enumerable';
 import { turnTime } from '../functions/nice';
 
 export const PlainMatrix = (function(){

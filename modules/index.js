@@ -6,17 +6,17 @@ require("core-js/modules/web.dom.iterable");
 
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./block", "./editable", "./makeup", "./paginate", "./promise", "./operate", "./session", "./ranger", "./dimension", "./affect"], factory);
+    define(["exports", "./block", "./editable", "./makeup", "./paginate", "./promise", "./operate", "./session", "./ranger", "./dimension", "./affect", "./matrix"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./block"), require("./editable"), require("./makeup"), require("./paginate"), require("./promise"), require("./operate"), require("./session"), require("./ranger"), require("./dimension"), require("./affect"));
+    factory(exports, require("./block"), require("./editable"), require("./makeup"), require("./paginate"), require("./promise"), require("./operate"), require("./session"), require("./ranger"), require("./dimension"), require("./affect"), require("./matrix"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.block, global.editable, global.makeup, global.paginate, global.promise, global.operate, global.session, global.ranger, global.dimension, global.affect);
+    factory(mod.exports, global.block, global.editable, global.makeup, global.paginate, global.promise, global.operate, global.session, global.ranger, global.dimension, global.affect, global.matrix);
     global.index = mod.exports;
   }
-})(this, function (_exports, _block, _editable, _makeup, _paginate, _promise, _operate, _session, _ranger, _dimension, _affect) {
+})(this, function (_exports, _block, _editable, _makeup, _paginate, _promise, _operate, _session, _ranger, _dimension, _affect, _matrix) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -118,6 +118,16 @@ require("core-js/modules/web.dom.iterable");
       enumerable: true,
       get: function get() {
         return _affect[key];
+      }
+    });
+  });
+  Object.keys(_matrix).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+    Object.defineProperty(_exports, key, {
+      enumerable: true,
+      get: function get() {
+        return _matrix[key];
       }
     });
   });
