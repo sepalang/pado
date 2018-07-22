@@ -20,6 +20,8 @@
     "report:modules": "madge .src/modules/index.js --image .util/report/modules.report.png",
     "report:functions": "madge .src/functions/index.js --image .util/report/functions.report.png",
     "report": "npm run report:index & npm run report:pado & npm run report:modules & npm run report:functions",
+    "test:functions": "padoc --test .src/functions --verbose",
+    "test:modules": "padoc --test .src/modules --verbose",
     "test:web": "padoc --test .src/web --verbose",
     "test": "padoc --test .src --verbose",
     "pack:a": "padoc --pack '.util/fnpack/case-a/*.js' .util/fnpack/case-a/packed -m es",

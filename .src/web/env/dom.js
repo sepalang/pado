@@ -1,4 +1,4 @@
-import { rect } from "../../modules/dimension";
+import { rect } from "../../modules/stance";
 import { likeString, isArray, likeArray, isNode } from "../../functions/isLike";
 import { asArray } from "../../functions/cast";
 

@@ -1,7 +1,6 @@
 import { isArray, isNumber } from '../functions/isLike';
 import { asArray } from '../functions/cast';
 import { asMatrix, validMatrix, multiplyMatrix } from '../functions/matrix';
-
 import { makeMatrixArray } from './matrix';
 
 
@@ -363,7 +362,7 @@ Rect.prototype = {
     const pieceHeight = this.height / row;
     eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
     
-    return makeMatrixArray(column, row, (index, column, row)=>{
+    return makeMatrixArray(column, row, (index, colIndex, rowIndex)=>{
       const result = new Rect(colIndex*pieceWidth, rowIndex*pieceHeight, pieceWidth, pieceHeight);
       return eachResultHook ? eachResultHook(result,index,colIndex,rowIndex) : result;
     });

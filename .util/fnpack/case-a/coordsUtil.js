@@ -6,4 +6,4 @@ export {
 
 export { 
   rect
-} from '../../../.src/modules/dimension';
+} from '../../../.src/modules/stance';
