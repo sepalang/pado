@@ -8,7 +8,7 @@
       exports: {}
     };
     factory(mod.exports, global.es6Regexp, global.es6Date, global.es6Array, global.es6Object, global.webDom, global.es6Object, global.isLike, global.cast, global.matrix, global.matrix);
-    global.dimension = mod.exports;
+    global.stance = mod.exports;
   }
 })(this, function (_exports, _es6Regexp, _es6Date, _es6Array, _es6Object, _webDom, _es6Object2, _isLike, _cast, _matrix, _matrix2) {
   "use strict";
@@ -660,10 +660,11 @@
       var pieceWidth = this.width / column;
       var pieceHeight = this.height / row;
       eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
-      return (0, _matrix2.makeMatrixArray)(column, row, function (index, column, row) {
+      var pacResult = (0, _matrix2.makeMatrixArray)(column, row, function (index, colIndex, rowIndex) {
         var result = new Rect(colIndex * pieceWidth, rowIndex * pieceHeight, pieceWidth, pieceHeight);
         return eachResultHook ? eachResultHook(result, index, colIndex, rowIndex) : result;
       });
+      return pacResult;
     },
     //TODO : incompleted sticky(parent, position, offset);
     sticky: function sticky(_ref5, position) {
@@ -745,4 +746,4 @@
 
   _exports.rect = rect;
 });
-//# sourceMappingURL=dimension.js.map
+//# sourceMappingURL=stance.js.map

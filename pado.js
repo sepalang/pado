@@ -127,24 +127,9 @@
     if (typeof data === "string") return String(parseFloat(data)) === String(data);
     return false;
   };
-  var likeArray = function (nodeFn, webFn) {
-    var definedNodeList;
-
-    try {
-      definedNodeList = 0 instanceof NodeList;
-      definedNodeList = true;
-    } catch (e) {
-      definedNodeList = false;
-    }
-
-    return definedNodeList ? webFn : nodeFn;
-  }( //nodeFn
-  function (data) {
-    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray$1(data);
-  }, //webFn
-  function (data) {
-    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray$1(data) || data instanceof NodeList;
-  });
+  var likeArray = function likeArray(item) {
+    return Array.isArray(item) || item !== null && typeof item === "object" && item.hasOwnProperty("length") && typeof item.length === "number" && item.length > 0;
+  };
   var isPlainObject = function isPlainObject(data) {
     return typeof data === "object" && data.constructor === Object;
   };
@@ -3430,8 +3415,8 @@
     return new Limitter(max, min);
   };
 
-  var PlainMatrix = function () {
-    var PlainMatrix = function PlainMatrix(data, column, row) {
+  var MatrixArray = function () {
+    var MatrixArray = function MatrixArray(data, column, row) {
       var _this = this;
 
       asArray$1(data).forEach(function (datum) {
@@ -3449,9 +3434,10 @@
       });
     };
 
-    PlainMatrix.prototype = {
-      eachColumn: function eachColumn() {},
-      eachRow: function eachRow() {},
+    MatrixArray.prototype = Object.assign([], {
+      toString: function toString() {
+        return "[object Array]";
+      },
       toMatrix: function toMatrix(eachResultHook) {
         var _this2 = this;
 
@@ -3462,15 +3448,32 @@
               colIndex = _turnTime[0],
               rowIndex = _turnTime[1];
 
-          if (!result[rowIndex]) result.push([]);
+          var data = _this2[index];
           var dataResult = eachResultHook ? eachResultHook(data, index, colIndex, rowIndex) : data;
+          if (!result[rowIndex]) result[rowIndex] = [];
           result[rowIndex].push(dataResult);
         });
         return result;
       },
-      multiply: function multiply() {}
-    };
-    return PlainMatrix;
+      eachColumn: function eachColumn(eachFn) {
+        var rows = this.toMatrix();
+        var columns = times(this.column, function (colIndex) {
+          var colData = [];
+          rows.forEach(function (row) {
+            return colData.push(row[colIndex]);
+          });
+          return colData;
+        });
+        return typeof eachFn === "function" ? columns.map(eachFn) : columns;
+      },
+      eachRow: function eachRow(eachFn) {
+        var rows = this.toMatrix();
+        return typeof eachFn === "function" ? rows.map(eachFn) : rows;
+      },
+      multiply: function multiply() {//TODO
+      }
+    });
+    return MatrixArray;
   }();
   var makeMatrixArray = function makeMatrixArray(column, row, eachHook) {
     var matrixProto = times(column * row, function (index) {
@@ -3478,9 +3481,10 @@
           colIndex = _turnTime2[0],
           rowIndex = _turnTime2[1];
 
-      return eachHook(index, colIndex, rowIndex);
+      return eachHook(index, colIndex, rowIndex) || [colIndex, rowIndex];
     });
-    return new PlainMatrix(matrixProto, column, row);
+    var matrixArray = new MatrixArray(matrixProto, column, row);
+    return matrixArray;
   };
 
   var likePoint = function likePoint(p) {
@@ -4124,10 +4128,11 @@
       var pieceWidth = this.width / column;
       var pieceHeight = this.height / row;
       eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
-      return makeMatrixArray(column, row, function (index, column, row) {
+      var pacResult = makeMatrixArray(column, row, function (index, colIndex, rowIndex) {
         var result = new Rect(colIndex * pieceWidth, rowIndex * pieceHeight, pieceWidth, pieceHeight);
         return eachResultHook ? eachResultHook(result, index, colIndex, rowIndex) : result;
       });
+      return pacResult;
     },
     //TODO : incompleted sticky(parent, position, offset);
     sticky: function sticky(_ref5, position) {
@@ -4350,7 +4355,7 @@
     vertex: vertex,
     rect: rect,
     affect: affect,
-    PlainMatrix: PlainMatrix,
+    MatrixArray: MatrixArray,
     makeMatrixArray: makeMatrixArray
   });
 

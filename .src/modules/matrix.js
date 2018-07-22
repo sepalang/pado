@@ -20,6 +20,9 @@ export const MatrixArray = (function(){
   };
 
   MatrixArray.prototype = Object.assign([],{
+    toString (){
+      return "[object Array]";
+    },
     toMatrix (eachResultHook){
       const result = [];
       eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;

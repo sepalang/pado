@@ -77,6 +77,7 @@
                     :x="point.x"
                     :y="point.y"
                   ></PadoPoint>
+                  {{piecesPoints}}
                 </Layer>
               </Layer>
             </td>
@@ -134,7 +135,9 @@ export default {
         console.log("col", col);
       });
       
-      this.piecesPoints = pointArr;
+      console.log("pointArr",pointArr, Array.isArray(pointArr), pointArr.toString())
+      this.piecesPoints = Array.from(pointArr);
+      
     }
   },
   mounted (){

@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.fill", "core-js/modules/web.dom.iterable", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "../../modules/dimension", "../../functions/isLike", "../../functions/cast"], factory);
+    define(["exports", "core-js/modules/es6.array.fill", "core-js/modules/web.dom.iterable", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "../../modules/stance", "../../functions/isLike", "../../functions/cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.fill"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("../../modules/dimension"), require("../../functions/isLike"), require("../../functions/cast"));
+    factory(exports, require("core-js/modules/es6.array.fill"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("../../modules/stance"), require("../../functions/isLike"), require("../../functions/cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.webDom, global.es6Object, global.es6Regexp, global.es6Date, global.dimension, global.isLike, global.cast);
+    factory(mod.exports, global.es6Array, global.webDom, global.es6Object, global.es6Regexp, global.es6Date, global.stance, global.isLike, global.cast);
     global.dom = mod.exports;
   }
-})(this, function (_exports, _es6Array, _webDom, _es6Object, _es6Regexp, _es6Date, _dimension, _isLike, _cast) {
+})(this, function (_exports, _es6Array, _webDom, _es6Object, _es6Regexp, _es6Date, _stance, _isLike, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -35,7 +35,7 @@
     el = getNode(el);
 
     if (!isElement(el)) {
-      return (0, _dimension.rect)({
+      return (0, _stance.rect)({
         x: 0,
         y: 0,
         left: 0,
@@ -63,7 +63,7 @@
       }
     } while (el);
 
-    return (0, _dimension.rect)({
+    return (0, _stance.rect)({
       x: offsetLeft,
       y: offsetTop,
       left: offsetLeft,
@@ -80,7 +80,7 @@
     el = getNode(el);
 
     if (!isElement(el)) {
-      return (0, _dimension.rect)({
+      return (0, _stance.rect)({
         x: 0,
         y: 0,
         left: 0,
@@ -110,7 +110,7 @@
       }
     }
 
-    return (0, _dimension.rect)({
+    return (0, _stance.rect)({
       x: boundingRect.left + offsetX,
       y: boundingRect.top + offsetY,
       left: boundingRect.left + offsetX,
@@ -130,7 +130,7 @@
     var elRect = getBoundingRect(el).toJSON();
 
     if (elRect.valid === false) {
-      return (0, _dimension.rect)(elRect);
+      return (0, _stance.rect)(elRect);
     }
 
     var current = el;
@@ -155,7 +155,7 @@
       }
     } while (!!parent);
 
-    return (0, _dimension.rect)(elRect);
+    return (0, _stance.rect)(elRect);
   };
 
   _exports.getElementBoundingRect = getElementBoundingRect;
@@ -278,7 +278,7 @@
   _exports.getElementTransform = getElementTransform;
 
   var windowRect = function windowRect() {
-    return (0, _dimension.rect)({
+    return (0, _stance.rect)({
       left: window.screenLeft || window.screenX,
       top: window.screenTop || window.screenY,
       width: window.outerWidth,
@@ -289,7 +289,7 @@
   _exports.windowRect = windowRect;
 
   var screenRect = function screenRect() {
-    return (0, _dimension.rect)({
+    return (0, _stance.rect)({
       left: 0,
       top: 0,
       width: screen.width,

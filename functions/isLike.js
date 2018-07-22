@@ -104,24 +104,9 @@
 
   _exports.likeNumber = likeNumber;
 
-  var likeArray = function (nodeFn, webFn) {
-    var definedNodeList;
-
-    try {
-      definedNodeList = 0 instanceof NodeList;
-      definedNodeList = true;
-    } catch (e) {
-      definedNodeList = false;
-    }
-
-    return definedNodeList ? webFn : nodeFn;
-  }( //nodeFn
-  function (data) {
-    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray(data);
-  }, //webFn
-  function (data) {
-    return typeof data === "object" && data.hasOwnProperty("length") ? true : isArray(data) || data instanceof NodeList;
-  });
+  var likeArray = function likeArray(item) {
+    return Array.isArray(item) || item !== null && typeof item === "object" && item.hasOwnProperty("length") && typeof item.length === "number" && item.length > 0;
+  };
 
   _exports.likeArray = likeArray;
 
