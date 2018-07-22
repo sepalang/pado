@@ -5,6 +5,7 @@ import { turnTime } from '../functions/nice';
 export const MatrixArray = (function(){
   const MatrixArray = function(data, column, row){
     asArray(data).forEach(datum=>{ this.push(datum); });
+    
     Object.defineProperties(this,{
       column:{
         enumerable:false,
@@ -14,7 +15,8 @@ export const MatrixArray = (function(){
         enumerable:false,
         value:row
       }
-    })
+    });
+    
   };
 
   MatrixArray.prototype = Object.assign([],{
@@ -24,8 +26,9 @@ export const MatrixArray = (function(){
 
       times(this.column * this.row,(index)=>{
         const [ colIndex, rowIndex ] = turnTime(index, this.column);
-        if(!result[rowIndex]) result.push([]);
+        const data       = this[index];
         const dataResult = eachResultHook ? eachResultHook(data,index,colIndex,rowIndex) : data;
+        if(!result[rowIndex]) result[rowIndex] = [];
         result[rowIndex].push(dataResult);
       });
       
@@ -38,6 +41,7 @@ export const MatrixArray = (function(){
         rows.forEach(row=>colData.push(row[colIndex]));
         return colData;
       });
+      
       return typeof eachFn === "function" ? columns.map(eachFn) : columns;
     },
     eachRow (eachFn){
@@ -53,9 +57,11 @@ export const MatrixArray = (function(){
 })();
 
 export const makeMatrixArray = function(column,row,eachHook){
-  const matrixProto = times(column*row,(index)=>{
+  const matrixProto = times(column * row,(index)=>{
     const [ colIndex, rowIndex ] = turnTime(index, column);
-    return eachHook(index, colIndex, rowIndex);
+    return eachHook(index, colIndex, rowIndex) || [colIndex, rowIndex];
   });
-  return new MatrixArray(matrixProto,column,row);
+  
+  const matrixArray = new MatrixArray(matrixProto,column,row);
+  return matrixArray;
 };

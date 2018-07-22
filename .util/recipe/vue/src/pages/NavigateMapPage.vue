@@ -30,6 +30,13 @@
             </td>
             <td>{{ rowCount }}</td>
           </tr>
+          <tr>
+            <th>addEachCol</th>
+            <td>
+              <PadoSlider v-model="addEachCol" input-cycle="enter" min-value="1" max-value="20"  @input="drawRect"></PadoSlider>
+            </td>
+            <td>{{ addEachCol }}</td>
+          </tr>
         </tbody>
       </table>
       <table class="cell-table">
@@ -76,7 +83,6 @@
           </tr>
         </tbody>
       </table>
-      
     </div>
   </AppLayout>
 </template>
@@ -100,6 +106,7 @@ export default {
     rectSize    : 150,
     colCount    : 1,
     rowCount    : 1,
+    addEachCol  : 0,
     piecesRects : [],
     piecesPoints: []
   }),
@@ -114,12 +121,20 @@ export default {
         };
       });
       
-      this.piecesPoints = rootRect.piecesAsCount([this.colCount, this.rowCount], (rect, i, c, r)=>{
+      console.log("a>this.piecesRects", this.colCount, this.rowCount, this.piecesRects);
+      
+      const pointArr = rootRect.piecesAsCount([this.colCount, this.rowCount], (rect, i, c, r)=>{
         return {
           key: [c, r] + "",
           ...rect.findPoint("middle center").toJSON()
         };
       });
+      
+      pointArr.eachColumn(col=>{
+        console.log("col", col);
+      });
+      
+      this.piecesPoints = pointArr;
     }
   },
   mounted (){

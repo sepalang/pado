@@ -362,10 +362,12 @@ Rect.prototype = {
     const pieceHeight = this.height / row;
     eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
     
-    return makeMatrixArray(column, row, (index, colIndex, rowIndex)=>{
+    const pacResult = makeMatrixArray(column, row, (index, colIndex, rowIndex)=>{
       const result = new Rect(colIndex*pieceWidth, rowIndex*pieceHeight, pieceWidth, pieceHeight);
       return eachResultHook ? eachResultHook(result,index,colIndex,rowIndex) : result;
     });
+    
+    return pacResult;
   },
   //TODO : incompleted sticky(parent, position, offset);
   sticky ({left:refX, top:refY, width:refWidth, height:refHeight}, position="bottom left"){
