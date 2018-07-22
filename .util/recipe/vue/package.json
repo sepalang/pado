@@ -91,15 +91,24 @@
           "align": "colon"
         }
       ],
-      "keyword-spacing":["error", {
-        "before": true,
-        "after": true,
-        "overrides":{
-          "if": { "after": false },
-          "for": { "after": false },
-          "while": { "after": false }
+      "keyword-spacing": [
+        "error",
+        {
+          "before": true,
+          "after": true,
+          "overrides": {
+            "if": {
+              "after": false
+            },
+            "for": {
+              "after": false
+            },
+            "while": {
+              "after": false
+            }
+          }
         }
-      }],
+      ],
       "no-mixed-operators": 0,
       "no-return-assign": 0,
       "no-useless-return": 0,

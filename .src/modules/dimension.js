@@ -1,7 +1,8 @@
 import { isArray, isNumber } from '../functions/isLike';
 import { asArray } from '../functions/cast';
 import { asMatrix, validMatrix, multiplyMatrix } from '../functions/matrix';
-import { turnTime } from '../functions/nice';
+
+import { makeMatrixArray } from './matrix';
 
 
 const likePoint = function(p){
@@ -358,29 +359,14 @@ Rect.prototype = {
   },
   piecesAsCount (splitCount, eachResultHook){
     const { column, row } = splitCountParser(splitCount);
+    const pieceWidth = this.width / column;
+    const pieceHeight = this.height / row;
     eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
     
-    return Array(column*row)
-    .fill({
-      width:this.width / column,
-      height:this.height / row
-    })
-    .map(({ width, height }, index)=>{
-      const [ colIndex, rowIndex ] = turnTime(index, column);
-      const result = new Rect(colIndex*width,rowIndex*height,width,height);
+    return makeMatrixArray(column, row, (index, column, row)=>{
+      const result = new Rect(colIndex*pieceWidth, rowIndex*pieceHeight, pieceWidth, pieceHeight);
       return eachResultHook ? eachResultHook(result,index,colIndex,rowIndex) : result;
     });
-  },
-  matrixAsCount (splitCount, eachResultHook){
-    const result = [];
-    eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
-    
-    this.piecesAsCount(splitCount,(data,index,colIndex,rowIndex)=>{
-      if(!result[rowIndex]) result.push([]);
-      const dataResult = eachResultHook ? eachResultHook(data,index,colIndex,rowIndex) : data;
-      result[rowIndex].push(dataResult);
-    });
-    return result;
   },
   //TODO : incompleted sticky(parent, position, offset);
   sticky ({left:refX, top:refY, width:refWidth, height:refHeight}, position="bottom left"){
