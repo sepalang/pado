@@ -275,7 +275,10 @@ const Rect = function(left=0,top=0,width=0,height=0,meta=null){
     meta:{
       enumerable:false, 
       get(){ return __meta },
-      set(it){ this.__meta = typeof it === "object" ? it : null; return this.__meta; }
+      set(it){ 
+        __meta = typeof it === "object" ? it : null; 
+        return __meta;
+      }
     }
   });
   
@@ -358,12 +361,15 @@ Rect.prototype = {
   },
   piecesWithCount (splitCount, eachResultHook){
     const { column, row } = splitCountParser(splitCount);
-    const pieceWidth = this.width / column;
-    const pieceHeight = this.height / row;
+    const width = this.width;
+    const height = this.height;
+    const pieceWidth = width / column;
+    const pieceHeight = height / row;
     eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
     
     const pacResult = makeMatrixArray(column, row, (index, colIndex, rowIndex)=>{
-      const result = new Rect(colIndex*pieceWidth, rowIndex*pieceHeight, pieceWidth, pieceHeight);
+      const pacMeta = { col:colIndex, row:rowIndex, root:{ width, height } };
+      const result = new Rect(colIndex*pieceWidth, rowIndex*pieceHeight, pieceWidth, pieceHeight, pacMeta);
       return eachResultHook ? eachResultHook(result,index,colIndex,rowIndex) : result;
     });
     

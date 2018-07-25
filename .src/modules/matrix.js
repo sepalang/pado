@@ -37,6 +37,9 @@ export const MatrixArray = (function(){
       
       return result;
     },
+    toArray (){
+      return Array.from(this);
+    },
     eachColumn (eachFn){
       const rows = this.toMatrix();
       const columns = times(this.column, colIndex=>{

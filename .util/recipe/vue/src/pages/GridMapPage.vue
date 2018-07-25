@@ -51,12 +51,12 @@
                 </Layer>
                 <Layer opacity=".5">
                   <PadoRect 
-                    v-for="rect in piecesRects"
-                    :key="rect.key"
-                    :left="rect.left"
-                    :top="rect.top"
-                    :width="rect.width"
-                    :height="rect.height"
+                    v-for="item in piecesRects"
+                    :key="[item.meta.col, item.meta.row]+''"
+                    :left="item.rect.left"
+                    :top="item.rect.top"
+                    :width="item.rect.width"
+                    :height="item.rect.height"
                     style="border:1px solid silver"
                   >
                   </PadoRect>
@@ -82,11 +82,41 @@
               </Layer>
             </td>
           </tr>
+          <tr>
+            <td>
+              <Layer root @click="selectRect(';ayer')">
+                <PadoRect 
+                  v-for="item in piecesRects"
+                  :key="[item.meta.col, item.meta.row]+''"
+                  :left="item.rect.left"
+                  :top="item.rect.top"
+                  :width="item.rect.width"
+                  :height="item.rect.height"
+                  style="border:1px solid silver"
+                  @click.native="selectRect(item)"
+                >
+                </PadoRect>
+              </Layer>
+            </td>
+            <td>
+              <Layer root @click="selectRect(';ayer')">
+                <PadoRect 
+                  v-for="item in selectedRects"
+                  :key="[item.meta.col, item.meta.row]+''"
+                  :left="item.rect.left"
+                  :top="item.rect.top"
+                  :width="item.rect.width"
+                  :height="item.rect.height"
+                  style="border:1px solid silver"
+                  @click.native="selectRect(item)"
+                >
+                </PadoRect>
+              </Layer>
+            </td>
+          </tr>
         </tbody>
       </table>
-      <div>
-        {{piecesPoints}}
-      </div>
+      
     </div>
   </AppLayout>
 </template>
@@ -112,20 +142,24 @@ export default {
     rowCount    : 1,
     addEachCol  : 0,
     piecesRects : [],
-    piecesPoints: []
+    piecesPoints: [],
   }),
+  computed: {
+    selectedRects (){
+      return this.piecesRects.filter(rect=>rect.selected);
+    }
+  },
   methods: {
     drawRect (){
       const rootRect = rect(0, 0, this.rectSize, this.rectSize);
       
-      this.piecesRects = rootRect.piecesWithCount([this.colCount, this.rowCount], (rect, i, c, r)=>{
+      this.piecesRects = rootRect.piecesWithCount([this.colCount, this.rowCount],rect=>{
         return {
-          key: [c, r] + "",
-          ...rect.toJSON()
-        };
+          selected:false,
+          rect,
+          meta:rect.meta
+        }
       });
-      
-      console.log("a>this.piecesRects", this.colCount, this.rowCount, this.piecesRects);
       
       const pointArr = rootRect.piecesWithCount([this.colCount, this.rowCount], (rect, i, c, r)=>{
         return {
@@ -134,12 +168,12 @@ export default {
         };
       });
       
-      pointArr.eachColumn(col=>{
-        console.log("col", col);
-      });
       
       this.piecesPoints = pointArr;
-    }
+    },
+    selectRect (rect){
+      rect.selected = !rect.selected
+    },
   },
   mounted (){
     this.drawRect();
