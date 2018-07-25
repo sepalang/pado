@@ -11,6 +11,7 @@ import ModalPage from '@/pages/ModalPage.vue';
 import NavigateMapPage from '@/pages/NavigateMapPage.vue';
 import RotateMapPage from '@/pages/RotateMapPage.vue';
 import SliderPage from '@/pages/SliderPage.vue';
+import ScreenPage from '@/pages/ScreenPage.vue';
 
 Vue.use(Router);
 
@@ -31,6 +32,10 @@ export default new Router({
     {
       path     : '/slider',
       component: SliderPage
+    },
+    {
+      path     : '/screen',
+      component: ScreenPage
     },
     {
       path     : '/rotate-map',

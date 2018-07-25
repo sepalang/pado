@@ -135,9 +135,8 @@ export default {
         console.log("col", col);
       });
       
-      console.log("pointArr",pointArr, Array.isArray(pointArr), pointArr.toString())
+      console.log("pointArr", pointArr, Array.isArray(pointArr), pointArr.toString());
       this.piecesPoints = Array.from(pointArr);
-      
     }
   },
   mounted (){

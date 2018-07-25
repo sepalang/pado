@@ -76,6 +76,7 @@
           "classes": "always"
         }
       ],
+      "spaced-comment": 0,
       "arrow-spacing": [
         "error",
         {

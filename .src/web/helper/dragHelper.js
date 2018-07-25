@@ -150,6 +150,10 @@ export default function DragHelper(element,option){
     bindDraggingAttribute();
   };
   
+  dragElement.addEventListener("dragstart",function(e){
+    e.preventDefault();
+  })
+  
   dragElement.addEventListener(DEVICE_EVENT.START,dragEnter);
   
   return $element;
