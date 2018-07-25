@@ -14,15 +14,15 @@ export const MatrixArray = (function(){
       row:{
         enumerable:false,
         value:row
+      },
+      length:{
+        enumerable:false
       }
     });
     
   };
 
   MatrixArray.prototype = Object.assign([],{
-    toString (){
-      return "[object Array]";
-    },
     toMatrix (eachResultHook){
       const result = [];
       eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;

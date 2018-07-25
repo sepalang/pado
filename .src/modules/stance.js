@@ -356,7 +356,7 @@ Rect.prototype = {
       );
     }
   },
-  piecesAsCount (splitCount, eachResultHook){
+  piecesWithCount (splitCount, eachResultHook){
     const { column, row } = splitCountParser(splitCount);
     const pieceWidth = this.width / column;
     const pieceHeight = this.height / row;

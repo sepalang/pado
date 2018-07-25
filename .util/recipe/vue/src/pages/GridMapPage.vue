@@ -77,13 +77,16 @@
                     :x="point.x"
                     :y="point.y"
                   ></PadoPoint>
-                  {{piecesPoints}}
+                  
                 </Layer>
               </Layer>
             </td>
           </tr>
         </tbody>
       </table>
+      <div>
+        {{piecesPoints}}
+      </div>
     </div>
   </AppLayout>
 </template>
@@ -115,7 +118,7 @@ export default {
     drawRect (){
       const rootRect = rect(0, 0, this.rectSize, this.rectSize);
       
-      this.piecesRects = rootRect.piecesAsCount([this.colCount, this.rowCount], (rect, i, c, r)=>{
+      this.piecesRects = rootRect.piecesWithCount([this.colCount, this.rowCount], (rect, i, c, r)=>{
         return {
           key: [c, r] + "",
           ...rect.toJSON()
@@ -124,7 +127,7 @@ export default {
       
       console.log("a>this.piecesRects", this.colCount, this.rowCount, this.piecesRects);
       
-      const pointArr = rootRect.piecesAsCount([this.colCount, this.rowCount], (rect, i, c, r)=>{
+      const pointArr = rootRect.piecesWithCount([this.colCount, this.rowCount], (rect, i, c, r)=>{
         return {
           key: [c, r] + "",
           ...rect.findPoint("middle center").toJSON()
@@ -135,8 +138,7 @@ export default {
         console.log("col", col);
       });
       
-      console.log("pointArr", pointArr, Array.isArray(pointArr), pointArr.toString());
-      this.piecesPoints = Array.from(pointArr);
+      this.piecesPoints = pointArr;
     }
   },
   mounted (){
