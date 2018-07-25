@@ -8,7 +8,7 @@ import PanelPage from '@/pages/PanelPage.vue';
 import TabPage from '@/pages/TabPage.vue';
 import TreePage from '@/pages/TreePage.vue';
 import ModalPage from '@/pages/ModalPage.vue';
-import NavigateMapPage from '@/pages/NavigateMapPage.vue';
+import GridMapPage from '@/pages/GridMapPage.vue';
 import RotateMapPage from '@/pages/RotateMapPage.vue';
 import SliderPage from '@/pages/SliderPage.vue';
 import ScreenPage from '@/pages/ScreenPage.vue';
@@ -42,8 +42,8 @@ export default new Router({
       component: RotateMapPage
     },
     {
-      path     : '/navigate-map',
-      component: NavigateMapPage
+      path     : '/grid-map',
+      component: GridMapPage
     },
     {
       path     : '/grid',

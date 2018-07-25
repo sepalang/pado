@@ -10,7 +10,7 @@
         <li><router-link to="/modal">Modal</router-link></li>
         <li><router-link to="/slider">Slider</router-link></li>
         <li><router-link to="/screen">Screen</router-link></li>
-        <li><router-link to="/navigate-map">NavigateMap</router-link></li>
+        <li><router-link to="/grid-map">GridMap</router-link></li>
         <li><router-link to="/rotate-map">RotateMap</router-link></li>
         <li><router-link to="/grid">Grid</router-link></li>
         <li><router-link to="/transform">Transform</router-link></li>

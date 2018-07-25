@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <div>NavigateMapPage</div>
+    <div>GridMapPage</div>
     <div>
       <table class="form-table" style="width:400px;">
         <colgroup>
