@@ -5,25 +5,26 @@
       <tbody>
         <tr>
           <td>
-            <PadoScreen padding="20" width="150" height="100" :viewport="screenViewport">
-              <img src="@/assets/sepalang.png">
+            <PadoScreen padding="20" width="100" height="100" :viewport="screenViewport">
+              <div style="width:167px;height:167px;">
+                <img src="@/assets/sepalang.png">
+              </div>
+              
             </PadoScreen>
           </td>
           <td>
-            <PadoMinimap padding="20" width="100" height="70" :viewport="screenViewport">
+            <PadoMinimap width="100" height="70" :viewport="screenViewport">
               <img src="@/assets/sepalang.png" style="width:167px;height:167px;">
             </PadoMinimap>
           </td>
         </tr>
         <tr>
           <td colspan="2">
-            {{ screenViewport }}
+            Viewport : {{ screenViewport }}
           </td>
         </tr>
       </tbody>
     </table>
-    
-    
   </AppLayout>
 </template>
 <script>

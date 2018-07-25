@@ -1,7 +1,7 @@
 <template>
   <div class="v-pado-minimap" :style="rectStyle">
-    <div class="v-pado-minimap-view" :style="viewStyle">
-      <slot></slot>
+    <div class="v-pado-minimap-viewport" :style="viewportStyle">
+      <div class="v-pado-minimap-view" :style="viewStyle"><slot></slot></div>
       <div class="v-pado-minimap-port" :style="portStyle"></div>
     </div>
   </div>
@@ -21,39 +21,52 @@ export default {
     event: 'input'
   },
   props: {
-    padding: {
-      default: 0
-    },
-    scrollStyle: {
-      default: "drag"
-    },
     viewport: {
-      type: Object
+      require: true,
+      type   : Object
     }
   },
   data: ()=>({
-    readyEl      : false,
-    viewportRatio: 1
+    readyEl: false
   }),
   computed: {
     rectStyle (){
       const { width, height } = this.rectValue;
       const [left, top] = [this.left + 'px', this.top + 'px'];
-      
-      const overflow = (()=>{
-        switch (this.scrollStyle){
-          case "drag":
-            return "hidden";
-            break;
-          default:
-            return "auto";
-            break;
-        }
-      })();
-      
-      return { width: width + 'px', height: height + 'px', overflow, left, top};
+      return { width: width + 'px', height: height + 'px', left, top};
     },
-    viewStyle (){
+    viewportBoundings (){
+      const padding = (this.viewport.contentPadding || 0);
+      const contentWidth = (this.viewport.contentWidth || 0);
+      const contentHeight = (this.viewport.contentHeight || 0);
+      return {
+        padding,
+        contentWidth,
+        contentHeight
+      };
+    },
+    viewportRatio (){
+      const { width:masterWidth, height:masterHeight } = this.rectValue;
+      const { padding, contentWidth, contentHeight } = this.viewportBoundings;
+      return top([masterWidth / (contentWidth + (padding * 2)), masterHeight / (contentHeight + (padding * 2))], false);
+    },
+    viewportVariant (){
+      if(typeof this.viewport !== "object"){
+        return {
+          contentPadding: 0,
+          width         : 10,
+          height        : 10
+        };
+      }
+      
+      return {
+        top   : this.viewport.top,
+        left  : this.viewport.left,
+        width : this.viewport.width,
+        height: this.viewport.height
+      };
+    },
+    viewportStyle (){
       const viewportRatio = this.viewportRatio;
       const readyEl = this.readyEl;
       
@@ -62,31 +75,28 @@ export default {
       }
       
       const style = {
-        transform: `translate(-50%, -50%) scale(${viewportRatio})`,
+        transform: `translate(-50%, -50.1%) scale(${viewportRatio})`,
         left     : `50%`,
         top      : `50%`
       };
       
       return style;
     },
-    portVariant (){
-      const port = this.viewport && this.viewport.port;
-      if(!port){
-        return {
-          width : 10,
-          height: 10
-        };
-      }
-      
+    viewStyle (){
+      const { padding } = this.viewportBoundings;
       return {
-        width : port.width,
-        height: port.height
+        'left'          : `${padding}px`,
+        'top'           : `${padding}px`,
+        'padding-right' : `${padding}px`,
+        'padding-bottom': `${padding}px`
       };
     },
     portStyle (){
-      const { width:portWidth, height:portHeight } = this.portVariant;
+      const { left:portLeft, top:portTop, width:portWidth, height:portHeight } = this.viewportVariant;
       
       const style = {
+        left  : `${portLeft}px`,
+        top   : `${portTop}px`,
         width : `${portWidth}px`,
         height: `${portHeight}px`
       };
@@ -94,19 +104,9 @@ export default {
       return style;
     }
   },
-  watch: {
-    readyEl (newValue){
-      if(newValue === true){
-        const viewElement = this.$el.querySelector(".v-pado-minimap-view");
-        const { offsetWidth:masterWidth, offsetHeight:masterHeight } = this.$el;
-        const { scrollWidth:viewWidth, scrollHeight:viewHeight } = viewElement;
-        this.viewportRatio = top([masterWidth / viewWidth, masterHeight / viewHeight], false);
-      }
-    }
-  },
   mounted (){
     nextTick(()=>{
-      const viewElement = this.$el.querySelector(".v-pado-minimap-view");
+      const viewElement = this.$el.querySelector(".v-pado-minimap-viewport");
       const portElement = this.$el.querySelector(".v-pado-minimap-port");
     
       dragHelper(portElement, ({ element:dragElement })=>{
@@ -123,8 +123,8 @@ export default {
             startPosition.top = element.offsetTop;
           },
           move: ({ pointer })=>{
-            const boostX = pointer.offsetX;
-            const boostY = pointer.offsetY;
+            const boostX = pointer.offsetX * (1 / this.viewportRatio);
+            const boostY = pointer.offsetY * (1 / this.viewportRatio);
             
             let { destLeft:left, destTop:top } = {
               destLeft: limitNumber(
@@ -138,11 +138,15 @@ export default {
                 0
               )
             };
-            dragElement.css({ left, top });
+            
+            if(typeof this.viewport !== "object"){
+              this.$set(this, "viewport", {});
+            }
+            this.$set(this.viewport, "left", parseInt(left, 10));
+            this.$set(this.viewport, "top", parseInt(top, 10));
           }
         };
       });
-      
       this.readyEl = true;
     });
   }
@@ -153,13 +157,17 @@ export default {
     display:inline-block;
     background-color:#eee;
     position:relative;
-    overflow:auto;
+    overflow:hidden;
 
-    > .v-pado-minimap-view {
+    > .v-pado-minimap-viewport {
       position:absolute;
       
       * {
         pointer-events:none;
+      }
+      
+      > .v-pado-minimap-view {
+        position:relative;
       }
       
       > .v-pado-minimap-port {
