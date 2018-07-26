@@ -70,7 +70,19 @@ const Point = function(x=0,y=0,z=0,w=1,meta){
     meta:{
       enumerable:false, 
       get(){ return __meta },
-      set(it){ this.__meta = typeof it === "object" ? it : null; return this.__meta; }
+      set(it){ __meta = typeof it === "object" ? it : null; return __meta; }
+    },
+    rx:{ enumerable:false, get:()=>{
+      console.log("rx",this.meta && this.meta.range && this.meta.range.width, this.x)
+        const rangeWidth = (this.meta && this.meta.range && this.meta.range.width) || 0;
+        return this.x / rangeWidth;
+      }
+    },
+    ry:{ 
+      enumerable:false, get:()=>{
+        const rangeHeight = (this.meta && this.meta.range && this.meta.range.height) || 0;
+        return this.y / rangeHeight;
+      }
     },
     addMatrix: {
       enumerable:false,
@@ -82,7 +94,6 @@ const Point = function(x=0,y=0,z=0,w=1,meta){
       }
     }
   });
-  
   this.meta = meta;
 };
 
@@ -92,7 +103,13 @@ Point.prototype = {
     return this;
   },
   clone (){
-    return new Point(this.x,this.y,this.z,this.w);
+    return new Point(this.x,this.y,this.z,this.w,this.meta);
+  },
+  call (fn){
+    if(typeof fn === "function"){
+      return fn(this) || this;
+    }
+    return this;
   },
   toJSON (withMeta){
     const json = { x:this.x, y:this.y, z:this.z, w:this.w };
@@ -127,7 +144,7 @@ const Vertex = function(pointArray,meta){
     meta:{
       enumerable:false, 
       get(){ return __meta },
-      set(it){ this.__meta = typeof it === "object" ? it : null; return this.__meta; }
+      set(it){ __meta = typeof it === "object" ? it : null; return __meta; }
     }
   });
   
@@ -194,11 +211,18 @@ const Vertex = function(pointArray,meta){
     return this;
   },
   point (order){
+    console.log(" point this.meta",this.meta)
     switch(order){
     case "e": case "end":
     case "d": case "down": case "r": case "right":
       const { x:px,y:py,z:pz,w:pw } = this.end;
-      return new Point(px,py,pz,pw);
+      return new Point(
+        px,
+        py,
+        pz,
+        pw,
+        this.meta
+      );
     case "c": case "m": case "center": case "middle":
       const { x:sx, y:sy, z:sz, w:sw } = this.start;
       const { x:ex, y:ey, z:ez, w:ew } = this.end;
@@ -206,13 +230,20 @@ const Vertex = function(pointArray,meta){
         sx/2 + ex/2,
         sy/2 + ey/2,
         sz/2 + ez/2,
-        sw/2 + ew/2
+        sw/2 + ew/2,
+        this.meta
       );
     case "s": case "start":
     case "u": case "up": case "l": case "left":
     default:
       const { x,y,z,w } = this.start;
-      return new Point(x,y,z,w,this.meta);
+      return new Point(
+        x,
+        y,
+        z,
+        w,
+        this.meta
+      );
     }
   },
   transform (transform,rect){
@@ -368,7 +399,12 @@ Rect.prototype = {
     eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
     
     const pacResult = makeMatrixArray(column, row, (index, colIndex, rowIndex)=>{
-      const pacMeta = { col:colIndex, row:rowIndex, root:{ width, height } };
+      const pacMeta = { 
+        column: colIndex,
+        row   : rowIndex,
+        coords: [colIndex, rowIndex], 
+        range : { width, height }
+      };
       const result = new Rect(colIndex*pieceWidth, rowIndex*pieceHeight, pieceWidth, pieceHeight, pacMeta);
       return eachResultHook ? eachResultHook(result,index,colIndex,rowIndex) : result;
     });

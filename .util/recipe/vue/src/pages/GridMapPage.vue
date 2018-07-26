@@ -44,20 +44,16 @@
           <tr>
             <td>
               <Layer root :size="rectSize">
-                <Layer>
-                  <PadoRect :size="rectSize">
-                    <template slot-scope="scope">Root Size<br>{{scope.rect.width}}</template>
-                  </PadoRect>
-                </Layer>
-                <Layer opacity=".5">
+                <Layer root @click="selectRect(';ayer')">
                   <PadoRect 
                     v-for="item in piecesRects"
-                    :key="[item.meta.col, item.meta.row]+''"
+                    :key="item.meta.coords+''"
                     :left="item.rect.left"
                     :top="item.rect.top"
                     :width="item.rect.width"
                     :height="item.rect.height"
                     style="border:1px solid silver"
+                    @click.native="selectRect(item)"
                   >
                   </PadoRect>
                 </Layer>
@@ -77,17 +73,16 @@
                     :x="point.x"
                     :y="point.y"
                   ></PadoPoint>
-                  
                 </Layer>
               </Layer>
             </td>
           </tr>
           <tr>
             <td>
-              <Layer root @click="selectRect(';ayer')">
+              <Layer root :size="rectSize">
                 <PadoRect 
-                  v-for="item in piecesRects"
-                  :key="[item.meta.col, item.meta.row]+''"
+                  v-for="item in selectedRects"
+                  :key="item.meta.coords+''"
                   :left="item.rect.left"
                   :top="item.rect.top"
                   :width="item.rect.width"
@@ -99,24 +94,66 @@
               </Layer>
             </td>
             <td>
-              <Layer root @click="selectRect(';ayer')">
-                <PadoRect 
-                  v-for="item in selectedRects"
-                  :key="[item.meta.col, item.meta.row]+''"
-                  :left="item.rect.left"
-                  :top="item.rect.top"
-                  :width="item.rect.width"
-                  :height="item.rect.height"
-                  style="border:1px solid silver"
-                  @click.native="selectRect(item)"
+              <Layer root :size="rectSize">
+                <PadoPoint
+                  v-for="item in selectedPoints"
+                  :key="item.meta.coords+''"
+                  :x="item.point.x"
+                  :y="item.point.y"
                 >
-                </PadoRect>
+                </PadoPoint>
+              </Layer>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <Layer root :size="rectSize">
+                <PadoPoint
+                  v-for="item in selectedPoints"
+                  :key="item.meta.coords+''"
+                  :x="item.point.x"
+                  :y="item.point.y"
+                  placement="top"
+                >
+                  <div style="width:50px;height:20px;border:1px solid blue;">{{item.meta.coords}}</div>
+                </PadoPoint>
+              </Layer>
+            </td>
+            <td>
+              <Layer root :size="rectSize">
+                <PadoPoint
+                  v-for="item in selectedPoints"
+                  :key="item.meta.coords+''"
+                  :x="item.point.x"
+                  :y="item.point.y"
+                  placement="top"
+                  pointer="true"
+                >
+                  <div style="width:50px;height:20px;border:1px solid blue;">{{item.meta.coords}}</div>
+                </PadoPoint>
+              </Layer>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <Layer root :size="rectSize*2">
+                <PadoPoint
+                  v-for="item in relativePoints"
+                  :key="item.meta.coords+''"
+                  :rx="item.point.rx"
+                  :ry="item.point.ry"
+                  placement="top"
+                  pointer="true"
+                >
+                  <div style="width:50px;height:20px;border:1px solid blue;">
+                    asdf
+                  </div>
+                </PadoPoint>
               </Layer>
             </td>
           </tr>
         </tbody>
       </table>
-      
     </div>
   </AppLayout>
 </template>
@@ -138,27 +175,43 @@ export default {
   },
   data: ()=>({
     rectSize    : 150,
-    colCount    : 1,
-    rowCount    : 1,
+    colCount    : 3,
+    rowCount    : 3,
     addEachCol  : 0,
     piecesRects : [],
-    piecesPoints: [],
+    piecesPoints: []
   }),
   computed: {
     selectedRects (){
-      return this.piecesRects.filter(rect=>rect.selected);
+      return this.piecesRects.filter(item=>item.selected);
+    },
+    selectedPoints (){
+      return this.selectedRects.map(item=>{
+        const { rect } = item;
+        item.point = rect.findPoint("middle center");
+        return item;
+      });
+    },
+    relativePoints (){
+      return this.selectedPoints.map(item=>{
+        item.point = item.point.clone().call(point=>{
+          point.y += point.meta.column * 10;
+          return point;
+        });
+        return item;
+      });
     }
   },
   methods: {
     drawRect (){
       const rootRect = rect(0, 0, this.rectSize, this.rectSize);
       
-      this.piecesRects = rootRect.piecesWithCount([this.colCount, this.rowCount],rect=>{
+      this.piecesRects = rootRect.piecesWithCount([this.colCount, this.rowCount], rect=>{
         return {
-          selected:false,
+          selected: false,
           rect,
-          meta:rect.meta
-        }
+          meta    : rect.meta
+        };
       });
       
       const pointArr = rootRect.piecesWithCount([this.colCount, this.rowCount], (rect, i, c, r)=>{
@@ -172,8 +225,8 @@ export default {
       this.piecesPoints = pointArr;
     },
     selectRect (rect){
-      rect.selected = !rect.selected
-    },
+      rect.selected = !rect.selected;
+    }
   },
   mounted (){
     this.drawRect();

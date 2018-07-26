@@ -95,6 +95,15 @@ export default {
       background-color:transparent;
       border:1px dashed gray;
     }
+    
+    &[theme="selectable"]{
+      &:hover {
+        
+      };
+      &[selected] {
+        
+      };
+    }
 
   }
 </style>

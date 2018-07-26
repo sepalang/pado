@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-import { getElementTransform, dragHelper } from '../../../../../.src/web';
+import { dragHelper } from '../../../../../.src/web';
 import { limitNumber } from '../../../../../.src/functions';
 import { nextTick, nextQueue } from '@/service';
 import HighOrderRect from './mixins/HighOrderRect';
@@ -81,7 +81,7 @@ export default {
       return typeof this.viewport === "object" && this.viewport !== null;
     }
   },
-  watch :{
+  watch: {
     "viewport.left" (newValue){
       typeof newValue === "number" && (this.scrollLeft = newValue);
     },
@@ -127,7 +127,6 @@ export default {
         //const first
         return {
           start: ({ pointer, event })=>{
-            //const { translate:{ x:left, y:top } } = getElementTransform(element);
             initialScrollVariant.left = this.scrollLeft;
             initialScrollVariant.top = this.scrollTop;
             //
