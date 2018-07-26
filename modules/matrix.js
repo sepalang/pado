@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.object.assign", "core-js/modules/web.dom.iterable", "../functions/cast", "../functions/enumerable", "../functions/nice"], factory);
+    define(["exports", "core-js/modules/es6.array.from", "core-js/modules/es6.object.assign", "core-js/modules/web.dom.iterable", "../functions/cast", "../functions/enumerable", "../functions/nice"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.object.assign"), require("core-js/modules/web.dom.iterable"), require("../functions/cast"), require("../functions/enumerable"), require("../functions/nice"));
+    factory(exports, require("core-js/modules/es6.array.from"), require("core-js/modules/es6.object.assign"), require("core-js/modules/web.dom.iterable"), require("../functions/cast"), require("../functions/enumerable"), require("../functions/nice"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Object, global.webDom, global.cast, global.enumerable, global.nice);
+    factory(mod.exports, global.es6Array, global.es6Object, global.webDom, global.cast, global.enumerable, global.nice);
     global.matrix = mod.exports;
   }
-})(this, function (_exports, _es6Object, _webDom, _cast, _enumerable, _nice) {
+})(this, function (_exports, _es6Array, _es6Object, _webDom, _cast, _enumerable, _nice) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -33,14 +33,14 @@
         row: {
           enumerable: false,
           value: row
+        },
+        length: {
+          enumerable: false
         }
       });
     };
 
     MatrixArray.prototype = Object.assign([], {
-      toString: function toString() {
-        return "[object Array]";
-      },
       toMatrix: function toMatrix(eachResultHook) {
         var _this2 = this;
 
@@ -57,6 +57,9 @@
           result[rowIndex].push(dataResult);
         });
         return result;
+      },
+      toArray: function toArray() {
+        return Array.from(this);
       },
       eachColumn: function eachColumn(eachFn) {
         var rows = this.toMatrix();

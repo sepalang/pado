@@ -23,6 +23,8 @@
   };
 
   var Point = function Point(x, y, z, w, meta) {
+    var _this = this;
+
     if (x === void 0) {
       x = 0;
     }
@@ -137,8 +139,23 @@
           return __meta;
         },
         set: function set(it) {
-          this.__meta = typeof it === "object" ? it : null;
-          return this.__meta;
+          __meta = typeof it === "object" ? it : null;
+          return __meta;
+        }
+      },
+      rx: {
+        enumerable: false,
+        get: function get() {
+          console.log("rx", _this.meta && _this.meta.range && _this.meta.range.width, _this.x);
+          var rangeWidth = _this.meta && _this.meta.range && _this.meta.range.width || 0;
+          return _this.x / rangeWidth;
+        }
+      },
+      ry: {
+        enumerable: false,
+        get: function get() {
+          var rangeHeight = _this.meta && _this.meta.range && _this.meta.range.height || 0;
+          return _this.y / rangeHeight;
         }
       },
       addMatrix: {
@@ -162,7 +179,14 @@
       return this;
     },
     clone: function clone() {
-      return new Point(this.x, this.y, this.z, this.w);
+      return new Point(this.x, this.y, this.z, this.w, this.meta);
+    },
+    call: function call(fn) {
+      if (typeof fn === "function") {
+        return fn(this) || this;
+      }
+
+      return this;
     },
     toJSON: function toJSON(withMeta) {
       var json = {
@@ -229,7 +253,7 @@
   };
 
   var Vertex = function Vertex(pointArray, meta) {
-    var _this = this;
+    var _this2 = this;
 
     var __meta;
 
@@ -240,8 +264,8 @@
           return __meta;
         },
         set: function set(it) {
-          this.__meta = typeof it === "object" ? it : null;
-          return this.__meta;
+          __meta = typeof it === "object" ? it : null;
+          return __meta;
         }
       }
     });
@@ -253,7 +277,7 @@
           z = point.z,
           w = point.w;
 
-      _this.push(new Point(x, y, z, w, __meta));
+      _this2.push(new Point(x, y, z, w, __meta));
     });
   };
 
@@ -296,13 +320,13 @@
       return this[index];
     },
     join: function join(fn) {
-      var _this2 = this;
+      var _this3 = this;
 
       var joins = [];
       this.forEach(function (refp, i) {
         joins.push(refp);
-        if (!_this2[i + 1]) return;
-        var newp = fn(refp, _this2[i + 1], i);
+        if (!_this3[i + 1]) return;
+        var newp = fn(refp, _this3[i + 1], i);
         if (!likePoint(newp)) return;
         var x = newp.x,
             y = newp.y,
@@ -313,11 +337,13 @@
       });
       this.splice(0, this.length);
       joins.forEach(function (p) {
-        return _this2.push(p);
+        return _this3.push(p);
       });
       return this;
     },
     point: function point(order) {
+      console.log(" point this.meta", this.meta);
+
       switch (order) {
         case "e":
         case "end":
@@ -330,7 +356,7 @@
               py = _this$end.y,
               pz = _this$end.z,
               pw = _this$end.w;
-          return new Point(px, py, pz, pw);
+          return new Point(px, py, pz, pw, this.meta);
 
         case "c":
         case "m":
@@ -346,7 +372,7 @@
               ey = _this$end2.y,
               ez = _this$end2.z,
               ew = _this$end2.w;
-          return new Point(sx / 2 + ex / 2, sy / 2 + ey / 2, sz / 2 + ez / 2, sw / 2 + ew / 2);
+          return new Point(sx / 2 + ex / 2, sy / 2 + ey / 2, sz / 2 + ez / 2, sw / 2 + ew / 2, this.meta);
 
         case "s":
         case "start":
@@ -485,8 +511,8 @@
           return __meta;
         },
         set: function set(it) {
-          this.__meta = typeof it === "object" ? it : null;
-          return this.__meta;
+          __meta = typeof it === "object" ? it : null;
+          return __meta;
         }
       }
     });
@@ -652,16 +678,27 @@
           }], inheritMeta);
       }
     },
-    piecesAsCount: function piecesAsCount(splitCount, eachResultHook) {
+    piecesWithCount: function piecesWithCount(splitCount, eachResultHook) {
       var _splitCountParser = splitCountParser(splitCount),
           column = _splitCountParser.column,
           row = _splitCountParser.row;
 
-      var pieceWidth = this.width / column;
-      var pieceHeight = this.height / row;
+      var width = this.width;
+      var height = this.height;
+      var pieceWidth = width / column;
+      var pieceHeight = height / row;
       eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
       var pacResult = (0, _matrix2.makeMatrixArray)(column, row, function (index, colIndex, rowIndex) {
-        var result = new Rect(colIndex * pieceWidth, rowIndex * pieceHeight, pieceWidth, pieceHeight);
+        var pacMeta = {
+          column: colIndex,
+          row: rowIndex,
+          coords: [colIndex, rowIndex],
+          range: {
+            width: width,
+            height: height
+          }
+        };
+        var result = new Rect(colIndex * pieceWidth, rowIndex * pieceHeight, pieceWidth, pieceHeight, pacMeta);
         return eachResultHook ? eachResultHook(result, index, colIndex, rowIndex) : result;
       });
       return pacResult;
