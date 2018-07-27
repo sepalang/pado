@@ -12,51 +12,51 @@ import {
 } from './read'
 
 //reduce.spec.js
-export const cut = function(collection,cutLength=1,emptyDefault=undefined){
-  let data = asArray(collection);
-  let fill = emptyDefault;
+export const cut = function (collection, cutLength = 1, emptyDefault = undefined){
+  let data = asArray(collection)
+  let fill = emptyDefault
   
   if(data.length > cutLength){
-    data.splice(cutLength,Number.POSITIVE_INFINITY);
-    return data;
+    data.splice(cutLength, Number.POSITIVE_INFINITY)
+    return data
   }
   
-  let dataLength = data.length;
+  let dataLength = data.length
   
   if(typeof emptyDefault !== "function"){
-    fill = ()=>emptyDefault;
+    fill = ()=>emptyDefault
   }
   
-  for(let i=0,l=cutLength-dataLength;i<l;i++){
-    data.push(fill( dataLength++, i ));
+  for(let i = 0, l = cutLength - dataLength; i < l; i++){
+    data.push(fill(dataLength++, i))
   }
   
-  return data;
+  return data
 }
 
 //reduce.spec.js
-export const top = function(data,iteratee,topLength){
-  switch(typeof iteratee){
-  case "function":
+export const top = function (data, iteratee, topLength){
+  switch (typeof iteratee){
+    case "function":
     //iteratee=iteratee;
-    break;
-  case "string":
-    const path = iteratee;
-    iteratee=(a,b)=>get(a,path)<get(b,path);
-    break;
-  case "boolean":
-    iteratee=iteratee?(a,b)=>a<b:(a,b)=>a>b;
-    break;
-  default:
-    iteratee=(a,b)=>a<b;
-    break;
+      break
+    case "string":
+      const path = iteratee
+      iteratee = (a, b)=>get(a, path) < get(b, path)
+      break
+    case "boolean":
+      iteratee = iteratee ? (a, b)=>a < b : (a, b)=>a > b
+      break
+    default:
+      iteratee = (a, b)=>a < b
+      break
   }
   
   if(typeof topLength === "boolean"){
-    topLength = topLength ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+    topLength = topLength ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY
   }
   
-  return isNumber(topLength) || isInfinity(topLength) ?
-  asArray(data).sort((a,b)=>iteratee(a,b)).splice(0,topLength):
-  asArray(data).sort((a,b)=>iteratee(a,b))[0];
-};
+  return isNumber(topLength) || isInfinity(topLength)
+    ? asArray(data).sort((a, b)=>iteratee(a, b)).splice(0, topLength)
+    : asArray(data).sort((a, b)=>iteratee(a, b))[0]
+}
