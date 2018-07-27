@@ -4,7 +4,6 @@
   </span>
 </template>
 <script>
-import { isPresence } from '../../../../../.src/functions';
 import { dragHelper, getElementBoundingRect } from '../../../../../.src/web';
 import { nextQueue } from '@/service';
 import HighOrderRect from './mixins/HighOrderRect';
@@ -45,7 +44,6 @@ export default {
     const boundingRect = getElementBoundingRect(this.$el);
     if(boundingRect.valid !== false) this.$emit('bounding', getElementBoundingRect(this.$el));
 
-    if(isPresence(this.dragmove)){
       dragHelper(this.$el, ({ element })=>{
         const startOffset = this.pointValue;
         const positionWithOffset = function (x, y){

@@ -10,6 +10,8 @@ import ModalPage from '@/pages/ModalPage.vue';
 import GridMapPage from '@/pages/GridMapPage.vue';
 import SliderPage from '@/pages/SliderPage.vue';
 import ScreenPage from '@/pages/ScreenPage.vue';
+import ControlsPage from '@/pages/ControlsPage.vue';
+
 
 Vue.use(Router);
 
@@ -18,6 +20,10 @@ export default new Router({
     {
       path     : '/main',
       component: MainPage
+    },
+    {
+      path : '/controls',
+      component: ControlsPage
     },
     {
       path     : '/tree',

@@ -1,7 +1,7 @@
 import $ from '../plugins/jquery';
 import { rebase } from '../../functions';
 
-//
+// eslint-disable-next-line no-undef
 const DEVICE_EVENT = (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) ?
 {
   TOUCH_DEVICE:true,

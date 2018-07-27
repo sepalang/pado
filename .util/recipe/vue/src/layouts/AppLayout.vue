@@ -6,6 +6,7 @@
       </header>
       <menu>
         <li><router-link to="/main">Main</router-link></li>
+        <li><router-link to="/controls">Controls</router-link></li>
         <li><router-link to="/tree">Tree</router-link></li>
         <li><router-link to="/modal">Modal</router-link></li>
         <li><router-link to="/slider">Slider</router-link></li>

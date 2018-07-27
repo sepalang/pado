@@ -11,10 +11,6 @@ const isElementEvent = $.isElementEvent = function (e){
   return typeof e.stopPropagation === "function";
 }
 
-const getOriginalEvent = $.getOriginalEvent = function(e){
-  if(!isElementEvent(e)) return undefined;
-};
-
 const getElementPosition = $.getElementPosition = function(el){
   let [ element ] = $(el);
   
@@ -37,7 +33,6 @@ const getPointerPosition = $.getPointerPosition = function(e, root){
   
   root = !root ? document.documentElement : root;
 
-  const evt = getOriginalEvent(e);
   const pos = getElementPosition(root);
   
   if(!pos) return;
@@ -45,11 +40,6 @@ const getPointerPosition = $.getPointerPosition = function(e, root){
   pos.x = (e.touches ? e.targetTouches[0].pageX : e.pageX) - pos.x;
   pos.y = (e.touches ? e.targetTouches[0].pageY : e.pageY) - pos.y;
   
-  if(e.touches){
-    var rect = e.target.getBoundingClientRect();
-    var x = e.targetTouches[0].pageX - rect.left;
-    var y = e.targetTouches[0].pageY - rect.top;
-  }
   return pos;
 }
 
