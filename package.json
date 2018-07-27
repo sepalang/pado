@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/pado",
-  "version": "0.2.1",
+  "version": "0.2.10",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -26,7 +26,9 @@
     "test": "padoc --test .src --verbose",
     "pack:a": "padoc --pack '.util/fnpack/case-a/*.js' .util/fnpack/case-a/packed -m es",
     "pack:b": "padoc --pack '.util/fnpack/case-b/*.js' .util/fnpack/case-b/packed -m es",
-    "repl": "padoc --exec .util/repl/index.js -i -g"
+    "repl": "padoc --exec .util/repl/index.js -i -g",
+    "lint": "lintpad .src -m lib --no-ignore",
+    "lint:fix": "npm run lint -- --fix"
   },
   "author": "AHN HO JUNG",
   "license": "MIT",
@@ -35,6 +37,7 @@
     "functions"
   ],
   "devDependencies": {
+    "@sepalang/lintpad": "0.0.5",
     "@sepalang/padoc": "^0.8.16",
     "jquery": "^3.3.1",
     "jsdom": "^11.11.0",
