@@ -4,7 +4,7 @@ import { top } from './reduce'
 import { turn, limitNumber } from './nice'
 import { times } from './enumerable'
 
-export const rangeModel = function (value, step, sizeBase){
+const rangeModel = function (value, step, sizeBase){
   let start, end, reverse
   
   if(typeof value === "number"){
@@ -23,11 +23,13 @@ export const rangeModel = function (value, step, sizeBase){
     }
   }
   
+  /*
   if(typeof start !== "number" || typeof end !== "number"){
     if(typeof start !== "number" && typeof end !== "number") return r
     if(typeof start === "number") return r.push(start), r
     if(typeof end === "number") return r.push(end), r
   }
+  */
   
   if(start > end){
     reverse = end

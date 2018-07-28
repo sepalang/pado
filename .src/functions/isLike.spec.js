@@ -9,22 +9,8 @@ import {
   likeEqual,
   isPresence
 } from './isLike'
+
 describe('Functions isLike', ()=>{
-  it('select', ()=>{
-    return "TODO : get", undefined
-    
-    var object = { 'a': [{ 'b': { 'c': 3 } }] }
-    
-    _.get(object, 'a[0].b.c')
-    // => 3
-    
-    _.get(object, ['a', '0', 'b', 'c'])
-    // => 3
-    
-    _.get(object, 'a.b.c', 'default')
-    // => 'default'
-  })
-  
   // isEmpty
   it('isEmpty', ()=>{
     expect(isEmpty(null)).toEqual(true)

@@ -8,9 +8,7 @@ export const argumentNamesBy = function getArgs (fn){
 }
 
 export const scopelizeBy = function (evalCommand){
-  if(evalCommand.indexOf("return") > -1){
-    evalCommand
-  } else {
+  if(evalCommand.indexOf("return") == -1){
     evalCommand = `  return ${evalCommand}`
   }
 

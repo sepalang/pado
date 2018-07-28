@@ -3,35 +3,19 @@ import {
   isArray,
   isFunction,
   isNode,
-  isEmpty,
-  likeRegexp
+  isEqual
 } from './isLike'
 
 import {
-  toArray,
-  asArray,
-  instance
+  asArray
 } from './cast'
 
 import {
-  get
+  get,
+  hasValue
 } from './read'
 
-export const unique = function (array){
-  var value = []; var result = []; var array = toArray(array)
-  for(var i = 0, l = array.length; i < l; i++){
-    var unique = true
-    for(var i2 = 0, l2 = result.length; i2 < l2; i2++){
-      if(array[i] == result[i2]){
-        unique = false; break
-      }
-    }
-    if(unique == true) result.push(array[i])
-  }
-  return result
-}
-
-export const unique2 = function (array, findKey){
+export const unique = function (array, findKey){
   const result    = []
   const uniqueSet = new Set()
   if(typeof findKey === "undefined"){ findKey = (v)=>v }
@@ -92,7 +76,9 @@ export const filterOf = function (data, func, exitFn){
     var value = data[key]
     var result = func(value, key)
     if(result == false){
+      /*
       var exit = Array.prototype.splice.call(data, i, 1)
+      */
       i--
       l--
       typeof exitFn === "function" && exitFn(value, ri, exitCnt++)
@@ -205,39 +191,6 @@ const NESTED_HAS_PROC = function (obj, key){
   return true
 }
 
-export const apart = function (text, split, block, blockEnd){
-  if(typeof text !== "string") return [text]
-  
-  let result = text.split(split === true ? /\s+/ : split || /\s+/)
-  
-  if(likeRegexp(block)){
-    if(!likeRegexp(blockEnd)){
-      blockEnd = block
-    }
-    
-    let aparts = []
-    let buffer = { dept: 0, parts: [] }
-    
-    for(let d = result, i = 0, l = d.length; i < l; i++){
-      let part = d[i]
-      let greb = {
-        start: findIndexes(part, block), 
-        end  : findIndexes(part, blockEnd) 
-      }
-      
-      console.log("part, greb", part, greb)
-      
-      for(let d = greb.start, i = 0, l = d.length; i < l; ++i){
-        let startIndex = d[i]
-      }
-    }
-    
-    return aparts
-  } else {
-    return result
-  }
-}
-
 export const diffStructure = function (before, after){
   var afterKeys = Object.keys(after)
   var beforeKeys
@@ -274,7 +227,7 @@ export const diffStructure = function (before, after){
       analysis.match.push(key)
       analysis.keys[key] = "match"
 
-      if(canDiff && !angular.equals(get(after, key), get(before, key))){
+      if(canDiff && !isEqual(get(after, key), get(before, key))){
         analysis.diff.push(key)
         analysis.keys[key] = "diff"
       }

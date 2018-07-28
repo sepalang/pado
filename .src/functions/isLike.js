@@ -86,8 +86,8 @@ export const isEmpty = function (it){
     }
   }
   if(typeof it === "number"){
-    //NaN check || false
-    return it !== it || false
+    //NaN check 
+    return isAbsoluteNaN(it) || false
   }
   if(typeof it === "function") return false
   if(typeof it === "boolean") return false
