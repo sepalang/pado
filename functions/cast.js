@@ -239,8 +239,9 @@
   _exports.removeValue = removeValue;
 
   var instance = function instance(func, proto) {
-    var ins,
-        DummyInstance = function DummyInstance(param) {
+    var ins;
+
+    var DummyInstance = function DummyInstance(param) {
       if (typeof param === "object") for (var k in param) {
         this[k] = param[k];
       }

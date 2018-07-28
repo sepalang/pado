@@ -67,7 +67,7 @@
   _exports.isArray = isArray;
 
   var isObject = function isObject(it) {
-    return it !== null && typeof it === "object" ? true : false;
+    return !!(it !== null && typeof it === "object");
   };
 
   _exports.isObject = isObject;
@@ -130,7 +130,7 @@
 
   var isEmpty = function isEmpty(it) {
     if (typeof it === "undefined") return true;
-    if (typeof it === "string") return it.trim().length < 1 ? true : false;
+    if (typeof it === "string") return it.trim().length < 1;
 
     if (typeof it === "object") {
       if (it == null) return true;
@@ -161,7 +161,7 @@
   _exports.isEmpty = isEmpty;
 
   var isPresence = function isPresence(it) {
-    return it === undefined || isAbsoluteNaN(it) ? false : true;
+    return !(it === undefined || isAbsoluteNaN(it));
   };
 
   _exports.isPresence = isPresence;
@@ -232,8 +232,8 @@
         break;
 
       case "hash":
-        var vKeys = Object.keys(value),
-            oKeys = Object.keys(other);
+        var vKeys = Object.keys(value);
+        var oKeys = Object.keys(other);
         if (vKeys.length !== oKeys.length || !baseEq(vKeys.sort(), oKeys.sort())) return false;
         return vKeys.every(function (key) {
           var vValue = value[key];

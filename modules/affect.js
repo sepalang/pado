@@ -43,7 +43,7 @@
   };
 
   var affect = function affect(effect, judgeOfEqual) {
-    var affectValue = undefined;
+    var affectValue;
     var manualReactive = new ManualReactive(function () {
       return affectValue;
     }, effect, judgeOfEqual);

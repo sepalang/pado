@@ -121,11 +121,11 @@
   var findIndexes = function () {
     return function (c, s, at) {
       if (typeof c === "string" || typeof c === "number") {
-        var idxs = [],
-            mvc = c + "",
-            s = (0, _isLike.likeRegexp)(s) ? s : s + "",
-            at = !at || !(0, _isLike.isNumber)(at) || at < 0 ? 0 : at,
-            next;
+        var idxs = [];
+        var mvc = c + "";
+        var s = (0, _isLike.likeRegexp)(s) ? s : s + "";
+        var at = !at || !(0, _isLike.isNumber)(at) || at < 0 ? 0 : at;
+        var next;
 
         do {
           var i = findIndex(c, s, at);

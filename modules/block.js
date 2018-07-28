@@ -182,7 +182,7 @@
           size: $size,
           end: $start + $size
         };
-      }.bind(this));
+      });
     },
     map: function map() {
       var domainMap = this.domainMap();

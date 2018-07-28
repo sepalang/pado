@@ -221,7 +221,7 @@
     return Array.isArray(data) || data instanceof Array;
   };
   var isObject = function isObject(it) {
-    return it !== null && typeof it === "object" ? true : false;
+    return !!(it !== null && typeof it === "object");
   };
   var likeString = function likeString(data) {
     if (typeof data === "string") return true;
@@ -297,7 +297,7 @@
     } //find some error ( return true => false)
 
 
-    return Array.from(arr).some(function (v) {
+    return !Array.from(arr).some(function (v) {
       if (likeArray(v)) {
         //length check
         if (v.length !== arr.length) return true; //type check
@@ -308,7 +308,7 @@
       }
 
       return true;
-    }) ? false : true;
+    });
   }; // real matrix model
 
   var asMatrix = function asMatrix(arr, columnSize) {
@@ -809,7 +809,7 @@
         var left = rect.left,
             top = rect.top,
             width = rect.width,
-            height = rect.height;
+            height = rect.height; //rotateOrigin
 
         var originX = left + width / 2;
         var originY = top + height / 2;
@@ -1296,7 +1296,7 @@
         current = parent;
         parent = current.parentNode;
       }
-    } while (!!parent);
+    } while (parent);
 
     return rect(elRect);
   };
@@ -1698,7 +1698,7 @@
     var url;
 
     try {
-      url = inputUrl ? inputUrl : window.document.URL.toString();
+      url = inputUrl || window.document.URL.toString();
       info = /([\w]+)(\:[\/]+)([^/]*\@|)([\w\d\.\-\_\+]+)(\:[\d]+|)(\/|)([\w\d\.\/\-\_\;\=]+|)(\?[\d\w\=\&\%\,\.\/\(\)-]+|)(\#[\d\w]*|)/.exec(url);
     } catch (e) {
       info = null;
@@ -1794,10 +1794,6 @@
     return typeof e.stopPropagation === "function";
   };
 
-  var getOriginalEvent = $.getOriginalEvent = function (e) {
-    if (!isElementEvent(e)) return undefined;
-  };
-
   var getElementPosition = $.getElementPosition = function (el) {
     var _$ = $(el),
         element = _$[0];
@@ -1820,18 +1816,10 @@
 
   var getPointerPosition = $.getPointerPosition = function (e, root) {
     root = !root ? document.documentElement : root;
-    var evt = getOriginalEvent(e);
     var pos = getElementPosition(root);
     if (!pos) return;
     pos.x = (e.touches ? e.targetTouches[0].pageX : e.pageX) - pos.x;
     pos.y = (e.touches ? e.targetTouches[0].pageY : e.pageY) - pos.y;
-
-    if (e.touches) {
-      var rect = e.target.getBoundingClientRect();
-      var x = e.targetTouches[0].pageX - rect.left;
-      var y = e.targetTouches[0].pageY - rect.top;
-    }
-
     return pos;
   };
 
@@ -1841,10 +1829,13 @@
       var _$$eq = $(node).eq(0),
           target = _$$eq[0];
 
-      if (target) for (var i = 0, l = this.length; i < l; i++) {
-        if (this[i] === target) return true;
-        if (this.eq(i).find(target).length) return true;
+      if (target) {
+        for (var i = 0, l = this.length; i < l; i++) {
+          if (this[i] === target) return true;
+          if (this.eq(i).find(target).length) return true;
+        }
       }
+
       return false;
     },
     //파라메터 노드가 제이쿼리가 가진 노드 밖에 있는지 확인
@@ -1887,11 +1878,12 @@
         right: offsetLeft + offsetWidth,
         bottom: offsetTop + offsetHeight,
         center: offsetLeft + offsetWidth / 2,
-        middle: offsetTop + offsetHeight / 2
-      }; //if(isElementEvent(option)){
-      //  const { x:left, y:top } = getPointerPosition(offset);
-      //  option = { left, top };
-      //}
+        middle: offsetTop + offsetHeight / 2 //if(isElementEvent(option)){
+        //  const { x:left, y:top } = getPointerPosition(offset);
+        //  option = { left, top };
+        //}
+
+      };
 
       if (isPlainObject(option)) {
         //console.log("option,",option)
@@ -1985,9 +1977,9 @@
     TOUCH_DEVICE: false,
     START: 'mousedown',
     MOVE: 'mousemove',
-    END: 'mouseup'
-  }; //
+    END: 'mouseup' //
 
+  };
   var dragRetainCount = 0; //
 
   var bindDraggingAttribute = function bindDraggingAttribute() {
@@ -2147,9 +2139,9 @@
 
         var newMeta = {
           key: newDatumKey,
-          datum: datum
-        }; //매치되는 오래된 메타를 확인합니다.
+          datum: datum //매치되는 오래된 메타를 확인합니다.
 
+        };
         var matchOldMeta = oldBag.find(function (old) {
           return old.key === newDatumKey;
         }); //오래된 메타가 확인될 시

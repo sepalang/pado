@@ -34,7 +34,10 @@
       return s.replace('YYYY', r.year).replace(/(MM|M)/, r.month).replace(/(DD|D)/, r.date).replace(/(hh|h)/, r.hour).replace(/(mm|m)/, r.minute).replace(/(ss|s)/, r.second).replace(/(A)/, (0, _cast.toNumber)(r.hour) > 12 ? 'PM' : 'AM');
     };
 
-    if (typeof format === 'string') return r.format(format);
+    if (typeof format === 'string') {
+      return r.format(format);
+    }
+
     return r;
   };
 

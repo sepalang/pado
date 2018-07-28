@@ -21,7 +21,7 @@
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  //
+  // eslint-disable-next-line no-undef
   var DEVICE_EVENT = 'ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch ? {
     TOUCH_DEVICE: true,
     START: 'touchstart',
@@ -31,9 +31,9 @@
     TOUCH_DEVICE: false,
     START: 'mousedown',
     MOVE: 'mousemove',
-    END: 'mouseup'
-  }; //
+    END: 'mouseup' //
 
+  };
   var dragRetainCount = 0; //
 
   var bindDraggingAttribute = function bindDraggingAttribute() {

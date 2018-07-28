@@ -200,7 +200,7 @@
     } //find some error ( return true => false)
 
 
-    return Array.from(arr).some(function (v) {
+    return !Array.from(arr).some(function (v) {
       if ((0, _isLike.likeArray)(v)) {
         //length check
         if (v.length !== arr.length) return true; //type check
@@ -211,7 +211,7 @@
       }
 
       return true;
-    }) ? false : true;
+    });
   }; // real matrix model
 
 

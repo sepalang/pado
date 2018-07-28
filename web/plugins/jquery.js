@@ -29,10 +29,6 @@
     return typeof e.stopPropagation === "function";
   };
 
-  var getOriginalEvent = $.getOriginalEvent = function (e) {
-    if (!isElementEvent(e)) return undefined;
-  };
-
   var getElementPosition = $.getElementPosition = function (el) {
     var _$ = $(el),
         element = _$[0];
@@ -55,18 +51,10 @@
 
   var getPointerPosition = $.getPointerPosition = function (e, root) {
     root = !root ? document.documentElement : root;
-    var evt = getOriginalEvent(e);
     var pos = getElementPosition(root);
     if (!pos) return;
     pos.x = (e.touches ? e.targetTouches[0].pageX : e.pageX) - pos.x;
     pos.y = (e.touches ? e.targetTouches[0].pageY : e.pageY) - pos.y;
-
-    if (e.touches) {
-      var rect = e.target.getBoundingClientRect();
-      var x = e.targetTouches[0].pageX - rect.left;
-      var y = e.targetTouches[0].pageY - rect.top;
-    }
-
     return pos;
   };
 
@@ -76,10 +64,13 @@
       var _$$eq = $(node).eq(0),
           target = _$$eq[0];
 
-      if (target) for (var i = 0, l = this.length; i < l; i++) {
-        if (this[i] === target) return true;
-        if (this.eq(i).find(target).length) return true;
+      if (target) {
+        for (var i = 0, l = this.length; i < l; i++) {
+          if (this[i] === target) return true;
+          if (this.eq(i).find(target).length) return true;
+        }
       }
+
       return false;
     },
     //파라메터 노드가 제이쿼리가 가진 노드 밖에 있는지 확인
@@ -122,11 +113,12 @@
         right: offsetLeft + offsetWidth,
         bottom: offsetTop + offsetHeight,
         center: offsetLeft + offsetWidth / 2,
-        middle: offsetTop + offsetHeight / 2
-      }; //if(isElementEvent(option)){
-      //  const { x:left, y:top } = getPointerPosition(offset);
-      //  option = { left, top };
-      //}
+        middle: offsetTop + offsetHeight / 2 //if(isElementEvent(option)){
+        //  const { x:left, y:top } = getPointerPosition(offset);
+        //  option = { left, top };
+        //}
+
+      };
 
       if ((0, _functions.isPlainObject)(option)) {
         //console.log("option,",option)

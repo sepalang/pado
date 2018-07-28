@@ -40,9 +40,9 @@
 
         var newMeta = {
           key: newDatumKey,
-          datum: datum
-        }; //매치되는 오래된 메타를 확인합니다.
+          datum: datum //매치되는 오래된 메타를 확인합니다.
 
+        };
         var matchOldMeta = oldBag.find(function (old) {
           return old.key === newDatumKey;
         }); //오래된 메타가 확인될 시

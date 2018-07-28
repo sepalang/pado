@@ -23,7 +23,7 @@
     var url;
 
     try {
-      url = inputUrl ? inputUrl : window.document.URL.toString();
+      url = inputUrl || window.document.URL.toString();
       info = /([\w]+)(\:[\/]+)([^/]*\@|)([\w\d\.\-\_\+]+)(\:[\d]+|)(\/|)([\w\d\.\/\-\_\;\=]+|)(\?[\d\w\=\&\%\,\.\/\(\)-]+|)(\#[\d\w]*|)/.exec(url);
     } catch (e) {
       info = null;

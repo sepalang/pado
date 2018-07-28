@@ -153,7 +153,7 @@
         current = parent;
         parent = current.parentNode;
       }
-    } while (!!parent);
+    } while (parent);
 
     return (0, _stance.rect)(elRect);
   };

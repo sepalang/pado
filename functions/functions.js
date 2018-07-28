@@ -19,9 +19,9 @@
   _exports.toggle = _exports.diffStructure = _exports.apart = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.unique2 = _exports.unique = void 0;
 
   var unique = function unique(array) {
-    var value = [],
-        result = [],
-        array = (0, _cast.toArray)(array);
+    var value = [];
+    var result = [];
+    var array = (0, _cast.toArray)(array);
 
     for (var i = 0, l = array.length; i < l; i++) {
       var unique = true;
@@ -340,8 +340,9 @@
       missing: [],
       surplus: [],
       diff: [],
-      pass: false
-    }; //match, missing
+      pass: false //match, missing
+
+    };
 
     for (var ki in beforeKeys) {
       if (!beforeKeys.hasOwnProperty(ki)) continue;

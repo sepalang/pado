@@ -105,7 +105,7 @@
     return Array.isArray(data) || data instanceof Array;
   };
   var isObject = function isObject(it) {
-    return it !== null && typeof it === "object" ? true : false;
+    return !!(it !== null && typeof it === "object");
   };
   var isFunction = function isFunction(it) {
     return typeof it === "function";
@@ -141,7 +141,7 @@
   };
   var isEmpty$1 = function isEmpty(it) {
     if (typeof it === "undefined") return true;
-    if (typeof it === "string") return it.trim().length < 1 ? true : false;
+    if (typeof it === "string") return it.trim().length < 1;
 
     if (typeof it === "object") {
       if (it == null) return true;
@@ -169,7 +169,7 @@
   }; // check JSON, input.value possible value
 
   var isPresence = function isPresence(it) {
-    return it === undefined || isAbsoluteNaN(it) ? false : true;
+    return !(it === undefined || isAbsoluteNaN(it));
   };
   var likeRegexp = function likeRegexp(s) {
     return typeof s === "string" || s instanceof RegExp;
@@ -232,8 +232,8 @@
         break;
 
       case "hash":
-        var vKeys = Object.keys(value),
-            oKeys = Object.keys(other);
+        var vKeys = Object.keys(value);
+        var oKeys = Object.keys(other);
         if (vKeys.length !== oKeys.length || !baseEq(vKeys.sort(), oKeys.sort())) return false;
         return vKeys.every(function (key) {
           var vValue = value[key];
@@ -478,8 +478,9 @@
     return obj;
   };
   var instance = function instance(func, proto) {
-    var ins,
-        DummyInstance = function DummyInstance(param) {
+    var ins;
+
+    var DummyInstance = function DummyInstance(param) {
       if (typeof param === "object") for (var k in param) {
         this[k] = param[k];
       }
@@ -604,10 +605,10 @@
   var findIndexes$1 = function () {
     return function (c, s, at) {
       if (typeof c === "string" || typeof c === "number") {
-        var idxs = [],
-            s = likeRegexp(s) ? s : s + "",
-            at = !at || !isNumber(at) || at < 0 ? 0 : at,
-            next;
+        var idxs = [];
+        var s = likeRegexp(s) ? s : s + "";
+        var at = !at || !isNumber(at) || at < 0 ? 0 : at;
+        var next;
 
         do {
           var i = findIndex(c, s, at);
@@ -1020,8 +1021,8 @@
   }();
 
   var unique = function unique(array) {
-    var result = [],
-        array = toArray(array);
+    var result = [];
+    var array = toArray(array);
 
     for (var i = 0, l = array.length; i < l; i++) {
       var unique = true;
@@ -1302,8 +1303,9 @@
       missing: [],
       surplus: [],
       diff: [],
-      pass: false
-    }; //match, missing
+      pass: false //match, missing
+
+    };
 
     for (var ki in beforeKeys) {
       if (!beforeKeys.hasOwnProperty(ki)) continue;
@@ -1712,7 +1714,7 @@
     } //find some error ( return true => false)
 
 
-    return Array.from(arr).some(function (v) {
+    return !Array.from(arr).some(function (v) {
       if (likeArray(v)) {
         //length check
         if (v.length !== arr.length) return true; //type check
@@ -1723,7 +1725,7 @@
       }
 
       return true;
-    }) ? false : true;
+    });
   }; // real matrix model
 
   var asMatrix = function asMatrix(arr, columnSize) {
@@ -1816,7 +1818,10 @@
       return s.replace('YYYY', r.year).replace(/(MM|M)/, r.month).replace(/(DD|D)/, r.date).replace(/(hh|h)/, r.hour).replace(/(mm|m)/, r.minute).replace(/(ss|s)/, r.second).replace(/(A)/, toNumber(r.hour) > 12 ? 'PM' : 'AM');
     };
 
-    if (typeof format === 'string') return r.format(format);
+    if (typeof format === 'string') {
+      return r.format(format);
+    }
+
     return r;
   };
   var timestampExp = function timestampExp(exp) {
@@ -2149,7 +2154,7 @@
           size: $size,
           end: $start + $size
         };
-      }.bind(this));
+      });
     },
     map: function map() {
       var domainMap = this.domainMap();
@@ -3868,7 +3873,7 @@
         var left = rect.left,
             top = rect.top,
             width = rect.width,
-            height = rect.height;
+            height = rect.height; //rotateOrigin
 
         var originX = left + width / 2;
         var originY = top + height / 2;
@@ -4269,7 +4274,7 @@
     }
   };
   var affect = function affect(effect, judgeOfEqual) {
-    var affectValue = undefined;
+    var affectValue;
     var manualReactive = new ManualReactive(function () {
       return affectValue;
     }, effect, judgeOfEqual);
@@ -4415,6 +4420,7 @@
     applyBoxFns(fns);
     return BOX;
   };
+
   var DEFAULT = BowFactory(_objectSpread({}, functions));
   var factory = BowFactory;
 

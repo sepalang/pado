@@ -396,8 +396,7 @@
         var left = rect.left,
             top = rect.top,
             width = rect.width,
-            height = rect.height;
-        ; //rotateOrigin
+            height = rect.height; //rotateOrigin
 
         var originX = left + width / 2;
         var originY = top + height / 2;
