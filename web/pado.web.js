@@ -182,6 +182,7 @@
   };
 
   var fromDataString = function fromDataString(v) {
+    // eslint-disable-next-line no-eval
     return eval("(" + v + ")");
   }; //로컬스토리지 데이터 저장
 
@@ -1358,7 +1359,8 @@
   };
 
   var getElementBoundingRect = function getElementBoundingRect(el) {
-    el = getNode(el);
+    el = getNode(el); //const doc  = document
+
     var win = window;
     var elRect = getBoundingRect(el).toJSON();
 

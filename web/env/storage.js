@@ -35,6 +35,7 @@
   };
 
   var fromDataString = function fromDataString(v) {
+    // eslint-disable-next-line no-eval
     return eval("(" + v + ")");
   }; //로컬스토리지 데이터 저장
 

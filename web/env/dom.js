@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.fill", "core-js/modules/web.dom.iterable", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "../../modules/stance", "../../functions/isLike", "../../functions/cast"], factory);
+    define(["exports", "core-js/modules/es6.array.fill", "core-js/modules/web.dom.iterable", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "../../modules/stance", "../../functions/isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.fill"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("../../modules/stance"), require("../../functions/isLike"), require("../../functions/cast"));
+    factory(exports, require("core-js/modules/es6.array.fill"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("../../modules/stance"), require("../../functions/isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.webDom, global.es6Object, global.es6Regexp, global.es6Date, global.stance, global.isLike, global.cast);
+    factory(mod.exports, global.es6Array, global.webDom, global.es6Object, global.es6Regexp, global.es6Date, global.stance, global.isLike);
     global.dom = mod.exports;
   }
-})(this, function (_exports, _es6Array, _webDom, _es6Object, _es6Regexp, _es6Date, _stance, _isLike, _cast) {
+})(this, function (_exports, _es6Array, _webDom, _es6Object, _es6Regexp, _es6Date, _stance, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -124,8 +124,8 @@
   };
 
   var getElementBoundingRect = function getElementBoundingRect(el) {
-    el = getNode(el);
-    var doc = document;
+    el = getNode(el); //const doc  = document
+
     var win = window;
     var elRect = getBoundingRect(el).toJSON();
 
