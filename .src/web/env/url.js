@@ -1,4 +1,4 @@
-import { isArray, asArray } from '../../functions'
+import { isArray } from '../../functions'
 
 export const readUrl = function (inputUrl){
   let info

@@ -11,6 +11,7 @@ const toDataString = function (tods){
 }
 
 const fromDataString = function (v){ 
+  // eslint-disable-next-line no-eval
   return eval("(" + v + ")")
 }
 

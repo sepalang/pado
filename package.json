@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/pado",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -37,7 +37,7 @@
     "functions"
   ],
   "devDependencies": {
-    "@sepalang/lintpad": "0.0.5",
+    "@sepalang/lintpad": "0.0.7",
     "@sepalang/padoc": "^0.8.16",
     "jquery": "^3.3.1",
     "jsdom": "^11.11.0",

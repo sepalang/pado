@@ -1,6 +1,5 @@
 import { rect } from "../../modules/stance"
 import { likeString, isArray, likeArray, isNode } from "../../functions/isLike"
-import { asArray } from "../../functions/cast"
 
 export const getNode = function (el){
   let select = likeArray(el) ? el[0] : el
@@ -92,7 +91,7 @@ const getBoundingRect = function (el){
 export const getElementBoundingRect = function (el){
   el = getNode(el)
   
-  const doc  = document
+  //const doc  = document
   const win  = window
   
   const elRect = getBoundingRect(el).toJSON()
