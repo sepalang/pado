@@ -906,8 +906,6 @@
         var originX = left + width / 2;
         var originY = top + height / 2;
         this.forEach(function (point) {
-          var left = rect.left,
-              top = rect.top;
           point.translate({
             x: -originX,
             y: -originY

@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "../functions", "../functions/datetime"], factory);
+    define(["exports"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("../functions"), require("../functions/datetime"));
+    factory(exports);
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.functions, global.datetime);
+    factory(mod.exports);
     global.timeProperties = mod.exports;
   }
-})(this, function (_exports, _functions, _datetime) {
+})(this, function (_exports) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -18,6 +18,8 @@
   });
   _exports.timeProperties = void 0;
 
+  //import { asArray } from '../functions'
+  //import { timescaleExp } from '../functions/datetime'
   // 데이터를 배열로 지니고 있음
   // 데이터마다 간격과 속성만 지니고 있음 (시작시간은 없음)
   var TimeProperties = function TimeProperties(fps) {

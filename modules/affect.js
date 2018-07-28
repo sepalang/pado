@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "../functions/isLike", "../functions"], factory);
+    define(["exports", "../functions"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("../functions/isLike"), require("../functions"));
+    factory(exports, require("../functions"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.isLike, global.functions);
+    factory(mod.exports, global.functions);
     global.affect = mod.exports;
   }
-})(this, function (_exports, _isLike, _functions) {
+})(this, function (_exports, _functions) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

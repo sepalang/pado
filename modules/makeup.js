@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "regenerator-runtime/runtime", "core-js/modules/web.dom.iterable", "./promise"], factory);
+    define(["exports", "regenerator-runtime/runtime", "core-js/modules/web.dom.iterable", "./promise", "../functions/cast", "../functions/isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("regenerator-runtime/runtime"), require("core-js/modules/web.dom.iterable"), require("./promise"));
+    factory(exports, require("regenerator-runtime/runtime"), require("core-js/modules/web.dom.iterable"), require("./promise"), require("../functions/cast"), require("../functions/isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.runtime, global.webDom, global.promise);
+    factory(mod.exports, global.runtime, global.webDom, global.promise, global.cast, global.isLike);
     global.makeup = mod.exports;
   }
-})(this, function (_exports, _runtime, _webDom, _promise) {
+})(this, function (_exports, _runtime, _webDom, _promise, _cast, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -19,7 +19,7 @@
   _exports.watchChange = _exports.awaitCompose = _exports.awaitLeadOnly = void 0;
 
   var awaitLeadOnly = function awaitLeadOnly(func) {
-    return alloc(function () {
+    return (0, _cast.alloc)(function () {
       var $pending = false;
       return function () {
         var _this = this;
@@ -49,9 +49,9 @@
   _exports.awaitLeadOnly = awaitLeadOnly;
 
   var awaitCompose = function awaitCompose(funcArgs) {
-    return alloc(function () {
+    return (0, _cast.alloc)(function () {
       var composeFuncs = [];
-      asArray(funcArgs).forEach(function (f) {
+      (0, _cast.asArray)(funcArgs).forEach(function (f) {
         typeof f === "function" && composeFuncs.push(f);
       });
       return function (payload) {
@@ -122,9 +122,7 @@
   var watchChange = function watchChange() {
     var changeValue = function changeValue(watchman, newValue) {
       var countScope = watchman.$count;
-
-      var destOldValue = _cloneDeep(newValue);
-
+      var destOldValue = (0, _cast.cloneDeep)(newValue);
       watchman.$setter.forEach(function (effect) {
         effect(newValue, watchman.$oldValue, countScope);
       });
@@ -142,7 +140,7 @@
       setter: function setter(changeListeners) {
         var _this3 = this;
 
-        asArray(changeListeners).forEach(function (fn) {
+        (0, _cast.asArray)(changeListeners).forEach(function (fn) {
           if (typeof fn === "function") {
             _this3.$setter.push(fn);
           }
@@ -152,7 +150,7 @@
         var newValue;
 
         if (this.$equalityLogic) {
-          if (!_isEqual(this.$oldValue, newValue)) {
+          if (!(0, _isLike.isEqual)(this.$oldValue, newValue)) {
             changeValue(this, newValue);
           }
         } else {

@@ -101,7 +101,7 @@
 
     return value == parseInt(value, 10);
   };
-  var isArray$1 = function isArray(data) {
+  var isArray = function isArray(data) {
     return Array.isArray(data) || data instanceof Array;
   };
   var isObject = function isObject(it) {
@@ -114,7 +114,7 @@
     * likeObject is have hasOwnProperty
   */
 
-  var likeObject$1 = function likeObject(it) {
+  var likeObject = function likeObject(it) {
     return isObject(it) || isFunction(it);
   };
   var likeString = function likeString(data) {
@@ -134,12 +134,12 @@
     return typeof data === "object" && data.constructor === Object;
   };
   var isEnumerableObject = function isEnumerableObject(data) {
-    return isPlainObject(data) || isArray$1(data);
+    return isPlainObject(data) || isArray(data);
   };
   var isNode = function isNode(a) {
     return isObject(a) && typeof a.nodeType === "number";
   };
-  var isEmpty$1 = function isEmpty(it) {
+  var isEmpty = function isEmpty(it) {
     if (typeof it === "undefined") return true;
     if (typeof it === "string") return it.trim().length < 1;
 
@@ -147,7 +147,7 @@
       if (it == null) return true;
       if (it instanceof RegExp) return false;
 
-      if (isArray$1(it)) {
+      if (isArray(it)) {
         return !it.length;
       } else {
         for (var prop in it) {
@@ -285,17 +285,17 @@
     return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";
   };
 
-  var asArray$1 = function asArray(data, defaultArray) {
+  var asArray = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
       defaultArray = undefined;
     }
 
-    if (isArray$1(data)) {
+    if (isArray(data)) {
       return data;
     }
 
     if (isNone(data)) {
-      return isArray$1(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
+      return isArray(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
     }
 
     if (typeof data === "object" && typeof data.toArray === "function") {
@@ -306,7 +306,7 @@
   };
   var toArray = function toArray(data, option) {
     if (typeof data === "undefined" || data === null || isAbsoluteNaN(data)) return [];
-    if (isArray$1(data)) return Array.prototype.slice.call(data);
+    if (isArray(data)) return Array.prototype.slice.call(data);
     if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
     if (typeof data === "string" && typeof option === "string") return data.split(option);
     return [data];
@@ -371,7 +371,7 @@
       case "object":
         if (target === null) return target;
 
-        if (isArray$1(target)) {
+        if (isArray(target)) {
           var _r = [];
 
           for (var i = 0, length = target.length; i < length; i++) {
@@ -410,8 +410,8 @@
     if (typeof target === "object") {
       var d;
 
-      if (isArray$1(target)) {
-        if (!isArray$1(d)) {
+      if (isArray(target)) {
+        if (!isArray(d)) {
           d = [];
         }
 
@@ -442,7 +442,7 @@
   };
 
   var getKeyWithValue = function getKeyWithValue(obj, value) {
-    if (isArray$1(obj)) {
+    if (isArray(obj)) {
       for (var i = 0, l = obj.length; i < l; i++) {
         if (obj[i] === value) return i;
       }
@@ -459,7 +459,7 @@
 
   var removeValue = function removeValue(obj, value) {
     var detect = true;
-    var array = isArray$1(obj);
+    var array = isArray(obj);
 
     while (detect) {
       var key = getKeyWithValue(obj, value);
@@ -498,7 +498,7 @@
 
     return ins;
   };
-  var alloc$1 = function alloc(init) {
+  var alloc = function alloc(init) {
     var fn = init();
 
     var rn = function rn() {
@@ -611,15 +611,15 @@
 
   var keys = function keys(target, filterExp, strict) {
     var result = [];
-    if (!likeObject$1(target)) return result;
+    if (!likeObject(target)) return result;
     var filter = typeof filterExp === "function" ? filterExp : function () {
       return true;
     };
-    (strict === true ? isArray$1(target) : likeArray(target)) && Object.keys(target).filter(function (key) {
+    (strict === true ? isArray(target) : likeArray(target)) && Object.keys(target).filter(function (key) {
       if (isNaN(key)) return;
       var numberKey = parseInt(key, 10);
       filter(numberKey, target) && result.push(parseInt(numberKey, 10));
-    }) || (strict === true ? isPlainObject(target) : likeObject$1(target)) && Object.keys(target).forEach(function (key) {
+    }) || (strict === true ? isPlainObject(target) : likeObject(target)) && Object.keys(target).forEach(function (key) {
       filter(key, target) && result.push(key);
     });
     return result;
@@ -630,7 +630,7 @@
     switch (typeof it) {
       case "object":
         // eslint-disable-next-line no-unused-expressions
-        isNone(it) ? 0 : likeArray(it) ? asArray$1(it).forEach(function (v, k) {
+        isNone(it) ? 0 : likeArray(it) ? asArray(it).forEach(function (v, k) {
           result.push([k, v]);
         }) : Object.keys(it).forEach(function (key) {
           result.push([key, it[key]]);
@@ -723,7 +723,7 @@
   }();
 
   var all = function all(data, fn) {
-    data = asArray$1(data);
+    data = asArray(data);
 
     if (data.length === 0) {
       return false;
@@ -755,7 +755,7 @@
 
   var readString = function () {
     var rebaseMatches = function rebaseMatches(matches) {
-      return entries(asArray$1(matches));
+      return entries(asArray(matches));
     };
 
     return function (text, matches, castFn, props) {
@@ -796,7 +796,7 @@
               matchExp = _ref2[1];
           return [matchString(text, matchExp, cursor), matchType, matchExp];
         });
-        var firstMatch = asArray$1(matchesMap).sort(function (_ref3, _ref4) {
+        var firstMatch = asArray(matchesMap).sort(function (_ref3, _ref4) {
           var a = _ref3[0],
               aPriority = _ref3[1];
           var b = _ref4[0],
@@ -934,7 +934,7 @@
     };
 
     return function (pathParam) {
-      if (isArray$1(pathParam)) {
+      if (isArray(pathParam)) {
         return pathParam;
       }
 
@@ -1017,9 +1017,9 @@
           path = readPath(path);
 
         case "object":
-          if (isArray$1(path)) {
+          if (isArray(path)) {
             var allget = all(path, function (name) {
-              if (likeObject$1(target) && (target.hasOwnProperty(name) || target[name])) {
+              if (likeObject(target) && (target.hasOwnProperty(name) || target[name])) {
                 target = target[name];
                 return true;
               } else {
@@ -1044,7 +1044,7 @@
   };
   var hasProperty = function hasProperty(target, pathParam) {
     return all(readPath(pathParam), function (path) {
-      if (likeObject$1(target) && likeString(path) && target.hasOwnProperty(path)) {
+      if (likeObject(target) && likeString(path) && target.hasOwnProperty(path)) {
         target = target[path];
         return true;
       }
@@ -1084,14 +1084,14 @@
 
       if (obj === value) {
         return true;
-      } else if (likeObject$1(obj)) {
-        if (value === void 0 && key === void 0) return !isEmpty$1(obj);
+      } else if (likeObject(obj)) {
+        if (value === void 0 && key === void 0) return !isEmpty(obj);
         var proc;
 
         if (key) {
           if (typeof key === "function") {
             proc = functionKeyObjectValueProc(key);
-          } else if (isArray$1(key) && key.length > 1) {
+          } else if (isArray(key) && key.length > 1) {
             proc = selectKeyObjectValueProc(key[0], key[1]);
           } else if (typeof key === "string" || typeof key === "number") {
             proc = selectKeyObjectValueProc(key, key);
@@ -1100,7 +1100,7 @@
           proc = defaultObjectValueFunc;
         }
 
-        if (isArray$1(obj)) {
+        if (isArray(obj)) {
           for (var i = 0, l = obj.length; i < l; i++) {
             if (proc(obj[i], value)) return getKey ? i : true;
           }
@@ -1143,14 +1143,14 @@
   };
   var getKeyBy = function getKeyBy(object, value) {
     if (isFunction(value)) {
-      if (isArray$1(object)) for (var i = 0, l = object.length; i < l; i++) {
+      if (isArray(object)) for (var i = 0, l = object.length; i < l; i++) {
         if (value(object[i], i) === true) return i;
       }
       if (isObject(object)) for (var key in object) {
         if (value(object[key], key) === true) return key;
       }
     } else {
-      if (isArray$1(object)) for (var i = 0, l = object.length; i < l; i++) {
+      if (isArray(object)) for (var i = 0, l = object.length; i < l; i++) {
         if (object[i] === value) return i;
       }
       if (isObject(object)) for (var key in object) {
@@ -1173,24 +1173,24 @@
     return fillFn && fillFn(data, sp), data;
   };
   var insertOf = function insertOf(data, v, a) {
-    isArray$1(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
+    isArray(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
     return data;
   };
   var moveOf = function moveOf(data, oldIndex, newIndex) {
-    if (oldIndex !== newIndex && isArray$1(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
+    if (oldIndex !== newIndex && isArray(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
       Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
     }
 
     return data;
   };
   var concatOf = function concatOf(data, appends) {
-    var data = asArray$1(data);
-    return asArray$1(appends).forEach(function (value) {
+    var data = asArray(data);
+    return asArray(appends).forEach(function (value) {
       data.push(value);
     }), data;
   };
   var filterOf = function filterOf(data, func, exitFn) {
-    var data = asArray$1(data);
+    var data = asArray(data);
     var exitCnt = 0;
 
     for (var i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++) {
@@ -1287,7 +1287,7 @@
             if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode(obj[key])) {
               result[deepKey] = obj[key];
             } else {
-              result[deepKey] = Object.assign(result[deepKey] || (isArray$1(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
+              result[deepKey] = Object.assign(result[deepKey] || (isArray(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
             }
           }
         });
@@ -1331,7 +1331,7 @@
     var canDiff = false;
 
     if (isObject(before)) {
-      if (isArray$1(before)) {
+      if (isArray(before)) {
         beforeKeys = before;
       } else {
         beforeKeys = Object.keys(before);
@@ -1375,7 +1375,7 @@
     } //surplus
 
 
-    asArray$1(afterKeys).forEach(function (key) {
+    asArray(afterKeys).forEach(function (key) {
       if (!hasValue(analysis.match, key)) {
         analysis.missing.push(key);
         analysis.keys[key] = "missing";
@@ -1389,7 +1389,7 @@
   var toggle = function toggle(ta, cv, set) {
     var index = -1;
 
-    for (var d = asArray$1(ta), _l = d.length, _i = 0; _i < _l; _i++) {
+    for (var d = asArray(ta), _l = d.length, _i = 0; _i < _l; _i++) {
       if (d[_i] == cv) {
         index = _i + 1;
         break;
@@ -1412,7 +1412,7 @@
       emptyDefault = undefined;
     }
 
-    var data = asArray$1(collection);
+    var data = asArray(collection);
     var fill = emptyDefault;
 
     if (data.length > cutLength) {
@@ -1470,9 +1470,9 @@
       topLength = topLength ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
     }
 
-    return isNumber(topLength) || isInfinity(topLength) ? asArray$1(data).sort(function (a, b) {
+    return isNumber(topLength) || isInfinity(topLength) ? asArray(data).sort(function (a, b) {
       return iteratee(a, b);
-    }).splice(0, topLength) : asArray$1(data).sort(function (a, b) {
+    }).splice(0, topLength) : asArray(data).sort(function (a, b) {
       return iteratee(a, b);
     })[0];
   };
@@ -1509,7 +1509,7 @@
         }
       }
 
-      if (isArray$1(numbers)) {
+      if (isArray(numbers)) {
         for (var d = numbers, i = 0, l = d.length; i < l; i++) {
           d[i] = limitOf(d[i], max, min);
         }
@@ -1677,7 +1677,7 @@
   }; //TODO : move to ?
 
   var hashMap = function hashMap(d, f) {
-    if (typeof d === "object" && !isArray$1(d)) {
+    if (typeof d === "object" && !isArray(d)) {
       for (var k in d) {
         d[k] = f(d[k], k);
       }
@@ -1746,7 +1746,7 @@
       return new Array(maxLength);
     });
     var turnSize = 1;
-    asArray$1(scales).forEach(function (scaleCase, scaleIndex) {
+    asArray(scales).forEach(function (scaleCase, scaleIndex) {
       var scaleCaseLength = scaleCase.length;
       times(result.length, function (time) {
         result[time][scaleIndex] = scaleCase[turn(time, scaleCaseLength, turnSize)];
@@ -1857,7 +1857,7 @@
   };
 
   var dateExp = function dateExp(dv, format, pad) {
-    if (isArray$1(dv)) dv = dv.join(' ');
+    if (isArray(dv)) dv = dv.join(' ');
     var dt = /(\d\d\d\d|)[^\d]?(\d\d|\d|).?(\d\d|\d|)[^\d]?(\d\d|\d|)[^\d]?(\d\d|\d|)[^\d]?(\d\d|\d|)/.exec(dv);
     dt[1] = dt[1] || new Date().getYear() + 1900 + '';
     dt[2] = dt[2] || new Date().getMonth() + 1;
@@ -1866,7 +1866,7 @@
     dt[5] = dt[5] || "00";
     dt[6] = dt[6] || "00";
     var r = [dt[1], dt[2], dt[3], dt[4], dt[5], dt[6], dt[0]];
-    Object.defineProperties({
+    Object.defineProperties(r, {
       year: {
         enumerable: false,
         value: dt[1]
@@ -1924,7 +1924,7 @@
       return exp;
     }
 
-    if (isArray$1(exp) && exp.length == 7) {
+    if (isArray(exp) && exp.length == 7) {
       exp = new Date(exp[0], exp[1], exp[2], exp[3], exp[4], exp[5]);
     }
 
@@ -2100,11 +2100,28 @@
 
 
   var Block = function Block(posSize, syncOpt) {
-    this.$space = void 0;
-    this.$posSize;
-    this.$mask;
-    this.$compute;
-    this.$sync;
+    Object.defineProperties(this, {
+      $space: {
+        enumerable: false,
+        value: undefined
+      },
+      $posSize: {
+        enumerable: false,
+        value: undefined
+      },
+      $mask: {
+        enumerable: false,
+        value: undefined
+      },
+      $compute: {
+        enumerable: false,
+        value: undefined
+      },
+      $sync: {
+        enumerable: false,
+        value: undefined
+      }
+    });
     this.sync(posSize, syncOpt);
   };
 
@@ -2123,13 +2140,13 @@
       }
 
       if (block instanceof Block) {
-        this.$posSize = _cloneDeep(block.$posSize); //.. this.$sync    = this.$sync || block.$sync
+        this.$posSize = cloneDeep(block.$posSize); //.. this.$sync    = this.$sync || block.$sync
 
         this.$space = this.$space || block.$space;
         this.$mask = this.$mask || block.$mask;
       } else {
-        this.$posSize = forMap(_cloneDeep(block), function (posSize) {
-          return !_.isArray(posSize) ? [posSize, 0] : posSize;
+        this.$posSize = forMap(cloneDeep(block), function (posSize) {
+          return !isArray(posSize) ? [posSize, 0] : posSize;
         });
       }
 
@@ -2149,20 +2166,20 @@
       return this;
     },
     get: function get$$1() {
-      return _cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
+      return cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
     },
     domainValue: function domainValue() {
-      return forMap(_cloneDeep(this.get()), function (posSize) {
+      return forMap(cloneDeep(this.get()), function (posSize) {
         return posSize[0];
       });
     },
     domainSize: function domainSize() {
-      return forMap(_cloneDeep(this.get()), function (posSize) {
+      return forMap(cloneDeep(this.get()), function (posSize) {
         return posSize[1];
       });
     },
     domainMap: function domainMap() {
-      return forMap(_cloneDeep(this.get()), function (posSize) {
+      return forMap(cloneDeep(this.get()), function (posSize) {
         return {
           start: posSize[0],
           size: posSize[1],
@@ -2171,7 +2188,7 @@
       });
     },
     conflicts: function conflicts(otherBlocks, selector) {
-      return asArray$1(otherBlocks).reduce(function (red, block) {
+      return asArray(otherBlocks).reduce(function (red, block) {
         var selectOtherBlock = get(block, selector);
 
         if (selectOtherBlock instanceof Block) {
@@ -2200,7 +2217,7 @@
     overflow: function overflow(mask) {
       var blockPosSize = this.get();
       var spaceDomain = this.$space.getDomain();
-      var overflowDomain = mask && _cloneDeep(mask) || this.$space && this.$space.getDomain() || [];
+      var overflowDomain = mask && cloneDeep(mask) || this.$space && this.$space.getDomain() || [];
       return forMap(overflowDomain, function ($overflowSelected, sel) {
         var $posSize = get(blockPosSize, sel);
         var $domain = get(spaceDomain, sel);
@@ -2247,9 +2264,13 @@
       var domainMap = this.domainMap();
       var rangeMap = this.rangeMap();
       var blockMap = forMap(rangeMap, function (map, key) {
-        map.rangeStart = map.start, map.rangeSize = map.size, map.rangeEnd = map.end;
+        map.rangeStart = map.start;
+        map.rangeSize = map.size;
+        map.rangeEnd = map.end;
         var $domainMap = get(domainMap, key);
-        map.domainStart = $domainMap.start, map.domainSize = $domainMap.size, map.domainEnd = $domainMap.end;
+        map.domainStart = $domainMap.start;
+        map.domainSize = $domainMap.size;
+        map.domainEnd = $domainMap.end;
         delete map.start;
         delete map.size;
         delete map.end;
@@ -2278,7 +2299,7 @@
 
   var Tracker = function Tracker(space, domainMask) {
     this.$space = space;
-    this.$domainMask = forMap(_cloneDeep(domainMask), function (mask, sel) {
+    this.$domainMask = forMap(cloneDeep(domainMask), function (mask, sel) {
       if (typeof mask === "number") mask = [mask];
 
       if (mask instanceof Array) {
@@ -2342,7 +2363,7 @@
       this.$range = _range;
     },
     getRange: function getRange() {
-      return forMap(_cloneDeep(this.$range), function (range$$1) {
+      return forMap(cloneDeep(this.$range), function (range$$1) {
         for (var i = 0, l = range$$1.length; i < l; i++) {
           if (typeof range$$1[i] === "function") range$$1[i] = range$$1[i]();
         }
@@ -2351,7 +2372,7 @@
       });
     },
     getDomain: function getDomain() {
-      return forMap(_cloneDeep(this.$domain), function (domain) {
+      return forMap(cloneDeep(this.$domain), function (domain) {
         for (var i = 0, l = domain.length; i < l; i++) {
           if (typeof domain[i] === "function") domain[i] = domain[i]();
         }
@@ -2652,25 +2673,15 @@
                       var _ref4 = _asyncToGenerator(
                       /*#__PURE__*/
                       regeneratorRuntime.mark(function _callee(formInputDataum) {
-                        var out;
                         return regeneratorRuntime.wrap(function _callee$(_context) {
                           while (1) {
                             switch (_context.prev = _context.next) {
                               case 0:
-                                if (!(typeof output === "function")) {
-                                  _context.next = 4;
-                                  break;
+                                /* TODO:lint
+                                if(typeof output === "function"){
+                                  const out = await output({ entry: formInputDataum })
                                 }
-
-                                _context.next = 3;
-                                return output({
-                                  entry: formInputDataum
-                                });
-
-                              case 3:
-                                out = _context.sent;
-
-                              case 4:
+                                */
                                 _this.outputs.push(formInputDataum);
 
                                 current--;
@@ -2681,7 +2692,7 @@
 
                                 kickStart();
 
-                              case 8:
+                              case 4:
                               case "end":
                                 return _context.stop();
                             }
@@ -2762,7 +2773,7 @@
       });
       Object.defineProperty(this, "concat", {
         value: function value(pushData) {
-          asArray$1(pushData).forEach(function (d) {
+          asArray(pushData).forEach(function (d) {
             return _this.inputs.push(d);
           });
           kickStart();
@@ -3022,7 +3033,7 @@
     var changeValue = function changeValue(watchman, newValue) {
       var countScope = watchman.$count;
 
-      var destOldValue = _cloneDeep(newValue);
+      var destOldValue = cloneDeep(newValue);
 
       watchman.$setter.forEach(function (effect) {
         effect(newValue, watchman.$oldValue, countScope);
@@ -3051,7 +3062,7 @@
         var newValue;
 
         if (this.$equalityLogic) {
-          if (!_isEqual(this.$oldValue, newValue)) {
+          if (!isEqual(this.$oldValue, newValue)) {
             changeValue(this, newValue);
           }
         } else {
@@ -3511,7 +3522,7 @@
     var MatrixArray = function MatrixArray(data, column, row) {
       var _this = this;
 
-      asArray$1(data).forEach(function (datum) {
+      asArray(data).forEach(function (datum) {
         _this.push(datum);
       });
       Object.defineProperties(this, {
@@ -3796,7 +3807,7 @@
       }
     },
     vertexWith: function vertexWith(destPoint) {
-      var points = asArray$1(destPoint);
+      var points = asArray(destPoint);
       points.unshift(this);
       return new Vertex(points);
     },
@@ -3834,7 +3845,7 @@
       }
     });
     this.meta = meta;
-    asArray$1(pointArray).forEach(function (point) {
+    asArray(pointArray).forEach(function (point) {
       if (!likePoint(point)) return;
       var x = point.x,
           y = point.y,
@@ -3965,8 +3976,6 @@
         var originX = left + width / 2;
         var originY = top + height / 2;
         this.forEach(function (point) {
-          var left = rect.left,
-              top = rect.top;
           point.translate({
             x: -originX,
             y: -originY
@@ -4086,7 +4095,7 @@
     //splitCount [ horizental, vertical ]
     //1 = [ 1 ]
     //[1, 2] = [1, 2]
-    var _asArray = asArray$1(split),
+    var _asArray = asArray(split),
         columnOrder = _asArray[0],
         rowOrder = _asArray[1];
 
@@ -4114,7 +4123,7 @@
       return json;
     },
     findPoint: function findPoint(findWord) {
-      var _ref4 = isArray$1(findWord) ? findWord : findWord.trim().split(/\s+/),
+      var _ref4 = isArray(findWord) ? findWord : findWord.trim().split(/\s+/),
           lineFind = _ref4[0],
           pointFind = _ref4[1];
 
@@ -4321,7 +4330,7 @@
     return typeof x === "object" ? new Point(x.x, x.y, x.z, x.w) : new Point(x, y, z, w);
   };
   var vertex = function vertex(start, end) {
-    new Vertex([{
+    return new Vertex([{
       x: start.x,
       y: start.y,
       z: start.z,
@@ -4390,17 +4399,17 @@
     isNumber: isNumber,
     isInfinity: isInfinity,
     isInteger: isInteger,
-    isArray: isArray$1,
+    isArray: isArray,
     isObject: isObject,
     isFunction: isFunction,
-    likeObject: likeObject$1,
+    likeObject: likeObject,
     likeString: likeString,
     likeNumber: likeNumber,
     likeArray: likeArray,
     isPlainObject: isPlainObject,
     isEnumerableObject: isEnumerableObject,
     isNode: isNode,
-    isEmpty: isEmpty$1,
+    isEmpty: isEmpty,
     isPresence: isPresence,
     likeRegexp: likeRegexp,
     eqof: eqof,
@@ -4410,7 +4419,7 @@
     isExsist: isExsist,
     notExsist: notExsist,
     likePromise: likePromise,
-    asArray: asArray$1,
+    asArray: asArray,
     toArray: toArray,
     asObject: asObject,
     toNumber: toNumber,
@@ -4420,7 +4429,7 @@
     free: free,
     removeValue: removeValue,
     instance: instance,
-    alloc: alloc$1,
+    alloc: alloc,
     all: all,
     deep: deep,
     times: times,

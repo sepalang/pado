@@ -136,7 +136,7 @@
 
       var args = Array.from(arguments);
       return new Promise(function (resolve, reject) {
-        asyncErrCallbackfn.apply(_this, args.concat(function (err) {
+        var applyParams = args.concat(function () {
           var _Array$from = Array.from(arguments),
               error = _Array$from[0],
               callbakArgs = _Array$from.slice(1);
@@ -151,7 +151,8 @@
           } else {
             resolve(callbakArgs[0]);
           }
-        }));
+        });
+        asyncErrCallbackfn.apply(_this, applyParams);
       });
     };
 
@@ -315,7 +316,7 @@
       var sequanceLength = sequanceTaskEntries.length;
       var sequanceComplete = 0;
       var sequanceReseult = Array(sequanceTaskEntries.length);
-      var sequanceOperator = (0, _operate.operate)({
+      (0, _operate.operate)({
         output: function () {
           var _output = _asyncToGenerator(
           /*#__PURE__*/
@@ -363,6 +364,7 @@
                 switch (_context2.prev = _context2.next) {
                   case 0:
                     entry = _ref2.entry;
+                    // eslint-disable-next-line no-unused-vars
                     index = entry[0], fn = entry[1];
                     _context2.t0 = entry;
                     _context2.next = 5;
@@ -389,6 +391,7 @@
         }(),
         output: function output(_ref3) {
           var entry = _ref3.entry;
+          // eslint-disable-next-line no-unused-vars
           var index = entry[0],
               fn = entry[1],
               result = entry[2];

@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "../../functions", "../../functions/datetime"], factory);
+    define(["exports"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("../../functions"), require("../../functions/datetime"));
+    factory(exports);
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.functions, global.datetime);
+    factory(mod.exports);
     global.timeline = mod.exports;
   }
-})(this, function (_exports, _functions, _datetime) {
+})(this, function (_exports) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -18,6 +18,8 @@
   });
   _exports.timeline = void 0;
 
+  //import { asArray } from '../../functions'
+  //import { timescaleExp } from '../../functions/datetime'
   // 시작시간등의
   var Timeline = function Timeline(fps) {
     this._source = [];

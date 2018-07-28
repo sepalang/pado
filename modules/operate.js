@@ -24,7 +24,6 @@
 
   var operate = function () {
     var PARENT_OUTPUT_UPDATED = "ParentOutputUpdated";
-    var CHILDREN_INPUT_UPDATED = "ParentOutputUpdated";
 
     var operate = function operate(_ref) {
       var _this = this;
@@ -103,25 +102,15 @@
                       var _ref4 = _asyncToGenerator(
                       /*#__PURE__*/
                       regeneratorRuntime.mark(function _callee(formInputDataum) {
-                        var out;
                         return regeneratorRuntime.wrap(function _callee$(_context) {
                           while (1) {
                             switch (_context.prev = _context.next) {
                               case 0:
-                                if (!(typeof output === "function")) {
-                                  _context.next = 4;
-                                  break;
+                                /* TODO:lint
+                                if(typeof output === "function"){
+                                  const out = await output({ entry: formInputDataum })
                                 }
-
-                                _context.next = 3;
-                                return output({
-                                  entry: formInputDataum
-                                });
-
-                              case 3:
-                                out = _context.sent;
-
-                              case 4:
+                                */
                                 _this.outputs.push(formInputDataum);
 
                                 current--;
@@ -132,7 +121,7 @@
 
                                 kickStart();
 
-                              case 8:
+                              case 4:
                               case "end":
                                 return _context.stop();
                             }
