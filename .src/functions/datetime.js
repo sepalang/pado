@@ -3,7 +3,7 @@ import { toNumber } from './cast'
 
 export const dateExp = function (dv, format, pad){
   if(isArray(dv)) dv = dv.join(' ')
-			
+
   var dt = /(\d\d\d\d|)[^\d]?(\d\d|\d|).?(\d\d|\d|)[^\d]?(\d\d|\d|)[^\d]?(\d\d|\d|)[^\d]?(\d\d|\d|)/.exec(dv)
   dt[1] = dt[1] || (((new Date()).getYear() + 1900) + '')
   dt[2] = dt[2] || ((new Date()).getMonth() + 1)
@@ -11,7 +11,7 @@ export const dateExp = function (dv, format, pad){
   dt[4] = dt[4] || ("00")
   dt[5] = dt[5] || ("00")
   dt[6] = dt[6] || ("00")
-			
+
   var r    = [ dt[1], dt[2], dt[3], dt[4], dt[5], dt[6], dt[0] ]
   r.year = dt[1], r.month = dt[2], r.date = dt[3], r.hour = dt[4], r.minute = dt[5], r.second = dt[6], r.init = dt[7]
   r.format = function (s){

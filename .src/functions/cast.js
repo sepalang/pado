@@ -21,10 +21,10 @@ export const asArray = function (data, defaultArray = undefined){
 }
 
 export const toArray = function (data, option){
-  if(typeof data === "undefined" || data === null || data === NaN) return []
+  if(typeof data === "undefined" || data === null || isAbsoluteNaN(data)) return []
   if(isArray(data)) return Array.prototype.slice.call(data)
   if(typeof data === "object" && typeof data.toArray === "function") return data.toArray()
-  if(typeof data === "string", typeof option === "string") return data.split(option)
+  if(typeof data === "string" && typeof option === "string") return data.split(option)
   return [data]
 }
 
@@ -37,8 +37,8 @@ export const asObject = function (data, defaultKey = "default"){
 }
 
 export const toNumber = function (v, d){
-  switch (typeof v){ case "number":return v; case "string":var r = v.replace(/[^.\d\-]/g, "") * 1; return isAbsoluteNaN(r) ? 0 : r; break }
-  switch (typeof d){ case "number":return d; case "string":var r = d * 1; return isAbsoluteNaN(r) ? 0 : r; break }
+  switch (typeof v){ case "number":return v; case "string":const vr = v.replace(/[^.\d\-]/g, "") * 1; return isAbsoluteNaN(vr) ? 0 : vr; break }
+  switch (typeof d){ case "number":return d; case "string":const dr = d * 1; return isAbsoluteNaN(dr) ? 0 : dr; break }
   return 0
 }
 
@@ -168,9 +168,11 @@ export const alloc = function (init){
   return rn
 }
 
+// TODO
+/*
 const syncData = (function (){
-  const ENTER_HOOK  = (newDatum)=>_.assign({}, newDatum)
-  const UPDATE_HOOK = (oldDatum, newDatum)=>_.assign({}, oldDatum, newDatum)
+  const ENTER_HOOK  = (newDatum)=>Object.assign({}, newDatum)
+  const UPDATE_HOOK = (oldDatum, newDatum)=>Object.assign({}, oldDatum, newDatum)
   
   return function (oldData, newData, getId, options){
     if(!/string|function/.test(typeof getId)) throw new Error("syncData need getId")
@@ -201,10 +203,11 @@ const syncData = (function (){
     
     asArray(newData).forEach((newDatum, i)=>{
       const newId = getId(newDatum)
+      
       let oldDatum = _.get(oldDataMap[_.findIndex(oldDataMap, e=>e.id === newId)], "ref")
       let genDatum
       let dirty = false
-
+      // eslint-disable-next-line no-undef
       if(oldDatum){
         // change is not dirty, modify is dirty
         if(typeof oldDatum !== typeof newDatum){
@@ -256,3 +259,4 @@ const syncData = (function (){
     return result
   }
 }())
+*/

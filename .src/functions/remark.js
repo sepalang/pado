@@ -2,13 +2,10 @@ import {
   isNone,
   isNumber,
   likeRegexp,
-  likeString,
-  isObject,
   isArray,
   likeArray,
   likeObject,
-  isPlainObject,
-  isEnumerableObject
+  isPlainObject
 } from './isLike'
 
 import {
@@ -34,6 +31,7 @@ export const entries = function (it){
   const result = []
   switch (typeof it){
     case "object":
+      // eslint-disable-next-line no-unused-expressions
       isNone(it) ? 0
         : likeArray(it) ? asArray(it).forEach((v, k)=>{ result.push([k, v]) })
         : Object.keys(it).forEach(key=>{ result.push([key, it[key]]) })
@@ -61,7 +59,7 @@ export const deepKeys = (function (){
   
   return function (target, filter){
     const result = []
-    nestedDeepKeys(target, filter ? filter(child, key) : ()=>true, [], result)
+    nestedDeepKeys(target, filter ? (child, key)=>{ filter(child, key) } : ()=>true, [], result)
     return result
   }
 }())
@@ -87,7 +85,7 @@ export const findIndex = (function (){
 export const findIndexes = (function (){
   return function (c, s, at){
     if(typeof c === "string" || typeof c === "number"){
-      var idxs = []; var mvc = c + ""; var s = likeRegexp(s) ? s : s + ""; var at = (!at || !isNumber(at) || at < 0) ? 0 : at; var next
+      var idxs = []; var s = likeRegexp(s) ? s : s + ""; var at = (!at || !isNumber(at) || at < 0) ? 0 : at; var next
       do {
         let i = findIndex(c, s, at)
         if(i > -1){

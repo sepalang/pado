@@ -5,7 +5,7 @@ import { turn, limitNumber } from './nice'
 import { times } from './enumerable'
 
 export const rangeModel = function (value, step, sizeBase){
-  var start, end, reverse
+  let start, end, reverse
   
   if(typeof value === "number"){
     end = value
@@ -36,9 +36,12 @@ export const rangeModel = function (value, step, sizeBase){
     reverse = true
   }
   
-  end = parseFloat(end), end = isAbsoluteNaN(end) ? 0 : end
-  start = parseFloat(start), start = isAbsoluteNaN(start) ? 0 : start
-  step = parseFloat(step), step = isAbsoluteNaN(step) || step == 0 ? 1 : step
+  end = parseFloat(end)
+  end = isAbsoluteNaN(end) ? 0 : end
+  start = parseFloat(start)
+  start = isAbsoluteNaN(start) ? 0 : start
+  step = parseFloat(step)
+  step = isAbsoluteNaN(step) || step == 0 ? 1 : step
   
   return {
     start,
@@ -125,12 +128,12 @@ export const matrixRange = function (start, end, step, sizeBase){
   var maxLength = top([start.length, end.length])
     
   var selectLengthes = times(maxLength, function (scaleIndex){
-    var range = range([start[scaleIndex], end[scaleIndex]], step, sizeBase)
-    scales.push(range)
-    return range.length
+    const rangeResult = range([start[scaleIndex], end[scaleIndex]], step, sizeBase)
+    scales.push(rangeResult)
+    return rangeResult.length
   })
 
-  var result = times(reduce(selectLengthes, function (redu, value){
+  var result = times(selectLengthes.reduce(function (redu, value){
     return redu * value
   }, 1), function (){ return new Array(maxLength) })
     

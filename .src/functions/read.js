@@ -2,7 +2,8 @@ import {
   isArray,
   likeString,
   likeObject,
-  isNumber
+  isNumber,
+  isEmpty
 } from './isLike'
 
 import {

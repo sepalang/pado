@@ -1,4 +1,4 @@
-import { isNumber, isArray, isInfinity, isAbsoluteNaN } from './isLike'
+import { isNumber, isArray, isAbsoluteNaN } from './isLike'
 
 export const limitNumber = (function (){
   const limitOf = function (number, max, min){
