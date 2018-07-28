@@ -367,7 +367,7 @@
       if (obj === value) {
         return true;
       } else if ((0, _isLike.likeObject)(obj)) {
-        if (value === void 0 && key === void 0) return !isEmpty(obj);
+        if (value === void 0 && key === void 0) return !(0, _isLike.isEmpty)(obj);
         var proc;
 
         if (key) {

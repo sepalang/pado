@@ -50,9 +50,12 @@
       reverse = true;
     }
 
-    end = parseFloat(end), end = (0, _isLike.isAbsoluteNaN)(end) ? 0 : end;
-    start = parseFloat(start), start = (0, _isLike.isAbsoluteNaN)(start) ? 0 : start;
-    step = parseFloat(step), step = (0, _isLike.isAbsoluteNaN)(step) || step == 0 ? 1 : step;
+    end = parseFloat(end);
+    end = (0, _isLike.isAbsoluteNaN)(end) ? 0 : end;
+    start = parseFloat(start);
+    start = (0, _isLike.isAbsoluteNaN)(start) ? 0 : start;
+    step = parseFloat(step);
+    step = (0, _isLike.isAbsoluteNaN)(step) || step == 0 ? 1 : step;
     return {
       start: start,
       end: end,
@@ -165,11 +168,11 @@
     var scales = [];
     var maxLength = (0, _reduce.top)([start.length, end.length]);
     var selectLengthes = (0, _enumerable.times)(maxLength, function (scaleIndex) {
-      var range = range([start[scaleIndex], end[scaleIndex]], step, sizeBase);
-      scales.push(range);
-      return range.length;
+      var rangeResult = range([start[scaleIndex], end[scaleIndex]], step, sizeBase);
+      scales.push(rangeResult);
+      return rangeResult.length;
     });
-    var result = (0, _enumerable.times)(reduce(selectLengthes, function (redu, value) {
+    var result = (0, _enumerable.times)(selectLengthes.reduce(function (redu, value) {
       return redu * value;
     }, 1), function () {
       return new Array(maxLength);

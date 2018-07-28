@@ -258,6 +258,98 @@
     return [data];
   };
 
+  /*
+  const syncData = (function (){
+    const ENTER_HOOK  = (newDatum)=>Object.assign({}, newDatum)
+    const UPDATE_HOOK = (oldDatum, newDatum)=>Object.assign({}, oldDatum, newDatum)
+    
+    return function (oldData, newData, getId, options){
+      if(!/string|function/.test(typeof getId)) throw new Error("syncData need getId")
+    
+      if(typeof getId === "string"){
+        const getIdString = getId
+        getId = e=>_.get(e, getIdString)
+      }
+
+      oldData = asArray(oldData)
+      newData = asArray(newData)
+
+      const result = []
+      const hooks  = asObject(options, "afterEach")
+      
+      if(typeof hooks["enter"] !== "function"){
+        hooks["enter"] = ENTER_HOOK
+      }
+      
+      if(typeof hooks["update"] !== "function"){
+        hooks["update"] = UPDATE_HOOK
+      }
+      
+      const oldDataMap = _.map(oldData, e=>{
+        return { id: getId(e), ref: e }
+      })
+      
+      
+      asArray(newData).forEach((newDatum, i)=>{
+        const newId = getId(newDatum)
+        
+        let oldDatum = _.get(oldDataMap[_.findIndex(oldDataMap, e=>e.id === newId)], "ref")
+        let genDatum
+        let dirty = false
+        // eslint-disable-next-line no-undef
+        if(oldDatum){
+          // change is not dirty, modify is dirty
+          if(typeof oldDatum !== typeof newDatum){
+            dirty = false
+          } else { // same type
+            const oldOwnKeys = Object.keys(oldDatum).filter(key=>!(key.indexOf("$") === 0))
+            const newOwnKeys = Object.keys(newDatum).filter(key=>!(key.indexOf("$") === 0))
+
+            // inspect key chnage
+            if(_.isEqual(oldOwnKeys, newOwnKeys)){
+              dirty = !_.isEqual(_.pick(oldDatum, oldOwnKeys), _.pick(newDatum, newOwnKeys))
+            } else {
+              dirty = true
+            }
+          }
+          
+          if(typeof hooks["beforeUpdate"] === "function"){
+            if(hooks["beforeUpdate"](oldDatum, newDatum) === false){
+              return
+            }
+          }
+          
+          genDatum = hooks["update"](oldDatum, newDatum)
+          
+          if(typeof hooks["afterUpdate"] === "function"){
+            genDatum = hooks["afterUpdate"](genDatum, oldDatum, newDatum)
+          }
+        } else {
+          if(typeof hooks["beforeEnter"] === "function"){
+            if(hooks["beforeEnter"](newDatum) === false){
+              return
+            }
+          }
+          
+          genDatum = hooks["enter"](newDatum)
+          
+          if(typeof hooks["afterEnter"] === "function"){
+            genDatum = hooks["afterEnter"](genDatum, newDatum)
+          }
+        }
+
+        if(typeof hooks["afterEach"] === "function"){
+          hooks["afterEach"](genDatum, i, dirty)
+        }
+
+        result.push(genDatum)
+      })
+
+      return result
+    }
+  }())
+  */
+
   var times = function times(length, fn) {
     var result = [];
 

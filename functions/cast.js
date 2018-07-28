@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike"], factory);
+    define(["exports", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"));
+    factory(exports, require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike);
+    factory(mod.exports, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike);
     global.cast = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Array2, _es6Object, _webDom, _es6Regexp, _es6Regexp2, _isLike) {
+})(this, function (_exports, _es6Array, _es6Object, _webDom, _es6Regexp, _es6Regexp2, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -41,10 +41,10 @@
   _exports.asArray = asArray;
 
   var toArray = function toArray(data, option) {
-    if (typeof data === "undefined" || data === null || data === NaN) return [];
+    if (typeof data === "undefined" || data === null || (0, _isLike.isAbsoluteNaN)(data)) return [];
     if ((0, _isLike.isArray)(data)) return Array.prototype.slice.call(data);
     if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
-    if (typeof data === "string", typeof option === "string") return data.split(option);
+    if (typeof data === "string" && typeof option === "string") return data.split(option);
     return [data];
   };
 
@@ -72,8 +72,8 @@
         return v;
 
       case "string":
-        var r = v.replace(/[^.\d\-]/g, "") * 1;
-        return (0, _isLike.isAbsoluteNaN)(r) ? 0 : r;
+        var vr = v.replace(/[^.\d\-]/g, "") * 1;
+        return (0, _isLike.isAbsoluteNaN)(vr) ? 0 : vr;
         break;
     }
 
@@ -82,8 +82,8 @@
         return d;
 
       case "string":
-        var r = d * 1;
-        return (0, _isLike.isAbsoluteNaN)(r) ? 0 : r;
+        var dr = d * 1;
+        return (0, _isLike.isAbsoluteNaN)(dr) ? 0 : dr;
         break;
     }
 
@@ -279,113 +279,101 @@
 
     rn['$constructor'] = fn;
     return rn;
-  };
+  }; // TODO
 
-  _exports.alloc = alloc;
-
-  var syncData = function () {
-    var ENTER_HOOK = function ENTER_HOOK(newDatum) {
-      return _.assign({}, newDatum);
-    };
-
-    var UPDATE_HOOK = function UPDATE_HOOK(oldDatum, newDatum) {
-      return _.assign({}, oldDatum, newDatum);
-    };
-
-    return function (oldData, newData, getId, options) {
-      if (!/string|function/.test(typeof getId)) throw new Error("syncData need getId");
-
-      if (typeof getId === "string") {
-        var getIdString = getId;
-
-        getId = function getId(e) {
-          return _.get(e, getIdString);
-        };
+  /*
+  const syncData = (function (){
+    const ENTER_HOOK  = (newDatum)=>Object.assign({}, newDatum)
+    const UPDATE_HOOK = (oldDatum, newDatum)=>Object.assign({}, oldDatum, newDatum)
+    
+    return function (oldData, newData, getId, options){
+      if(!/string|function/.test(typeof getId)) throw new Error("syncData need getId")
+    
+      if(typeof getId === "string"){
+        const getIdString = getId
+        getId = e=>_.get(e, getIdString)
       }
-
-      oldData = asArray(oldData);
-      newData = asArray(newData);
-      var result = [];
-      var hooks = asObject(options, "afterEach");
-
-      if (typeof hooks["enter"] !== "function") {
-        hooks["enter"] = ENTER_HOOK;
+  
+      oldData = asArray(oldData)
+      newData = asArray(newData)
+  
+      const result = []
+      const hooks  = asObject(options, "afterEach")
+      
+      if(typeof hooks["enter"] !== "function"){
+        hooks["enter"] = ENTER_HOOK
       }
-
-      if (typeof hooks["update"] !== "function") {
-        hooks["update"] = UPDATE_HOOK;
+      
+      if(typeof hooks["update"] !== "function"){
+        hooks["update"] = UPDATE_HOOK
       }
-
-      var oldDataMap = _.map(oldData, function (e) {
-        return {
-          id: getId(e),
-          ref: e
-        };
-      });
-
-      asArray(newData).forEach(function (newDatum, i) {
-        var newId = getId(newDatum);
-
-        var oldDatum = _.get(oldDataMap[_.findIndex(oldDataMap, function (e) {
-          return e.id === newId;
-        })], "ref");
-
-        var genDatum;
-        var dirty = false;
-
-        if (oldDatum) {
+      
+      const oldDataMap = _.map(oldData, e=>{
+        return { id: getId(e), ref: e }
+      })
+      
+      
+      asArray(newData).forEach((newDatum, i)=>{
+        const newId = getId(newDatum)
+        
+        let oldDatum = _.get(oldDataMap[_.findIndex(oldDataMap, e=>e.id === newId)], "ref")
+        let genDatum
+        let dirty = false
+        // eslint-disable-next-line no-undef
+        if(oldDatum){
           // change is not dirty, modify is dirty
-          if (typeof oldDatum !== typeof newDatum) {
-            dirty = false;
-          } else {
-            // same type
-            var oldOwnKeys = Object.keys(oldDatum).filter(function (key) {
-              return !(key.indexOf("$") === 0);
-            });
-            var newOwnKeys = Object.keys(newDatum).filter(function (key) {
-              return !(key.indexOf("$") === 0);
-            }); // inspect key chnage
-
-            if (_.isEqual(oldOwnKeys, newOwnKeys)) {
-              dirty = !_.isEqual(_.pick(oldDatum, oldOwnKeys), _.pick(newDatum, newOwnKeys));
+          if(typeof oldDatum !== typeof newDatum){
+            dirty = false
+          } else { // same type
+            const oldOwnKeys = Object.keys(oldDatum).filter(key=>!(key.indexOf("$") === 0))
+            const newOwnKeys = Object.keys(newDatum).filter(key=>!(key.indexOf("$") === 0))
+  
+            // inspect key chnage
+            if(_.isEqual(oldOwnKeys, newOwnKeys)){
+              dirty = !_.isEqual(_.pick(oldDatum, oldOwnKeys), _.pick(newDatum, newOwnKeys))
             } else {
-              dirty = true;
+              dirty = true
             }
           }
-
-          if (typeof hooks["beforeUpdate"] === "function") {
-            if (hooks["beforeUpdate"](oldDatum, newDatum) === false) {
-              return;
+          
+          if(typeof hooks["beforeUpdate"] === "function"){
+            if(hooks["beforeUpdate"](oldDatum, newDatum) === false){
+              return
             }
           }
-
-          genDatum = hooks["update"](oldDatum, newDatum);
-
-          if (typeof hooks["afterUpdate"] === "function") {
-            genDatum = hooks["afterUpdate"](genDatum, oldDatum, newDatum);
+          
+          genDatum = hooks["update"](oldDatum, newDatum)
+          
+          if(typeof hooks["afterUpdate"] === "function"){
+            genDatum = hooks["afterUpdate"](genDatum, oldDatum, newDatum)
           }
         } else {
-          if (typeof hooks["beforeEnter"] === "function") {
-            if (hooks["beforeEnter"](newDatum) === false) {
-              return;
+          if(typeof hooks["beforeEnter"] === "function"){
+            if(hooks["beforeEnter"](newDatum) === false){
+              return
             }
           }
-
-          genDatum = hooks["enter"](newDatum);
-
-          if (typeof hooks["afterEnter"] === "function") {
-            genDatum = hooks["afterEnter"](genDatum, newDatum);
+          
+          genDatum = hooks["enter"](newDatum)
+          
+          if(typeof hooks["afterEnter"] === "function"){
+            genDatum = hooks["afterEnter"](genDatum, newDatum)
           }
         }
-
-        if (typeof hooks["afterEach"] === "function") {
-          hooks["afterEach"](genDatum, i, dirty);
+  
+        if(typeof hooks["afterEach"] === "function"){
+          hooks["afterEach"](genDatum, i, dirty)
         }
+  
+        result.push(genDatum)
+      })
+  
+      return result
+    }
+  }())
+  */
 
-        result.push(genDatum);
-      });
-      return result;
-    };
-  }();
+
+  _exports.alloc = alloc;
 });
 //# sourceMappingURL=cast.js.map

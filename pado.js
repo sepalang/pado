@@ -305,10 +305,10 @@
     return [data];
   };
   var toArray = function toArray(data, option) {
-    if (typeof data === "undefined" || data === null || data === NaN) return [];
+    if (typeof data === "undefined" || data === null || isAbsoluteNaN(data)) return [];
     if (isArray$1(data)) return Array.prototype.slice.call(data);
     if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
-    if (typeof option === "string") return data.split(option);
+    if (typeof data === "string" && typeof option === "string") return data.split(option);
     return [data];
   };
   var asObject = function asObject(data, defaultKey) {
@@ -330,8 +330,8 @@
         return v;
 
       case "string":
-        var r = v.replace(/[^.\d\-]/g, "") * 1;
-        return isAbsoluteNaN(r) ? 0 : r;
+        var vr = v.replace(/[^.\d\-]/g, "") * 1;
+        return isAbsoluteNaN(vr) ? 0 : vr;
         break;
     }
 
@@ -340,8 +340,8 @@
         return d;
 
       case "string":
-        var r = d * 1;
-        return isAbsoluteNaN(r) ? 0 : r;
+        var dr = d * 1;
+        return isAbsoluteNaN(dr) ? 0 : dr;
         break;
     }
 
@@ -515,7 +515,99 @@
 
     rn['$constructor'] = fn;
     return rn;
-  };
+  }; // TODO
+
+  /*
+  const syncData = (function (){
+    const ENTER_HOOK  = (newDatum)=>Object.assign({}, newDatum)
+    const UPDATE_HOOK = (oldDatum, newDatum)=>Object.assign({}, oldDatum, newDatum)
+    
+    return function (oldData, newData, getId, options){
+      if(!/string|function/.test(typeof getId)) throw new Error("syncData need getId")
+    
+      if(typeof getId === "string"){
+        const getIdString = getId
+        getId = e=>_.get(e, getIdString)
+      }
+
+      oldData = asArray(oldData)
+      newData = asArray(newData)
+
+      const result = []
+      const hooks  = asObject(options, "afterEach")
+      
+      if(typeof hooks["enter"] !== "function"){
+        hooks["enter"] = ENTER_HOOK
+      }
+      
+      if(typeof hooks["update"] !== "function"){
+        hooks["update"] = UPDATE_HOOK
+      }
+      
+      const oldDataMap = _.map(oldData, e=>{
+        return { id: getId(e), ref: e }
+      })
+      
+      
+      asArray(newData).forEach((newDatum, i)=>{
+        const newId = getId(newDatum)
+        
+        let oldDatum = _.get(oldDataMap[_.findIndex(oldDataMap, e=>e.id === newId)], "ref")
+        let genDatum
+        let dirty = false
+        // eslint-disable-next-line no-undef
+        if(oldDatum){
+          // change is not dirty, modify is dirty
+          if(typeof oldDatum !== typeof newDatum){
+            dirty = false
+          } else { // same type
+            const oldOwnKeys = Object.keys(oldDatum).filter(key=>!(key.indexOf("$") === 0))
+            const newOwnKeys = Object.keys(newDatum).filter(key=>!(key.indexOf("$") === 0))
+
+            // inspect key chnage
+            if(_.isEqual(oldOwnKeys, newOwnKeys)){
+              dirty = !_.isEqual(_.pick(oldDatum, oldOwnKeys), _.pick(newDatum, newOwnKeys))
+            } else {
+              dirty = true
+            }
+          }
+          
+          if(typeof hooks["beforeUpdate"] === "function"){
+            if(hooks["beforeUpdate"](oldDatum, newDatum) === false){
+              return
+            }
+          }
+          
+          genDatum = hooks["update"](oldDatum, newDatum)
+          
+          if(typeof hooks["afterUpdate"] === "function"){
+            genDatum = hooks["afterUpdate"](genDatum, oldDatum, newDatum)
+          }
+        } else {
+          if(typeof hooks["beforeEnter"] === "function"){
+            if(hooks["beforeEnter"](newDatum) === false){
+              return
+            }
+          }
+          
+          genDatum = hooks["enter"](newDatum)
+          
+          if(typeof hooks["afterEnter"] === "function"){
+            genDatum = hooks["afterEnter"](genDatum, newDatum)
+          }
+        }
+
+        if(typeof hooks["afterEach"] === "function"){
+          hooks["afterEach"](genDatum, i, dirty)
+        }
+
+        result.push(genDatum)
+      })
+
+      return result
+    }
+  }())
+  */
 
   var keys = function keys(target, filterExp, strict) {
     var result = [];
@@ -537,6 +629,7 @@
 
     switch (typeof it) {
       case "object":
+        // eslint-disable-next-line no-unused-expressions
         isNone(it) ? 0 : likeArray(it) ? asArray$1(it).forEach(function (v, k) {
           result.push([k, v]);
         }) : Object.keys(it).forEach(function (key) {
@@ -568,7 +661,9 @@
 
     return function (target, filter) {
       var result = [];
-      nestedDeepKeys(target, filter ? filter(child, key) : function () {
+      nestedDeepKeys(target, filter ? function (child, key) {
+        filter(child, key);
+      } : function () {
         return true;
       }, [], result);
       return result;
@@ -990,7 +1085,7 @@
       if (obj === value) {
         return true;
       } else if (likeObject$1(obj)) {
-        if (value === void 0 && key === void 0) return !isEmpty(obj);
+        if (value === void 0 && key === void 0) return !isEmpty$1(obj);
         var proc;
 
         if (key) {
@@ -1584,9 +1679,12 @@
       reverse = true;
     }
 
-    end = parseFloat(end), end = isAbsoluteNaN(end) ? 0 : end;
-    start = parseFloat(start), start = isAbsoluteNaN(start) ? 0 : start;
-    step = parseFloat(step), step = isAbsoluteNaN(step) || step == 0 ? 1 : step;
+    end = parseFloat(end);
+    end = isAbsoluteNaN(end) ? 0 : end;
+    start = parseFloat(start);
+    start = isAbsoluteNaN(start) ? 0 : start;
+    step = parseFloat(step);
+    step = isAbsoluteNaN(step) || step == 0 ? 1 : step;
     return {
       start: start,
       end: end,
@@ -1682,11 +1780,11 @@
     var scales = [];
     var maxLength = top([start.length, end.length]);
     var selectLengthes = times(maxLength, function (scaleIndex) {
-      var range = range([start[scaleIndex], end[scaleIndex]], step, sizeBase);
-      scales.push(range);
-      return range.length;
+      var rangeResult = range([start[scaleIndex], end[scaleIndex]], step, sizeBase);
+      scales.push(rangeResult);
+      return rangeResult.length;
     });
-    var result = times(reduce(selectLengthes, function (redu, value) {
+    var result = times(selectLengthes.reduce(function (redu, value) {
       return redu * value;
     }, 1), function () {
       return new Array(maxLength);

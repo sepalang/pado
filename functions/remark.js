@@ -41,6 +41,7 @@
 
     switch (typeof it) {
       case "object":
+        // eslint-disable-next-line no-unused-expressions
         (0, _isLike.isNone)(it) ? 0 : (0, _isLike.likeArray)(it) ? (0, _cast.asArray)(it).forEach(function (v, k) {
           result.push([k, v]);
         }) : Object.keys(it).forEach(function (key) {
@@ -75,7 +76,9 @@
 
     return function (target, filter) {
       var result = [];
-      nestedDeepKeys(target, filter ? filter(child, key) : function () {
+      nestedDeepKeys(target, filter ? function (child, key) {
+        filter(child, key);
+      } : function () {
         return true;
       }, [], result);
       return result;
@@ -122,7 +125,6 @@
     return function (c, s, at) {
       if (typeof c === "string" || typeof c === "number") {
         var idxs = [];
-        var mvc = c + "";
         var s = (0, _isLike.likeRegexp)(s) ? s : s + "";
         var at = !at || !(0, _isLike.isNumber)(at) || at < 0 ? 0 : at;
         var next;
