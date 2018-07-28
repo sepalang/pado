@@ -5,7 +5,6 @@ import {
 
 export const operate = (function (){
   const PARENT_OUTPUT_UPDATED = "ParentOutputUpdated"
-  const CHILDREN_INPUT_UPDATED = "ParentOutputUpdated"
   
   const operate = function ({ input, output, concurrent, rescue, limitInput, limitOutput }){
     this.parent = undefined
@@ -62,9 +61,11 @@ export const operate = (function (){
         current++
         
         const outputHandle = async (formInputDataum)=>{
+          /* TODO:lint
           if(typeof output === "function"){
             const out = await output({ entry: formInputDataum })
           }
+          */
           
           this.outputs.push(formInputDataum)
           current--

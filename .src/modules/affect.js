@@ -1,4 +1,3 @@
-import { isEqual } from '../functions/isLike'
 import { cloneDeep } from '../functions'
 
 const ManualReactive = function (watch, effect, judgeOfEqual){

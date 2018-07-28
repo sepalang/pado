@@ -13,7 +13,7 @@ export const dateExp = function (dv, format, pad){
   dt[6] = dt[6] || ("00")
 
   var r = [ dt[1], dt[2], dt[3], dt[4], dt[5], dt[6], dt[0] ]
-  Object.defineProperties({
+  Object.defineProperties(r, {
     year  : { enumerable: false, value: dt[1] },
     month : { enumerable: false, value: dt[2] },
     date  : { enumerable: false, value: dt[3] },

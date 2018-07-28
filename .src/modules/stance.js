@@ -259,7 +259,6 @@ const Vertex = function (pointArray, meta){
       const originY = top + height / 2
       
       this.forEach(point=>{
-        const { left, top } = rect
         point.translate({ x: -originX, y: -originY })
         point.transform(transform)
         point.translate({ x: originX, y: originY })
@@ -443,7 +442,7 @@ export const point = function (x, y, z, w){
 }
 
 export const vertex = function (start, end){
-  new Vertex([{x: start.x, y: start.y, z: start.z, w: start.w}, {x: end.x, y: end.y, z: end.z, w: end.w}])
+  return new Vertex([{x: start.x, y: start.y, z: start.z, w: start.w}, {x: end.x, y: end.y, z: end.z, w: end.w}])
 }
 
 export const rect = function (left, top, width, height, x, y, valid){

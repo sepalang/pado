@@ -79,7 +79,7 @@ export const promisify = function (asyncErrCallbackfn){
   const promisified   = function (){
     const args = Array.from(arguments)
     return new Promise((resolve, reject)=>{
-      asyncErrCallbackfn.apply(this, args.concat(function (err){
+      const applyParams = args.concat(function(){
         const [error, ...callbakArgs] = Array.from(arguments)
         if(error){
           reject(error)
@@ -91,7 +91,8 @@ export const promisify = function (asyncErrCallbackfn){
         } else {
           resolve(callbakArgs[0])
         }
-      }))
+      })
+      asyncErrCallbackfn.apply(this, applyParams)
     })
   }
   return function (){
@@ -249,7 +250,7 @@ export const batch = function (funcArray, opts){
     let sequanceComplete = 0
     const sequanceReseult = Array(sequanceTaskEntries.length)
       
-    const sequanceOperator = operate({
+    operate({
       output: async ({ entry })=>{
         if(option.interval > -1){
           await PromiseFunction.timeout(option.interval)
@@ -261,14 +262,18 @@ export const batch = function (funcArray, opts){
     .operate({
       concurrent: option.concurrent,
       input     : async ({ entry })=>{
+        // eslint-disable-next-line no-unused-vars
         const [index, fn] = entry
         entry.push(await fn())
         return entry
       },
       output: ({ entry })=>{
+        // eslint-disable-next-line no-unused-vars
         const [index, fn, result] = entry
+        
         sequanceReseult[index] = result
         sequanceComplete++
+        
         if(sequanceComplete === sequanceLength){
           resolve(sequanceReseult)
         }

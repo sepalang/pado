@@ -1,11 +1,19 @@
 import {
   promise,
-  defer as _defer,
-  timeout as _timeout,
   valueOf as _valueOf,
   abort as _abort,
   reject as _reject
 } from './promise'
+
+import {
+  alloc,
+  asArray,
+  cloneDeep as _cloneDeep
+} from '../functions/cast'
+
+import {
+  isEqual as _isEqual
+} from '../functions/isLike'
 
 export const awaitLeadOnly = function (func){
   return alloc(function (){

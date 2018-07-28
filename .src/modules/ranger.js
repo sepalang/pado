@@ -1,4 +1,4 @@
-import { isNumber, limitNumber, isAbsoluteNaN } from "../functions"
+import { limitNumber, isAbsoluteNaN } from "../functions"
 
 export const Limitter = function (max, min){
   this.value = 0

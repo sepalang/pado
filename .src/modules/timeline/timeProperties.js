@@ -1,5 +1,5 @@
-import { asArray } from '../functions'
-import { timescaleExp } from '../functions/datetime'
+//import { asArray } from '../functions'
+//import { timescaleExp } from '../functions/datetime'
 
 // 데이터를 배열로 지니고 있음
 // 데이터마다 간격과 속성만 지니고 있음 (시작시간은 없음)

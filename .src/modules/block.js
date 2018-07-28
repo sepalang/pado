@@ -1,10 +1,19 @@
 import {
-  asArray,
   get,
-  cloneDeep,
   forMap,
   domainRangeValue
 } from '../functions'
+
+import {
+  isArray,
+  likeObject,
+  isEmpty
+} from '../functions/isLike'
+
+import {
+  asArray,
+  cloneDeep as _cloneDeep
+} from '../functions/cast'
 
 // ?
 const hasValueProperty = function (obj, value, key){
@@ -25,12 +34,15 @@ const hasValueProperty = function (obj, value, key){
 //정의역과 치역을 계산하여 결과값을 리턴함, 속성별로 정의하여 다중 차원 지원
 
 const Block = function (posSize, syncOpt){
-  this.$space = (void 0)
-  this.$posSize
-  this.$mask
-          
-  this.$compute
-  this.$sync
+  Object.defineProperties(this, {
+    $space  : { enumerable: false, value: undefined },
+    $posSize: { enumerable: false, value: undefined },
+    $mask   : { enumerable: false, value: undefined },
+    $compute: { enumerable: false, value: undefined },
+    $sync   : { enumerable: false, value: undefined }
+  })
+  
+  
   this.sync(posSize, syncOpt)
 }
   
@@ -52,7 +64,7 @@ Block.prototype = {
       this.$space = this.$space || block.$space 
       this.$mask = this.$mask || block.$mask 
     } else {
-      this.$posSize = forMap(_cloneDeep(block), function (posSize){ return !_.isArray(posSize) ? [posSize, 0] : posSize })
+      this.$posSize = forMap(_cloneDeep(block), function (posSize){ return !isArray(posSize) ? [posSize, 0] : posSize })
     }
     return this 
   },
@@ -133,14 +145,15 @@ Block.prototype = {
     var rangeMap = this.rangeMap()
               
     var blockMap = forMap(rangeMap, function (map, key){
-      map.rangeStart = map.start,
-      map.rangeSize = map.size,
+      map.rangeStart = map.start
+      map.rangeSize = map.size
       map.rangeEnd = map.end
                   
       var $domainMap  = get(domainMap, key)
-      map.domainStart = $domainMap.start,
-      map.domainSize = $domainMap.size,
+      map.domainStart = $domainMap.start
+      map.domainSize = $domainMap.size
       map.domainEnd = $domainMap.end
+      
       delete map.start
       delete map.size
       delete map.end
