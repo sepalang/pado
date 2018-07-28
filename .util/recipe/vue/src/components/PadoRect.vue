@@ -44,29 +44,28 @@ export default {
     const boundingRect = getElementBoundingRect(this.$el);
     if(boundingRect.valid !== false) this.$emit('bounding', getElementBoundingRect(this.$el));
 
-      dragHelper(this.$el, ({ element })=>{
-        const startOffset = this.pointValue;
-        const positionWithOffset = function (x, y){
-          const result = {
-            left: startOffset.left + x,
-            top : startOffset.top + y
-          };
-          element.css(result);
-          return result;
+    dragHelper(this.$el, ({ element })=>{
+      const startOffset = this.pointValue;
+      const positionWithOffset = function (x, y){
+        const result = {
+          left: startOffset.left + x,
+          top : startOffset.top + y
         };
+        element.css(result);
+        return result;
+      };
 
-        return {
-          move: ({ pointer: { offsetX, offsetY } })=>{
-            const result = positionWithOffset(offsetX, offsetY);
-            this.$emit('drawPoint', result);
-          },
-          end: ({ pointer: { offsetX, offsetY } })=>{
-            const result = positionWithOffset(offsetX, offsetY);
-            this.$emit('inputPoint', result);
-          }
-        };
-      });
-    }
+      return {
+        move: ({ pointer: { offsetX, offsetY } })=>{
+          const result = positionWithOffset(offsetX, offsetY);
+          this.$emit('drawPoint', result);
+        },
+        end: ({ pointer: { offsetX, offsetY } })=>{
+          const result = positionWithOffset(offsetX, offsetY);
+          this.$emit('inputPoint', result);
+        }
+      };
+    });
   }
 };
 </script>

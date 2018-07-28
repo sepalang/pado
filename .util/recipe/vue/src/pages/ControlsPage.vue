@@ -16,7 +16,7 @@ export default {
     AppLayout,
     PadoRadio
   },
-  data:()=>({
+  data: ()=>({
     selected: '2'
   })
 };

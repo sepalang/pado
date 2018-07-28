@@ -22,7 +22,7 @@ export default new Router({
       component: MainPage
     },
     {
-      path : '/controls',
+      path     : '/controls',
       component: ControlsPage
     },
     {

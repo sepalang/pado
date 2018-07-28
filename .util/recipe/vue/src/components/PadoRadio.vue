@@ -6,12 +6,12 @@
 </template>
 <script>
 export default {
-  computed :{
+  computed: {
     isChecked (){
       return false;
     }
   }
-}
+};
 </script>
 <style lang="scss">
 .v-radio {
