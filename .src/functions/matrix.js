@@ -4,7 +4,7 @@ import { top } from './reduce'
 import { turn, limitNumber } from './nice'
 import { times } from './enumerable'
 
-const rangeModel = function (value, step, sizeBase){
+export const rangeModel = function (value, step, sizeBase){
   let start, end, reverse
   
   if(typeof value === "number"){

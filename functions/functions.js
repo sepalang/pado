@@ -16,32 +16,9 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.toggle = _exports.diffStructure = _exports.apart = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.unique2 = _exports.unique = void 0;
+  _exports.toggle = _exports.diffStructure = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.unique = void 0;
 
-  var unique = function unique(array) {
-    var value = [];
-    var result = [];
-    var array = (0, _cast.toArray)(array);
-
-    for (var i = 0, l = array.length; i < l; i++) {
-      var unique = true;
-
-      for (var i2 = 0, l2 = result.length; i2 < l2; i2++) {
-        if (array[i] == result[i2]) {
-          unique = false;
-          break;
-        }
-      }
-
-      if (unique == true) result.push(array[i]);
-    }
-
-    return result;
-  };
-
-  _exports.unique = unique;
-
-  var unique2 = function unique2(array, findKey) {
+  var unique = function unique(array, findKey) {
     var result = [];
     var uniqueSet = new Set();
 
@@ -68,7 +45,7 @@
     return result;
   };
 
-  _exports.unique2 = unique2;
+  _exports.unique = unique;
 
   var getKeyBy = function getKeyBy(object, value) {
     if ((0, _isLike.isFunction)(value)) {
@@ -143,7 +120,9 @@
       var result = func(value, key);
 
       if (result == false) {
-        var exit = Array.prototype.splice.call(data, i, 1);
+        /*
+        var exit = Array.prototype.splice.call(data, i, 1)
+        */
         i--;
         l--;
         typeof exitFn === "function" && exitFn(value, ri, exitCnt++);
@@ -277,42 +256,6 @@
     return true;
   };
 
-  var apart = function apart(text, split, block, blockEnd) {
-    if (typeof text !== "string") return [text];
-    var result = text.split(split === true ? /\s+/ : split || /\s+/);
-
-    if ((0, _isLike.likeRegexp)(block)) {
-      if (!(0, _isLike.likeRegexp)(blockEnd)) {
-        blockEnd = block;
-      }
-
-      var aparts = [];
-      var buffer = {
-        dept: 0,
-        parts: []
-      };
-
-      for (var d = result, i = 0, l = d.length; i < l; i++) {
-        var part = d[i];
-        var greb = {
-          start: findIndexes(part, block),
-          end: findIndexes(part, blockEnd)
-        };
-        console.log("part, greb", part, greb);
-
-        for (var _d = greb.start, _i = 0, _l = _d.length; _i < _l; ++_i) {
-          var startIndex = _d[_i];
-        }
-      }
-
-      return aparts;
-    } else {
-      return result;
-    }
-  };
-
-  _exports.apart = apart;
-
   var diffStructure = function diffStructure(before, after) {
     var afterKeys = Object.keys(after);
     var beforeKeys;
@@ -352,7 +295,7 @@
         analysis.match.push(key);
         analysis.keys[key] = "match";
 
-        if (canDiff && !angular.equals((0, _read.get)(after, key), (0, _read.get)(before, key))) {
+        if (canDiff && !(0, _isLike.isEqual)((0, _read.get)(after, key), (0, _read.get)(before, key))) {
           analysis.diff.push(key);
           analysis.keys[key] = "diff";
         }
@@ -364,7 +307,7 @@
 
 
     (0, _cast.asArray)(afterKeys).forEach(function (key) {
-      if (!hasValue(analysis.match, key)) {
+      if (!(0, _read.hasValue)(analysis.match, key)) {
         analysis.missing.push(key);
         analysis.keys[key] = "missing";
       }
@@ -380,9 +323,9 @@
   var toggle = function toggle(ta, cv, set) {
     var index = -1;
 
-    for (var d = (0, _cast.asArray)(ta), _l2 = d.length, _i2 = 0; _i2 < _l2; _i2++) {
-      if (d[_i2] == cv) {
-        index = _i2 + 1;
+    for (var d = (0, _cast.asArray)(ta), _l = d.length, _i = 0; _i < _l; _i++) {
+      if (d[_i] == cv) {
+        index = _i + 1;
         break;
       }
     }

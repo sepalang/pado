@@ -34,9 +34,7 @@
   _exports.argumentNamesBy = argumentNamesBy;
 
   var scopelizeBy = function scopelizeBy(evalCommand) {
-    if (evalCommand.indexOf("return") > -1) {
-      evalCommand;
-    } else {
+    if (evalCommand.indexOf("return") == -1) {
       evalCommand = "  return " + evalCommand;
     }
 

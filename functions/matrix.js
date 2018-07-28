@@ -36,12 +36,14 @@
         sizeBase = false;
       }
     }
-
-    if (typeof start !== "number" || typeof end !== "number") {
-      if (typeof start !== "number" && typeof end !== "number") return r;
-      if (typeof start === "number") return r.push(start), r;
-      if (typeof end === "number") return r.push(end), r;
+    /*
+    if(typeof start !== "number" || typeof end !== "number"){
+      if(typeof start !== "number" && typeof end !== "number") return r
+      if(typeof start === "number") return r.push(start), r
+      if(typeof end === "number") return r.push(end), r
     }
+    */
+
 
     if (start > end) {
       reverse = end;

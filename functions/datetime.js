@@ -28,11 +28,44 @@
     dt[5] = dt[5] || "00";
     dt[6] = dt[6] || "00";
     var r = [dt[1], dt[2], dt[3], dt[4], dt[5], dt[6], dt[0]];
-    r.year = dt[1], r.month = dt[2], r.date = dt[3], r.hour = dt[4], r.minute = dt[5], r.second = dt[6], r.init = dt[7];
-
-    r.format = function (s) {
-      return s.replace('YYYY', r.year).replace(/(MM|M)/, r.month).replace(/(DD|D)/, r.date).replace(/(hh|h)/, r.hour).replace(/(mm|m)/, r.minute).replace(/(ss|s)/, r.second).replace(/(A)/, (0, _cast.toNumber)(r.hour) > 12 ? 'PM' : 'AM');
-    };
+    Object.defineProperties({
+      year: {
+        enumerable: false,
+        value: dt[1]
+      },
+      month: {
+        enumerable: false,
+        value: dt[2]
+      },
+      date: {
+        enumerable: false,
+        value: dt[3]
+      },
+      hour: {
+        enumerable: false,
+        value: dt[4]
+      },
+      minute: {
+        enumerable: false,
+        value: dt[5]
+      },
+      second: {
+        enumerable: false,
+        value: dt[6]
+      },
+      init: {
+        enumerable: false,
+        value: dt[7]
+      },
+      format: {
+        enumerable: false,
+        get: function get() {
+          return function (s) {
+            return s.replace('YYYY', r.year).replace(/(MM|M)/, r.month).replace(/(DD|D)/, r.date).replace(/(hh|h)/, r.hour).replace(/(mm|m)/, r.minute).replace(/(ss|s)/, r.second).replace(/(A)/, (0, _cast.toNumber)(r.hour) > 12 ? 'PM' : 'AM');
+          };
+        }
+      }
+    });
 
     if (typeof format === 'string') {
       return r.format(format);

@@ -159,8 +159,8 @@
     }
 
     if (typeof it === "number") {
-      //NaN check || false
-      return it !== it || false;
+      //NaN check 
+      return isAbsoluteNaN(it) || false;
     }
 
     if (typeof it === "function") return false;
@@ -697,7 +697,7 @@
     };
   }(); //remark.spec.js
 
-  var findIndexes$1 = function () {
+  var findIndexes = function () {
     return function (c, s, at) {
       if (typeof c === "string" || typeof c === "number") {
         var idxs = [];
@@ -1052,7 +1052,7 @@
       return false;
     });
   };
-  var hasValue$1 = function () {
+  var hasValue = function () {
     var defaultObjectValueFunc = function defaultObjectValueFunc(object, value) {
       return object === value;
     };
@@ -1115,26 +1115,7 @@
     };
   }();
 
-  var unique = function unique(array) {
-    var result = [];
-    var array = toArray(array);
-
-    for (var i = 0, l = array.length; i < l; i++) {
-      var unique = true;
-
-      for (var i2 = 0, l2 = result.length; i2 < l2; i2++) {
-        if (array[i] == result[i2]) {
-          unique = false;
-          break;
-        }
-      }
-
-      if (unique == true) result.push(array[i]);
-    }
-
-    return result;
-  };
-  var unique2 = function unique2(array, findKey) {
+  var unique = function unique(array, findKey) {
     var result = [];
     var uniqueSet = new Set();
 
@@ -1218,7 +1199,9 @@
       var result = func(value, key);
 
       if (result == false) {
-        var exit = Array.prototype.splice.call(data, i, 1);
+        /*
+        var exit = Array.prototype.splice.call(data, i, 1)
+        */
         i--;
         l--;
         typeof exitFn === "function" && exitFn(value, ri, exitCnt++);
@@ -1342,35 +1325,6 @@
     return true;
   };
 
-  var apart = function apart(text, split, block, blockEnd) {
-    if (typeof text !== "string") return [text];
-    var result = text.split(split === true ? /\s+/ : split || /\s+/);
-
-    if (likeRegexp(block)) {
-      if (!likeRegexp(blockEnd)) {
-        blockEnd = block;
-      }
-
-      var aparts = [];
-
-      for (var d = result, i = 0, l = d.length; i < l; i++) {
-        var part = d[i];
-        var greb = {
-          start: findIndexes(part, block),
-          end: findIndexes(part, blockEnd)
-        };
-        console.log("part, greb", part, greb);
-
-        for (var _d = greb.start, _i = 0, _l = _d.length; _i < _l; ++_i) {
-          var startIndex = _d[_i];
-        }
-      }
-
-      return aparts;
-    } else {
-      return result;
-    }
-  };
   var diffStructure = function diffStructure(before, after) {
     var afterKeys = Object.keys(after);
     var beforeKeys;
@@ -1410,7 +1364,7 @@
         analysis.match.push(key);
         analysis.keys[key] = "match";
 
-        if (canDiff && !angular.equals(get(after, key), get(before, key))) {
+        if (canDiff && !isEqual(get(after, key), get(before, key))) {
           analysis.diff.push(key);
           analysis.keys[key] = "diff";
         }
@@ -1435,9 +1389,9 @@
   var toggle = function toggle(ta, cv, set) {
     var index = -1;
 
-    for (var d = asArray$1(ta), _l2 = d.length, _i2 = 0; _i2 < _l2; _i2++) {
-      if (d[_i2] == cv) {
-        index = _i2 + 1;
+    for (var d = asArray$1(ta), _l = d.length, _i = 0; _i < _l; _i++) {
+      if (d[_i] == cv) {
+        index = _i + 1;
         break;
       }
     }
@@ -1665,12 +1619,14 @@
         sizeBase = false;
       }
     }
-
-    if (typeof start !== "number" || typeof end !== "number") {
-      if (typeof start !== "number" && typeof end !== "number") return r;
-      if (typeof start === "number") return r.push(start), r;
-      if (typeof end === "number") return r.push(end), r;
+    /*
+    if(typeof start !== "number" || typeof end !== "number"){
+      if(typeof start !== "number" && typeof end !== "number") return r
+      if(typeof start === "number") return r.push(start), r
+      if(typeof end === "number") return r.push(end), r
     }
+    */
+
 
     if (start > end) {
       reverse = end;
@@ -1910,11 +1866,44 @@
     dt[5] = dt[5] || "00";
     dt[6] = dt[6] || "00";
     var r = [dt[1], dt[2], dt[3], dt[4], dt[5], dt[6], dt[0]];
-    r.year = dt[1], r.month = dt[2], r.date = dt[3], r.hour = dt[4], r.minute = dt[5], r.second = dt[6], r.init = dt[7];
-
-    r.format = function (s) {
-      return s.replace('YYYY', r.year).replace(/(MM|M)/, r.month).replace(/(DD|D)/, r.date).replace(/(hh|h)/, r.hour).replace(/(mm|m)/, r.minute).replace(/(ss|s)/, r.second).replace(/(A)/, toNumber(r.hour) > 12 ? 'PM' : 'AM');
-    };
+    Object.defineProperties({
+      year: {
+        enumerable: false,
+        value: dt[1]
+      },
+      month: {
+        enumerable: false,
+        value: dt[2]
+      },
+      date: {
+        enumerable: false,
+        value: dt[3]
+      },
+      hour: {
+        enumerable: false,
+        value: dt[4]
+      },
+      minute: {
+        enumerable: false,
+        value: dt[5]
+      },
+      second: {
+        enumerable: false,
+        value: dt[6]
+      },
+      init: {
+        enumerable: false,
+        value: dt[7]
+      },
+      format: {
+        enumerable: false,
+        get: function get() {
+          return function (s) {
+            return s.replace('YYYY', r.year).replace(/(MM|M)/, r.month).replace(/(DD|D)/, r.date).replace(/(hh|h)/, r.hour).replace(/(mm|m)/, r.minute).replace(/(ss|s)/, r.second).replace(/(A)/, toNumber(r.hour) > 12 ? 'PM' : 'AM');
+          };
+        }
+      }
+    });
 
     if (typeof format === 'string') {
       return r.format(format);
@@ -2014,7 +2003,7 @@
     });
   };
   var scopelizeBy = function scopelizeBy(evalCommand) {
-    if (evalCommand.indexOf("return") > -1) ; else {
+    if (evalCommand.indexOf("return") == -1) {
       evalCommand = "  return " + evalCommand;
     }
 
@@ -4386,7 +4375,6 @@
 
   var functions = /*#__PURE__*/Object.freeze({
     unique: unique,
-    unique2: unique2,
     getKeyBy: getKeyBy,
     clearOf: clearOf,
     insertOf: insertOf,
@@ -4395,7 +4383,6 @@
     filterOf: filterOf,
     sortOf: sortOf,
     rebase: rebase,
-    apart: apart,
     diffStructure: diffStructure,
     toggle: toggle,
     isAbsoluteNaN: isAbsoluteNaN,
@@ -4464,12 +4451,12 @@
     deepKeys: deepKeys,
     matchString: matchString,
     findIndex: findIndex,
-    findIndexes: findIndexes$1,
+    findIndexes: findIndexes,
     readString: readString,
     readPath: readPath,
     get: get,
     hasProperty: hasProperty,
-    hasValue: hasValue$1,
+    hasValue: hasValue,
     argumentNamesBy: argumentNamesBy,
     scopelizeBy: scopelizeBy,
     drawCircleVars: drawCircleVars,
