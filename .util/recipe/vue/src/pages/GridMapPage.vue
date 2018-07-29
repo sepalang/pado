@@ -230,6 +230,8 @@ export default {
   },
   mounted (){
     this.drawRect();
+    const recta = rect(0, 0, 50, 100);
+    recta.fit(rect(0,0,10,20));
   }
 };
 </script>

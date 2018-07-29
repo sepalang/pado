@@ -79,7 +79,7 @@ export const promisify = function (asyncErrCallbackfn){
   const promisified   = function (){
     const args = Array.from(arguments)
     return new Promise((resolve, reject)=>{
-      const applyParams = args.concat(function(){
+      const applyParams = args.concat(function (){
         const [error, ...callbakArgs] = Array.from(arguments)
         if(error){
           reject(error)

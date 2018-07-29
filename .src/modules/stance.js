@@ -213,7 +213,6 @@ const Vertex = function (pointArray, meta){
     return this
   },
   point (order){
-    console.log(" point this.meta", this.meta)
     switch (order){
       case "e": case "end":
       case "d": case "down": case "r": case "right":
@@ -282,9 +281,8 @@ const Rect = function (left = 0, top = 0, width = 0, height = 0, meta = null){
       get (){ return __ref.width },
       set (newValue){
         const oldValue = __ref.width
-        const offsetValue = newValue - oldValue
         __ref.width = newValue
-        __ref.right += offsetValue
+        __ref.right += newValue - oldValue
         return newValue
       }
     },
@@ -293,9 +291,8 @@ const Rect = function (left = 0, top = 0, width = 0, height = 0, meta = null){
       get (){ return __ref.height },
       set (newValue){
         const oldValue = __ref.height
-        const offsetValue = newValue - oldValue
         __ref.height = newValue
-        __ref.bottom += offsetValue
+        __ref.bottom += newValue - oldValue
         return newValue
       }
     },
@@ -410,6 +407,19 @@ Rect.prototype = {
     })
     
     return pacResult
+  },
+  fit (rect){
+    if(typeof rect !== "object"){ throw new Error("fit::argument[0] is not object") }
+    const { width, height } = rect
+    
+    if(!isNumber(width) || !isNumber(height)){ throw new Error("fit::argument[0] is not { width:Number, height:Number }") }
+    const WHRatio = [ width / this.width, height / this.height ]
+    const transformRatio = WHRatio.sort()[0]
+    
+    this.width = this.width * transformRatio
+    this.height = this.height * transformRatio
+    
+    return this
   },
   //TODO : incompleted sticky(parent, position, offset);
   sticky ({left:refX, top:refY, width:refWidth, height:refHeight}, position = "bottom left"){
