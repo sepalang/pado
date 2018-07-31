@@ -1,8 +1,8 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.sort", "core-js/modules/es6.number.constructor", "./reduce.base", "./isLike", "./cast", "./read"], factory);
+    define(["exports", "core-js/modules/es6.array.sort", "core-js/modules/es6.number.constructor", "./reduce.base", "../isLike", "../cast", "../read"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.number.constructor"), require("./reduce.base"), require("./isLike"), require("./cast"), require("./read"));
+    factory(exports, require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.number.constructor"), require("./reduce.base"), require("../isLike"), require("../cast"), require("../read"));
   } else {
     var mod = {
       exports: {}

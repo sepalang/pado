@@ -5,15 +5,15 @@ import {
 import { 
   isInfinity,
   isNumber
-} from './isLike'
+} from '../isLike'
 
 import {
   asArray
-} from './cast'
+} from '../cast'
 
 import {
   get
-} from './read'
+} from '../read'
 
 
 export const cut = function (collection, cutLength, fillContent){

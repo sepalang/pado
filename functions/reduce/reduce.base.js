@@ -2,9 +2,9 @@ require("core-js/modules/es6.array.fill");
 
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.number.constructor", "./isLike", "./cast", "./reform"], factory);
+    define(["exports", "core-js/modules/es6.number.constructor", "../isLike", "../cast", "../reform"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.number.constructor"), require("./isLike"), require("./cast"), require("./reform"));
+    factory(exports, require("core-js/modules/es6.number.constructor"), require("../isLike"), require("../cast"), require("../reform"));
   } else {
     var mod = {
       exports: {}

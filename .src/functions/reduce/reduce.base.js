@@ -1,14 +1,14 @@
 import { 
   isNumber
-} from './isLike'
+} from '../isLike'
 
 import {
   asArray
-} from './cast'
+} from '../cast'
 
 import {
   fill
-} from './reform'
+} from '../reform'
 
 export const baseCut = function (collection, cutLength, emptyDefault, useFill){
   let data = asArray(collection); let rest
