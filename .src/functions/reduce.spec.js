@@ -1,4 +1,4 @@
-import { cut, top } from './reduce'
+import { cut, cuts,  top } from './reduce'
 describe('Functions reducer', ()=>{
   it('cut', ()=>{
     expect(cut([1, 2, 3])).toEqual([1])
@@ -6,7 +6,28 @@ describe('Functions reducer', ()=>{
     expect(cut([1, 2], 3)).toEqual([1, 2, undefined])
     expect(cut([1], 3, 1)).toEqual([1, 1, 1])
     expect(cut([0], 3, i=>i)).toEqual([0, 1, 2])
+    expect(cut([0], 3, i=>i * i)).toEqual([0, 1, 4])
     expect(cut(0, 3, i=>i)).toEqual([0, 1, 2])
+    //
+    expect(cut([1, 2, 3], 1, undefined, true)).toEqual([[1], [2, 3]])
+    expect(cut([1, 2, 3], 2, undefined, true)).toEqual([[1, 2], [3]])
+    expect(cut([1, 2, 3], 4, 4, true)).toEqual([[1, 2, 3, 4], []])
+    expect(cut([1, 2, 3], 4, i=>i, true)).toEqual([[1, 2, 3, 3], []])
+  })
+  
+  it('cuts', ()=>{
+    expect(cuts([1, 2, 3])).toEqual([[1], [2], [3]])
+    expect(cuts([1, 2, 3], 2)).toEqual([[1, 2], [3, undefined]])
+    //index
+    expect(cuts([1, 2, 3], 2, (index, column, row)=>index)).toEqual([[1, 2], [3, 3]])
+    expect(cuts([1, 2, 3, 4, 5], 2, (index, column, row)=>index)).toEqual([[1, 2], [3, 4], [5, 5]])
+    //col
+    expect(cuts([1, 2, 3], 2, (index, column, row)=>column)).toEqual([[1, 2], [3, 1]])
+    expect(cuts([1, 2, 3, 4, 5], 2, (index, column, row)=>column)).toEqual([[1, 2], [3, 4], [5, 1]])
+    //row
+    expect(cuts([1], 2, (index, column, row)=>row)).toEqual([[1, 0]])
+    expect(cuts([1, 2, 3], 2, (index, column, row)=>row)).toEqual([[1, 2], [3, 1]])
+    expect(cuts([1, 2, 3, 4, 5], 2, (index, column, row)=>row)).toEqual([[1, 2], [3, 4], [5, 2]])
   })
   
   it('top', ()=>{

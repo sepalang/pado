@@ -11,27 +11,37 @@ import {
   get
 } from './read'
 
+import {
+  fill
+} from './reform'
+
 //reduce.spec.js
-export const cut = function (collection, cutLength = 1, emptyDefault = undefined){
-  let data = asArray(collection)
-  let fill = emptyDefault
+export const cut = function (collection, cutLength, emptyDefault, fullResult = false){
+  let data = asArray(collection); let rest
+  cutLength = isNumber(cutLength) ? cutLength : 1
   
   if(data.length > cutLength){
-    data.splice(cutLength, Number.POSITIVE_INFINITY)
-    return data
+    rest = data.splice(cutLength, Number.POSITIVE_INFINITY)
+    return fullResult === true ? [data, rest] : data
   }
   
-  let dataLength = data.length
+  data = fill(data, cutLength, emptyDefault)
+  return fullResult === true ? [data, []] : data
+}
+
+export const cuts = function (collection, cutLength, emptyDefault){
+  const result = []
+  let rest = collection
+  //
+  let rowIndex = 0
+  const enumFn = typeof emptyDefault !== "function" ? ()=>emptyDefault : (index)=>emptyDefault(rowIndex * cutLength + index, index, rowIndex)
   
-  if(typeof emptyDefault !== "function"){
-    fill = ()=>emptyDefault
-  }
-  
-  for(let i = 0, l = cutLength - dataLength; i < l; i++){
-    data.push(fill(dataLength++, i))
-  }
-  
-  return data
+  do {
+    ([collection, rest] = cut(rest, cutLength, enumFn, true))
+    result.push(collection)
+    rowIndex++
+  } while(rest.length > 0)
+  return result
 }
 
 //reduce.spec.js

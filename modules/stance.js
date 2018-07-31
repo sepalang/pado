@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.object.assign", "../functions/isLike", "../functions/cast", "../functions/matrix", "./matrix"], factory);
+    define(["exports", "core-js/modules/es6.array.sort", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.object.assign", "../functions/isLike", "../functions/cast", "../functions/matrix", "./matrix"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.object.assign"), require("../functions/isLike"), require("../functions/cast"), require("../functions/matrix"), require("./matrix"));
+    factory(exports, require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.object.assign"), require("../functions/isLike"), require("../functions/cast"), require("../functions/matrix"), require("./matrix"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.es6Date, global.es6Array, global.es6Object, global.webDom, global.es6Object, global.isLike, global.cast, global.matrix, global.matrix);
+    factory(mod.exports, global.es6Array, global.es6Regexp, global.es6Date, global.es6Array, global.es6Object, global.webDom, global.es6Object, global.isLike, global.cast, global.matrix, global.matrix);
     global.stance = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _es6Date, _es6Array, _es6Object, _webDom, _es6Object2, _isLike, _cast, _matrix, _matrix2) {
+})(this, function (_exports, _es6Array, _es6Regexp, _es6Date, _es6Array2, _es6Object, _webDom, _es6Object2, _isLike, _cast, _matrix, _matrix2) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -146,7 +146,6 @@
       rx: {
         enumerable: false,
         get: function get() {
-          console.log("rx", _this.meta && _this.meta.range && _this.meta.range.width, _this.x);
           var rangeWidth = _this.meta && _this.meta.range && _this.meta.range.width || 0;
           return _this.x / rangeWidth;
         }
@@ -342,8 +341,6 @@
       return this;
     },
     point: function point(order) {
-      console.log(" point this.meta", this.meta);
-
       switch (order) {
         case "e":
         case "end":
@@ -459,9 +456,8 @@
         },
         set: function set(newValue) {
           var oldValue = __ref.width;
-          var offsetValue = newValue - oldValue;
           __ref.width = newValue;
-          __ref.right += offsetValue;
+          __ref.right += newValue - oldValue;
           return newValue;
         }
       },
@@ -472,9 +468,8 @@
         },
         set: function set(newValue) {
           var oldValue = __ref.height;
-          var offsetValue = newValue - oldValue;
           __ref.height = newValue;
-          __ref.bottom += offsetValue;
+          __ref.bottom += newValue - oldValue;
           return newValue;
         }
       },
@@ -534,6 +529,9 @@
     addMeta: function addMeta(obj) {
       if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
       return this;
+    },
+    clone: function clone() {
+      return new Rect(this.left, this.top, this.width, this.height, this.meta);
     },
     toJSON: function toJSON(withMeta) {
       var json = {
@@ -699,6 +697,24 @@
         return eachResultHook ? eachResultHook(result, index, colIndex, rowIndex) : result;
       });
       return pacResult;
+    },
+    fit: function fit(rect) {
+      if (typeof rect !== "object") {
+        throw new Error("fit::argument[0] is not object");
+      }
+
+      var width = rect.width,
+          height = rect.height;
+
+      if (!(0, _isLike.isNumber)(width) || !(0, _isLike.isNumber)(height)) {
+        throw new Error("fit::argument[0] is not { width:Number, height:Number }");
+      }
+
+      var WHRatio = [width / this.width, height / this.height];
+      var transformRatio = WHRatio.sort()[0];
+      this.width = this.width * transformRatio;
+      this.height = this.height * transformRatio;
+      return this;
     },
     //TODO : incompleted sticky(parent, position, offset);
     sticky: function sticky(_ref5, position) {

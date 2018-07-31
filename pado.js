@@ -1403,36 +1403,62 @@
     return ta[index];
   };
 
-  var cut = function cut(collection, cutLength, emptyDefault) {
-    if (cutLength === void 0) {
-      cutLength = 1;
-    }
-
+  var fill = function fill(collection, fillLength, emptyDefault) {
     if (emptyDefault === void 0) {
       emptyDefault = undefined;
     }
 
     var data = asArray(collection);
-    var fill = emptyDefault;
+    var dataLength = data.length;
+    fillLength = isNumber(fillLength) ? fillLength : 0;
+    var fillFn = typeof emptyDefault !== "function" ? function () {
+      return emptyDefault;
+    } : emptyDefault;
+
+    for (var i = 0, l = fillLength - dataLength; i < l; data.push(fillFn(dataLength++, i++))) {
+    }
+
+    return collection;
+  };
+
+  var cut = function cut(collection, cutLength, emptyDefault, fullResult) {
+    if (fullResult === void 0) {
+      fullResult = false;
+    }
+
+    var data = asArray(collection);
+    var rest;
+    cutLength = isNumber(cutLength) ? cutLength : 1;
 
     if (data.length > cutLength) {
-      data.splice(cutLength, Number.POSITIVE_INFINITY);
-      return data;
+      rest = data.splice(cutLength, Number.POSITIVE_INFINITY);
+      return fullResult === true ? [data, rest] : data;
     }
 
-    var dataLength = data.length;
+    data = fill(data, cutLength, emptyDefault);
+    return fullResult === true ? [data, []] : data;
+  };
+  var cuts = function cuts(collection, cutLength, emptyDefault) {
+    var result = [];
+    var rest = collection; //
 
-    if (typeof emptyDefault !== "function") {
-      fill = function fill() {
-        return emptyDefault;
-      };
-    }
+    var rowIndex = 0;
+    var enumFn = typeof emptyDefault !== "function" ? function () {
+      return emptyDefault;
+    } : function (index) {
+      return emptyDefault(rowIndex * cutLength + index, index, rowIndex);
+    };
 
-    for (var i = 0, l = cutLength - dataLength; i < l; i++) {
-      data.push(fill(dataLength++, i));
-    }
+    do {
+      var _cut = cut(rest, cutLength, enumFn, true);
 
-    return data;
+      collection = _cut[0];
+      rest = _cut[1];
+      result.push(collection);
+      rowIndex++;
+    } while (rest.length > 0);
+
+    return result;
   }; //reduce.spec.js
 
   var top = function top(data, iteratee, topLength) {
@@ -3721,7 +3747,6 @@
       rx: {
         enumerable: false,
         get: function get() {
-          console.log("rx", _this.meta && _this.meta.range && _this.meta.range.width, _this.x);
           var rangeWidth = _this.meta && _this.meta.range && _this.meta.range.width || 0;
           return _this.x / rangeWidth;
         }
@@ -3917,8 +3942,6 @@
       return this;
     },
     point: function point(order) {
-      console.log(" point this.meta", this.meta);
-
       switch (order) {
         case "e":
         case "end":
@@ -4034,9 +4057,8 @@
         },
         set: function set(newValue) {
           var oldValue = __ref.width;
-          var offsetValue = newValue - oldValue;
           __ref.width = newValue;
-          __ref.right += offsetValue;
+          __ref.right += newValue - oldValue;
           return newValue;
         }
       },
@@ -4047,9 +4069,8 @@
         },
         set: function set(newValue) {
           var oldValue = __ref.height;
-          var offsetValue = newValue - oldValue;
           __ref.height = newValue;
-          __ref.bottom += offsetValue;
+          __ref.bottom += newValue - oldValue;
           return newValue;
         }
       },
@@ -4109,6 +4130,9 @@
     addMeta: function addMeta(obj) {
       if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
       return this;
+    },
+    clone: function clone$$1() {
+      return new Rect(this.left, this.top, this.width, this.height, this.meta);
     },
     toJSON: function toJSON(withMeta) {
       var json = {
@@ -4275,6 +4299,24 @@
       });
       return pacResult;
     },
+    fit: function fit(rect) {
+      if (typeof rect !== "object") {
+        throw new Error("fit::argument[0] is not object");
+      }
+
+      var width = rect.width,
+          height = rect.height;
+
+      if (!isNumber(width) || !isNumber(height)) {
+        throw new Error("fit::argument[0] is not { width:Number, height:Number }");
+      }
+
+      var WHRatio = [width / this.width, height / this.height];
+      var transformRatio = WHRatio.sort()[0];
+      this.width = this.width * transformRatio;
+      this.height = this.height * transformRatio;
+      return this;
+    },
     //TODO : incompleted sticky(parent, position, offset);
     sticky: function sticky(_ref5, position) {
       var refX = _ref5.left,
@@ -4435,6 +4477,7 @@
     times: times,
     forMap: forMap,
     cut: cut,
+    cuts: cuts,
     top: top,
     rand64: rand64,
     tokenize: tokenize,

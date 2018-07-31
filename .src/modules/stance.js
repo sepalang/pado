@@ -74,7 +74,6 @@ const Point = function (x = 0, y = 0, z = 0, w = 1, meta){
     },
     rx: { enumerable: false,
       get       : ()=>{
-        console.log("rx", this.meta && this.meta.range && this.meta.range.width, this.x)
         const rangeWidth = (this.meta && this.meta.range && this.meta.range.width) || 0
         return this.x / rangeWidth
       }
@@ -328,6 +327,9 @@ Rect.prototype = {
   addMeta (obj){
     if(typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj)
     return this
+  },
+  clone (){
+    return new Rect(this.left, this.top, this.width, this.height, this.meta)
   },
   toJSON (withMeta){
     const json = {width: this.width, height: this.height, left: this.left, top: this.top, right: this.right, bottom: this.bottom }

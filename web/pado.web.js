@@ -652,7 +652,6 @@
       rx: {
         enumerable: false,
         get: function get() {
-          console.log("rx", _this.meta && _this.meta.range && _this.meta.range.width, _this.x);
           var rangeWidth = _this.meta && _this.meta.range && _this.meta.range.width || 0;
           return _this.x / rangeWidth;
         }
@@ -848,8 +847,6 @@
       return this;
     },
     point: function point(order) {
-      console.log(" point this.meta", this.meta);
-
       switch (order) {
         case "e":
         case "end":
@@ -965,9 +962,8 @@
         },
         set: function set(newValue) {
           var oldValue = __ref.width;
-          var offsetValue = newValue - oldValue;
           __ref.width = newValue;
-          __ref.right += offsetValue;
+          __ref.right += newValue - oldValue;
           return newValue;
         }
       },
@@ -978,9 +974,8 @@
         },
         set: function set(newValue) {
           var oldValue = __ref.height;
-          var offsetValue = newValue - oldValue;
           __ref.height = newValue;
-          __ref.bottom += offsetValue;
+          __ref.bottom += newValue - oldValue;
           return newValue;
         }
       },
@@ -1040,6 +1035,9 @@
     addMeta: function addMeta(obj) {
       if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
       return this;
+    },
+    clone: function clone$$1() {
+      return new Rect(this.left, this.top, this.width, this.height, this.meta);
     },
     toJSON: function toJSON(withMeta) {
       var json = {
@@ -1205,6 +1203,24 @@
         return eachResultHook ? eachResultHook(result, index, colIndex, rowIndex) : result;
       });
       return pacResult;
+    },
+    fit: function fit(rect) {
+      if (typeof rect !== "object") {
+        throw new Error("fit::argument[0] is not object");
+      }
+
+      var width = rect.width,
+          height = rect.height;
+
+      if (!isNumber(width) || !isNumber(height)) {
+        throw new Error("fit::argument[0] is not { width:Number, height:Number }");
+      }
+
+      var WHRatio = [width / this.width, height / this.height];
+      var transformRatio = WHRatio.sort()[0];
+      this.width = this.width * transformRatio;
+      this.height = this.height * transformRatio;
+      return this;
     },
     //TODO : incompleted sticky(parent, position, offset);
     sticky: function sticky(_ref5, position) {
