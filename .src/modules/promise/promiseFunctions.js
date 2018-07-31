@@ -1,78 +1,12 @@
-import { asArray, asObject, isNumber, likePromise, turn, argumentNamesBy } from '../functions'
-import { operate } from './operate'
+// promise utils
+import { PromiseClass, newPromise } from './promiseEngine'
+import { promise as PromiseFunction } from './promise'
+import { asArray, asObject } from '../../functions/cast'
+import { isNumber } from '../../functions/isLike'
+import { turn } from '../../functions/nice'
+import { argumentNamesBy } from '../../functions/hack'
 
-const PromiseClass = Promise
-
-const resolveFn = PromiseClass.resolve
-const rejectFn = PromiseClass.reject
-
-export const newPromise = (fn)=>(new PromiseClass((r, c)=>{
-  const maybeAwaiter = fn(r, c)
-  likePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c)
-}))
-
-export const promise = (fn)=>newPromise(fn)
-const PromiseFunction = promise
-
-export const all     = Promise.all
-PromiseFunction.all = all
-
-export const resolve    = resolveFn
-PromiseFunction.resolve = resolve
-
-export const reject    = rejectFn
-PromiseFunction.reject = reject
-
-export const timeout = function (fn, time){
-  if(typeof fn === "number"){
-    return newPromise(resolve=>setTimeout(()=>resolve(time), fn))
-  } else {
-    return newPromise(resolve=>setTimeout(()=>resolve(typeof fn === "function" ? fn() : fn), time))
-  }
-}
-PromiseFunction.timeout = timeout
-
-export const valueOf = function (maybeQ){
-  return newPromise(function (resolve, reject){
-    likePromise(maybeQ)
-      ? maybeQ.then(resolve).catch(reject)
-      : resolve(maybeQ) 
-  })
-}
-PromiseFunction.valueOf = valueOf
-
-const abortMessage = new function (){
-  Object.defineProperty(this, "message", {
-    get: ()=>":abort"
-  })
-  Object.defineProperty(this, "abort", {
-    get: ()=>true
-  })
-}()
-
-export const abort = function (notifyConsole = undefined){
-  return new PromiseClass((resolve, reject)=>{
-    if(notifyConsole === true){
-      console.warn("abort promise")
-    }
-    reject(abortMessage)
-  })
-}
-PromiseFunction.abort = abort
-
-export const defer = function (){
-  var resolve, reject
-  var promise = new PromiseClass(function (){
-    resolve = arguments[0]
-    reject = arguments[1]
-  })
-  return {
-    resolve: resolve,
-    reject : reject,
-    promise: promise
-  }
-}
-PromiseFunction.defer = defer
+import { operate } from '../operate'
 
 export const promisify = function (asyncErrCallbackfn){
   const argumentNames = argumentNamesBy(asyncErrCallbackfn).slice(1)
@@ -161,14 +95,14 @@ export const until = function (tasks, option){
   
   const thenStack  = [
     e=>{
-      if(finished === null) return PromiseFunction.abort()
+      if(finished === null) return abort()
       finished = true
       return e
     }
   ]
   const catchStack = [
     e=>{
-      if(finished === null) return PromiseFunction.abort()
+      if(finished === null) return abort()
       finished = true
       return PromiseFunction.reject(e)
     }
@@ -280,5 +214,25 @@ export const batch = function (funcArray, opts){
       }
     })
     .concat(sequanceTaskEntries)
+  })
+}
+
+
+// abort is deprecated
+const abortMessage = new function (){
+  Object.defineProperty(this, "message", {
+    get: ()=>":abort"
+  })
+  Object.defineProperty(this, "abort", {
+    get: ()=>true
+  })
+}()
+
+export const abort = function (notifyConsole = undefined){
+  return new PromiseClass((resolve, reject)=>{
+    if(notifyConsole === true){
+      console.warn("abort promise")
+    }
+    reject(abortMessage)
   })
 }

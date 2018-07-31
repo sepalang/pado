@@ -2619,6 +2619,63 @@
     return editableQuery;
   };
 
+  var PromiseClass = Promise;
+  var resolveFn = PromiseClass.resolve;
+  var rejectFn = PromiseClass.reject;
+  var newPromise = function newPromise(fn) {
+    return new PromiseClass(function (r, c) {
+      var maybeAwaiter = fn(r, c);
+      likePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
+    });
+  };
+  var promise = function promise(fn) {
+    return newPromise(fn);
+  };
+  var PromiseFunction = promise;
+  var all$1 = Promise.all;
+  PromiseFunction.all = all$1;
+  var resolve = resolveFn;
+  PromiseFunction.resolve = resolve;
+  var reject = rejectFn;
+  PromiseFunction.reject = reject;
+
+  var defer = function defer() {
+    var resolve$$1, reject$$1;
+    var promise$$1 = new PromiseClass(function () {
+      resolve$$1 = arguments[0];
+      reject$$1 = arguments[1];
+    });
+    return {
+      resolve: resolve$$1,
+      reject: reject$$1,
+      promise: promise$$1
+    };
+  };
+  promise.defer = defer;
+  var timeout = function timeout(fn, time) {
+    if (typeof fn === "number") {
+      return newPromise(function (resolve$$1) {
+        return setTimeout(function () {
+          return resolve$$1(time);
+        }, fn);
+      });
+    } else {
+      return newPromise(function (resolve$$1) {
+        return setTimeout(function () {
+          return resolve$$1(typeof fn === "function" ? fn() : fn);
+        }, time);
+      });
+    }
+  };
+  promise.timeout = timeout;
+  var valueOf = function valueOf(maybeQ) {
+    return newPromise(function (resolve$$1, reject$$1) {
+      likePromise(maybeQ) ? maybeQ.then(resolve$$1).catch(reject$$1) : resolve$$1(maybeQ);
+    });
+  };
+  promise.valueOf = valueOf;
+  var promise$1 = promise;
+
   var operate = function () {
     var PARENT_OUTPUT_UPDATED = "ParentOutputUpdated";
 
@@ -2879,55 +2936,14 @@
     return operateFunction;
   }();
 
-  var PromiseClass = Promise;
-  var resolveFn = PromiseClass.resolve;
-  var rejectFn = PromiseClass.reject;
-  var newPromise = function newPromise(fn) {
-    return new PromiseClass(function (r, c) {
-      var maybeAwaiter = fn(r, c);
-      likePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
-    });
-  };
-  var promise = function promise(fn) {
-    return newPromise(fn);
-  };
-  var PromiseFunction = promise;
-  var all$1 = Promise.all;
-  PromiseFunction.all = all$1;
-  var resolve = resolveFn;
-  PromiseFunction.resolve = resolve;
-  var reject = rejectFn;
-  PromiseFunction.reject = reject;
-  var timeout = function timeout(fn, time) {
-    if (typeof fn === "number") {
-      return newPromise(function (resolve) {
-        return setTimeout(function () {
-          return resolve(time);
-        }, fn);
-      });
-    } else {
-      return newPromise(function (resolve) {
-        return setTimeout(function () {
-          return resolve(typeof fn === "function" ? fn() : fn);
-        }, time);
-      });
-    }
-  };
-  PromiseFunction.timeout = timeout;
-  var valueOf = function valueOf(maybeQ) {
-    return newPromise(function (resolve, reject) {
-      likePromise(maybeQ) ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
-    });
-  };
-  PromiseFunction.valueOf = valueOf;
   var abortMessage = new function () {
     Object.defineProperty(this, "message", {
-      get: function get$$1() {
+      get: function get() {
         return ":abort";
       }
     });
     Object.defineProperty(this, "abort", {
-      get: function get$$1() {
+      get: function get() {
         return true;
       }
     });
@@ -2937,28 +2953,14 @@
       notifyConsole = undefined;
     }
 
-    return new PromiseClass(function (resolve, reject) {
+    return new PromiseClass(function (resolve$$1, reject$$1) {
       if (notifyConsole === true) {
         console.warn("abort promise");
       }
 
-      reject(abortMessage);
+      reject$$1(abortMessage);
     });
   };
-  PromiseFunction.abort = abort;
-  var defer = function defer() {
-    var resolve, reject;
-    var promise = new PromiseClass(function () {
-      resolve = arguments[0];
-      reject = arguments[1];
-    });
-    return {
-      resolve: resolve,
-      reject: reject,
-      promise: promise
-    };
-  };
-  PromiseFunction.defer = defer;
 
   var awaitLeadOnly = function awaitLeadOnly(func) {
     return alloc(function () {
@@ -2974,7 +2976,7 @@
           return abort();
         } else {
           $pending = true;
-          return promise(function (resolve$$1, reject$$1) {
+          return promise$1(function (resolve$$1, reject$$1) {
             return valueOf(func.apply(_this, args)).then(resolve$$1).catch(reject$$1);
           }).then(function (e) {
             $pending = false;
@@ -2996,7 +2998,7 @@
       return function (payload) {
         var _this2 = this;
 
-        return promise(function (resolve$$1, reject$$1) {
+        return promise$1(function (resolve$$1, reject$$1) {
           var _marked =
           /*#__PURE__*/
           regeneratorRuntime.mark(iterator);
@@ -3146,7 +3148,7 @@
       var _this = this;
 
       if (this.$fetchState != -1) {
-        return promise.reject(new Error("paginate::다른 페이징 작업 중에 페이징 처리를 할 수 없습니다."));
+        return promise$1.reject(new Error("paginate::다른 페이징 작업 중에 페이징 처리를 할 수 없습니다."));
       }
 
       if (typeof payload === "object") {
@@ -3155,8 +3157,8 @@
 
       this.$fetchState = 0;
       this.$pending = true;
-      return promise(function (resolve$$1, reject$$1) {
-        promise.valueOf(_this.$fetchFn(payload)).then(function (e) {
+      return promise$1(function (resolve$$1, reject$$1) {
+        promise$1.valueOf(_this.$fetchFn(payload)).then(function (e) {
           if (_this.$fetchState == 0) {
             console.warn("paginate::fetch중엔 반드시 update를 해 주십시오");
           }
@@ -3212,7 +3214,7 @@
     fetchIndex: function fetchIndex(pageIndex) {
       // 설정할수 있는 페이지보다 너무 높으면
       if (pageIndex < 0) {
-        return promise.reject("paginate::-1 이하로 페이지네이션에 접근 할 수 없습니다.");
+        return promise$1.reject("paginate::-1 이하로 페이지네이션에 접근 할 수 없습니다.");
       }
 
       if (this.pageLimit < pageIndex) {
@@ -3288,7 +3290,7 @@
       if (action) {
         return action();
       } else {
-        return promise.reject("paginate::unknown command", command);
+        return promise$1.reject("paginate::unknown command", command);
       }
     }
   }; // pagenation에서 이동 가능한 index의 크기를 반환함
@@ -3470,14 +3472,14 @@
           }
         }
 
-        var input = promise.valueOf(SESSION_STORE[name](payload));
+        var input = promise$1.valueOf(SESSION_STORE[name](payload));
         var managedSpawn = {
           input: input,
           output: undefined,
           item: undefined
         };
         return input.then(function (item) {
-          var deferred = promise.defer();
+          var deferred = promise$1.defer();
           var deferPromise = deferred.promise;
           managedSpawn.output = deferPromise;
           managedSpawn.item = item;
@@ -4513,7 +4515,7 @@
     scopelizeBy: scopelizeBy,
     drawCircleVars: drawCircleVars,
     fill: fill,
-    promise: promise,
+    promise: promise$1,
     space: space,
     block: block,
     isEditable: _isEditable,

@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.object.keys", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/es6.string.repeat", "core-js/modules/es6.number.constructor", "core-js/modules/es6.array.from", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.promise", "../functions", "./operate"], factory);
+    define(["exports", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/es6.string.repeat", "core-js/modules/es6.number.constructor", "core-js/modules/web.dom.iterable", "core-js/modules/es6.promise", "core-js/modules/es6.array.from", "./promiseEngine", "./promise", "../../functions/cast", "../../functions/isLike", "../../functions/nice", "../../functions/hack", "../operate"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.object.keys"), require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.string.repeat"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/es6.array.from"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.promise"), require("../functions"), require("./operate"));
+    factory(exports, require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.string.repeat"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.promise"), require("core-js/modules/es6.array.from"), require("./promiseEngine"), require("./promise"), require("../../functions/cast"), require("../../functions/isLike"), require("../../functions/nice"), require("../../functions/hack"), require("../operate"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Object, global.runtime, global.es6Array, global.es6String, global.es6Number, global.es6Array, global.webDom, global.es6Array, global.es6, global.functions, global.operate);
-    global.promise = mod.exports;
+    factory(mod.exports, global.es6Array, global.es6Object, global.runtime, global.es6Array, global.es6String, global.es6Number, global.webDom, global.es6, global.es6Array, global.promiseEngine, global.promise, global.cast, global.isLike, global.nice, global.hack, global.operate);
+    global.promiseFunctions = mod.exports;
   }
-})(this, function (_exports, _es6Object, _runtime, _es6Array, _es6String, _es6Number, _es6Array2, _webDom, _es6Array3, _es, _functions, _operate) {
+})(this, function (_exports, _es6Array, _es6Object, _runtime, _es6Array2, _es6String, _es6Number, _webDom, _es, _es6Array3, _promiseEngine, _promise, _cast, _isLike, _nice, _hack, _operate) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.batch = _exports.until = _exports.promisify = _exports.defer = _exports.abort = _exports.valueOf = _exports.timeout = _exports.reject = _exports.resolve = _exports.all = _exports.promise = _exports.newPromise = void 0;
+  _exports.abort = _exports.batch = _exports.until = _exports.promisify = void 0;
 
   function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -26,110 +26,8 @@
 
   function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-  var PromiseClass = Promise;
-  var resolveFn = PromiseClass.resolve;
-  var rejectFn = PromiseClass.reject;
-
-  var newPromise = function newPromise(fn) {
-    return new PromiseClass(function (r, c) {
-      var maybeAwaiter = fn(r, c);
-      (0, _functions.likePromise)(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
-    });
-  };
-
-  _exports.newPromise = newPromise;
-
-  var promise = function promise(fn) {
-    return newPromise(fn);
-  };
-
-  _exports.promise = promise;
-  var PromiseFunction = promise;
-  var all = Promise.all;
-  _exports.all = all;
-  PromiseFunction.all = all;
-  var resolve = resolveFn;
-  _exports.resolve = resolve;
-  PromiseFunction.resolve = resolve;
-  var reject = rejectFn;
-  _exports.reject = reject;
-  PromiseFunction.reject = reject;
-
-  var timeout = function timeout(fn, time) {
-    if (typeof fn === "number") {
-      return newPromise(function (resolve) {
-        return setTimeout(function () {
-          return resolve(time);
-        }, fn);
-      });
-    } else {
-      return newPromise(function (resolve) {
-        return setTimeout(function () {
-          return resolve(typeof fn === "function" ? fn() : fn);
-        }, time);
-      });
-    }
-  };
-
-  _exports.timeout = timeout;
-  PromiseFunction.timeout = timeout;
-
-  var valueOf = function valueOf(maybeQ) {
-    return newPromise(function (resolve, reject) {
-      (0, _functions.likePromise)(maybeQ) ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
-    });
-  };
-
-  _exports.valueOf = valueOf;
-  PromiseFunction.valueOf = valueOf;
-  var abortMessage = new function () {
-    Object.defineProperty(this, "message", {
-      get: function get() {
-        return ":abort";
-      }
-    });
-    Object.defineProperty(this, "abort", {
-      get: function get() {
-        return true;
-      }
-    });
-  }();
-
-  var abort = function abort(notifyConsole) {
-    if (notifyConsole === void 0) {
-      notifyConsole = undefined;
-    }
-
-    return new PromiseClass(function (resolve, reject) {
-      if (notifyConsole === true) {
-        console.warn("abort promise");
-      }
-
-      reject(abortMessage);
-    });
-  };
-
-  _exports.abort = abort;
-  PromiseFunction.abort = abort;
-
-  var defer = function defer() {
-    var resolve, reject;
-    var promise = new PromiseClass(function () {
-      resolve = arguments[0];
-      reject = arguments[1];
-    });
-    return {
-      resolve: resolve,
-      reject: reject,
-      promise: promise
-    };
-  };
-
-  _exports.defer = defer;
-  PromiseFunction.defer = defer;
-
   var promisify = function promisify(asyncErrCallbackfn) {
-    var argumentNames = (0, _functions.argumentNamesBy)(asyncErrCallbackfn).slice(1);
+    var argumentNames = (0, _hack.argumentNamesBy)(asyncErrCallbackfn).slice(1);
 
     var promisified = function promisified() {
       var _this = this;
@@ -165,19 +63,19 @@
 
   var until = function until(tasks, option) {
     if (!(tasks instanceof Array)) {
-      return PromiseFunction.reject(new Error("tasks must be array"));
+      return _promise.promise.reject(new Error("tasks must be array"));
     }
 
     if (!tasks.length || !tasks.some(function (e) {
       return typeof e === "function";
     })) {
-      return PromiseFunction.reject(new Error("not found wheel executable"));
+      return _promise.promise.reject(new Error("not found wheel executable"));
     }
 
     if (!tasks.some(function (e) {
       return typeof e !== "function" || typeof e !== "number";
     })) {
-      return PromiseFunction.reject(new Error("wheel task only function or number executable"));
+      return _promise.promise.reject(new Error("wheel task only function or number executable"));
     }
 
     if (typeof option !== "object") {
@@ -192,7 +90,7 @@
     var resetScope = 0;
 
     var nextWheelTick = function nextWheelTick(tick, value, tickScope) {
-      var nowAction = tasks[(0, _functions.turn)(tick, taskLength, 1)];
+      var nowAction = tasks[(0, _nice.turn)(tick, taskLength, 1)];
 
       var isActiveFn = function isActiveFn() {
         return tickScope === resetScope;
@@ -227,20 +125,20 @@
     };
 
     var thenStack = [function (e) {
-      if (finished === null) return PromiseFunction.abort();
+      if (finished === null) return abort();
       finished = true;
       return e;
     }];
     var catchStack = [function (e) {
-      if (finished === null) return PromiseFunction.abort();
+      if (finished === null) return abort();
       finished = true;
-      return PromiseFunction.reject(e);
+      return _promise.promise.reject(e);
     }];
 
     var deferReset = function deferReset(resetTick) {
       defer && defer.stop(); //
 
-      defer = PromiseFunction.defer();
+      defer = _promise.promise.defer();
       thenStack.forEach(function (fn) {
         return defer.promise.then(fn);
       });
@@ -289,25 +187,25 @@
   _exports.until = until;
 
   var batch = function batch(funcArray, opts) {
-    return newPromise(function (resolve, reject) {
-      var option = (0, _functions.asObject)(opts, "concurrent");
+    return (0, _promiseEngine.newPromise)(function (resolve, reject) {
+      var option = (0, _cast.asObject)(opts, "concurrent");
 
       if (option.concurrent === true) {
         option.concurrent = Number.POSITIVE_INFINITY;
-      } else if (!(0, _functions.isNumber)(option.concurrent) || option.concurrent < 1) {
+      } else if (!(0, _isLike.isNumber)(option.concurrent) || option.concurrent < 1) {
         option.concurrent = 1;
       }
 
-      if (!(0, _functions.isNumber)(option.interval) || option.interval < -1) {
+      if (!(0, _isLike.isNumber)(option.interval) || option.interval < -1) {
         option.interval = -1;
       }
 
-      if (!(0, _functions.isNumber)(option.repeat) || option.repeat < 1) {
+      if (!(0, _isLike.isNumber)(option.repeat) || option.repeat < 1) {
         option.repeat = 1;
       } //set task with repeat
 
 
-      var sequanceTaskEntries = Array(option.repeat).fill((0, _functions.asArray)(funcArray)).reduce(function (dest, tasks) {
+      var sequanceTaskEntries = Array(option.repeat).fill((0, _cast.asArray)(funcArray)).reduce(function (dest, tasks) {
         tasks.forEach(function (fn, index) {
           return dest.push([index, fn]);
         });
@@ -334,7 +232,7 @@
                     }
 
                     _context.next = 4;
-                    return PromiseFunction.timeout(option.interval);
+                    return _promise.promise.timeout(option.interval);
 
                   case 4:
                     return _context.abrupt("return", entry);
@@ -404,8 +302,37 @@
         }
       }).concat(sequanceTaskEntries);
     });
-  };
+  }; // abort is deprecated
+
 
   _exports.batch = batch;
+  var abortMessage = new function () {
+    Object.defineProperty(this, "message", {
+      get: function get() {
+        return ":abort";
+      }
+    });
+    Object.defineProperty(this, "abort", {
+      get: function get() {
+        return true;
+      }
+    });
+  }();
+
+  var abort = function abort(notifyConsole) {
+    if (notifyConsole === void 0) {
+      notifyConsole = undefined;
+    }
+
+    return new _promiseEngine.PromiseClass(function (resolve, reject) {
+      if (notifyConsole === true) {
+        console.warn("abort promise");
+      }
+
+      reject(abortMessage);
+    });
+  };
+
+  _exports.abort = abort;
 });
-//# sourceMappingURL=promise.js.map
+//# sourceMappingURL=promiseFunctions.js.map
