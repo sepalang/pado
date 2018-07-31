@@ -1,23 +1,32 @@
+import { baseCut } from './reduce.base'
 import { cut, cuts,  top } from './reduce'
 describe('Functions reducer', ()=>{
+  it('baseCut', ()=>{
+    expect(baseCut([1, 2, 3], 1)).toEqual([[1], [2, 3]])
+    expect(baseCut([1, 2, 3], 2, undefined, true)).toEqual([[1, 2], [3]])
+    expect(baseCut([1], 2, 555, true)).toEqual([[1, 555],[]])
+    expect(baseCut([1, 2, 3], 2, 555, true)).toEqual([[1, 2], [3]])
+    expect(baseCut([1, 2, 3], 4, i=>i, true)).toEqual([[1, 2, 3, 3], []])
+    expect(baseCut([1, 2, 3], 4, 4)).toEqual([[1, 2, 3], []])
+  })
+  
   it('cut', ()=>{
     expect(cut([1, 2, 3])).toEqual([1])
     expect(cut([1, 2, 3], 2)).toEqual([1, 2])
-    expect(cut([1, 2], 3)).toEqual([1, 2, undefined])
+    expect(cut([1, 2], 3)).toEqual([1, 2])
+    expect(cut([1, 2], 3, undefined)).toEqual([1, 2, undefined])
     expect(cut([1], 3, 1)).toEqual([1, 1, 1])
     expect(cut([0], 3, i=>i)).toEqual([0, 1, 2])
     expect(cut([0], 3, i=>i * i)).toEqual([0, 1, 4])
     expect(cut(0, 3, i=>i)).toEqual([0, 1, 2])
-    //
-    expect(cut([1, 2, 3], 1, undefined, true)).toEqual([[1], [2, 3]])
-    expect(cut([1, 2, 3], 2, undefined, true)).toEqual([[1, 2], [3]])
-    expect(cut([1, 2, 3], 4, 4, true)).toEqual([[1, 2, 3, 4], []])
-    expect(cut([1, 2, 3], 4, i=>i, true)).toEqual([[1, 2, 3, 3], []])
   })
   
   it('cuts', ()=>{
     expect(cuts([1, 2, 3])).toEqual([[1], [2], [3]])
-    expect(cuts([1, 2, 3], 2)).toEqual([[1, 2], [3, undefined]])
+    expect(cuts([1, 2, 3], 2)).toEqual([[1, 2], [3]])
+    expect(cuts([1, 2, 3], 2, undefined)).toEqual([[1, 2], [3, undefined]])
+    expect(cuts([1, 2, 3], 2, 555)).toEqual([[1, 2], [3, 555]])
+    
     //index
     expect(cuts([1, 2, 3], 2, (index, column, row)=>index)).toEqual([[1, 2], [3, 3]])
     expect(cuts([1, 2, 3, 4, 5], 2, (index, column, row)=>index)).toEqual([[1, 2], [3, 4], [5, 5]])

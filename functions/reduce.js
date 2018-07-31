@@ -1,18 +1,16 @@
-require("core-js/modules/es6.array.fill");
-
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.sort", "core-js/modules/es6.number.constructor", "./isLike", "./cast", "./read", "./reform"], factory);
+    define(["exports", "core-js/modules/es6.array.sort", "core-js/modules/es6.number.constructor", "./reduce.base", "./isLike", "./cast", "./read"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.number.constructor"), require("./isLike"), require("./cast"), require("./read"), require("./reform"));
+    factory(exports, require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.number.constructor"), require("./reduce.base"), require("./isLike"), require("./cast"), require("./read"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Number, global.isLike, global.cast, global.read, global.reform);
+    factory(mod.exports, global.es6Array, global.es6Number, global.reduce, global.isLike, global.cast, global.read);
     global.reduce = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Number, _isLike, _cast, _read, _reform) {
+})(this, function (_exports, _es6Array, _es6Number, _reduce, _isLike, _cast, _read) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -20,43 +18,29 @@ require("core-js/modules/es6.array.fill");
   });
   _exports.top = _exports.cuts = _exports.cut = void 0;
 
-  //reduce.spec.js
-  var cut = function cut(collection, cutLength, emptyDefault, fullResult) {
-    if (fullResult === void 0) {
-      fullResult = false;
-    }
-
-    var data = (0, _cast.asArray)(collection);
-    var rest;
-    cutLength = (0, _isLike.isNumber)(cutLength) ? cutLength : 1;
-
-    if (data.length > cutLength) {
-      rest = data.splice(cutLength, Number.POSITIVE_INFINITY);
-      return fullResult === true ? [data, rest] : data;
-    }
-
-    data = (0, _reform.fill)(data, cutLength, emptyDefault);
-    return fullResult === true ? [data, []] : data;
+  var cut = function cut(collection, cutLength, fillContent) {
+    var useFill = arguments.length > 2;
+    return (0, _reduce.baseCut)(collection, cutLength, fillContent, useFill)[0];
   };
 
   _exports.cut = cut;
 
-  var cuts = function cuts(collection, cutLength, emptyDefault) {
+  var cuts = function cuts(collection, cutLength, fillContent) {
     var result = [];
-    var rest = collection; //
-
+    var rest = collection;
     var rowIndex = 0;
-    var enumFn = typeof emptyDefault !== "function" ? function () {
-      return emptyDefault;
+    var enumFn = typeof fillContent !== "function" ? function () {
+      return fillContent;
     } : function (index) {
-      return emptyDefault(rowIndex * cutLength + index, index, rowIndex);
+      return fillContent(rowIndex * cutLength + index, index, rowIndex);
     };
+    var useFill = arguments.length > 2;
 
     do {
-      var _cut = cut(rest, cutLength, enumFn, true);
+      var _baseCut = (0, _reduce.baseCut)(rest, cutLength, enumFn, useFill);
 
-      collection = _cut[0];
-      rest = _cut[1];
+      collection = _baseCut[0];
+      rest = _baseCut[1];
       result.push(collection);
       rowIndex++;
     } while (rest.length > 0);

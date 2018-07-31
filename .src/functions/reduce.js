@@ -1,3 +1,7 @@
+import {
+  baseCut
+} from './reduce.base'
+
 import { 
   isInfinity,
   isNumber
@@ -11,33 +15,21 @@ import {
   get
 } from './read'
 
-import {
-  fill
-} from './reform'
 
-//reduce.spec.js
-export const cut = function (collection, cutLength, emptyDefault, fullResult = false){
-  let data = asArray(collection); let rest
-  cutLength = isNumber(cutLength) ? cutLength : 1
-  
-  if(data.length > cutLength){
-    rest = data.splice(cutLength, Number.POSITIVE_INFINITY)
-    return fullResult === true ? [data, rest] : data
-  }
-  
-  data = fill(data, cutLength, emptyDefault)
-  return fullResult === true ? [data, []] : data
+export const cut = function (collection, cutLength, fillContent){
+  const useFill = arguments.length > 2
+  return baseCut(collection, cutLength, fillContent, useFill)[0]
 }
 
-export const cuts = function (collection, cutLength, emptyDefault){
+export const cuts = function (collection, cutLength, fillContent){
   const result = []
   let rest = collection
-  //
   let rowIndex = 0
-  const enumFn = typeof emptyDefault !== "function" ? ()=>emptyDefault : (index)=>emptyDefault(rowIndex * cutLength + index, index, rowIndex)
+  const enumFn = typeof fillContent !== "function" ? ()=>fillContent : (index)=>fillContent(rowIndex * cutLength + index, index, rowIndex)
+  const useFill = arguments.length > 2
   
   do {
-    ([collection, rest] = cut(rest, cutLength, enumFn, true))
+    ([collection, rest] = baseCut(rest, cutLength, enumFn, useFill))
     result.push(collection)
     rowIndex++
   } while(rest.length > 0)

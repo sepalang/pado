@@ -1421,39 +1421,40 @@
     return collection;
   };
 
-  var cut = function cut(collection, cutLength, emptyDefault, fullResult) {
-    if (fullResult === void 0) {
-      fullResult = false;
-    }
-
+  var baseCut = function baseCut(collection, cutLength, emptyDefault, useFill) {
     var data = asArray(collection);
     var rest;
     cutLength = isNumber(cutLength) ? cutLength : 1;
 
     if (data.length > cutLength) {
       rest = data.splice(cutLength, Number.POSITIVE_INFINITY);
-      return fullResult === true ? [data, rest] : data;
+      return [data, rest];
     }
 
-    data = fill(data, cutLength, emptyDefault);
-    return fullResult === true ? [data, []] : data;
+    useFill === true && (data = fill(data, cutLength, emptyDefault));
+    return [data, []];
   };
-  var cuts = function cuts(collection, cutLength, emptyDefault) {
-    var result = [];
-    var rest = collection; //
 
+  var cut = function cut(collection, cutLength, fillContent) {
+    var useFill = arguments.length > 2;
+    return baseCut(collection, cutLength, fillContent, useFill)[0];
+  };
+  var cuts = function cuts(collection, cutLength, fillContent) {
+    var result = [];
+    var rest = collection;
     var rowIndex = 0;
-    var enumFn = typeof emptyDefault !== "function" ? function () {
-      return emptyDefault;
+    var enumFn = typeof fillContent !== "function" ? function () {
+      return fillContent;
     } : function (index) {
-      return emptyDefault(rowIndex * cutLength + index, index, rowIndex);
+      return fillContent(rowIndex * cutLength + index, index, rowIndex);
     };
+    var useFill = arguments.length > 2;
 
     do {
-      var _cut = cut(rest, cutLength, enumFn, true);
+      var _baseCut = baseCut(rest, cutLength, enumFn, useFill);
 
-      collection = _cut[0];
-      rest = _cut[1];
+      collection = _baseCut[0];
+      rest = _baseCut[1];
       result.push(collection);
       rowIndex++;
     } while (rest.length > 0);
