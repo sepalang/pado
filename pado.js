@@ -4512,6 +4512,7 @@
     argumentNamesBy: argumentNamesBy,
     scopelizeBy: scopelizeBy,
     drawCircleVars: drawCircleVars,
+    fill: fill,
     promise: promise,
     space: space,
     block: block,
