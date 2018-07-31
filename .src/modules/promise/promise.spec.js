@@ -1,4 +1,4 @@
-import { promisify } from './promise'
+import { promisify } from './index'
 import fs from 'fs'
 import path from 'path'
 
