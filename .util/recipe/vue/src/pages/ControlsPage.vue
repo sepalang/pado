@@ -6,24 +6,25 @@
       <PadoRadio v-model="radio" value="1">1</PadoRadio>
       <PadoRadio v-model="radio" value="2">2</PadoRadio>
       <PadoRadio v-model="radio" value="3">3</PadoRadio>
+      <PadoRadio v-model="radio" :unvalue="false">B</PadoRadio>
       <div>{{radio}}</div>
     </div>
     <div>
       <hgroup>checkbox - boolean</hgroup>
-      <PadoRadio v-model="check_boolean.a">1</PadoRadio>
-      <PadoRadio v-model="check_boolean.b">2</PadoRadio>
-      <PadoRadio v-model="check_boolean.c">3</PadoRadio>
+      <PadoCheckbox v-model="check_boolean.a">1</PadoCheckbox>
+      <PadoCheckbox v-model="check_boolean.b">2</PadoCheckbox>
+      <PadoCheckbox v-model="check_boolean.c">3</PadoCheckbox>
+      <PadoCheckbox v-model="check_boolean.d" :unvalue="null">B</PadoCheckbox>
       <div>{{check_boolean}}</div>
     </div>
     <div>
       <hgroup>checkbox multiple</hgroup>
-      <PadoRadio v-model="radio" value="1">1</PadoRadio>
-      <PadoRadio v-model="radio" value="2">2</PadoRadio>
-      <PadoRadio v-model="radio" value="3">3</PadoRadio>
-      <div></div>
+      <PadoCheckbox v-model="check_multiple" multiple value="1">1</PadoCheckbox>
+      <PadoCheckbox v-model="check_multiple" multiple value="2">2</PadoCheckbox>
+      <PadoCheckbox v-model="check_multiple" multiple value="3">3</PadoCheckbox>
+      <PadoCheckbox v-model="check_multiple" multiple>B</PadoCheckbox>
+      <div>{{check_multiple}}</div>
     </div>
-    
-    
   </AppLayout>
 </template>
 <script>
@@ -43,7 +44,8 @@ export default {
       a: false,
       b: false,
       c: false
-    }
+    },
+    check_multiple: ['2']
   })
 };
 </script>

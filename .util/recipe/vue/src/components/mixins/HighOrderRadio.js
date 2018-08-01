@@ -4,7 +4,11 @@ export default function (...options){
       prop : "model",
       event: "change"
     },
-    props   : ["model", "value", "toggle"],
+    props: {
+      model  : {},
+      value  : {},
+      unvalue: {}
+    },
     computed: {
       modelValue: {
         get: function (){
@@ -14,8 +18,17 @@ export default function (...options){
           this.$emit("change", value);
         }
       },
+      positiveValue (){
+        return !this.$options.propsData.hasOwnProperty("value") ? true : this.value;
+      },
+      negativeValue (){
+        return !this.$options.propsData.hasOwnProperty("unvalue") ? undefined : this.unvalue;
+      },
+      isToggleActive (){
+        return this.$options.propsData.hasOwnProperty("unvalue");
+      },
       isChecked (){
-        return this.modelValue === this.value;
+        return this.modelValue === this.positiveValue;
       }
     },
     methods: {
@@ -26,7 +39,12 @@ export default function (...options){
         ){
           return;
         }
-        this.modelValue = this.value;
+        
+        if(this.modelValue !== this.positiveValue){
+          this.modelValue = this.positiveValue;
+        } else if(this.isToggleActive){
+          this.modelValue = this.negativeValue;
+        }
       }
     }
   };

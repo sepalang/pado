@@ -6,7 +6,12 @@ export default function (...options){
       prop : "model",
       event: "change"
     },
-    props   : ["model", "value", "toggle"],
+    props: {
+      model   : {},
+      value   : {},
+      unvalue : {},
+      multiple: {}
+    },
     computed: {
       modelValue: {
         get: function (){
@@ -19,16 +24,16 @@ export default function (...options){
       isMultiple (){
         return typeof this.multiple === 'string';
       },
-      isChecked (){
-        return this.isMultiple
-          ? asArray(this.modelValue).some(modelDatum=>modelDatum === this.value)
-          : this.modelValue === this.value;
-      },
       positiveValue (){
-        return typeof this.value === "undefined" ? true : this.value;
+        return !this.$options.propsData.hasOwnProperty("value") ? true : this.value;
       },
       negativeValue (){
-        return typeof this.value === "undefined" ? true : undefined;
+        return !this.$options.propsData.hasOwnProperty("unvalue") ? false : this.unvalue;
+      },
+      isChecked (){
+        return this.isMultiple
+          ? asArray(this.modelValue).some(modelDatum=>modelDatum === this.positiveValue)
+          : this.modelValue === this.positiveValue;
       }
     },
     methods: {
@@ -43,13 +48,13 @@ export default function (...options){
         if(this.isMultiple){
           const modelValue = asArray(this.modelValue);
           
-          modelValue.some(modelDatum=>modelDatum != this.value)
-            ? modelValue.push(this.value)
-            : removeValue(modelValue, this.value);
-          
+          modelValue.some(modelDatum=>modelDatum === this.positiveValue)
+            ? removeValue(modelValue, this.positiveValue)
+            : modelValue.push(this.positiveValue);
+            
           this.modelValue = modelValue;
         } else {
-          this.modelValue = this.positiveValue === this.modelValue ? this.negativeValue : this.positiveValue;
+          this.modelValue = this.modelValue === this.positiveValue ? this.negativeValue : this.positiveValue;
         }
       }
     }

@@ -1,7 +1,7 @@
 <template>
   <span class="v-checkbox" @click="input()">
-    <input type="checkbox" v-model="isChecked" readOnly>
-    <span>{{isMultiple}}<slot></slot></span>
+    <input type="checkbox" :checked="isChecked" readOnly>
+    <span><slot></slot></span>
   </span>
 </template>
 <script>
