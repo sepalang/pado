@@ -4,7 +4,7 @@ describe('Functions reducer', ()=>{
   it('baseCut', ()=>{
     expect(baseCut([1, 2, 3], 1)).toEqual([[1], [2, 3]])
     expect(baseCut([1, 2, 3], 2, undefined, true)).toEqual([[1, 2], [3]])
-    expect(baseCut([1], 2, 555, true)).toEqual([[1, 555],[]])
+    expect(baseCut([1], 2, 555, true)).toEqual([[1, 555], []])
     expect(baseCut([1, 2, 3], 2, 555, true)).toEqual([[1, 2], [3]])
     expect(baseCut([1, 2, 3], 4, i=>i, true)).toEqual([[1, 2, 3, 3], []])
     expect(baseCut([1, 2, 3], 4, 4)).toEqual([[1, 2, 3], []])

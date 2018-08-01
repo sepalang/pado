@@ -6,7 +6,7 @@ export default function (...options){
     },
     props   : ["model", "value", "toggle"],
     computed: {
-      radioValue: {
+      modelValue: {
         get: function (){
           return this.model;
         },
@@ -15,7 +15,7 @@ export default function (...options){
         }
       },
       isChecked (){
-        return this.radioValue === this.value;
+        return this.modelValue === this.value;
       }
     },
     methods: {
@@ -26,7 +26,7 @@ export default function (...options){
         ){
           return;
         }
-        this.radioValue = this.value;
+        this.modelValue = this.value;
       }
     }
   };

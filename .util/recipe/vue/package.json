@@ -39,19 +39,22 @@
     },
     "rules": {
       "quotes": 0,
-      "semi"  : [1, "always"],
+      "semi": [
+        1,
+        "always"
+      ],
       "eqeqeq": 0,
       "indent": [
         "error",
         2,
         {
-          "SwitchCase"        : 1,
+          "SwitchCase": 1,
           "VariableDeclarator": {
-            "var"  : 2,
-            "let"  : 2,
+            "var": 2,
+            "let": 2,
             "const": 3
           },
-          "MemberExpression"   : 0,
+          "MemberExpression": 0,
           "FunctionDeclaration": {
             "parameters": "first"
           },
@@ -61,42 +64,42 @@
           "CallExpression": {
             "arguments": "first"
           },
-          "ArrayExpression"       : 1,
-          "ObjectExpression"      : 1,
-          "ImportDeclaration"     : 1,
+          "ArrayExpression": 1,
+          "ObjectExpression": 1,
+          "ImportDeclaration": 1,
           "flatTernaryExpressions": true,
-          "ignoreComments"        : true
+          "ignoreComments": true
         }
       ],
       "space-before-blocks": [
         "error",
         {
           "functions": "never",
-          "keywords" : "never",
-          "classes"  : "always"
+          "keywords": "never",
+          "classes": "always"
         }
       ],
       "spaced-comment": 0,
-      "arrow-spacing" : [
+      "arrow-spacing": [
         "error",
         {
           "before": false,
-          "after" : false
+          "after": false
         }
       ],
       "key-spacing": [
         "error",
         {
           "beforeColon": false,
-          "afterColon" : true,
-          "align"      : "colon"
+          "afterColon": true,
+          "align": "colon"
         }
       ],
       "keyword-spacing": [
         "error",
         {
-          "before"   : true,
-          "after"    : true,
+          "before": true,
+          "after": true,
           "overrides": {
             "if": {
               "after": false
@@ -111,26 +114,27 @@
         }
       ],
       "no-multi-spaces": [
-        "error", {
+        "error",
+        {
           "exceptions": {
             "VariableDeclarator": true,
-            "ImportDeclaration" : true
+            "ImportDeclaration": true
           }
         }
       ],
-      "no-useless-escape"      : 0,
-      "new-cap"                : 0,
-      "no-redeclare"           : 0,
-      "camelcase"              : 0,
-      "no-sequences"           : 0,
-      "no-unused-vars"         : 1,
-      "no-fallthrough"         : 0,
-      "no-mixed-operators"     : 0,
-      "no-return-assign"       : 0,
-      "no-useless-return"      : 0,
-      "no-unreachable"         : 0,
-      "no-trailing-spaces"     : 0,
-      "no-return-await"        : 0,
+      "no-useless-escape": 0,
+      "new-cap": 0,
+      "no-redeclare": 0,
+      "camelcase": 0,
+      "no-sequences": 0,
+      "no-unused-vars": 1,
+      "no-fallthrough": 0,
+      "no-mixed-operators": 0,
+      "no-return-assign": 0,
+      "no-useless-return": 0,
+      "no-unreachable": 0,
+      "no-trailing-spaces": 0,
+      "no-return-await": 0,
       "no-multiple-empty-lines": [
         1,
         {
