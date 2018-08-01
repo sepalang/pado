@@ -2,6 +2,13 @@
   <AppLayout>
     <div>TreePage</div>
     <hr>
+    <h2>render</h2>
+    <div is="PadoNodes" class="asdf" v-if="1===1" :style="{'background-color':bgcol}">
+      <li>asdf</li>
+    </div>
+    <input type="text" v-model="bgcol">
+    <hr>
+    
     <h2>Custom tree</h2>
     <pre>{{ treeModel }}</pre>
     <PadoNode :model="treeModel">
@@ -51,10 +58,12 @@
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
 import PadoNode from '../components/PadoNode.vue';
+import PadoNodes from '../components/PadoNodes.vue';
 export default {
   components: {
     AppLayout,
-    PadoNode
+    PadoNode,
+    PadoNodes
   },
   data: ()=>({
     treeModel: [
@@ -72,7 +81,8 @@ export default {
         ]
       },
       {name: 'bar'}
-    ]
+    ],
+    bgcol: 'yellow'
   })
 };
 </script>
