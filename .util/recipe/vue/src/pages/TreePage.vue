@@ -3,15 +3,30 @@
     <div>TreePage</div>
     <hr>
     <h2>render</h2>
-    <div is="PadoNodes" class="asdf" v-if="1===1" :style="{'background-color':bgcol}">
-      <li>asdf</li>
-    </div>
-    <input type="text" v-model="bgcol">
+    <ul v-model="treeModel" is="PadoNode" ref="rootnode" class="foobar">
+      <template slot-scope="node">
+        <template v-for="item in node.model">
+          <li :key="item.name+0">
+            {{ item.name }}
+          </li>
+          <li v-if="item.children && item.children.length" :key="item.name+1">
+            ({{ item.name }} hasChild)
+            <ul v-model="item.children" is="PadoNode">
+              <template slot-scope="node">
+                <li v-for="(item, index) in node.model" :key="item.name">
+                  {{index}}-{{ item }}
+                </li>
+              </template>
+            </ul>
+          </li>
+        </template>
+      </template>
+    </ul>
     <hr>
     
     <h2>Custom tree</h2>
     <pre>{{ treeModel }}</pre>
-    <PadoNode :model="treeModel">
+    <PadoNodes :model="treeModel">
       <template slot-scope="node">
         <div>
           <button 
@@ -22,7 +37,7 @@
           {{ node.model.name }}
         </div>
         <div v-if="node.open">
-          <PadoNode :model="node.model.children">
+          <PadoNodes :model="node.model.children">
             <template slot-scope="node">
               <button
                 v-if="node.model.children && node.model.children.length"
@@ -37,28 +52,29 @@
                 {{ node.model.children }}
               </div>
             </template>
-          </PadoNode>
+          </PadoNodes>
         </div>
       </template>
-    </PadoNode>
+    </PadoNodes>
     
     <hr>
     
     <h2>Auto tree : incomplete</h2>
-    <PadoNode :model="treeModel" :nested="true">
+    <PadoNodes :model="treeModel" :nested="true">
       <template slot-scope="node">
         <button 
           @click="node.toggleOpen" 
           :disabled="!node.model.children"
         > Open: {{ node.open }}</button>
       </template>
-    </PadoNode>
+    </PadoNodes>
   </AppLayout>
 </template>
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
 import PadoNode from '../components/PadoNode.vue';
 import PadoNodes from '../components/PadoNodes.vue';
+
 export default {
   components: {
     AppLayout,
@@ -83,6 +99,9 @@ export default {
       {name: 'bar'}
     ],
     bgcol: 'yellow'
-  })
+  }),
+  mounted (){
+    console.log("rootnode", this.$refs.rootnode);
+  }
 };
 </script>
