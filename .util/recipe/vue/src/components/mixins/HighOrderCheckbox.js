@@ -16,10 +16,19 @@ export default function (...options){
           this.$emit("change", value);
         }
       },
+      isMultiple (){
+        return typeof this.multiple === 'string';
+      },
       isChecked (){
-        return typeof this.multiple === 'string'
+        return this.isMultiple
           ? asArray(this.modelValue).some(modelDatum=>modelDatum === this.value)
           : this.modelValue === this.value;
+      },
+      positiveValue (){
+        return typeof this.value === "undefined" ? true : this.value;
+      },
+      negativeValue (){
+        return typeof this.value === "undefined" ? true : undefined;
       }
     },
     methods: {
@@ -31,7 +40,7 @@ export default function (...options){
           return;
         }
         
-        if(typeof this.multiple === 'string'){
+        if(this.isMultiple){
           const modelValue = asArray(this.modelValue);
           
           modelValue.some(modelDatum=>modelDatum != this.value)
@@ -40,7 +49,7 @@ export default function (...options){
           
           this.modelValue = modelValue;
         } else {
-          this.modelValue = this.value === this.modelValue ? undefined : this.value;
+          this.modelValue = this.positiveValue === this.modelValue ? this.negativeValue : this.positiveValue;
         }
       }
     }

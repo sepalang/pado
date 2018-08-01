@@ -1,20 +1,17 @@
 <template>
-  <span class="v-radio">
-    <input type="radio" :selected="isChecked" readOnly>
-    <span>{{isChecked}}<slot></slot></span>
+  <span class="v-radio" @click="input()">
+    <input type="radio" :checked="isChecked" readOnly>
+    <span><slot></slot></span>
   </span>
 </template>
 <script>
+import HighOrderRadio from './mixins/HighOrderRadio.js';
 export default {
-  computed: {
-    isChecked (){
-      return false;
-    }
-  }
+  mixins: [ HighOrderRadio() ]
 };
 </script>
 <style lang="scss">
 .v-radio {
-  
+  cursor:pointer;
 }
 </style>
