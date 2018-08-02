@@ -3,18 +3,33 @@
     <div>TreePage</div>
     <hr>
     <h2>render</h2>
-    <ul v-model="treeModel" is="PadoNode" ref="rootnode" class="foobar">
-      <template slot-scope="node">
-        <template v-for="item in node.model">
+    <ul v-model="treeModel" is="PadoNode" ref="rootnode" class="foo" :class={bar:true}>
+      <template slot-scope="{ model:list, toggleOpen, depth, isOpen, hasChildren }">
+        <template v-for="item in list">
           <li :key="item.name+0">
-            {{ item.name }}
+            <button
+              @click="toggleOpen(item)"
+              :disabled="!hasChildren(item)"
+            >{{depth}} OPEN</button>{{ item.name }}
           </li>
-          <li v-if="item.children && item.children.length" :key="item.name+1">
-            ({{ item.name }} hasChild)
+          <li v-if="isOpen(item) && hasChildren(item)" :key="item.name+1" style="display:block;">
             <ul v-model="item.children" is="PadoNode">
-              <template slot-scope="node">
-                <li v-for="(item, index) in node.model" :key="item.name">
-                  {{index}}-{{ item }}
+              <template slot-scope="{ model:list, depth, toggleOpen, hasChildren, toggleSelected }">
+                <li v-for="(item, index) in list" :key="item.name" style="display:block;">
+                  <input type="checkbox" v-model="item.$selected">
+                  <button @click="toggleSelected(item)"></button>
+                  [{{depth + ':' + index}}] {{ item.name }}
+                  <button
+                    @click="toggleOpen(item)"
+                    :disabled="!hasChildren(item)"
+                  >MORE</button>
+                  <div v-if="isOpen(item) && hasChildren(item)" is="PadoNode" v-model="item.children">
+                    <template slot-scope="{ model:list, depth, toggleOpen, hasChildren, toggleSelected }">
+                      <div v-for="(item ,index) in list" :key="item.name">
+                        [{{ depth + ':' + index }}] {{ item.name }}
+                      </div>
+                    </template>
+                  </div>
                 </li>
               </template>
             </ul>
@@ -93,7 +108,9 @@ export default {
               { name: "김밥" }
             ]
           },
-          {name: "chi"}
+          {name: "chi"},
+          {name: "foo"},
+          {name: "bar"}
         ]
       },
       {name: 'bar'}
