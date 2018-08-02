@@ -26,6 +26,10 @@ export default {
     children: {
       type   : [String, Number],
       default: 'children'
+    },
+    contextKey: {
+      type   : String,
+      default: undefined
     }
   },
   computed: {
@@ -39,59 +43,86 @@ export default {
       return this.model || [];
     },
     contexts (){
-      return this.model.map(datum=>{
-        const context = {};
+      const rootModel = this.nodes;
+      const cachedNodelistContext = this.__cachedNodelistContext || [];
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      this.__cachedNodelistContextId = this.__cachedNodelistContextId || 0;
+      const contextKey = this.contextKey;
+      const useContextKey = typeof contextKey === "string";
+      const ref = this;
+      
+      
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      this.__cachedNodelistContext = rootModel.map(datum=>{
+        let context = cachedNodelistContext.find(
+          useContextKey
+            ? (oldCtx)=>oldCtx.datum[contextKey] === datum[contextKey]
+            : (oldCtx)=>oldCtx.datum === datum
+        );
+        
+        if(!context){
+          context = {};
+          Object.defineProperties(context, {
+            key: {
+              // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+              value: `${ref._uid}-${this.__cachedNodelistContextId++}`
+            },
+            depth: {
+              get: ()=>ref.depth
+            },
+            toggle: {
+              get (){ return key=>{ return ref.toggle(this.datum, key); }; }
+            },
+            toggleOnly: {
+              get (){ return key=>{ return ref.toggleOnly(this.datum, key); }; }
+            },
+            inputAll: {
+              get (){ return val=>{ return ref.inputAll(this.datum, val); }; }
+            },
+            is: {
+              get (){ return key=>{ return ref.is(this.datum, key); }; }
+            },
+            open: {
+              get (){ return ()=>{ this.toggle('open'); }; }
+            },
+            selected: {
+              get (){ return ()=>{ this.toggleOnly('selected'); }; }
+            },
+            checked: {
+              get (){ return ()=>{ this.toggle('checked'); }; }
+            },
+            isOpen: {
+              get (){ return this.is('open'); }
+            },
+            isSelected: {
+              get (){ return this.is('selected'); }
+            },
+            isChecked: {
+              get (){ return this.is('checked'); }
+            },
+            children: {
+              get (){ return this.datum[ref.children] instanceof Array ? this.datum[ref.children] : []; }
+            },
+            hasChildren: {
+              get (){ return this.datum.hasOwnProperty(ref.children) && !!this.children.length; }
+            },
+            visibleChildren: {
+              get (){ return this.isOpen && this.hasChildren; }
+            }
+          });
+        }
         
         Object.defineProperties(context, {
           datum: {
-            get: ()=>datum
-          },
-          depth: {
-            get: ()=>this.depth
-          },
-          toggle: {
-            get: ()=>key=>{ return this.toggle(datum, key); }
-          },
-          toggleOnly: {
-            get: ()=>key=>{ return this.toggleOnly(datum, key); }
-          },
-          inputAll: {
-            get: ()=>val=>{ return this.inputAll(datum, val); }
-          },
-          is: {
-            get: ()=>key=>{ return this.is(datum, key); }
-          },
-          open: {
-            get: ()=>()=>{ context.toggle('open'); }
-          },
-          selected: {
-            get: ()=>()=>{ context.toggleOnly('selected'); }
-          },
-          checked: {
-            get: ()=>()=>{ context.toggle('checked'); }
-          },
-          isOpen: {
-            get: ()=>context.is('open')
-          },
-          isSelected: {
-            get: ()=>context.is('selected')
-          },
-          isChecked: {
-            get: ()=>context.is('checked')
-          },
-          children: {
-            get: ()=>datum[this.children] instanceof Array ? datum[this.children] : []
-          },
-          hasChildren: {
-            get: ()=>datum.hasOwnProperty(this.children) && !!context.children.length
-          },
-          visibleChildren: {
-            get: ()=>context.isOpen && context.hasChildren
+            configurable: true,
+            get         : ()=>datum
           }
         });
         
         return context;
       });
+      
+      return this.__cachedNodelistContext;
     }
   },
   methods: {
@@ -110,7 +141,7 @@ export default {
     },
     inputProperty (datum, propertyKey, value, resolve){
       const name  = `$${propertyKey}`;
-      typeof resolve === "function" ? resolve(datum, name) : true && this.$set(datum, name, typeof value === "function" ? value(datum, name) : value);
+      (typeof resolve === "function" ? resolve(datum, name) : true) && this.$set(datum, name, typeof value === "function" ? value(datum, name) : value);
       this.$emit("state", { datum, name, value });
     },
     toggle (datum, propertyKey){
@@ -118,7 +149,7 @@ export default {
     },
     toggleOnly (datum, propertyKey){
       this.nodes.forEach(item=>{
-        datum !== item && this.inputProperty(datum, propertyKey, ()=>false, (datum, name)=>datum[name] === true);
+        datum !== item && this.inputProperty(item, propertyKey, ()=>false, (item, name)=>{ return item[name] === true; });
       });
       this.inputProperty(datum, propertyKey, (datum, name)=>!datum[name]);
     },

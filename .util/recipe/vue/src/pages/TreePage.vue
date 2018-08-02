@@ -3,25 +3,25 @@
     <div>TreePage</div>
     <hr>
     <h2>render</h2>
-    <ul v-model="treeModel" is="Nodelist" ref="rootnode" class="foo" :class={bar:true}>
+    <ul is="Nodelist" v-model="treeModel" ref="rootnode" class="foo" :class="{bar:true}">
       <template slot-scope="{ contexts }">
         <template v-for="scope in contexts">
           <li :key="scope.datum.name+0">
             <button @click="scope.open()" :disabled="!scope.hasChildren">{{scope.depth}} OPEN</button>
-            {{ scope.datum.name }}
+            {{ scope.datum.name }} {{ scope.key }}
           </li>
           <li v-if="scope.visibleChildren" :key="scope.datum.name+1" style="display:block;">
-            <ul v-model="scope.children" is="Nodelist">
+            <ul is="Nodelist" v-model="scope.children" >
               <template slot-scope="{ contexts }">
                 <li v-for="(scope, index) in contexts" :key="scope.datum.name" style="display:block;">
                   <input type="checkbox" v-model="scope.datum.$selected">
                   <button @click="scope.selected()"></button>
-                  [{{scope.depth + ':' + index}}] {{ scope.datum.name }}
+                  [{{scope.depth + ':' + index}}] {{ scope.datum.name }} {{ scope.key }}
                   <button @click="scope.open()" :disabled="!scope.hasChildren">MORE</button>
                   <div v-if="scope.visibleChildren" is="Nodelist" v-model="scope.children">
                     <template slot-scope="{ contexts }">
                       <div v-for="(scope ,index) in contexts" :key="scope.datum.name">
-                        [{{ scope.depth + ':' + index }}] {{ scope.datum.name }}
+                        [{{ scope.depth + ':' + index }}] {{ scope.datum.name }} {{ scope.key }}
                       </div>
                     </template>
                   </div>
