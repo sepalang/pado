@@ -3,13 +3,9 @@ export default {
   render (h){
     const slot = this.$scopedSlots.default 
       ? this.$scopedSlots.default({
-        model         : this.model,
-        toggleOpen    : this.toggleOpen,
-        toggleSelected: this.toggleSelected,
-        toggleChecked : this.toggleChecked,
-        depth         : this.depth,
-        isOpen        : this.isOpen,
-        hasChildren   : this.hasChildren
+        model   : this.model,
+        contexts: this.contexts,
+        depth   : this.depth
       }) 
       : [ this.$slots.default ];
     return h(this.tag, { class: 'v-node', attr: this.$attr }, slot);
@@ -22,11 +18,13 @@ export default {
       type: Array
     },
     tag: {
+      type: String,
       default (){
         return this.$vnode.data.tag;
       }
     },
     children: {
+      type   : [String, Number],
       default: 'children'
     }
   },
@@ -39,6 +37,61 @@ export default {
     },
     nodes (){
       return this.model || [];
+    },
+    contexts (){
+      return this.model.map(datum=>{
+        const context = {};
+        
+        Object.defineProperties(context, {
+          datum: {
+            get: ()=>datum
+          },
+          depth: {
+            get: ()=>this.depth
+          },
+          toggle: {
+            get: ()=>key=>{ return this.toggle(datum, key); }
+          },
+          toggleOnly: {
+            get: ()=>key=>{ return this.toggleOnly(datum, key); }
+          },
+          inputAll: {
+            get: ()=>val=>{ return this.inputAll(datum, val); }
+          },
+          is: {
+            get: ()=>key=>{ return this.is(datum, key); }
+          },
+          open: {
+            get: ()=>()=>{ context.toggle('open'); }
+          },
+          selected: {
+            get: ()=>()=>{ context.toggleOnly('selected'); }
+          },
+          checked: {
+            get: ()=>()=>{ context.toggle('checked'); }
+          },
+          isOpen: {
+            get: ()=>context.is('open')
+          },
+          isSelected: {
+            get: ()=>context.is('selected')
+          },
+          isChecked: {
+            get: ()=>context.is('checked')
+          },
+          children: {
+            get: ()=>datum[this.children] instanceof Array ? datum[this.children] : []
+          },
+          hasChildren: {
+            get: ()=>datum.hasOwnProperty(this.children) && !!context.children.length
+          },
+          visibleChildren: {
+            get: ()=>context.isOpen && context.hasChildren
+          }
+        });
+        
+        return context;
+      });
     }
   },
   methods: {
@@ -55,26 +108,27 @@ export default {
       const parents = this.parentNodeComponents();
       return parents[parents.length - 1] || this;
     },
-    toggleOpen (item){
-      const destOpenValue = !item.$open;
-      this.$set(item, '$open', destOpenValue);
+    inputProperty (datum, propertyKey, value, resolve){
+      const name  = `$${propertyKey}`;
+      typeof resolve === "function" ? resolve(datum, name) : true && this.$set(datum, name, typeof value === "function" ? value(datum, name) : value);
+      this.$emit("state", { datum, name, value });
     },
-    toggleSelected (item){
-      this.nodes.forEach(datum=>{
-        datum !== item && this.$set(datum, '$selected', false);
+    toggle (datum, propertyKey){
+      this.inputProperty(datum, propertyKey, (datum, name)=>!datum[name]);
+    },
+    toggleOnly (datum, propertyKey){
+      this.nodes.forEach(item=>{
+        datum !== item && this.inputProperty(datum, propertyKey, ()=>false, (datum, name)=>datum[name] === true);
       });
-      const destOpenValue = !item.$selected;
-      this.$set(item, '$selected', destOpenValue);
+      this.inputProperty(datum, propertyKey, (datum, name)=>!datum[name]);
     },
-    toggleChecked (item){
-      const destOpenValue = !item.$checked;
-      this.$set(item, '$checked', destOpenValue);
+    inputAll (propertyKey, value){
+      this.nodes.forEach(datum=>{
+        this.inputProperty(datum, propertyKey, value);
+      });
     },
-    isOpen (item){
-      return item.$open === true;
-    },
-    hasChildren (item){
-      return item[this.children] && item[this.children].length;
+    is (datum, propertyKey){
+      return datum[`$${propertyKey}`] === true;
     }
   }
 };

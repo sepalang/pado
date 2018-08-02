@@ -4,29 +4,24 @@
     <hr>
     <h2>render</h2>
     <ul v-model="treeModel" is="PadoNode" ref="rootnode" class="foo" :class={bar:true}>
-      <template slot-scope="{ model:list, toggleOpen, depth, isOpen, hasChildren }">
-        <template v-for="item in list">
-          <li :key="item.name+0">
-            <button
-              @click="toggleOpen(item)"
-              :disabled="!hasChildren(item)"
-            >{{depth}} OPEN</button>{{ item.name }}
+      <template slot-scope="{ contexts }">
+        <template v-for="scope in contexts">
+          <li :key="scope.datum.name+0">
+            <button @click="scope.open()" :disabled="!scope.hasChildren">{{scope.depth}} OPEN</button>
+            {{ scope.datum.name }}
           </li>
-          <li v-if="isOpen(item) && hasChildren(item)" :key="item.name+1" style="display:block;">
-            <ul v-model="item.children" is="PadoNode">
-              <template slot-scope="{ model:list, depth, toggleOpen, hasChildren, toggleSelected }">
-                <li v-for="(item, index) in list" :key="item.name" style="display:block;">
-                  <input type="checkbox" v-model="item.$selected">
-                  <button @click="toggleSelected(item)"></button>
-                  [{{depth + ':' + index}}] {{ item.name }}
-                  <button
-                    @click="toggleOpen(item)"
-                    :disabled="!hasChildren(item)"
-                  >MORE</button>
-                  <div v-if="isOpen(item) && hasChildren(item)" is="PadoNode" v-model="item.children">
-                    <template slot-scope="{ model:list, depth, toggleOpen, hasChildren, toggleSelected }">
-                      <div v-for="(item ,index) in list" :key="item.name">
-                        [{{ depth + ':' + index }}] {{ item.name }}
+          <li v-if="scope.visibleChildren" :key="scope.datum.name+1" style="display:block;">
+            <ul v-model="scope.children" is="PadoNode">
+              <template slot-scope="{ contexts }">
+                <li v-for="(scope, index) in contexts" :key="scope.datum.name" style="display:block;">
+                  <input type="checkbox" v-model="scope.datum.$selected">
+                  <button @click="scope.selected()"></button>
+                  [{{scope.depth + ':' + index}}] {{ scope.datum.name }}
+                  <button @click="scope.open()" :disabled="!scope.hasChildren">MORE</button>
+                  <div v-if="scope.visibleChildren" is="PadoNode" v-model="scope.children">
+                    <template slot-scope="{ contexts }">
+                      <div v-for="(scope ,index) in contexts" :key="scope.datum.name">
+                        [{{ scope.depth + ':' + index }}] {{ scope.datum.name }}
                       </div>
                     </template>
                   </div>
