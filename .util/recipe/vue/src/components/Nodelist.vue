@@ -8,7 +8,7 @@ export default {
         depth   : this.depth
       }) 
       : [ this.$slots.default ];
-    return h(this.tag, { class: 'v-node', attr: this.$attr }, slot);
+    return h(this.tag, { class: 'v-nodelist', attr: this.$attr }, slot);
   },
   model: {
     prop: "model"

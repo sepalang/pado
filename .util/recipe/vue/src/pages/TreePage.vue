@@ -3,7 +3,7 @@
     <div>TreePage</div>
     <hr>
     <h2>render</h2>
-    <ul v-model="treeModel" is="PadoNode" ref="rootnode" class="foo" :class={bar:true}>
+    <ul v-model="treeModel" is="Nodelist" ref="rootnode" class="foo" :class={bar:true}>
       <template slot-scope="{ contexts }">
         <template v-for="scope in contexts">
           <li :key="scope.datum.name+0">
@@ -11,14 +11,14 @@
             {{ scope.datum.name }}
           </li>
           <li v-if="scope.visibleChildren" :key="scope.datum.name+1" style="display:block;">
-            <ul v-model="scope.children" is="PadoNode">
+            <ul v-model="scope.children" is="Nodelist">
               <template slot-scope="{ contexts }">
                 <li v-for="(scope, index) in contexts" :key="scope.datum.name" style="display:block;">
                   <input type="checkbox" v-model="scope.datum.$selected">
                   <button @click="scope.selected()"></button>
                   [{{scope.depth + ':' + index}}] {{ scope.datum.name }}
                   <button @click="scope.open()" :disabled="!scope.hasChildren">MORE</button>
-                  <div v-if="scope.visibleChildren" is="PadoNode" v-model="scope.children">
+                  <div v-if="scope.visibleChildren" is="Nodelist" v-model="scope.children">
                     <template slot-scope="{ contexts }">
                       <div v-for="(scope ,index) in contexts" :key="scope.datum.name">
                         [{{ scope.depth + ':' + index }}] {{ scope.datum.name }}
@@ -82,13 +82,13 @@
 </template>
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
-import PadoNode from '../components/PadoNode.vue';
+import Nodelist from '../components/Nodelist.vue';
 import PadoNodes from '../components/PadoNodes.vue';
 
 export default {
   components: {
     AppLayout,
-    PadoNode,
+    Nodelist,
     PadoNodes
   },
   data: ()=>({
