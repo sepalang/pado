@@ -1,4 +1,6 @@
 import {
+  isNone,
+  likeString,
   isObject,
   likeObject,
   isEmpty,
@@ -11,6 +13,34 @@ import {
 } from './isLike'
 
 describe('Functions isLike', ()=>{
+  it('isNone', ()=>{
+    const NI = Number.NEGATIVE_INFINITY
+    const PI = Number.POSITIVE_INFINITY
+    
+    expect(isNone()).toEqual(true)
+    expect(isNone(undefined)).toEqual(true)
+    expect(isNone(void 0)).toEqual(true)
+    expect(isNone(NaN)).toEqual(true)
+    expect(isNone(null)).toEqual(true)
+    expect(isNone(NI)).toEqual(false)
+    expect(isNone(PI)).toEqual(false)
+    expect(isNone(0)).toEqual(false)
+    expect(isNone(-0)).toEqual(false)
+    expect(isNone(true)).toEqual(false)
+    expect(isNone({})).toEqual(false)
+    expect(isNone("")).toEqual(false)
+  })
+  
+  it('likeString', ()=>{
+    expect(likeString("")).toEqual(true)
+    expect(likeString(123)).toEqual(true)
+    expect(likeString({})).toEqual(false)
+    expect(likeString(undefined)).toEqual(false)
+    expect(likeString(null)).toEqual(false)
+    expect(likeString(NaN)).toEqual(false)
+    expect(likeString(true)).toEqual(false)
+  })
+  
   // isEmpty
   it('isEmpty', ()=>{
     expect(isEmpty(null)).toEqual(true)
@@ -155,4 +185,5 @@ describe('Functions isLike', ()=>{
     expect(isPresence(undefined)).toEqual(false)
     expect(isPresence()).toEqual(false)
   })
+  
 })
