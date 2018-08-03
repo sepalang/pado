@@ -116,6 +116,14 @@ export default {
           datum: {
             configurable: true,
             get         : ()=>datum
+          },
+          isFirst: {
+            configurable: true,
+            get (){ return ref.nodes[0] === this.datum; }
+          },
+          isLast: {
+            configurable: true,
+            get (){ return ref.nodes[ref.nodes.length - 1] === this.datum; }
           }
         });
         
