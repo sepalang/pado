@@ -2,8 +2,8 @@
   <div class="v-pado-minimap" :style="rectStyle">
     <div class="v-pado-minimap-viewport" :style="viewportStyle">
       <div class="v-pado-minimap-view" :style="viewStyle"><slot></slot></div>
-      <div class="v-pado-minimap-port" :style="portStyle"></div>
     </div>
+    <div class="v-pado-minimap-port" :style="portStyle"></div>
   </div>
 </template>
 <script>
@@ -24,6 +24,9 @@ export default {
     viewport: {
       require: true,
       type   : Object
+    },
+    autoscale: {
+      default: false
     }
   },
   data: ()=>({
@@ -75,7 +78,7 @@ export default {
       }
       
       const style = {
-        transform: `translate(-50%, -50.1%) scale(${viewportRatio})`,
+        transform: `translate(-50%, -50%) scale(${viewportRatio})`,
         left     : `50%`,
         top      : `50%`
       };
@@ -84,19 +87,38 @@ export default {
     },
     viewStyle (){
       const { padding } = this.viewportBoundings;
-      return {
+      const style = {
         'left'          : `${padding}px`,
         'top'           : `${padding}px`,
         'padding-right' : `${padding}px`,
         'padding-bottom': `${padding}px`
       };
+      
+      if(this.autoscale === false){
+        const reverseRatio = 1 / this.viewportRatio;
+        style.transform = `scale(${reverseRatio})`;
+      }
+      
+      return style;
     },
     portStyle (){
-      const { left:portLeft, top:portTop, width:portWidth, height:portHeight } = this.viewportVariant;
+      const viewportRatio = this.viewportRatio;
+      
+      const { width:minimapWidth, height:minimapHeight } = this.rectValue;
+      let { contentWidth, contentHeight } = this.viewportBoundings;
+      let { left:portLeft, top:portTop, width:portWidth, height:portHeight } = this.viewportVariant;
+      
+      portLeft = portLeft * viewportRatio;
+      portTop = portTop * viewportRatio;
+      portWidth = portWidth * viewportRatio;
+      portHeight = portHeight * viewportRatio;
+      contentWidth = contentWidth * viewportRatio;
+      contentHeight = contentHeight * viewportRatio;
+      
       
       const style = {
-        left  : `${portLeft}px`,
-        top   : `${portTop}px`,
+        left  : `${((minimapWidth - contentWidth) / 2) + portLeft}px`,
+        top   : `${((minimapHeight - contentHeight) / 2) + portTop}px`,
         width : `${portWidth}px`,
         height: `${portHeight}px`
       };
@@ -106,12 +128,9 @@ export default {
   },
   mounted (){
     nextTick(()=>{
-      const viewElement = this.$el.querySelector(".v-pado-minimap-viewport");
       const portElement = this.$el.querySelector(".v-pado-minimap-port");
     
       dragHelper(portElement, ({ element:dragElement })=>{
-        const [ element ] = dragElement;
-      
         const startPosition = {
           top : 0,
           left: 0
@@ -119,22 +138,26 @@ export default {
       
         return {
           start: ()=>{
-            startPosition.left = element.offsetLeft;
-            startPosition.top = element.offsetTop;
+            let { left, top } = this.viewportVariant;
+            startPosition.left = left;
+            startPosition.top = top;
           },
           move: ({ pointer })=>{
             const boostX = pointer.offsetX * (1 / this.viewportRatio);
             const boostY = pointer.offsetY * (1 / this.viewportRatio);
             
+            let { width:viewportWidth, height:viewportHeight } = this.viewportVariant;
+            let { contentWidth, contentHeight } = this.viewportBoundings;
+            
             let { destLeft:left, destTop:top } = {
               destLeft: limitNumber(
                 startPosition.left + boostX,
-                viewElement.scrollWidth - element.offsetWidth,
+                contentWidth - viewportWidth,
                 0
               ),
               destTop: limitNumber(
                 startPosition.top + boostY,
-                viewElement.scrollHeight - element.offsetHeight,
+                contentHeight - viewportHeight,
                 0
               )
             };
@@ -169,14 +192,16 @@ export default {
       > .v-pado-minimap-view {
         position:relative;
       }
-      
-      > .v-pado-minimap-port {
-        pointer-events:all;
-        background-color:rgba(0,0,0,.2);
-        position:absolute;
-        top:0;
-        left:0;
-      }
+    }
+    
+    > .v-pado-minimap-port {
+      pointer-events:all;
+      background: #65ff00;
+      border: 1px solid #65ff00;
+      opacity: 0.4;
+      position:absolute;
+      top:0;
+      left:0;
     }
     
     img {

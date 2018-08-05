@@ -173,7 +173,7 @@ export default {
 <style lang="scss">
   .v-pado-screen {
     display:inline-block;
-    background-color:#eee;
+    background-color:transparent;
     position:relative;
     overflow:auto;
 
