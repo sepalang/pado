@@ -1,4 +1,6 @@
 <script>
+import { asArray, toggle } from '../../../../../.src/functions';
+
 export default {
   render (h){
     const slot = this.$scopedSlots.default 
@@ -71,10 +73,10 @@ export default {
               get: ()=>ref.depth
             },
             toggle: {
-              get (){ return key=>{ return ref.toggle(this.datum, key); }; }
+              get (){ return (key, toggleValues)=>{ return ref.toggle(this.datum, key, toggleValues); }; }
             },
             toggleOnly: {
-              get (){ return key=>{ return ref.toggleOnly(this.datum, key); }; }
+              get (){ return (key, toggleValues)=>{ return ref.toggleOnly(this.datum, key, toggleValues); }; }
             },
             inputAll: {
               get (){ return val=>{ return ref.inputAll(this.datum, val); }; }
@@ -83,13 +85,13 @@ export default {
               get (){ return key=>{ return ref.is(this.datum, key); }; }
             },
             open: {
-              get (){ return ()=>{ this.toggle('open'); }; }
+              get (){ return (toggleValues)=>{ this.toggle('open', toggleValues); }; }
             },
             selected: {
-              get (){ return ()=>{ this.toggleOnly('selected'); }; }
+              get (){ return (toggleValues)=>{ this.toggleOnly('selected', toggleValues); }; }
             },
             checked: {
-              get (){ return ()=>{ this.toggle('checked'); }; }
+              get (){ return (toggleValues)=>{ this.toggle('checked', toggleValues); }; }
             },
             isOpen: {
               get (){ return this.is('open'); }
@@ -152,14 +154,18 @@ export default {
       (typeof resolve === "function" ? resolve(datum, name) : true) && this.$set(datum, name, typeof value === "function" ? value(datum, name) : value);
       this.$emit("state", { datum, name, value });
     },
-    toggle (datum, propertyKey){
-      this.inputProperty(datum, propertyKey, (datum, name)=>!datum[name]);
+    toggle (datum, propertyKey, toggleValues = [true, false]){
+      toggleValues = asArray(toggleValues);
+      !toggleValues.length && (toggleValues = [true, false]);
+      this.inputProperty(datum, propertyKey, (datum, name)=>toggle(toggleValues, datum[name]));
     },
-    toggleOnly (datum, propertyKey){
+    toggleOnly (datum, propertyKey, toggleValues){
+      toggleValues = asArray(toggleValues);
+      !toggleValues.length && (toggleValues = [true, false]);
       this.nodes.forEach(item=>{
-        datum !== item && this.inputProperty(item, propertyKey, ()=>false, (item, name)=>{ return item[name] === true; });
+        datum !== item && this.inputProperty(item, propertyKey, ()=>toggle(toggleValues, toggleValues[0]), (item, name)=>{ return item[name] === toggleValues[0]; });
       });
-      this.inputProperty(datum, propertyKey, (datum, name)=>!datum[name]);
+      this.inputProperty(datum, propertyKey, (datum, name)=>toggle(toggleValues, datum[name]));
     },
     inputAll (propertyKey, value){
       this.nodes.forEach(datum=>{

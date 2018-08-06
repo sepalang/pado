@@ -250,14 +250,3 @@ export const diffStructure = function (before, after){
 
   return analysis
 }
-
-//PINPONGPOOL INTERFACE
-export const toggle = function (ta, cv, set){
-  var index = -1
-  for(let d = asArray(ta), l = d.length, i = 0; i < l; i++){
-    if(d[i] == cv){ index = i + 1; break }
-  }
-  if(arguments.length > 2) for(var i = 0, l = ta.length; i < l; i++) if(ta[i] == set) return ta[i]
-  index = ta.length == index ? 0 : index
-  return ta[index]
-}

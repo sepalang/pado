@@ -33,12 +33,14 @@
       </template>
     </ul>
     <hr>
-    
+    <button @click="toggleTest">toggleTest</button>
+    <div>{{toggleValue}}</div>
   </AppLayout>
 </template>
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
 import Nodelist from '../components/Nodelist.vue';
+import { toggle } from '../../../../../.src/functions';
 
 export default {
   components: {
@@ -64,8 +66,14 @@ export default {
       },
       {name: 'bar'}
     ],
-    bgcol: 'yellow'
+    bgcol      : 'yellow',
+    toggleValue: undefined
   }),
+  methods: {
+    toggleTest (){
+      this.toggleValue = toggle([true, false, 1], this.toggleValue);
+    }
+  },
   mounted (){
     console.log("rootnode", this.$refs.rootnode);
   }

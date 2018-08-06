@@ -1,4 +1,5 @@
 import { isNumber, isArray, isAbsoluteNaN } from './isLike'
+import { asArray } from './cast'
 
 export const limitNumber = (function (){
   const limitOf = function (number, max, min){
@@ -100,4 +101,8 @@ export const turn = function (i, limit, ts, resultHook){
 
 export const turnTime = function (i, limit, ts){
   return turn(i, limit, ts, (result, i, limit, ts)=>[result, Math.floor(i / (limit * ts))])
+}
+
+export const toggle = function (toggleArgs, currentValue, step=1){
+  return (toggleArgs = asArray(toggleArgs)) && toggleArgs[(toggleArgs.findIndex(val=>val === currentValue) + step) % toggleArgs.length];
 }
