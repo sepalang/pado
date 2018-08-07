@@ -1,4 +1,4 @@
-import { isArray, isNumber } from '../functions/isLike'
+import { isArray, isNumber, isInfinity } from '../functions/isLike'
 import { asArray } from '../functions/cast'
 import { asMatrix, validMatrix, multiplyMatrix } from '../functions/matrix'
 import { makeMatrixArray } from './matrix'
@@ -14,59 +14,11 @@ const Point = function (x = 0, y = 0, z = 0, w = 1, meta){
   const __ref = { x, y, z, w }
   let __meta
   
-  // compute matrix
-  const __matrix   = []
-  const __computed = {
-    matrixVersion  : 0,
-    computedVersion: 0,
-    memoizeRef     : null,
-    memoizeOutput  : null
-  }
-  
-  const compute = (key)=>{
-    const { matrixVersion, computedVersion } = __computed
-    //why un used?
-    //const { memoizeRef } = __computed;
-    
-    let needCompute = !__computed.memoizeRef || matrixVersion !== computedVersion || !(
-      __computed.memoizeRef.x === __ref.x &&
-      __computed.memoizeRef.y === __ref.y &&
-      __computed.memoizeRef.z === __ref.z &&
-      __computed.memoizeRef.w === __ref.w 
-    )
-    
-    if(needCompute){
-      const newMemoizeRef = {
-        x: __ref.x,
-        y: __ref.y,
-        z: __ref.z,
-        w: __ref.w
-      }
-      const newComputedMatrix = __matrix.reduce(
-        (dest, matrix)=>multiplyMatrix(matrix, dest),
-        asMatrix([newMemoizeRef.x, newMemoizeRef.y, newMemoizeRef.z, newMemoizeRef.w], 1)
-      )
-      //
-      __computed.memoizeOutput = {
-        x: newComputedMatrix[0][0],
-        y: newComputedMatrix[0][1],
-        z: newComputedMatrix[0][2],
-        w: newComputedMatrix[0][3]
-      }
-      __computed.memoizeRef = newMemoizeRef
-      __computed.computedVersion = matrixVersion
-    } 
-    //else {
-    //  console.log(`compute cache ${key}`);
-    //}
-    return key && __computed.memoizeOutput[key] || __computed.memoizeOutput
-  }
-  
   Object.defineProperties(this, {
-    x   : { enumerable: true, get: ()=>(__matrix.length && compute('x') || __ref.x), set: v=>__ref.x = v},
-    y   : { enumerable: true, get: ()=>(__matrix.length && compute('y') || __ref.y), set: v=>__ref.y = v},
-    z   : { enumerable: true, get: ()=>(__matrix.length && compute('z') || __ref.z), set: v=>__ref.z = v},
-    w   : { enumerable: true, get: ()=>(__matrix.length && compute('w') || __ref.w), set: v=>__ref.w = v},
+    x   : { enumerable: true, get: ()=>__ref.x, set: v=>__ref.x = v},
+    y   : { enumerable: true, get: ()=>__ref.y, set: v=>__ref.y = v},
+    z   : { enumerable: true, get: ()=>__ref.z, set: v=>__ref.z = v},
+    w   : { enumerable: true, get: ()=>__ref.w, set: v=>__ref.w = v},
     meta: {
       enumerable: false, 
       get (){ return __meta },
@@ -83,15 +35,6 @@ const Point = function (x = 0, y = 0, z = 0, w = 1, meta){
       get       : ()=>{
         const rangeHeight = (this.meta && this.meta.range && this.meta.range.height) || 0
         return this.y / rangeHeight
-      }
-    },
-    addMatrix: {
-      enumerable: false,
-      value     : function (matrix){
-        if(!validMatrix(matrix)) throw new Error("invalid addMatrix param")
-        __matrix.push(matrix)
-        __computed.matrixVersion += 1
-        return this
       }
     }
   })
@@ -135,6 +78,27 @@ Point.prototype = {
     const [largeX, smallX] = this.x > x ? [ this.x, x ] : [ x, this.x ]
     const [largeY, smallY] = this.y > y ? [ this.y, y ] : [ y, this.y ]
     return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0)
+  },
+  multiflyMatrix (matrix44){
+    if(!validMatrix(matrix44)){
+      throw new Error('Point::multiflyMatrix invalid matrix', matrix44);
+    }
+    
+    // yet support affin
+    //let perspectiveVar = (this.meta && this.meta.perspective)
+    //perspectiveVar = !isNumber(perspectiveVar) ? 0 : perspectiveVar;
+    //perspectiveVar = -1/perspectiveVar;
+    //perspectiveVar = isInfinity(perspectiveVar) ? 0 : (perspectiveVar || 0) ;
+    
+    const {x:px, y:py, z:pz} = (this.meta && this.meta.perspectiveOrigin) || {x:0, y:0, z:0}
+    const [[x],[y],[z],[w]] = multiplyMatrix(matrix44, [[this.x - px],[this.y - py],[this.z - pz],[this.w]])
+    
+    this.x = x + px;
+    this.y = y + py;
+    this.z = z + pz;
+    this.w = w;
+    
+    return this;
   }
 }
 
@@ -345,7 +309,7 @@ Rect.prototype = {
       perspective      : 0,
       perspectiveOrigin: {
         x: this.left + (this.width / 2),
-        y: this.top + (this.top / 2),
+        y: this.top + (this.height / 2),
         z: 0
       }
     }, this.meta)

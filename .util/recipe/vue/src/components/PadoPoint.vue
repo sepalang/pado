@@ -30,7 +30,6 @@ export default {
     },
     pointStyle (){
       const { x, y } = this.pointStyleValue;
-      console.log("this.pointStyleValue", this.pointStyleValue);
       return {left: x, top: y};
     },
     pointerRectStyle (){

@@ -98,8 +98,8 @@ const parseMatrix = (function (){
 /* https://keithclark.co.uk/articles/calculating-element-vertex-data-from-css-transforms/ */
 export const getElementTransform = function (el){
   let computedStyle = getComputedStyle(el, null)
-  let val     = computedStyle.transform || computedStyle.webkitTransform || computedStyle.MozTransform || computedStyle.msTransform
-  let matrix  = parseMatrix(val)
+  let transformStyle     = computedStyle.transform || computedStyle.webkitTransform || computedStyle.MozTransform || computedStyle.msTransform
+  let matrix  = parseMatrix(transformStyle)
   let rotateY = Math.asin(-matrix.m13)
   let rotateX = Math.atan2(matrix.m23, matrix.m33)
   let rotateZ = Math.atan2(matrix.m12, matrix.m11)
@@ -115,8 +115,7 @@ export const getElementTransform = function (el){
       y: matrix.m42,
       z: matrix.m43
     },
-    matrix        : matrix,
-    transformStyle: val
+    transformStyle
   }
 }
 

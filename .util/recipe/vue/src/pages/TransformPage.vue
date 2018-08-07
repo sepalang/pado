@@ -1,26 +1,36 @@
 <template>
   <AppLayout>
-    <div>PostTransform</div>
+    <div>Affine</div>
     <section>
-      <layer class="no-pointer-events" :style="{left:`${box01MoveDistance}px`}">
-        <PadoRect class="box01" size="150" label="transform" :style="boxTransform01"></PadoRect>
+      <layer class="no-pointer-events" :style="{left:`${boxMoveDistance}px`}">
+        <PadoRect ref="box" class="box" size="150" label="transform" :style="transformedBoxStyle"></PadoRect>
+      </layer>
+      <layer v-if="boxBoundingRect.width">
+        <PadoRect
+          theme="frame"
+          :left="boxBoundingRect.left"
+          :top="boxBoundingRect.top"
+          :width="boxBoundingRect.width"
+          :height="boxBoundingRect.height"
+        >
+        </PadoRect>
       </layer>
       <layer class="no-pointer-events">
         <PadoRect size="150" label="" theme="frame"></PadoRect>
       </layer>
       <layer class="no-pointer-events">
         <PadoPoint
-          v-for="vertex in box01VertexTransform"
-          :key="vertex.key"
+          v-for="(vertex, index) in boxVertexPointArray"
+          :key="index"
           :x="vertex.x"
           :y="vertex.y"
           :label="vertex.key"
         >
-          비
+          v{{ index }}
         </PadoPoint>
       </layer>
       <layer class="no-pointer-events" >
-        <PadoPoint :x="box01.perspectiveOrigin.x" :y="box01.perspectiveOrigin.y" label="perspective-origin" style="opacity:.4"></PadoPoint>
+        <PadoPoint :x="perspectiveOrigin.x" :y="perspectiveOrigin.y" label="perspective-origin" style="opacity:.4"></PadoPoint>
       </layer>
       <div style="min-height:170px;"></div>
       <div class="no-word-break"></div>
@@ -33,33 +43,38 @@
         <tbody>
           <tr>
             <th>rotateX</th>
-            <td><PadoSlider v-model="box01.rotateX" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
-            <td>{{box01.rotateX}}</td>
+            <td><PadoSlider v-model="rotateX" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+            <td>{{rotateX}}</td>
           </tr>
           <tr>
             <th>rotateY</th>
-            <td><PadoSlider v-model="box01.rotateY" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
-            <td>{{box01.rotateY}}</td>
+            <td><PadoSlider v-model="rotateY" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+            <td>{{rotateY}}</td>
           </tr>
           <tr>
-            <th>skewX</th>
-            <td><PadoSlider v-model="box01.skewX" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
-            <td>{{box01.skewX}}</td>
-          </tr>
-          <tr>
-            <th>skewY</th>
-            <td><PadoSlider v-model="box01.skewY" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
-            <td>{{box01.skewY}}</td>
+            <th>rotateZ</th>
+            <td><PadoSlider v-model="rotateZ" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+            <td>{{rotateZ}}</td>
           </tr>
           <tr>
             <th>perspective</th>
-            <td><PadoSlider v-model="box01.perspective" input-cycle="enter" min-value="100" max-value="500"></PadoSlider></td>
-            <td>{{box01.perspective}}</td>
+            <td><PadoSlider v-model="perspective" input-cycle="enter" min-value="0" max-value="500"></PadoSlider></td>
+            <td>{{perspective}}</td>
+          </tr>
+          <tr v-for="(vertex, index) in boxVertexPointArray" :key="index">
+            <td>Point {{ index }}</td>
+            <td>x : {{ vertex.x }}, y : {{ vertex.y }}</td>
+          </tr>
+          <tr v-if="boxTransformMatrix">
+            <td colspan="2">
+              <div>{{ boxTransformMatrix }}</div>
+              <div>{{ boxTransformVariant }}</div>
+            </td>
           </tr>
           <tr>
             <th colspan="3">
               <PadoPointSlider
-                v-model="box01.perspectiveOrigin"
+                v-model="perspectiveOrigin"
                 input-cycle="enter"
                 x-max-value="150"
                 y-max-value="150"
@@ -68,8 +83,8 @@
           </tr>
           <tr>
             <th>target move</th>
-            <td><PadoSlider v-model="box01MoveDistance" input-cycle="enter" min-value="0" max-value="500"></PadoSlider></td>
-            <td>{{box01MoveDistance}}</td>
+            <td><PadoSlider v-model="boxMoveDistance" input-cycle="enter" min-value="0" max-value="500"></PadoSlider></td>
+            <td>{{boxMoveDistance}}</td>
           </tr>
         </tbody>
       </table>
@@ -81,9 +96,16 @@ import AppLayout from '../layouts/AppLayout.vue';
 import { Layer, PadoRect, PadoSlider, PadoPoint, PadoPointSlider } from '../components';
 import {
   transformVariant,
+  getElementOffsetRect,
   getElementBoundingRect,
-  getElementTransformMatrix
+  getElementTransformMatrix,
+  getElementTransform
 } from '../../../../../.src/web';
+
+import {
+  rect
+} from '../../../../../.src/modules';
+
 import { nextTick } from '../service';
 
 export default {
@@ -96,58 +118,62 @@ export default {
     PadoPointSlider
   },
   computed: {
-    boxTransform01 (){
+    transformedBoxStyle (){
       return {
-        transform: transformVariant(this.box01),
-        opacity  : 0.7
+        transform: transformVariant({
+          perspectiveOrigin: this.perspectiveOrigin,
+          perspective      : this.perspective,
+          rotateZ          : this.rotateZ,
+          rotateY          : this.rotateY,
+          rotateX          : this.rotateX
+        }),
+        opacity: 0.7
       };
     },
-    box01Element (){
-      return this.$el.querySelectorAll('.box01')[0];
+    boxTransformMatrix (){
+      const [ box ] = [this.$refs.box && this.$refs.box.$el, this.transformedBoxStyle];
+      return box ? getElementTransformMatrix(box) : undefined;
     },
-    $drawVertexHandle (){
-      return [this.box01, this.box01.rotateX, this.box01.rotateY] &&
-      this.$el &&
-      this.drawVertex();
-    }
-  },
-  watch: {
-    $drawVertexHandle (){}
-  },
-  methods: {
-    drawVertex (){
-      const box01 = this.$el.querySelectorAll('.box01')[0];
-      const perspectiveOrigin = getElementBoundingRect(box01).findPoint('center');
-      const box01VertexOriginal = getElementBoundingRect(box01).vertex();
-      const transformMatrix = getElementTransformMatrix(box01);
-
-      this.box01VertexTransform = box01VertexOriginal.map((vertex, index)=>{
-        return Object.assign(
-          vertex.addMatrix(transformMatrix, perspectiveOrigin, 400).toJSON(),
-          { key: index }
-        );
+    boxTransformVariant (){
+      const [ box ] = [this.$refs.box && this.$refs.box.$el, this.transformedBoxStyle];
+      return box ? getElementTransform(box) : undefined;
+    },
+    boxBoundingRect (){
+      const [ box ] = [this.$refs.box && this.$refs.box.$el, this.transformedBoxStyle];
+      return box ? getElementBoundingRect(box) : rect();
+    },
+    boxElement (){
+      return this.$el.querySelectorAll('.box')[0];
+    },
+    boxVertexPointArray (){
+      const transformMatrix = this.boxTransformMatrix;
+      const perspective = this.perspective;
+      
+      const box = this.$refs.box && this.$refs.box.$el;
+      if(!box) return [];
+      
+      const boxRect = getElementOffsetRect(box);
+      boxRect.meta = { perspective };
+      
+      return boxRect.vertex().map((vertex, index)=>{
+        return transformMatrix ? vertex.multiflyMatrix(transformMatrix) : vertex;
       });
     }
   },
   data (){
     return {
-      box01: { 
-        rotateX          : 0, 
-        rotateY          : 0,
-        skewX            : 0,
-        skewY            : 0,
-        perspective      : 0, 
-        perspectiveOrigin: {x: 75, y: 75} 
-      },
-      box01VertexOriginal : [],
-      box01VertexTransform: [],
-      box01MoveDistance   : 0
+      rotateX          : 0, 
+      rotateY          : 0,
+      rotateZ          : 0,
+      perspective      : undefined,
+      perspectiveOrigin: {x: 75, y: 75},
+      boxMoveDistance  : 0
     };
   },
   mounted (){
     nextTick(()=>{
-      console.log(this.$el);
-      this.drawVertex();
+      this.perspective = 0;
+      console.log(this.boxVertexPointArray);
     });
   }
 };
