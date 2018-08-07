@@ -11,6 +11,9 @@ import GridMapPage from '@/pages/GridMapPage.vue';
 import SliderPage from '@/pages/SliderPage.vue';
 import ScreenPage from '@/pages/ScreenPage.vue';
 import ControlsPage from '@/pages/ControlsPage.vue';
+import LinePage from '@/pages/LinePage.vue';
+import WowPage from '@/pages/WowPage.vue';
+
 
 
 Vue.use(Router);
@@ -48,6 +51,14 @@ export default new Router({
     {
       path     : '/transform',
       component: TransformPage
+    },
+    {
+      path     : '/line',
+      component: LinePage
+    },
+    {
+      path     : '/wow',
+      component: WowPage
     },
     {
       path     : '/svg',
