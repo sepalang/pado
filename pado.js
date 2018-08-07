@@ -1384,23 +1384,6 @@
 
     analysis.pass = !analysis.missing.length && !analysis.surplus.length;
     return analysis;
-  }; //PINPONGPOOL INTERFACE
-
-  var toggle = function toggle(ta, cv, set) {
-    var index = -1;
-
-    for (var d = asArray(ta), _l = d.length, _i = 0; _i < _l; _i++) {
-      if (d[_i] == cv) {
-        index = _i + 1;
-        break;
-      }
-    }
-
-    if (arguments.length > 2) for (var i = 0, l = ta.length; i < l; i++) {
-      if (ta[i] == set) return ta[i];
-    }
-    index = ta.length == index ? 0 : index;
-    return ta[index];
   };
 
   var fill = function fill(collection, fillLength, emptyDefault) {
@@ -1626,6 +1609,15 @@
     return turn(i, limit, ts, function (result, i, limit, ts) {
       return [result, Math.floor(i / (limit * ts))];
     });
+  };
+  var toggle = function toggle(toggleArgs, currentValue, step) {
+    if (step === void 0) {
+      step = 1;
+    }
+
+    return (toggleArgs = asArray(toggleArgs)) && toggleArgs[(toggleArgs.findIndex(function (val) {
+      return val === currentValue;
+    }) + step) % toggleArgs.length];
   };
 
   var rangeModel = function rangeModel(value, step, sizeBase) {
@@ -4316,8 +4308,8 @@
 
       var WHRatio = [width / this.width, height / this.height];
       var transformRatio = WHRatio.sort()[0];
-      this.width = this.width * transformRatio;
-      this.height = this.height * transformRatio;
+      this.width = this.width * transformRatio || 0;
+      this.height = this.height * transformRatio || 0;
       return this;
     },
     //TODO : incompleted sticky(parent, position, offset);
@@ -4438,7 +4430,6 @@
     sortOf: sortOf,
     rebase: rebase,
     diffStructure: diffStructure,
-    toggle: toggle,
     isAbsoluteNaN: isAbsoluteNaN,
     isNone: isNone,
     isNumber: isNumber,
@@ -4501,6 +4492,7 @@
     accurateTimeout: accurateTimeout,
     turn: turn,
     turnTime: turnTime,
+    toggle: toggle,
     keys: keys,
     entries: entries,
     deepKeys: deepKeys,

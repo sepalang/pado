@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.number.constructor", "./isLike"], factory);
+    define(["exports", "core-js/modules/es6.array.find-index", "core-js/modules/es6.number.constructor", "./isLike", "./cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.number.constructor"), require("./isLike"));
+    factory(exports, require("core-js/modules/es6.array.find-index"), require("core-js/modules/es6.number.constructor"), require("./isLike"), require("./cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Number, global.isLike);
+    factory(mod.exports, global.es6Array, global.es6Number, global.isLike, global.cast);
     global.nice = mod.exports;
   }
-})(this, function (_exports, _es6Number, _isLike) {
+})(this, function (_exports, _es6Array, _es6Number, _isLike, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.turnTime = _exports.turn = _exports.accurateTimeout = _exports.limitNumber = void 0;
+  _exports.toggle = _exports.turnTime = _exports.turn = _exports.accurateTimeout = _exports.limitNumber = void 0;
 
   var limitNumber = function () {
     var limitOf = function limitOf(number, max, min) {
@@ -152,5 +152,17 @@
   };
 
   _exports.turnTime = turnTime;
+
+  var toggle = function toggle(toggleArgs, currentValue, step) {
+    if (step === void 0) {
+      step = 1;
+    }
+
+    return (toggleArgs = (0, _cast.asArray)(toggleArgs)) && toggleArgs[(toggleArgs.findIndex(function (val) {
+      return val === currentValue;
+    }) + step) % toggleArgs.length];
+  };
+
+  _exports.toggle = toggle;
 });
 //# sourceMappingURL=nice.js.map

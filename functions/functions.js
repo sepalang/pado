@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.toggle = _exports.diffStructure = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.unique = void 0;
+  _exports.diffStructure = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.unique = void 0;
 
   var unique = function unique(array, findKey) {
     var result = [];
@@ -315,28 +315,8 @@
 
     analysis.pass = !analysis.missing.length && !analysis.surplus.length;
     return analysis;
-  }; //PINPONGPOOL INTERFACE
-
-
-  _exports.diffStructure = diffStructure;
-
-  var toggle = function toggle(ta, cv, set) {
-    var index = -1;
-
-    for (var d = (0, _cast.asArray)(ta), _l = d.length, _i = 0; _i < _l; _i++) {
-      if (d[_i] == cv) {
-        index = _i + 1;
-        break;
-      }
-    }
-
-    if (arguments.length > 2) for (var i = 0, l = ta.length; i < l; i++) {
-      if (ta[i] == set) return ta[i];
-    }
-    index = ta.length == index ? 0 : index;
-    return ta[index];
   };
 
-  _exports.toggle = toggle;
+  _exports.diffStructure = diffStructure;
 });
 //# sourceMappingURL=functions.js.map
