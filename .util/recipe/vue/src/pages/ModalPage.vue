@@ -1,8 +1,12 @@
 <template>
   <AppLayout>
-    <div>ModalPage</div>
+    <div>BaseModal</div>
     <button @click="openSampleModal(0)">modal0</button>
     <button @click="openSampleModal(1000)">modal1000</button>
+    
+    <hr>
+    
+    <div>ModalView</div>
   </AppLayout>
 </template>
 <script>

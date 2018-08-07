@@ -418,8 +418,8 @@ Rect.prototype = {
     const WHRatio = [ width / this.width, height / this.height ]
     const transformRatio = WHRatio.sort()[0]
     
-    this.width = this.width * transformRatio
-    this.height = this.height * transformRatio
+    this.width = (this.width * transformRatio) || 0
+    this.height = (this.height * transformRatio) || 0
     
     return this
   },

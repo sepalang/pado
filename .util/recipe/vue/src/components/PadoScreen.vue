@@ -18,9 +18,6 @@ export default {
     event: 'input'
   },
   props: {
-    viewport: {
-      type: Object
-    },
     padding: {
       default: 0
     },
@@ -37,10 +34,43 @@ export default {
     }
   },
   data: ()=>({
-    scrollLeft: 0,
-    scrollTop : 0
+    contentWidth  : 0,
+    contentHeight : 0,
+    contentPadding: 0,
+    scrollLeft    : 0,
+    scrollTop     : 0,
+    screenWidth   : 0,
+    screenHeight  : 0
   }),
   computed: {
+    viewport: {
+      get (){
+        const contentPadding = parseInt(this.padding, 10);
+        const { scrollLeft, scrollTop, screenWidth, screenHeight, contentWidth, contentHeight } = this;
+        const viewport = { 
+          left  : scrollLeft, 
+          top   : scrollTop, 
+          width : screenWidth, 
+          height: screenHeight, 
+          contentWidth, 
+          contentHeight, 
+          contentPadding
+        };
+        
+        return viewport;
+      },
+      set (newValue){
+        if(typeof newValue === "object"){
+          typeof newValue.contentWidth === 'number' && (this.contentWidth = newValue.contentWidth);
+          typeof newValue.contentHeight === 'number' && (this.contentHeight = newValue.contentHeight);
+          typeof newValue.contentPadding === 'number' && (this.contentPadding = newValue.contentPadding);
+          typeof newValue.left === 'number' && (this.scrollLeft = newValue.left);
+          typeof newValue.top === 'number' && (this.scrollTop = newValue.top);
+          typeof newValue.width === 'number' && (this.screenWidth = newValue.width);
+          typeof newValue.height === 'number' && (this.screenHeight = newValue.height);
+        }
+      }
+    },
     rectStyle (){
       const { width, height } = this.rectValue;
       const [left, top] = [this.left + 'px', this.top + 'px'];
@@ -76,48 +106,33 @@ export default {
       }
       
       return style;
-    },
-    hasViewport (){
-      return typeof this.viewport === "object" && this.viewport !== null;
-    }
-  },
-  watch: {
-    "viewport.left" (newValue){
-      typeof newValue === "number" && (this.scrollLeft = newValue);
-    },
-    "viewport.top" (newValue){
-      typeof newValue === "number" && (this.scrollTop = newValue);
     }
   },
   methods: {
     updateScrollBoundings (){
-      if(!this.viewport){ this.viewport = {}; }
       const contentElement = this.$el.querySelector(".v-pado-screen-content");
-      const paddingValue = parseInt(this.padding, 10);
-
-      this.$set(this.viewport, "contentWidth", contentElement.offsetWidth);
-      this.$set(this.viewport, "contentHeight", contentElement.offsetHeight);
-      this.$set(this.viewport, "contentPadding", paddingValue);
+      this.contentWidth = contentElement.offsetWidth;
+      this.contentHeight = contentElement.offsetHeight;
     },
-    updateViewport (){
-      this.hasViewport && nextQueue(()=>{
+    updateScreenBoundings (){
+      nextQueue(()=>{
         const { offsetWidth, offsetHeight } = this.$el;
-        this.$set(this.viewport, "left", this.scrollLeft);
-        this.$set(this.viewport, "top", this.scrollTop);
-        this.$set(this.viewport, "width", offsetWidth);
-        this.$set(this.viewport, "height", offsetHeight);
+        this.screenWidth = offsetWidth;
+        this.screenHeight = offsetHeight;
       }, 10);
     }
   },
   mounted (){
     const element = this.$el;
     
-    
     if(this.scrollStyle === "drag"){
       dragHelper(this.$el, ()=>{
         const initialScrollVariant = {
-          top    : 0,
-          left   : 0,
+          top : 0,
+          left: 0
+        };
+        
+        const limitValues = {
           topMin : 0,
           topMax : 0,
           leftMin: 0,
@@ -134,13 +149,13 @@ export default {
             this.updateScrollBoundings();
             const paddingGap = this.viewport.contentPadding * 2;
             
-            initialScrollVariant.leftMax = limitNumber(
+            limitValues.leftMax = limitNumber(
               this.viewport.contentWidth - element.offsetWidth + paddingGap,
               Number.POSITIVE_INFINITY,
               0
             );
             
-            initialScrollVariant.topMax = limitNumber(
+            limitValues.topMax = limitNumber(
               this.viewport.contentHeight - element.offsetHeight + paddingGap,
               Number.POSITIVE_INFINITY,
               0
@@ -149,15 +164,15 @@ export default {
           move: ({ pointer })=>{
             this.scrollLeft = limitNumber(
               initialScrollVariant.left - pointer.offsetX,
-              initialScrollVariant.leftMax,
-              initialScrollVariant.leftMin
+              limitValues.leftMax,
+              limitValues.leftMin
             );
             this.scrollTop = limitNumber(
               initialScrollVariant.top - pointer.offsetY,
-              initialScrollVariant.topMax,
-              initialScrollVariant.topMin
+              limitValues.topMax,
+              limitValues.topMin
             );
-            this.updateViewport();
+            this.updateScreenBoundings();
           }
         };
       });
@@ -165,7 +180,7 @@ export default {
     
     nextTick(()=>{
       this.updateScrollBoundings();
-      this.updateViewport();
+      this.updateScreenBoundings();
     });
   }
 };

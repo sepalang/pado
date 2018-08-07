@@ -1,7 +1,9 @@
 <template>
   <div class="v-pado-minimap" :style="rectStyle">
     <div class="v-pado-minimap-viewport" :style="viewportStyle">
-      <div class="v-pado-minimap-view" :style="viewStyle"><slot></slot></div>
+      <div class="v-pado-minimap-view" :style="viewStyle">
+        <slot :ratio="viewportRatio"></slot>
+      </div>
     </div>
     <div class="v-pado-minimap-port" :style="portStyle"></div>
   </div>
@@ -9,6 +11,7 @@
 <script>
 import { limitNumber, top } from '../../../../../.src/functions';
 import { dragHelper } from '../../../../../.src/web';
+import { rect } from '../../../../../.src/modules/stance';
 import { nextTick } from '@/service';
 import HighOrderRect from './mixins/HighOrderRect';
 
@@ -16,115 +19,131 @@ export default {
   mixins: [
     HighOrderRect([['width', 'height', 'size', 'rect'], ['auto', 'auto']])
   ],
-  model: {
-    prop : 'offset',
-    event: 'input'
-  },
   props: {
-    viewport: {
-      require: true,
-      type   : Object
+    screenRef: {
+      default: undefined
     },
     autoscale: {
       default: false
     }
   },
   data: ()=>({
-    readyEl: false
+    viewport: undefined
   }),
   computed: {
+    screenVariant (){
+      const viewport = typeof this.viewport === 'object' && (this.viewport['viewport'] || this.viewport);
+      const { width, height } = this.rectValue;
+      
+      const computed = {
+        contentPadding: 0,
+        contentWidth  : 0,
+        contentHeight : 0,
+        top           : 0,
+        left          : 0,
+        width         : width,
+        height        : height
+      };
+      
+      if(typeof this.viewport === "object"){
+        typeof viewport['contentPadding'] === 'number' && (computed['contentPadding'] = viewport['contentPadding']);
+        typeof viewport['contentWidth'] === 'number' && (computed['contentWidth'] = viewport['contentWidth']);
+        typeof viewport['contentHeight'] === 'number' && (computed['contentHeight'] = viewport['contentHeight']);
+        typeof viewport['top'] === 'number' && (computed['top'] = viewport['top']);
+        typeof viewport['left'] === 'number' && (computed['left'] = viewport['left']);
+        typeof viewport['width'] === 'number' && (computed['width'] = viewport['width']);
+        typeof viewport['height'] === 'number' && (computed['height'] = viewport['height']);
+      }
+      
+      return computed;
+    },
+    viewportElementRect (){
+      const { width:masterWidth, height:masterHeight } = this.rectValue;
+      const { contentWidth, contentHeight }  = this.screenVariant;
+      const masterRect = { left: 0, top: 0, width: masterWidth, height: masterHeight };
+      return rect(0, 0, contentWidth, contentHeight).fit(masterRect).sticky(masterRect, 'center').toJSON();
+    },
+    originalScrollConentRect (){
+      const { contentWidth, contentHeight, contentPadding } = this.screenVariant;
+      return {
+        width : (contentWidth + (contentPadding * 2)),
+        height: (contentHeight + (contentPadding * 2))
+      };
+    },
+    viewportRatio (){
+      const { width:viewportWidth, height:viewportHeight } = this.viewportElementRect;
+      const { width:contentWidth, height:contentHeight } = this.originalScrollConentRect;
+      const result = top([viewportWidth / contentWidth, viewportHeight / contentHeight], false);
+      return result || 0;
+    },
     rectStyle (){
       const { width, height } = this.rectValue;
       const [left, top] = [this.left + 'px', this.top + 'px'];
       return { width: width + 'px', height: height + 'px', left, top};
     },
-    viewportBoundings (){
-      const padding = (this.viewport.contentPadding || 0);
-      const contentWidth = (this.viewport.contentWidth || 0);
-      const contentHeight = (this.viewport.contentHeight || 0);
-      return {
-        padding,
-        contentWidth,
-        contentHeight
-      };
-    },
-    viewportRatio (){
-      const { width:masterWidth, height:masterHeight } = this.rectValue;
-      const { padding, contentWidth, contentHeight } = this.viewportBoundings;
-      return top([masterWidth / (contentWidth + (padding * 2)), masterHeight / (contentHeight + (padding * 2))], false);
-    },
-    viewportVariant (){
-      if(typeof this.viewport !== "object"){
-        return {
-          contentPadding: 0,
-          width         : 10,
-          height        : 10
-        };
-      }
-      
-      return {
-        top   : this.viewport.top,
-        left  : this.viewport.left,
-        width : this.viewport.width,
-        height: this.viewport.height
-      };
-    },
+    
     viewportStyle (){
-      const viewportRatio = this.viewportRatio;
-      const readyEl = this.readyEl;
+      const { left, top, width, height } = this.viewportElementRect;
       
-      if(readyEl === false){
-        return {visibility: "hidden"};
-      }
-      
+      return {
+        left  : `${left}px`,
+        top   : `${top}px`,
+        width : `${width}px`,
+        height: `${height}px`
+      };
+    },
+    viewStyle (){
       const style = {
-        transform: `translate(-50%, -50%) scale(${viewportRatio})`,
+        transform: `translate(-50%, -50%) scale(1)`,
         left     : `50%`,
         top      : `50%`
       };
-      
-      return style;
-    },
-    viewStyle (){
-      const { padding } = this.viewportBoundings;
-      const style = {
-        'left'          : `${padding}px`,
-        'top'           : `${padding}px`,
-        'padding-right' : `${padding}px`,
-        'padding-bottom': `${padding}px`
-      };
-      
-      if(this.autoscale === false){
-        const reverseRatio = 1 / this.viewportRatio;
-        style.transform = `scale(${reverseRatio})`;
-      }
-      
       return style;
     },
     portStyle (){
       const viewportRatio = this.viewportRatio;
+      const { left:viewportLeft, top:viewportTop } = this.viewportElementRect;
+      let { left:scrollLeft, top:scrollTop, width:scrollWidth, height:scrollHeight } = this.screenVariant;
       
-      const { width:minimapWidth, height:minimapHeight } = this.rectValue;
-      let { contentWidth, contentHeight } = this.viewportBoundings;
-      let { left:portLeft, top:portTop, width:portWidth, height:portHeight } = this.viewportVariant;
-      
-      portLeft = portLeft * viewportRatio;
-      portTop = portTop * viewportRatio;
-      portWidth = portWidth * viewportRatio;
-      portHeight = portHeight * viewportRatio;
-      contentWidth = contentWidth * viewportRatio;
-      contentHeight = contentHeight * viewportRatio;
-      
-      
+      scrollLeft *= viewportRatio;
+      scrollTop *= viewportRatio;
+      scrollWidth *= viewportRatio;
+      scrollHeight *= viewportRatio;
+      scrollLeft += viewportLeft;
+      scrollTop += viewportTop;
+
       const style = {
-        left  : `${((minimapWidth - contentWidth) / 2) + portLeft}px`,
-        top   : `${((minimapHeight - contentHeight) / 2) + portTop}px`,
-        width : `${portWidth}px`,
-        height: `${portHeight}px`
+        left  : `${scrollLeft}px`,
+        top   : `${scrollTop}px`,
+        width : `${scrollWidth}px`,
+        height: `${scrollHeight}px`
       };
       
       return style;
     }
+  },
+  beforeMount (){
+    let currentRef;
+    
+    this.$unwatchViewport = undefined;
+    this.$unwatchScreenRef = this.$watch('screenRef', (ref)=>{
+      currentRef = ref;
+      
+      if(typeof ref !== "object"){
+        return;
+      }
+
+      this.$unwatchViewport && this.$unwatchViewport();
+      this.$unwatchViewport = this.$watch(()=>ref['viewport'], (viewport)=>{
+        this.viewport = viewport;
+      });
+    });
+    
+    this.$sendViewport = function (send){
+      if(currentRef){
+        currentRef['viewport'] = send;
+      }
+    };
   },
   mounted (){
     nextTick(()=>{
@@ -138,7 +157,7 @@ export default {
       
         return {
           start: ()=>{
-            let { left, top } = this.viewportVariant;
+            let { left, top } = this.screenVariant;
             startPosition.left = left;
             startPosition.top = top;
           },
@@ -146,51 +165,51 @@ export default {
             const boostX = pointer.offsetX * (1 / this.viewportRatio);
             const boostY = pointer.offsetY * (1 / this.viewportRatio);
             
-            let { width:viewportWidth, height:viewportHeight } = this.viewportVariant;
-            let { contentWidth, contentHeight } = this.viewportBoundings;
+            let { width:viewportWidth, height:viewportHeight } = this.screenVariant;
+            let { width:contentWidth, height:contentHeight } = this.originalScrollConentRect;
             
             let { destLeft:left, destTop:top } = {
-              destLeft: limitNumber(
+              destLeft: parseInt(limitNumber(
                 startPosition.left + boostX,
                 contentWidth - viewportWidth,
                 0
-              ),
-              destTop: limitNumber(
+              ), 10),
+              destTop: parseInt(limitNumber(
                 startPosition.top + boostY,
                 contentHeight - viewportHeight,
                 0
-              )
+              ), 10)
             };
             
-            if(typeof this.viewport !== "object"){
-              this.$set(this, "viewport", {});
-            }
-            this.$set(this.viewport, "left", parseInt(left, 10));
-            this.$set(this.viewport, "top", parseInt(top, 10));
+            this.$sendViewport({ left, top });
           }
         };
       });
-      this.readyEl = true;
     });
+  },
+  destroyed (){
+    this.$unwatchScreenRef();
+    this.$unwatchViewport && this.$unwatchViewport();
   }
 };
 </script>
 <style lang="scss">
   .v-pado-minimap {
     display:inline-block;
-    background-color:#eee;
     position:relative;
     overflow:hidden;
-
+    
     > .v-pado-minimap-viewport {
-      position:absolute;
-      
-      * {
-        pointer-events:none;
-      }
+      position:relative;
+      pointer-events:none;
       
       > .v-pado-minimap-view {
-        position:relative;
+        position:absolute;
+        display:inline-block;
+        > * {
+          left:0px;
+          top:0px;
+        }
       }
     }
     
@@ -207,5 +226,23 @@ export default {
     img {
       display:inline-block;
     }
+    
+    &.debug {
+      border:1px solid red;
+      
+      > .v-pado-minimap-viewport {
+        border:1px solid green;
+        
+        > .v-pado-minimap-view {
+          border:1px solid purple;
+        }
+      }
+      
+      > .v-pado-minimap-port {
+        border:1px solid blue;
+      }
+    }
   }
+  
+  
 </style>
