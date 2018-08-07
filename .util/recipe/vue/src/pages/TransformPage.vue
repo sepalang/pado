@@ -42,19 +42,18 @@
             <td>{{box01.rotateY}}</td>
           </tr>
           <tr>
-            <th>skewX</th>
-            <td><PadoSlider v-model="box01.skewX" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
-            <td>{{box01.skewX}}</td>
-          </tr>
-          <tr>
-            <th>skewY</th>
-            <td><PadoSlider v-model="box01.skewY" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
-            <td>{{box01.skewY}}</td>
+            <th>rotateZ</th>
+            <td><PadoSlider v-model="box01.rotateZ" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+            <td>{{box01.rotateZ}}</td>
           </tr>
           <tr>
             <th>perspective</th>
-            <td><PadoSlider v-model="box01.perspective" input-cycle="enter" min-value="100" max-value="500"></PadoSlider></td>
+            <td><PadoSlider v-model="box01.perspective" input-cycle="enter" min-value="0" max-value="500"></PadoSlider></td>
             <td>{{box01.perspective}}</td>
+          </tr>
+          <tr v-for="(vertex, index) in box01VertexTransform" :key="index">
+            <td>Point {{ index }}</td>
+            <td>x : {{ vertex.x }}, y : {{ vertex.y }}</td>
           </tr>
           <tr>
             <th colspan="3">
@@ -134,8 +133,7 @@ export default {
       box01: { 
         rotateX          : 0, 
         rotateY          : 0,
-        skewX            : 0,
-        skewY            : 0,
+        rotateZ          : 0,
         perspective      : 0, 
         perspectiveOrigin: {x: 75, y: 75} 
       },
