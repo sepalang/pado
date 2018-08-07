@@ -185,5 +185,4 @@ describe('Functions isLike', ()=>{
     expect(isPresence(undefined)).toEqual(false)
     expect(isPresence()).toEqual(false)
   })
-  
 })
