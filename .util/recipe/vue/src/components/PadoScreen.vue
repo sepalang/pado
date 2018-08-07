@@ -201,5 +201,9 @@ export default {
     img {
       display:inline-block;
     }
+    
+    &[debug] {
+      border:1px solid blue;
+    }
   }
 </style>
