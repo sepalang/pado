@@ -172,8 +172,8 @@ export default {
   },
   mounted (){
     nextTick(()=>{
+      this.boxVertexPointArray.toString();
       this.perspective = 0;
-      console.log(this.boxVertexPointArray);
     });
   }
 };

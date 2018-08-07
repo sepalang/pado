@@ -15,8 +15,6 @@
         <li><router-link to="/transform">Transform</router-link></li>
         <li><router-link to="/line">Line</router-link></li>
         <li><router-link to="/wow">WOW</router-link></li>
-        <li><router-link to="/svg">SVG</router-link></li>
-        <li><router-link to="/panel">Panel</router-link></li>
         <li><router-link to="/tab">Tab</router-link></li>
       </menu>
     </header>

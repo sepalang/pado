@@ -1,10 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import PostSVG from '@/pages/PostSVG.vue';
 import TransformPage from '@/pages/TransformPage.vue';
 import MainPage from '@/pages/MainPage.vue';
-import PanelPage from '@/pages/PanelPage.vue';
-import TabPage from '@/pages/TabPage.vue';
 import TreePage from '@/pages/TreePage.vue';
 import ModalPage from '@/pages/ModalPage.vue';
 import GridMapPage from '@/pages/GridMapPage.vue';
@@ -13,7 +10,7 @@ import ScreenPage from '@/pages/ScreenPage.vue';
 import ControlsPage from '@/pages/ControlsPage.vue';
 import LinePage from '@/pages/LinePage.vue';
 import WowPage from '@/pages/WowPage.vue';
-
+import TabPage from '@/pages/TabPage.vue';
 
 
 Vue.use(Router);
@@ -59,14 +56,6 @@ export default new Router({
     {
       path     : '/wow',
       component: WowPage
-    },
-    {
-      path     : '/svg',
-      component: PostSVG
-    },
-    {
-      path     : '/panel',
-      component: PanelPage
     },
     {
       path     : '/tab',

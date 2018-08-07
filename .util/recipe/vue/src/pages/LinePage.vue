@@ -15,7 +15,7 @@
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
 import PadoRect from '@/components/PadoRect.vue';
-import { dragHelper, getElementBoundingRect, makeSVG } from '../../../../../.src/web';
+import { getElementBoundingRect, makeSVG } from '../../../../../.src/web';
 
 export default {
   components: {
@@ -24,22 +24,21 @@ export default {
   },
   data (){
     return {
-      bounding:{},
-      rectSize:40,
-      x:0,
-      y:0
-    }
+      bounding: {},
+      rectSize: 40,
+      x       : 0,
+      y       : 0
+    };
   },
-  methods:{
-    drawLine:function(){
+  methods: {
+    drawLine: function (){
+      const rootBoundingRect    = getElementBoundingRect(this.$el.querySelector(".root-rect"));
+      const upsideBoundingRect  = getElementBoundingRect(this.$el.querySelector(".rect-upside"));
+      const uprightBoundingRect = getElementBoundingRect(this.$el.querySelector(".rect-upright"));
       
-      const rootBoundingRect    = getElementBoundingRect( this.$el.querySelector(".root-rect") );
-      const upsideBoundingRect  = getElementBoundingRect( this.$el.querySelector(".rect-upside") );
-      const uprightBoundingRect = getElementBoundingRect( this.$el.querySelector(".rect-upright") );
-      
-      const downrightBoundingRect = getElementBoundingRect( this.$el.querySelector(".rect-downright") );
-      const downBoundingRect      = getElementBoundingRect( this.$el.querySelector(".rect-downside") );
-      const angleDownBoundingRect = getElementBoundingRect( this.$el.querySelector(".rect-angledown") );
+      const downrightBoundingRect = getElementBoundingRect(this.$el.querySelector(".rect-downright"));
+      const downBoundingRect      = getElementBoundingRect(this.$el.querySelector(".rect-downside"));
+      const angleDownBoundingRect = getElementBoundingRect(this.$el.querySelector(".rect-angledown"));
       
       const rootTopPoint    = rootBoundingRect.vertex("top").point("center");
       const rootBottomPoint = rootBoundingRect.vertex("bottom").point("center");
@@ -49,14 +48,14 @@ export default {
       const anglePath = bottom2Points
       .eq(1)
       .vertexWith(angleDownBoundingRect.findPoint("left center"))
-      .join((first,last)=>first.rectWith(last).findPoint("left down"));
+      .join((first, last)=>first.rectWith(last).findPoint("left down"));
       
       const svgTag = makeSVG()
-      .addPath([rootTopPoint,upsideBoundingRect.vertex("bottom").point("center")])
-      .addPath([rootTopPoint,uprightBoundingRect.vertex("left").point("center")])
-      .addPath([bottom2Points.eq(0),downBoundingRect.findPoint("top center")])
-      .addPath([bottom2Points.eq(1),downrightBoundingRect.findPoint("left center")])
-      .addPath(anglePath,{ "strokeWidth":2 , "stroke":"blue"})
+      .addPath([rootTopPoint, upsideBoundingRect.vertex("bottom").point("center")])
+      .addPath([rootTopPoint, uprightBoundingRect.vertex("left").point("center")])
+      .addPath([bottom2Points.eq(0), downBoundingRect.findPoint("top center")])
+      .addPath([bottom2Points.eq(1), downrightBoundingRect.findPoint("left center")])
+      .addPath(anglePath, { "strokeWidth": 2, "stroke": "blue"})
       .createElement();
       
       const placeholder = this.$el.querySelector(".path-placeholder");
