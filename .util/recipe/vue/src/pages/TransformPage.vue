@@ -16,7 +16,7 @@
           :y="vertex.y"
           :label="vertex.key"
         >
-          비비
+          비
         </PadoPoint>
       </layer>
       <layer class="no-pointer-events" >
@@ -40,6 +40,16 @@
             <th>rotateY</th>
             <td><PadoSlider v-model="box01.rotateY" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
             <td>{{box01.rotateY}}</td>
+          </tr>
+          <tr>
+            <th>skewX</th>
+            <td><PadoSlider v-model="box01.skewX" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+            <td>{{box01.skewX}}</td>
+          </tr>
+          <tr>
+            <th>skewY</th>
+            <td><PadoSlider v-model="box01.skewY" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+            <td>{{box01.skewY}}</td>
           </tr>
           <tr>
             <th>perspective</th>
@@ -121,7 +131,14 @@ export default {
   },
   data (){
     return {
-      box01               : { rotateX: 0, rotateY: 0, perspective: 0, perspectiveOrigin: {x: 75, y: 75} },
+      box01: { 
+        rotateX          : 0, 
+        rotateY          : 0,
+        skewX            : 0,
+        skewY            : 0,
+        perspective      : 0, 
+        perspectiveOrigin: {x: 75, y: 75} 
+      },
       box01VertexOriginal : [],
       box01VertexTransform: [],
       box01MoveDistance   : 0

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import PostSVG from '@/pages/PostSVG.vue';
-import PostTransform from '@/pages/PostTransform.vue';
+import TransformPage from '@/pages/TransformPage.vue';
 import MainPage from '@/pages/MainPage.vue';
 import PanelPage from '@/pages/PanelPage.vue';
 import TabPage from '@/pages/TabPage.vue';
@@ -47,7 +47,7 @@ export default new Router({
     },
     {
       path     : '/transform',
-      component: PostTransform
+      component: TransformPage
     },
     {
       path     : '/svg',
