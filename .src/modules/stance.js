@@ -90,18 +90,13 @@ Point.prototype = {
     //perspectiveVar = -1/perspectiveVar;
     //perspectiveVar = isInfinity(perspectiveVar) ? 0 : (perspectiveVar || 0) ;
     
-    const {x:px, y:py, z:pz} = (this.meta && this.meta.perspectiveOrigin) || {x: 0, y: 0, z: 0}
-    const [mx, my, mz] = [
-      px - matrix44[0][3],
-      py - matrix44[1][3],
-      pz - matrix44[2][3]
-    ]
+    const {x:px=0, y:py=0, z:pz=0} = (this.meta && this.meta.perspectiveOrigin) || {x: 0, y: 0, z: 0}
     
-    const [[x], [y], [z], [w]] = multiplyMatrix(matrix44, [[this.x - mx], [this.y - my], [this.z - mz], [this.w]])
+    const [[x], [y], [z], [w]] = multiplyMatrix(matrix44, [[this.x - px], [this.y - py], [this.z - pz], [this.w]])
     
-    this.x = x + mx + matrix44[0][3]
-    this.y = y + my + matrix44[1][3]
-    this.z = z + mz + matrix44[2][3]
+    this.x = x + px + matrix44[0][3]
+    this.y = y + py + matrix44[1][3]
+    this.z = z + pz + matrix44[2][3]
     this.w = w
     
     return this

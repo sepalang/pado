@@ -3,7 +3,7 @@
     <div>Affine</div>
     <section>
       <layer class="no-pointer-events" :style="{left:`${boxMoveDistance}px`}">
-        <PadoRect ref="box" class="box" size="150" label="transform" :style="transformedBoxStyle"></PadoRect>
+        <PadoRect ref="box" class="box" :size="boxSize" label="transform" :style="transformedBoxStyle"></PadoRect>
       </layer>
       <layer v-if="boxBoundingRect.width">
         <PadoRect
@@ -180,10 +180,20 @@ export default {
     PadoPointSlider
   },
   computed: {
+    perspectiveOrigin (){
+      [this.boxSize].includes();
+      return {x: 0, y: 0} && {x: this.boxSize / 2, y: this.boxSize / 2};
+    },
     transformedBoxStyle (){
+      const boxSize = this.boxSize;
+      let {x:left, y:top} = this.perspectiveOrigin;
+      left = `${left / boxSize * 100}%`;
+      top = `${top / boxSize * 100}%`;
+      
       return {
-        transform: transformStyleVariant(this),
-        opacity  : 0.7
+        transform           : transformStyleVariant(this),
+        'perspective-origin': `${left} ${top}`,
+        opacity             : 0.7
       };
     },
     transfomedComputedMatrix (){
@@ -211,11 +221,15 @@ export default {
       const box = this.$refs.box && this.$refs.box.$el;
       const transformMatrix = this.transfomedComputedMatrix;
       const perspective = this.perspective;
+      const perspectiveOrigin = this.perspectiveOrigin;
       
       if(!box) return [];
       
       const boxRect = getElementOffsetRect(box);
-      boxRect.meta = { perspective };
+      boxRect.meta = { 
+        perspective,
+        perspectiveOrigin
+      };
       
       return boxRect.vertex().map((vertex, index)=>{
         return transformMatrix ? vertex.multiflyMatrix(transformMatrix) : vertex;
@@ -224,18 +238,18 @@ export default {
   },
   data (){
     return {
-      rotateX          : 0, 
-      rotateY          : 0,
-      rotateZ          : 0,
-      translateX       : 0, 
-      translateY       : 0,
-      translateZ       : 0,
-      scaleX           : 1, 
-      scaleY           : 1,
-      scaleZ           : 1,
-      perspective      : undefined,
-      perspectiveOrigin: {x: 75, y: 75},
-      boxMoveDistance  : 0
+      boxSize        : 150,
+      rotateX        : 0, 
+      rotateY        : 0,
+      rotateZ        : 0,
+      translateX     : 0, 
+      translateY     : 0,
+      translateZ     : 0,
+      scaleX         : 1, 
+      scaleY         : 1,
+      scaleZ         : 1,
+      perspective    : undefined,
+      boxMoveDistance: 0
     };
   },
   mounted (){
