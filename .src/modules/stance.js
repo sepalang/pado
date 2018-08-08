@@ -8,21 +8,103 @@ const likePoint = function (p){
   return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y")
 }
 
+const calcTransformedPoint = (__ref, { matrix, perspectiveOrigin })=>{
+  // yet support affin
+  //let perspectiveVar = (this.meta && this.meta.perspective)
+  //perspectiveVar = !isNumber(perspectiveVar) ? 0 : perspectiveVar;
+  //perspectiveVar = -1/perspectiveVar;
+  //perspectiveVar = isInfinity(perspectiveVar) ? 0 : (perspectiveVar || 0) ;
+  if(!matrix) return
+  
+  const transformPoint = {}
+  const {x:px = 0, y:py = 0, z:pz = 0} = perspectiveOrigin || {x: 0, y: 0, z: 0}
+  const [[x], [y], [z], [w]] = multiplyMatrix(matrix, [[__ref.x - px], [__ref.y - py], [__ref.z - pz], [__ref.w]])
+  
+  transformPoint.x = x + px + matrix[0][3]
+  transformPoint.y = y + py + matrix[1][3]
+  transformPoint.z = z + pz + matrix[2][3]
+  transformPoint.w = w
+  
+  return transformPoint
+}
 
 const Point = function (x = 0, y = 0, z = 0, w = 1, meta){
   // base point config
   const __ref = { x, y, z, w }
-  let __meta
+  let __meta = {}
+  let __transformedPoint
   
   Object.defineProperties(this, {
-    x   : { enumerable: true, get: ()=>__ref.x, set: v=>__ref.x = v},
-    y   : { enumerable: true, get: ()=>__ref.y, set: v=>__ref.y = v},
-    z   : { enumerable: true, get: ()=>__ref.z, set: v=>__ref.z = v},
-    w   : { enumerable: true, get: ()=>__ref.w, set: v=>__ref.w = v},
+    x: { 
+      enumerable: true,
+      get       : ()=>{
+        if(this.transform === true){
+          !__transformedPoint && (__transformedPoint = calcTransformedPoint(__ref, this.meta))
+          return __transformedPoint ? __transformedPoint.x : __ref.x
+        }
+        return __ref.x
+      }, 
+      set: v=>{
+        __transformedPoint = undefined
+        __ref.x = v
+      }
+    },
+    y: { 
+      enumerable: true,
+      get       : ()=>{
+        if(this.transform === true){
+          !__transformedPoint && (__transformedPoint = calcTransformedPoint(__ref, this.meta))
+          return __transformedPoint ? __transformedPoint.y : __ref.y
+        }
+        return __ref.y
+      }, 
+      set: v=>{
+        __transformedPoint = undefined
+        __ref.y = v
+      }
+    },
+    z: { 
+      enumerable: true,
+      get       : ()=>{
+        if(this.transform === true){
+          !__transformedPoint && (__transformedPoint = calcTransformedPoint(__ref, this.meta))
+          return __transformedPoint ? __transformedPoint.z : __ref.z
+        }
+        return __ref.z
+      }, 
+      set: v=>{
+        __transformedPoint = undefined
+        __ref.z = v
+      }
+    },
+    w: { 
+      enumerable: true,
+      get       : ()=>{
+        if(this.transform === true){
+          !__transformedPoint && (__transformedPoint = calcTransformedPoint(__ref, this.meta))
+          return __transformedPoint ? __transformedPoint.w : __ref.w
+        }
+        return __ref.w
+      }, 
+      set: v=>{
+        __transformedPoint = undefined
+        __ref.w = v
+      }
+    },
     meta: {
       enumerable: false, 
       get (){ return __meta },
-      set (it){ __meta = typeof it === "object" ? it : null; return __meta }
+      set (it){ 
+        typeof it === "object" && Object.assign(__meta, it)
+        __transformedPoint = undefined
+        return __meta
+      }
+    },
+    transform: {
+      enumerable  : false,
+      configurable: false,
+      writable    : true,
+      value       : false
     },
     rx: { enumerable: false,
       get       : ()=>{
@@ -38,7 +120,10 @@ const Point = function (x = 0, y = 0, z = 0, w = 1, meta){
       }
     }
   })
-  this.meta = meta
+  
+  if(typeof meta === "object"){
+    this.meta = meta
+  }
 }
 
 Point.prototype = {
@@ -79,26 +164,15 @@ Point.prototype = {
     const [largeY, smallY] = this.y > y ? [ this.y, y ] : [ y, this.y ]
     return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0)
   },
-  multiflyMatrix (matrix44){
+  applyTransform (matrix44 = this.meta.matrix){
     if(!validMatrix(matrix44)){
-      throw new Error('Point::multiflyMatrix invalid matrix', matrix44)
+      this.transform = false
+      throw new Error('Point::applyTransform invalid matrix', matrix44)
+      return this
     }
     
-    // yet support affin
-    //let perspectiveVar = (this.meta && this.meta.perspective)
-    //perspectiveVar = !isNumber(perspectiveVar) ? 0 : perspectiveVar;
-    //perspectiveVar = -1/perspectiveVar;
-    //perspectiveVar = isInfinity(perspectiveVar) ? 0 : (perspectiveVar || 0) ;
-    
-    const {x:px=0, y:py=0, z:pz=0} = (this.meta && this.meta.perspectiveOrigin) || {x: 0, y: 0, z: 0}
-    
-    const [[x], [y], [z], [w]] = multiplyMatrix(matrix44, [[this.x - px], [this.y - py], [this.z - pz], [this.w]])
-    
-    this.x = x + px + matrix44[0][3]
-    this.y = y + py + matrix44[1][3]
-    this.z = z + pz + matrix44[2][3]
-    this.w = w
-    
+    this.meta.matrix = matrix44
+    this.transform = true
     return this
   }
 }
@@ -211,26 +285,30 @@ const Vertex = function (pointArray, meta){
         )
     }
   },
-  transform (transform, rect){
-    const useRect = !!rect
+  rect (){
+    const first = this[0]
     
-    if(useRect){
-      const { left, top, width, height } = rect
-      
-      //rotateOrigin
-      const originX = left + width / 2
-      const originY = top + height / 2
-      
-      this.forEach(point=>{
-        point.translate({ x: -originX, y: -originY })
-        point.transform(transform)
-        point.translate({ x: originX, y: originY })
-      })
-    } else {
-      this.forEach(point=>{
-        point.transform(transform)
-      })
+    if(!first){
+      return new Rect(0, 0, 0, 0)
     }
+    
+    let left = first.x
+    let right = first.x
+    let top = first.y
+    let bottom = first.y
+    
+    for(let d = this, i = 1, l = this.length; i < l; i++){
+      const p = d[i]
+      p.x < left && (left = p.x)
+      p.x > right && (right = p.x)
+      p.y < top && (top = p.y)
+      p.y > bottom && (bottom = p.y)
+    }
+    
+    return new Rect(left, top, right - left, bottom - top)
+  },
+  applyTransform (param){
+    this.forEach(p=>p.applyTransform(param))
     return this
   }
 }))
@@ -238,7 +316,8 @@ const Vertex = function (pointArray, meta){
 
 const Rect = function (left = 0, top = 0, width = 0, height = 0, meta = null){
   const __ref = { left, top, width, height }
-  let __meta
+  let __meta = {}
+  
   Object.defineProperties(this, {
     width: { 
       enumerable: true, 
@@ -268,13 +347,15 @@ const Rect = function (left = 0, top = 0, width = 0, height = 0, meta = null){
       enumerable: false, 
       get (){ return __meta },
       set (it){ 
-        __meta = typeof it === "object" ? it : null 
+        typeof it === "object" && Object.assign(__meta, it)
         return __meta
       }
     }
   })
   
-  this.meta = meta
+  if(typeof meta === "object"){
+    this.meta = meta
+  }
 }
 
 const splitCountParser = (split)=>{
@@ -301,19 +382,22 @@ Rect.prototype = {
     if(withMeta === true && this.meta) json.meta = this.meta
     return json
   },
-  findPoint (findWord){
-    const [ lineFind, pointFind ] = isArray(findWord) ? findWord : findWord.trim().split(/\s+/)
-    return this.vertex(lineFind).point(pointFind)
-  },
-  vertex (order){
-    const inheritMeta = Object.assign({
+  defaultPerspective (){
+    return {
       perspective      : 0,
       perspectiveOrigin: {
         x: this.left + (this.width / 2),
         y: this.top + (this.height / 2),
         z: 0
       }
-    }, this.meta)
+    }
+  },
+  findPoint (findWord){
+    const [ lineFind, pointFind ] = isArray(findWord) ? findWord : findWord.trim().split(/\s+/)
+    return this.vertex(lineFind).point(pointFind)
+  },
+  vertex (order){
+    const inheritMeta = Object.assign(this.defaultPerspective(), this.meta)
     
     switch (order){
       case "right": case "r":
@@ -354,6 +438,9 @@ Rect.prototype = {
         )
     }
   },
+  transformRect (){
+    this.vertex()
+  },
   piecesWithCount (splitCount, eachResultHook){
     const { column, row } = splitCountParser(splitCount)
     const width = this.width
@@ -362,18 +449,77 @@ Rect.prototype = {
     const pieceHeight = height / row
     eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined
     
+    
+    const pacExt = { ...this.defaultPerspective() }
+    
+    if(this.meta.matrix && this.meta.matrix instanceof Array){
+      Object.assign(pacExt, {
+        matrix: this.meta.matrix
+      })
+    }
+    
     const pacResult = makeMatrixArray(column, row, (index, colIndex, rowIndex)=>{
       const pacMeta = { 
         column: colIndex,
         row   : rowIndex,
         coords: [colIndex, rowIndex], 
-        range : { width, height }
+        range : { width, height },
+        ...pacExt
       }
+      
+      //
       const result = new Rect(colIndex * pieceWidth, rowIndex * pieceHeight, pieceWidth, pieceHeight, pacMeta)
       return eachResultHook ? eachResultHook(result, index, colIndex, rowIndex) : result
     })
     
     return pacResult
+  },
+  diff ({ left:aleft, top:atop, width:awidth, height:aheight, right:aright, bottom:abottom }){
+    const diffResult = {}
+    const original = this.toJSON()
+    const offset = {left: 0, top: 0}
+    Object.defineProperties(diffResult, {
+      left: {
+        enumerable: true, 
+        get       : ()=>original.left - aleft + offset.left,
+        set       : (want)=>{ offset.left = typeof want === "number" ? -original.left + want : 0 }
+      },
+      top: {
+        enumerable: true,
+        get       : ()=>original.top - atop + offset.top,
+        set       : (want)=>{ offset.top = typeof want === "number" ? -original.top + want : 0 }
+      },
+      width : { enumerable: true, get: ()=>original.width - awidth},
+      height: { enumerable: true, get: ()=>original.height - aheight},
+      right : { enumerable: true, get: ()=>original.right - aright + offset.left},
+      bottom: { enumerable: true, get: ()=>original.bottom - abottom + offset.top},
+      x     : { enumerable: false, get: ()=>offset.left},
+      y     : { enumerable: false, get: ()=>offset.top},
+      offset: {
+        enumerable: false,
+        get       : ()=>()=>({
+          x     : offset.left,
+          y     : offset.top,
+          right : diffResult.right,
+          bottom: diffResult.bottom,
+          over  : diffResult.right > diffResult.bottom ? diffResult.right : diffResult.bottom
+        })
+      },
+      move: {
+        enumerable: false,
+        get       : ()=>(nleft, ntop)=>{
+          diffResult.left = typeof nleft === "number" ? nleft : aleft
+          diffResult.top = typeof ntop === "number" ? ntop : atop
+          return diffResult
+        }
+      },
+      toJSON: {
+        enumerable: false,
+        get       : ()=>()=>({ ...diffResult })
+      }
+    })
+    
+    return diffResult
   },
   fit (rect){
     if(typeof rect !== "object"){ throw new Error("fit::argument[0] is not object") }

@@ -62,12 +62,13 @@ export default {
     PadoPoint
   },
   data: ()=>({
-    gridSize: 50,
-    column  : 10,
-    row     : 10,
-    rotateX : 30,
-    rotateY : 0,
-    rotateZ : 0
+    gridSize  : 50,
+    column    : 5,
+    row       : 5,
+    rotateX   : 30,
+    rotateY   : 0,
+    rotateZ   : 10,
+    gridPoints: []
   }),
   computed: {
     mainRectSize (){
@@ -87,25 +88,30 @@ export default {
           rotateY: this.rotateY,
           rotateX: this.rotateX
         })
-        
       };
-    },
-    gridPoints (){
+    }
+  },
+  methods: {
+    mainDraw (){
       const { width, height } = this.mainRectSize;
-      const frame = rect(0, 0, width, height);
-      return frame.piecesWithCount([this.column, this.row], (rect)=>{
-        return rect.findPoint("middle center");
+      const pointFrame = rect(0, 0, width, height, { matrix: transformMatrixVariant(this) });
+      
+      const outsideRect = pointFrame.vertex().applyTransform().rect();
+      const differenceValues = outsideRect.diff(pointFrame);
+      
+      console.log('outsideRect', outsideRect.toJSON());
+      console.log('differenceValues', { ...differenceValues }, { ...differenceValues.move() }, { ...differenceValues.offset() });
+      
+      this.gridPoints = pointFrame.piecesWithCount([this.column, this.row], (rect)=>{
+        return rect.findPoint("middle center").applyTransform();
       });
     }
   },
   mounted (){
-    const mainTransform = getElementTransform(this.$refs.mainRect);
-    const mainTransformMatrix = getElementTransformMatrix(this.$refs.mainRect);
-    const mainTransformCalcMatrix = transformMatrixVariant(this);
+    //const mainTransform = getElementTransform(this.$refs.mainRect);
+    //const mainTransformMatrix = getElementTransformMatrix(this.$refs.mainRect);
     
-    console.log("mainTransform", mainTransform);
-    console.log("mainTransformMatrix", mainTransformMatrix);
-    console.log("mainTransformCalcMatrix", mainTransformCalcMatrix);
+    this.mainDraw();
   }
 };
 </script>

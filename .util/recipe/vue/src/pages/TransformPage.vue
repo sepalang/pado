@@ -232,7 +232,7 @@ export default {
       };
       
       return boxRect.vertex().map((vertex, index)=>{
-        return transformMatrix ? vertex.multiflyMatrix(transformMatrix) : vertex;
+        return transformMatrix ? vertex.applyTransform(transformMatrix) : vertex;
       });
     }
   },
