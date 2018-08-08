@@ -1,4 +1,5 @@
 import { likeString, isArray } from "../../functions/isLike"
+import { multiplyMatrix } from "../../functions/matrix"
 
 export const getElementTransformMatrix = function (el){
   const computedStyle       = getComputedStyle(el, null)
@@ -119,7 +120,7 @@ export const getElementTransform = function (el){
   }
 }
 
-export const transformVariant = (function (likeString, isArray){
+export const transformStyleVariant = (function (likeString, isArray){
   const TRANSFORM_UNDEFINED = "0"
   
   const parseTransformValue = function (value, matched){
@@ -166,8 +167,10 @@ export const transformVariant = (function (likeString, isArray){
     if(typeof props !== "object"){
       return ""
     }
-    const { translateX, translateY, scaleX, scaleY, scaleZ, rotateX, rotateY, rotateZ } = props
+    
+    const { translateX, translateY, translateZ, scaleX, scaleY, scaleZ, rotateX, rotateY, rotateZ } = props
     let { translate, translate3d, scale, scale3d, rotate, rotate3d } = props
+    
     translate = oneNumberToTwoArray(translate)
     translate3d = oneNumberToTwoArray(translate3d)
     scale = oneNumberToTwoArray(scale)
@@ -193,9 +196,10 @@ export const transformVariant = (function (likeString, isArray){
     parseTransformMultivalue(rotate3d, multiValueHook(rotateVars, "deg"))
     parseTransformValue(translateX, singleValueHook(translateVars, "px", 0))
     parseTransformValue(translateY, singleValueHook(translateVars, "px", 1))
-    parseTransformValue(scaleX, singleValueHook(scaleVars, "%", 0))
-    parseTransformValue(scaleY, singleValueHook(scaleVars, "%", 1))
-    parseTransformValue(scaleZ, singleValueHook(scaleVars, "%", 2))
+    parseTransformValue(translateZ, singleValueHook(translateVars, "px", 2))
+    parseTransformValue(scaleX, singleValueHook(scaleVars, "", 0))
+    parseTransformValue(scaleY, singleValueHook(scaleVars, "", 1))
+    parseTransformValue(scaleZ, singleValueHook(scaleVars, "", 2))
     parseTransformValue(rotateX, singleValueHook(rotateVars, "deg", 0))
     parseTransformValue(rotateY, singleValueHook(rotateVars, "deg", 1))
     parseTransformValue(rotateZ, singleValueHook(rotateVars, "deg", 2))
@@ -207,11 +211,13 @@ export const transformVariant = (function (likeString, isArray){
         ? result.push(`translate(${translateVars[0]},${translateVars[1]})`)
         : result.push(`translate3d(${translateVars[0]},${translateVars[1]},${translateVars[2]})`)
     }
+    
     if(scaleVars.some(v=>v !== TRANSFORM_UNDEFINED)){
       scaleVars[2] === TRANSFORM_UNDEFINED 
         ? result.push(`scale(${scaleVars[0]},${scaleVars[1]})`)
         : result.push(`scale3d(${scaleVars[0]},${scaleVars[1]},${scaleVars[2]})`)
     }
+    
     if(rotateVars.some(v=>v !== TRANSFORM_UNDEFINED)){
       if(rotateVars[0] === TRANSFORM_UNDEFINED && rotateVars[1] === TRANSFORM_UNDEFINED && rotateVars[2] !== TRANSFORM_UNDEFINED){
         return result.push(`rotate(${rotateVars[2]})`)
@@ -226,7 +232,76 @@ export const transformVariant = (function (likeString, isArray){
         result.push(`rotate3d(0,0,1,${rotateVars[2]})`)
       }
     }
-    
     return result.join(" ")
   }
 }(likeString, isArray))
+
+
+export const transformMatrixVariant = function (variant){
+  const RSIN = (v)=>{
+    return Math.sin(Math.PI * (v / 180))
+  }
+  const RCOS = (v)=>{
+    return Math.cos(Math.PI * (v / 180))
+  }
+  const UDF = undefined
+  const multiplyMatrixList = []
+  
+  let {
+    translateX = 0,
+    translateY = 0,
+    translateZ = 0,
+    scale = 1,
+    scaleX = UDF,
+    scaleY = UDF,
+    scaleZ = UDF,
+    rotateX = 0,
+    rotateY = 0,
+    rotateZ = 0
+  } = variant
+  
+  //scaleX = scaleX === UDF ? scale : scaleX
+  //scaleY = scaleY === UDF ? scale : scaleY
+  //scaleZ = scaleZ === UDF ? scale : scaleZ
+  
+  
+  multiplyMatrixList.push([
+    [1, 0, 0, translateX / scaleX],
+    [0, 1, 0, translateY / scaleY],
+    [0, 0, 1, translateZ / scaleZ],
+    [0, 0, 0, 1]
+  ])
+  
+  multiplyMatrixList.push([
+    [scaleX === UDF ? scale : scaleX, 0, 0, 0],
+    [0, scaleY === UDF ? scale : scaleY, 0, 0],
+    [0, 0, scaleZ === UDF ? scale : scaleZ, 0],
+    [0, 0, 0, 1]
+  ])
+  
+  rotateX && multiplyMatrixList.push([
+    [1, 0, 0, 0],
+    [0, RCOS(rotateX), -RSIN(rotateX), 0],
+    [0, RSIN(rotateX), RCOS(rotateX), 0],
+    [0, 0, 0, 1]
+  ])
+  
+  rotateY && multiplyMatrixList.push([
+    [RCOS(rotateY), 0, RSIN(rotateY), 0],
+    [0, 1, 0, 0],
+    [-RSIN(rotateY), 0, RCOS(rotateY), 0],
+    [0, 0, 0, 1]
+  ])
+  
+  rotateZ && multiplyMatrixList.push([
+    [RCOS(rotateZ), -RSIN(rotateZ), 0, 0],
+    [RSIN(rotateZ), RCOS(rotateZ), 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1]
+  ])
+  
+  return multiplyMatrixList.reduce((dest, matrix)=>{
+    if(!dest) return matrix
+    return multiplyMatrix(dest, matrix)
+  })
+}

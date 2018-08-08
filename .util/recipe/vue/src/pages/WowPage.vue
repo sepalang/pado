@@ -10,7 +10,11 @@
         </tr>
         <tr>
           <td></td>
-          <td></td>
+          <td>
+            <input type="text" v-model.number="rotateX" style="width:100%">
+            <input type="text" v-model.number="rotateY" style="width:100%">
+            <input type="text" v-model.number="rotateZ" style="width:100%">
+          </td>
           <td></td>
         </tr>
       </tbody>
@@ -18,14 +22,13 @@
         <tr>
           <td colspan="3">
             <PadoScreen ref="main" style="width:100%;height:200px;">
-              <div :style="mainRectStyle"></div>
+              <div :style="mainRectStyle" ref="mainRect"></div>
               <PadoPoint 
-                v-for="point in gridPoints"
+                v-for="(point, index) in gridPoints"
+                :key="index"
                 :x="point.x"
                 :y="point.y"
-                placement="top"
               >
-              p
               </PadoPoint>
             </PadoScreen>
           </td>
@@ -41,6 +44,15 @@ import PadoScreen from '@/components/PadoScreen.vue';
 import PadoMinimap from '@/components/PadoMinimap.vue';
 import PadoPoint from '@/components/PadoPoint.vue';
 import { rect } from '../../../../../.src/modules/stance';
+import {
+  transformStyleVariant,
+  transformMatrixVariant,
+  //getElementOffsetRect,
+  //getElementBoundingRect,
+  getElementTransformMatrix,
+  getElementTransform
+} from '../../../../../.src/web';
+
 export default {
   components: {
     AppLayout,
@@ -52,7 +64,10 @@ export default {
   data: ()=>({
     gridSize: 50,
     column  : 10,
-    row     : 10
+    row     : 10,
+    rotateX : 30,
+    rotateY : 0,
+    rotateZ : 0
   }),
   computed: {
     mainRectSize (){
@@ -64,9 +79,15 @@ export default {
     mainRectStyle (){
       const { width, height } = this.mainRectSize;
       return {
-        width : `${width}px`,
-        height: `${height}px`,
-        border: '1px solid blue'
+        width    : `${width}px`,
+        height   : `${height}px`,
+        border   : '1px solid blue',
+        transform: transformStyleVariant({
+          rotateZ: this.rotateZ,
+          rotateY: this.rotateY,
+          rotateX: this.rotateX
+        })
+        
       };
     },
     gridPoints (){
@@ -76,6 +97,15 @@ export default {
         return rect.findPoint("middle center");
       });
     }
+  },
+  mounted (){
+    const mainTransform = getElementTransform(this.$refs.mainRect);
+    const mainTransformMatrix = getElementTransformMatrix(this.$refs.mainRect);
+    const mainTransformCalcMatrix = transformMatrixVariant(this);
+    
+    console.log("mainTransform", mainTransform);
+    console.log("mainTransformMatrix", mainTransformMatrix);
+    console.log("mainTransformCalcMatrix", mainTransformCalcMatrix);
   }
 };
 </script>

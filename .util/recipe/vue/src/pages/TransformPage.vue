@@ -34,60 +34,123 @@
       </layer>
       <div style="min-height:170px;"></div>
       <div class="no-word-break"></div>
-      <table style="width:600px;">
-        <colgroup>
-          <col style="width:120px">
-          <col>
-          <col style="width:55px">
-        </colgroup>
+      <table style="width:900px;">
         <tbody>
           <tr>
-            <th>rotateX</th>
-            <td><PadoSlider v-model="rotateX" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
-            <td>{{rotateX}}</td>
-          </tr>
-          <tr>
-            <th>rotateY</th>
-            <td><PadoSlider v-model="rotateY" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
-            <td>{{rotateY}}</td>
-          </tr>
-          <tr>
-            <th>rotateZ</th>
-            <td><PadoSlider v-model="rotateZ" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
-            <td>{{rotateZ}}</td>
-          </tr>
-          <tr>
-            <th>perspective</th>
-            <td><PadoSlider v-model="perspective" input-cycle="enter" min-value="0" max-value="500"></PadoSlider></td>
-            <td>{{perspective}}</td>
-          </tr>
-          <tr v-for="(vertex, index) in boxVertexPointArray" :key="index">
-            <td>Point {{ index }}</td>
-            <td>x : {{ vertex.x }}, y : {{ vertex.y }}</td>
-          </tr>
-          <tr v-if="boxTransformMatrix">
-            <td colspan="2">
-              <div>{{ boxTransformMatrix }}</div>
-              <div>{{ boxTransformVariant }}</div>
+            <td style="vertical-align:top;">
+              <table>
+                <colgroup>
+                  <col style="width:110px">
+                  <col>
+                  <col style="width:65px">
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th>rotateX</th>
+                    <td><PadoSlider v-model="rotateX" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+                    <td><a @click="rotateX+=1">u</a><a @click="rotateX-=1">d</a> {{rotateX}}</td>
+                  </tr>
+                  <tr>
+                    <th>rotateY</th>
+                    <td><PadoSlider v-model="rotateY" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+                    <td><a @click="rotateY+=1">u</a><a @click="rotateY-=1">d</a> {{rotateY}}</td>
+                  </tr>
+                  <tr>
+                    <th>rotateZ</th>
+                    <td><PadoSlider v-model="rotateZ" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+                    <td><a @click="rotateZ+=1">u</a><a @click="rotateZ-=1">d</a> {{rotateZ}}</td>
+                  </tr>
+                  <tr>
+                    <th>translateX</th>
+                    <td><PadoSlider v-model="translateX" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+                    <td>{{translateX}}</td>
+                  </tr>
+                  <tr>
+                    <th>translateY</th>
+                    <td><PadoSlider v-model="translateY" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+                    <td>{{translateY}}</td>
+                  </tr>
+                  <tr>
+                    <th>translateZ</th>
+                    <td><PadoSlider v-model="translateZ" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+                    <td>{{translateZ}}</td>
+                  </tr>
+                  <tr>
+                    <th>scaleX</th>
+                    <td><PadoSlider v-model="scaleX" input-cycle="enter" min-value="-1" max-value="3"></PadoSlider></td>
+                    <td>{{scaleX}}</td>
+                  </tr>
+                  <tr>
+                    <th>scaleY</th>
+                    <td><PadoSlider v-model="scaleY" input-cycle="enter" min-value="-1" max-value="3"></PadoSlider></td>
+                    <td>{{scaleY}}</td>
+                  </tr>
+                  <tr>
+                    <th>scaleZ</th>
+                    <td><PadoSlider v-model="scaleZ" input-cycle="enter" min-value="-1" max-value="3"></PadoSlider></td>
+                    <td>{{scaleZ}}</td>
+                  </tr>
+                  <tr>
+                    <th>perspective</th>
+                    <td><PadoSlider v-model="perspective" input-cycle="enter" min-value="0" max-value="500"></PadoSlider></td>
+                    <td>{{perspective}}</td>
+                  </tr>
+                  <tr>
+                    <th colspan="3">
+                      <PadoPointSlider
+                        v-model="perspectiveOrigin"
+                        input-cycle="enter"
+                        x-max-value="150"
+                        y-max-value="150"
+                      ></PadoPointSlider>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>target move</th>
+                    <td><PadoSlider v-model="boxMoveDistance" input-cycle="enter" min-value="0" max-value="500"></PadoSlider></td>
+                    <td>{{boxMoveDistance}}</td>
+                  </tr>
+                </tbody>
+              </table>
             </td>
-          </tr>
-          <tr>
-            <th colspan="3">
-              <PadoPointSlider
-                v-model="perspectiveOrigin"
-                input-cycle="enter"
-                x-max-value="150"
-                y-max-value="150"
-              ></PadoPointSlider>
-            </th>
-          </tr>
-          <tr>
-            <th>target move</th>
-            <td><PadoSlider v-model="boxMoveDistance" input-cycle="enter" min-value="0" max-value="500"></PadoSlider></td>
-            <td>{{boxMoveDistance}}</td>
+            <td style="vertical-align:top;">
+              <table>
+                <colgroup>
+                  <col style="width:110px">
+                  <col>
+                </colgroup>
+                <tbody>
+                  <tr>
+                    <th>computed<br>matrix</th>
+                    <td>
+                      {{transfomedComputedMatrix}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>element<br>matrix</th>
+                    <td>
+                      {{boxTransformMatrix}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      
+                    </td>
+                    <td>
+                      <pre>{{boxTransformVariant}}</pre>
+                    </td>
+                  </tr>
+                  <tr v-for="(vertex, index) in boxVertexPointArray" :key="index">
+                    <td>Point {{ index }}</td>
+                    <td>x : {{ vertex.x }}, y : {{ vertex.y }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
           </tr>
         </tbody>
       </table>
+      
     </section>
   </AppLayout>
 </template>
@@ -95,7 +158,8 @@
 import AppLayout from '../layouts/AppLayout.vue';
 import { Layer, PadoRect, PadoSlider, PadoPoint, PadoPointSlider } from '../components';
 import {
-  transformVariant,
+  transformStyleVariant,
+  transformMatrixVariant,
   getElementOffsetRect,
   getElementBoundingRect,
   getElementTransformMatrix,
@@ -105,8 +169,6 @@ import {
 import {
   rect
 } from '../../../../../.src/modules';
-
-import { nextTick } from '../service';
 
 export default {
   components: {
@@ -120,36 +182,36 @@ export default {
   computed: {
     transformedBoxStyle (){
       return {
-        transform: transformVariant({
-          perspectiveOrigin: this.perspectiveOrigin,
-          perspective      : this.perspective,
-          rotateZ          : this.rotateZ,
-          rotateY          : this.rotateY,
-          rotateX          : this.rotateX
-        }),
-        opacity: 0.7
+        transform: transformStyleVariant(this),
+        opacity  : 0.7
       };
     },
+    transfomedComputedMatrix (){
+      return transformMatrixVariant(this);
+    },
     boxTransformMatrix (){
-      const [ box ] = [this.$refs.box && this.$refs.box.$el, this.transformedBoxStyle];
+      [this.transformedBoxStyle].includes();
+      const box = this.$refs.box && this.$refs.box.$el;
       return box ? getElementTransformMatrix(box) : undefined;
     },
     boxTransformVariant (){
-      const [ box ] = [this.$refs.box && this.$refs.box.$el, this.transformedBoxStyle];
+      [this.transformedBoxStyle].includes();
+      const box = this.$refs.box && this.$refs.box.$el;
       return box ? getElementTransform(box) : undefined;
     },
     boxBoundingRect (){
-      const [ box ] = [this.$refs.box && this.$refs.box.$el, this.transformedBoxStyle];
+      [this.transformedBoxStyle].includes();
+      const box = this.$refs.box && this.$refs.box.$el;
       return box ? getElementBoundingRect(box) : rect();
     },
     boxElement (){
       return this.$el.querySelectorAll('.box')[0];
     },
     boxVertexPointArray (){
-      const transformMatrix = this.boxTransformMatrix;
+      const box = this.$refs.box && this.$refs.box.$el;
+      const transformMatrix = this.transfomedComputedMatrix;
       const perspective = this.perspective;
       
-      const box = this.$refs.box && this.$refs.box.$el;
       if(!box) return [];
       
       const boxRect = getElementOffsetRect(box);
@@ -165,16 +227,21 @@ export default {
       rotateX          : 0, 
       rotateY          : 0,
       rotateZ          : 0,
+      translateX       : 0, 
+      translateY       : 0,
+      translateZ       : 0,
+      scaleX           : 1, 
+      scaleY           : 1,
+      scaleZ           : 1,
       perspective      : undefined,
       perspectiveOrigin: {x: 75, y: 75},
       boxMoveDistance  : 0
     };
   },
   mounted (){
-    nextTick(()=>{
-      this.boxVertexPointArray.toString();
-      this.perspective = 0;
-    });
+    this.isMounted = true;
+    this.boxVertexPointArray.toString();
+    this.perspective = 0;
   }
 };
 </script>
