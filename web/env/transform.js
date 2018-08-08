@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.fill", "core-js/modules/web.dom.iterable", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.split", "../../functions/isLike"], factory);
+    define(["exports", "core-js/modules/es6.array.fill", "core-js/modules/web.dom.iterable", "core-js/modules/es6.object.assign", "core-js/modules/es6.regexp.split", "../../functions/isLike", "../../functions/matrix"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.fill"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.split"), require("../../functions/isLike"));
+    factory(exports, require("core-js/modules/es6.array.fill"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.regexp.split"), require("../../functions/isLike"), require("../../functions/matrix"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.webDom, global.es6Object, global.es6Regexp, global.isLike);
+    factory(mod.exports, global.es6Array, global.webDom, global.es6Object, global.es6Regexp, global.isLike, global.matrix);
     global.transform = mod.exports;
   }
-})(this, function (_exports, _es6Array, _webDom, _es6Object, _es6Regexp, _isLike) {
+})(this, function (_exports, _es6Array, _webDom, _es6Object, _es6Regexp, _isLike, _matrix) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.transformVariant = _exports.getElementTransform = _exports.getElementTransformMatrix = void 0;
+  _exports.transformMatrixVariant = _exports.transformStyleVariant = _exports.getElementTransform = _exports.getElementTransformMatrix = void 0;
 
   var getElementTransformMatrix = function getElementTransformMatrix(el) {
     var computedStyle = getComputedStyle(el, null);
@@ -112,8 +112,8 @@
 
   var getElementTransform = function getElementTransform(el) {
     var computedStyle = getComputedStyle(el, null);
-    var val = computedStyle.transform || computedStyle.webkitTransform || computedStyle.MozTransform || computedStyle.msTransform;
-    var matrix = parseMatrix(val);
+    var transformStyle = computedStyle.transform || computedStyle.webkitTransform || computedStyle.MozTransform || computedStyle.msTransform;
+    var matrix = parseMatrix(transformStyle);
     var rotateY = Math.asin(-matrix.m13);
     var rotateX = Math.atan2(matrix.m23, matrix.m33);
     var rotateZ = Math.atan2(matrix.m12, matrix.m11);
@@ -128,14 +128,13 @@
         y: matrix.m42,
         z: matrix.m43
       },
-      matrix: matrix,
-      transformStyle: val
+      transformStyle: transformStyle
     };
   };
 
   _exports.getElementTransform = getElementTransform;
 
-  var transformVariant = function (likeString, isArray) {
+  var transformStyleVariant = function (likeString, isArray) {
     var TRANSFORM_UNDEFINED = "0";
 
     var parseTransformValue = function parseTransformValue(value, matched) {
@@ -187,6 +186,7 @@
 
       var translateX = props.translateX,
           translateY = props.translateY,
+          translateZ = props.translateZ,
           scaleX = props.scaleX,
           scaleY = props.scaleY,
           scaleZ = props.scaleZ,
@@ -225,9 +225,10 @@
       parseTransformMultivalue(rotate3d, multiValueHook(rotateVars, "deg"));
       parseTransformValue(translateX, singleValueHook(translateVars, "px", 0));
       parseTransformValue(translateY, singleValueHook(translateVars, "px", 1));
-      parseTransformValue(scaleX, singleValueHook(scaleVars, "%", 0));
-      parseTransformValue(scaleY, singleValueHook(scaleVars, "%", 1));
-      parseTransformValue(scaleZ, singleValueHook(scaleVars, "%", 2));
+      parseTransformValue(translateZ, singleValueHook(translateVars, "px", 2));
+      parseTransformValue(scaleX, singleValueHook(scaleVars, "", 0));
+      parseTransformValue(scaleY, singleValueHook(scaleVars, "", 1));
+      parseTransformValue(scaleZ, singleValueHook(scaleVars, "", 2));
       parseTransformValue(rotateX, singleValueHook(rotateVars, "deg", 0));
       parseTransformValue(rotateY, singleValueHook(rotateVars, "deg", 1));
       parseTransformValue(rotateZ, singleValueHook(rotateVars, "deg", 2));
@@ -269,6 +270,53 @@
     };
   }(_isLike.likeString, _isLike.isArray);
 
-  _exports.transformVariant = transformVariant;
+  _exports.transformStyleVariant = transformStyleVariant;
+
+  var transformMatrixVariant = function transformMatrixVariant(variant) {
+    var RSIN = function RSIN(v) {
+      return Math.sin(Math.PI * (v / 180));
+    };
+
+    var RCOS = function RCOS(v) {
+      return Math.cos(Math.PI * (v / 180));
+    };
+
+    var UDF = undefined;
+    var multiplyMatrixList = [];
+    var _variant$translateX = variant.translateX,
+        translateX = _variant$translateX === void 0 ? 0 : _variant$translateX,
+        _variant$translateY = variant.translateY,
+        translateY = _variant$translateY === void 0 ? 0 : _variant$translateY,
+        _variant$translateZ = variant.translateZ,
+        translateZ = _variant$translateZ === void 0 ? 0 : _variant$translateZ,
+        _variant$scale = variant.scale,
+        scale = _variant$scale === void 0 ? 1 : _variant$scale,
+        _variant$scaleX = variant.scaleX,
+        scaleX = _variant$scaleX === void 0 ? UDF : _variant$scaleX,
+        _variant$scaleY = variant.scaleY,
+        scaleY = _variant$scaleY === void 0 ? UDF : _variant$scaleY,
+        _variant$scaleZ = variant.scaleZ,
+        scaleZ = _variant$scaleZ === void 0 ? UDF : _variant$scaleZ,
+        _variant$rotateX = variant.rotateX,
+        rotateX = _variant$rotateX === void 0 ? 0 : _variant$rotateX,
+        _variant$rotateY = variant.rotateY,
+        rotateY = _variant$rotateY === void 0 ? 0 : _variant$rotateY,
+        _variant$rotateZ = variant.rotateZ,
+        rotateZ = _variant$rotateZ === void 0 ? 0 : _variant$rotateZ; //scaleX = scaleX === UDF ? scale : scaleX
+    //scaleY = scaleY === UDF ? scale : scaleY
+    //scaleZ = scaleZ === UDF ? scale : scaleZ
+
+    multiplyMatrixList.push([[1, 0, 0, translateX / scaleX], [0, 1, 0, translateY / scaleY], [0, 0, 1, translateZ / scaleZ], [0, 0, 0, 1]]);
+    multiplyMatrixList.push([[scaleX === UDF ? scale : scaleX, 0, 0, 0], [0, scaleY === UDF ? scale : scaleY, 0, 0], [0, 0, scaleZ === UDF ? scale : scaleZ, 0], [0, 0, 0, 1]]);
+    rotateX && multiplyMatrixList.push([[1, 0, 0, 0], [0, RCOS(rotateX), -RSIN(rotateX), 0], [0, RSIN(rotateX), RCOS(rotateX), 0], [0, 0, 0, 1]]);
+    rotateY && multiplyMatrixList.push([[RCOS(rotateY), 0, RSIN(rotateY), 0], [0, 1, 0, 0], [-RSIN(rotateY), 0, RCOS(rotateY), 0], [0, 0, 0, 1]]);
+    rotateZ && multiplyMatrixList.push([[RCOS(rotateZ), -RSIN(rotateZ), 0, 0], [RSIN(rotateZ), RCOS(rotateZ), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]);
+    return multiplyMatrixList.reduce(function (dest, matrix) {
+      if (!dest) return matrix;
+      return (0, _matrix.multiplyMatrix)(dest, matrix);
+    });
+  };
+
+  _exports.transformMatrixVariant = transformMatrixVariant;
 });
 //# sourceMappingURL=transform.js.map

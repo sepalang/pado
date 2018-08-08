@@ -49,58 +49,13 @@
       w: w
     };
 
-    var __meta; // compute matrix
-
-
-    var __matrix = [];
-    var __computed = {
-      matrixVersion: 0,
-      computedVersion: 0,
-      memoizeRef: null,
-      memoizeOutput: null
-    };
-
-    var compute = function compute(key) {
-      var matrixVersion = __computed.matrixVersion,
-          computedVersion = __computed.computedVersion; //why un used?
-      //const { memoizeRef } = __computed;
-
-      var needCompute = !__computed.memoizeRef || matrixVersion !== computedVersion || !(__computed.memoizeRef.x === __ref.x && __computed.memoizeRef.y === __ref.y && __computed.memoizeRef.z === __ref.z && __computed.memoizeRef.w === __ref.w);
-
-      if (needCompute) {
-        var newMemoizeRef = {
-          x: __ref.x,
-          y: __ref.y,
-          z: __ref.z,
-          w: __ref.w
-        };
-
-        var newComputedMatrix = __matrix.reduce(function (dest, matrix) {
-          return (0, _matrix.multiplyMatrix)(matrix, dest);
-        }, (0, _matrix.asMatrix)([newMemoizeRef.x, newMemoizeRef.y, newMemoizeRef.z, newMemoizeRef.w], 1)); //
-
-
-        __computed.memoizeOutput = {
-          x: newComputedMatrix[0][0],
-          y: newComputedMatrix[0][1],
-          z: newComputedMatrix[0][2],
-          w: newComputedMatrix[0][3]
-        };
-        __computed.memoizeRef = newMemoizeRef;
-        __computed.computedVersion = matrixVersion;
-      } //else {
-      //  console.log(`compute cache ${key}`);
-      //}
-
-
-      return key && __computed.memoizeOutput[key] || __computed.memoizeOutput;
-    };
+    var __meta;
 
     Object.defineProperties(this, {
       x: {
         enumerable: true,
         get: function get() {
-          return __matrix.length && compute('x') || __ref.x;
+          return __ref.x;
         },
         set: function set(v) {
           return __ref.x = v;
@@ -109,7 +64,7 @@
       y: {
         enumerable: true,
         get: function get() {
-          return __matrix.length && compute('y') || __ref.y;
+          return __ref.y;
         },
         set: function set(v) {
           return __ref.y = v;
@@ -118,7 +73,7 @@
       z: {
         enumerable: true,
         get: function get() {
-          return __matrix.length && compute('z') || __ref.z;
+          return __ref.z;
         },
         set: function set(v) {
           return __ref.z = v;
@@ -127,7 +82,7 @@
       w: {
         enumerable: true,
         get: function get() {
-          return __matrix.length && compute('w') || __ref.w;
+          return __ref.w;
         },
         set: function set(v) {
           return __ref.w = v;
@@ -155,17 +110,6 @@
         get: function get() {
           var rangeHeight = _this.meta && _this.meta.range && _this.meta.range.height || 0;
           return _this.y / rangeHeight;
-        }
-      },
-      addMatrix: {
-        enumerable: false,
-        value: function value(matrix) {
-          if (!(0, _matrix.validMatrix)(matrix)) throw new Error("invalid addMatrix param");
-
-          __matrix.push(matrix);
-
-          __computed.matrixVersion += 1;
-          return this;
         }
       }
     });
@@ -248,6 +192,45 @@
           smallY = _ref3[1];
 
       return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0);
+    },
+    multiflyMatrix: function multiflyMatrix(matrix44) {
+      if (!(0, _matrix.validMatrix)(matrix44)) {
+        throw new Error('Point::multiflyMatrix invalid matrix', matrix44);
+      } // yet support affin
+      //let perspectiveVar = (this.meta && this.meta.perspective)
+      //perspectiveVar = !isNumber(perspectiveVar) ? 0 : perspectiveVar;
+      //perspectiveVar = -1/perspectiveVar;
+      //perspectiveVar = isInfinity(perspectiveVar) ? 0 : (perspectiveVar || 0) ;
+
+
+      var _ref4 = this.meta && this.meta.perspectiveOrigin || {
+        x: 0,
+        y: 0,
+        z: 0
+      },
+          px = _ref4.x,
+          py = _ref4.y,
+          pz = _ref4.z;
+
+      var mx = px - matrix44[0][3],
+          my = py - matrix44[1][3],
+          mz = pz - matrix44[2][3];
+
+      var _multiplyMatrix = (0, _matrix.multiplyMatrix)(matrix44, [[this.x - mx], [this.y - my], [this.z - mz], [this.w]]),
+          _multiplyMatrix$ = _multiplyMatrix[0],
+          x = _multiplyMatrix$[0],
+          _multiplyMatrix$2 = _multiplyMatrix[1],
+          y = _multiplyMatrix$2[0],
+          _multiplyMatrix$3 = _multiplyMatrix[2],
+          z = _multiplyMatrix$3[0],
+          _multiplyMatrix$4 = _multiplyMatrix[3],
+          w = _multiplyMatrix$4[0];
+
+      this.x = x + mx + matrix44[0][3];
+      this.y = y + my + matrix44[1][3];
+      this.z = z + mz + matrix44[2][3];
+      this.w = w;
+      return this;
     }
   };
 
@@ -546,9 +529,9 @@
       return json;
     },
     findPoint: function findPoint(findWord) {
-      var _ref4 = (0, _isLike.isArray)(findWord) ? findWord : findWord.trim().split(/\s+/),
-          lineFind = _ref4[0],
-          pointFind = _ref4[1];
+      var _ref5 = (0, _isLike.isArray)(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref5[0],
+          pointFind = _ref5[1];
 
       return this.vertex(lineFind).point(pointFind);
     },
@@ -557,7 +540,7 @@
         perspective: 0,
         perspectiveOrigin: {
           x: this.left + this.width / 2,
-          y: this.top + this.top / 2,
+          y: this.top + this.height / 2,
           z: 0
         }
       }, this.meta);
@@ -717,11 +700,11 @@
       return this;
     },
     //TODO : incompleted sticky(parent, position, offset);
-    sticky: function sticky(_ref5, position) {
-      var refX = _ref5.left,
-          refY = _ref5.top,
-          refWidth = _ref5.width,
-          refHeight = _ref5.height;
+    sticky: function sticky(_ref6, position) {
+      var refX = _ref6.left,
+          refY = _ref6.top,
+          refWidth = _ref6.width,
+          refHeight = _ref6.height;
 
       if (position === void 0) {
         position = "bottom left";
