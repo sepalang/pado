@@ -74,88 +74,103 @@ export default {
             ? (oldCtx)=>oldCtx.datum[contextKey] === datum[contextKey]
             : (oldCtx)=>oldCtx.datum === datum
         );
-        
+      
         if(!context){
           context = {};
           Object.defineProperties(context, {
             key: {
+              enumerable: true,
               // eslint-disable-next-line vue/no-side-effects-in-computed-properties
               value: `${ref._uid}-${this.__cachedNodelistContextId++}`
             },
             depth: {
+              enumerable: true,
               get: ()=>ref.depth
             },
             toggle: {
+              enumerable: true,
               get (){ return (key, toggleValues)=>{ return ref.toggle(this.datum, key, toggleValues); }; }
             },
             toggleOnly: {
+              enumerable: true,
               get (){ return (key, toggleValues)=>{ return ref.toggleOnly(this.datum, key, toggleValues); }; }
             },
             input: {
+              enumerable: true,
               get (){ return (key, val)=>{ return ref.inputProperty(this.datum, key, val); }; }
             },
             inputAll: {
+              enumerable: true,
               get (){ return val=>{ return ref.inputAll(this.datum, val); }; }
             },
             is: {
+              enumerable: true,
               get (){ return key=>{ return ref.is(this.datum, key); }; }
             },
             open: {
-              get (){ return (toggleValues)=>{ this.toggle('open', toggleValues); }; }
+              enumerable: true,
+              get (){ return (toggleValues)=>{ this.toggle('open', toggleValues); }
             },
             selected: {
+              enumerable: true,
               get (){ return (toggleValues)=>{ this.toggleOnly('selected', toggleValues); }; }
             },
             checked: {
+              enumerable: true,
               get (){ return (toggleValues)=>{ this.toggle('checked', toggleValues); }; }
             },
             isOpen: {
-              get (){ return this.is('open'); }
+              enumerable: true,
+              get (){  return this.is('open'); }
             },
             isSelected: {
+              enumerable: true,
               get (){ return this.is('selected'); }
             },
             isChecked: {
+              enumerable: true,
               get (){ return this.is('checked'); }
             },
             children: {
+              enumerable: false,
               get (){ return this.datum[ref.children] instanceof Array ? this.datum[ref.children] : []; }
             },
             defined: {
+              enumerable: true,
               get (){ return (key)=>typeof this.datum[`$${key}`] !== 'undefined'; }
             },
             hasChildren: {
+              enumerable: true,
               get (){ return this.datum.hasOwnProperty(ref.children) && !!this.children.length; }
             },
             visibleChildren: {
+              enumerable: true,
               get (){ return this.isOpen && this.hasChildren; }
             }
           });
-        }
-        
-        //ref.requireStateList.forEach(stateName=>{
-        //  ref.touchState(datum, stateName);
-        //});
-        
-        
+        }      
+      
         Object.defineProperties(context, {
           datum: {
             configurable: true,
+            enumerable: false,
             get         : ()=>datum
           },
           isFirst: {
             configurable: true,
+            enumerable: true,
             get (){ return ref.nodes[0] === this.datum; }
           },
           isLast: {
             configurable: true,
+            enumerable: true,
             get (){ return ref.nodes[ref.nodes.length - 1] === this.datum; }
           }
         });
-        
+      
         return context;
       });
-      
+    
       return this.__cachedNodelistContext;
     }
   },
@@ -192,7 +207,7 @@ export default {
     inputProperty (datum, propertyKey, value, resolve){
       const name  = `$${propertyKey}`;
       (typeof resolve === "function" ? resolve(datum, name) : true) && this.$set(datum, name, typeof value === "function" ? value(datum, name) : value);
-      
+    
       this.dispatchBubble({ 
         datum, 
         key    : propertyKey, 
@@ -201,34 +216,38 @@ export default {
         context: this.__cachedNodelistContext.find(context=>context.datum === datum),
         depth  : this.depth
       });
+      
+      return datum[name];
     },
     toggle (datum, propertyKey, toggleValues = [true, false]){
       toggleValues = asArray(toggleValues);
       !toggleValues.length && (toggleValues = [true, false]);
-      this.inputProperty(datum, propertyKey, (datum, name)=>toggle(toggleValues, datum[name]));
+      return this.inputProperty(datum, propertyKey, (datum, name)=>toggle(toggleValues, datum[name]));
     },
     toggleOnly (datum, propertyKey, toggleValues){
       toggleValues = asArray(toggleValues);
       !toggleValues.length && (toggleValues = [true, false]);
-      
+
       let nextValue; 
       let propName;
       
-      this.inputProperty(datum, propertyKey, (datum, name)=>{
+      const returnValue = this.inputProperty(datum, propertyKey, (datum, name)=>{
         propName = name;
         nextValue = toggle(toggleValues, datum[propName]);
       });
-      
+    
       this.nodes.forEach(item=>{
         datum !== item && this.inputProperty(item, propertyKey, ()=>false, (item, name)=>{ return item[name] === true; });
       });
-      
+    
       datum[propName] = nextValue;
+      return returnValue;
     },
     inputAll (propertyKey, value){
       this.nodes.forEach(datum=>{
         this.inputProperty(datum, propertyKey, value);
       });
+      return value;
     },
     touchState (datum, propertyKey){
       const name = `$${propertyKey}`;
@@ -241,4 +260,5 @@ export default {
     }
   }
 };
+
 </script>
