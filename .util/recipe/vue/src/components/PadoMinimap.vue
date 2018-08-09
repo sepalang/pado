@@ -12,7 +12,7 @@
 import { limitNumber, top } from '../../../../../.src/functions';
 import { dragHelper } from '../../../../../.src/web';
 import { rect } from '../../../../../.src/modules/stance';
-import { nextTick } from '@/service';
+import { nextTick } from '@/utils';
 import HighOrderRect from './mixins/HighOrderRect';
 
 export default {

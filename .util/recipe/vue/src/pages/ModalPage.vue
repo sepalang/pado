@@ -11,7 +11,7 @@
 </template>
 <script>
 import AppLayout from '@/layouts/AppLayout.vue';
-import { createVue } from '@/service';
+import { createVue } from '@/utils';
 import SampleModal from '@/modules/SampleModal.vue';
 export default {
   components: {

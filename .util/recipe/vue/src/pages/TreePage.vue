@@ -51,10 +51,10 @@ export default {
     treeModel: [
       {
         name    : 'foo',
-        children: [
+        $children: [
           {
             name    : "kim",
-            children: [
+            $children: [
               { name: "김치" },
               { name: "김밥" }
             ]

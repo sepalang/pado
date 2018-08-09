@@ -6,7 +6,7 @@
 <script>
 import { dragHelper } from '../../../../../.src/web';
 import { limitNumber } from '../../../../../.src/functions';
-import { nextTick, nextQueue } from '@/service';
+import { nextTick, nextQueue } from '@/utils';
 import HighOrderRect from './mixins/HighOrderRect';
 
 export default {

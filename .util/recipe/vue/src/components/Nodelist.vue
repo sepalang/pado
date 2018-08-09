@@ -109,7 +109,7 @@ export default {
             },
             open: {
               enumerable: true,
-              get (){ return (toggleValues)=>{ this.toggle('open', toggleValues); }
+              get (){ return (toggleValues)=>{ this.toggle('open', toggleValues); }; }
             },
             selected: {
               enumerable: true,

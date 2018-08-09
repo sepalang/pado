@@ -5,7 +5,7 @@
 </template>
 <script>
 import { dragHelper, getElementBoundingRect } from '../../../../../.src/web';
-import { nextQueue } from '@/service';
+import { nextQueue } from '@/utils';
 import HighOrderRect from './mixins/HighOrderRect';
 import HighOrderPoint from './mixins/HighOrderPoint';
 

@@ -59,7 +59,21 @@ const vueCompileWithFile = function (vueFile, delegates){
 
 // vue file compile
 export const createVue = vueCompileWithFile;
+
 // promisify render after
 export const nextTick = (fn = undefined)=>new Promise(resolve=>Vue.nextTick(()=>{ typeof fn === 'function' ? resolve(fn()) : resolve(); }));
+
 // pormisify timeout 0
 export const nextQueue = (fn = undefined, time = 0)=>new Promise(resolve=>setTimeout(()=>{ typeof fn === 'function' ? resolve(fn()) : resolve(); }, time));
+
+// watchGroup
+export const watchGroup = function (vm, watchValues, fire){
+  const watchFn = typeof watchValues === "function" ? watchValues : ()=>watchValues;
+  let fireValue;
+  const unwatch = vm.$watch(
+    ()=>((fireValue = watchFn(vm)), Date.now()),
+    ()=>{ fire.call(vm, fireValue); }
+  );
+  fire.call(vm, watchFn(vm));
+  return unwatch;
+};

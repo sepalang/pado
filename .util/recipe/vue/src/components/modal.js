@@ -2,7 +2,7 @@ import ModalServiceComponent from './bases/ModalView.vue';
 
 import { promise } from '../../../../../.src/modules/promise';
 import { asArry, asObject } from '../../../../../.src/functions/cast';
-import { createVue } from '@/service/vue-compile';
+import { createVue } from '@/utils';
 
 const ModalComponentCompile = function (options){
   options = asObject(options);
