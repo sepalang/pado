@@ -238,12 +238,7 @@ export const transformStyleVariant = (function (likeString, isArray){
 
 
 export const transformMatrixVariant = function (variant){
-  const RSIN = (v)=>{
-    return Math.sin(Math.PI * (v / 180))
-  }
-  const RCOS = (v)=>{
-    return Math.cos(Math.PI * (v / 180))
-  }
+  
   const UDF = undefined
   const multiplyMatrixList = []
   
@@ -260,10 +255,16 @@ export const transformMatrixVariant = function (variant){
     rotateZ = 0
   } = variant
   
-  //scaleX = scaleX === UDF ? scale : scaleX
-  //scaleY = scaleY === UDF ? scale : scaleY
-  //scaleZ = scaleZ === UDF ? scale : scaleZ
+  scaleX = scaleX === UDF ? scale : scaleX
+  scaleY = scaleY === UDF ? scale : scaleY
+  scaleZ = scaleZ === UDF ? scale : scaleZ
   
+  const RSIN = (v)=>{
+    return Math.sin(Math.PI * (v / 180))
+  }
+  const RCOS = (v)=>{
+    return Math.cos(Math.PI * (v / 180))
+  }
   
   multiplyMatrixList.push([
     [1, 0, 0, translateX / scaleX],
@@ -273,9 +274,9 @@ export const transformMatrixVariant = function (variant){
   ])
   
   multiplyMatrixList.push([
-    [scaleX === UDF ? scale : scaleX, 0, 0, 0],
-    [0, scaleY === UDF ? scale : scaleY, 0, 0],
-    [0, 0, scaleZ === UDF ? scale : scaleZ, 0],
+    [scaleX, 0, 0, 0],
+    [0, scaleY, 0, 0],
+    [0, 0, scaleZ, 0],
     [0, 0, 0, 1]
   ])
   

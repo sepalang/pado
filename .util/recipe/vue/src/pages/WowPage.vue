@@ -22,19 +22,25 @@
         <tr>
           <td colspan="3">
             <PadoScreen ref="main" style="width:100%;height:200px;">
-              <div :style="mainRectStyle" ref="mainRect"></div>
-              <PadoPoint 
-                v-for="(point, index) in gridPoints"
-                :key="index"
-                :x="point.x"
-                :y="point.y"
-              >
-              </PadoPoint>
+              <div :style="outsideStyle">
+                <div :style="mainRectStyle" ref="mainRect"></div>
+                <PadoPoint 
+                  v-for="(point, index) in gridPoints"
+                  :key="index"
+                  :x="point.x"
+                  :y="point.y"
+                >
+                </PadoPoint>
+              </div>
             </PadoScreen>
           </td>
         </tr>
       </tbody>
     </table>
+    <div> main rect </div>
+    {{ mainRectStyle }}
+    <div> outside </div>
+    {{ outSide }}
   </AppLayout>
 </template>
 <script>
@@ -68,13 +74,25 @@ export default {
     rotateX   : 30,
     rotateY   : 0,
     rotateZ   : 10,
-    gridPoints: []
+    gridPoints: [],
+    outSide   : {
+      width : 0,
+      height: 0
+    }
   }),
   computed: {
     mainRectSize (){
       return {
         width : this.column * this.gridSize,
         height: this.row * this.gridSize
+      };
+    },
+    outsideStyle (){
+      return {
+        border   : '1px solid red',
+        width    : `${this.mainRectSize.width + this.outSide.width}px`,
+        height   : `${this.mainRectSize.height + this.outSide.height}px`,
+        transform: `translate(${-this.outSide.left}px, ${-this.outSide.top}px)`
       };
     },
     mainRectStyle (){
@@ -101,6 +119,8 @@ export default {
       
       console.log('outsideRect', outsideRect.toJSON());
       console.log('differenceValues', { ...differenceValues }, { ...differenceValues.move() }, { ...differenceValues.offset() });
+      
+      this.outSide = { ...differenceValues };
       
       this.gridPoints = pointFrame.piecesWithCount([this.column, this.row], (rect)=>{
         return rect.findPoint("middle center").applyTransform();

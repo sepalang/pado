@@ -81,11 +81,11 @@ export default {
             key: {
               enumerable: true,
               // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-              value: `${ref._uid}-${this.__cachedNodelistContextId++}`
+              value     : `${ref._uid}-${this.__cachedNodelistContextId++}`
             },
             depth: {
               enumerable: true,
-              get: ()=>ref.depth
+              get       : ()=>ref.depth
             },
             toggle: {
               enumerable: true,
@@ -121,7 +121,7 @@ export default {
             },
             isOpen: {
               enumerable: true,
-              get (){  return this.is('open'); }
+              get (){ return this.is('open'); }
             },
             isSelected: {
               enumerable: true,
@@ -153,17 +153,17 @@ export default {
         Object.defineProperties(context, {
           datum: {
             configurable: true,
-            enumerable: false,
+            enumerable  : false,
             get         : ()=>datum
           },
           isFirst: {
             configurable: true,
-            enumerable: true,
+            enumerable  : true,
             get (){ return ref.nodes[0] === this.datum; }
           },
           isLast: {
             configurable: true,
-            enumerable: true,
+            enumerable  : true,
             get (){ return ref.nodes[ref.nodes.length - 1] === this.datum; }
           }
         });
