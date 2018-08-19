@@ -35,19 +35,80 @@ const hasValueProperty = function (obj, value, key){
 
 const Block = function (posSize, syncOpt){
   Object.defineProperties(this, {
-    $space  : { enumerable: false, writable: true, value: undefined },
-    $posSize: { enumerable: false, writable: true, value: undefined },
-    $mask   : { enumerable: false, writable: true, value: undefined },
-    $compute: { enumerable: false, writable: true, value: undefined },
-    $sync   : { enumerable: false, writable: true, value: undefined }
+    $space     : { enumerable: false, writable: true, value: undefined },
+    $posSize   : { enumerable: false, writable: true, value: undefined },
+    $mask      : { enumerable: false, writable: true, value: undefined },
+    $compute   : { enumerable: false, writable: true, value: undefined },
+    $sync      : { enumerable: false, writable: true, value: undefined },
+    domainValue: { 
+      enumerable: true,
+      get (){
+        return hashMap(_cloneDeep(this.get()), function (posSize){ return posSize[0] })
+      }
+    },
+    domainSize: { 
+      enumerable: true,
+      get (){
+        return hashMap(_cloneDeep(this.get()), function (posSize){ return posSize[1] })
+      }
+    },
+    rangeStart: { 
+      enumerable: true,
+      get (){
+        return this.$space.domainRange(hashMap(this.get(), function (posSize){ return posSize[0] }))
+      }
+    },
+    rangeSize: { 
+      enumerable: true,
+      get (){
+        return this.$space.domainRangeSize(hashMap(this.get(), function (posSize){ return posSize[1] }))
+      }
+    }
   })
   
   this.sync(posSize, syncOpt)
 }
   
-Block.prototype = {
+const BlockPrototype = {}
+
+Object.defineProperties(BlockPrototype, {
+  domainMap: { 
+    enumerable: false,
+    get (){
+      return hashMap(_cloneDeep(this.get()), function (posSize){
+        return {
+          start: posSize[0],
+          size : posSize[1],
+          end  : posSize[0] + posSize[1]
+        }
+      })
+    }
+  },
+  rangeMap: { 
+    enumerable: false,
+    get (){
+      const rangeSize = this.rangeSize
+              
+      return hashMap(this.rangeStart, function ($start, sel){ 
+        var $size = sel ? rangeSize[sel] : rangeSize
+        return {
+          start: $start,
+          size : $size,
+          end  : $start + $size
+        }
+      })
+    }
+  },
+  rangeEnd: { 
+    enumerable: false,
+    get (){
+      return this.rangeMap(this.rangeMap, function (map){ return map.end })
+    }
+  }
+})
+
+Object.assign(BlockPrototype, {
   sync: function (block, syncOpt){ 
-    console.log('sync1')
     if(!arguments.length && this.$sync){
       block = this.$sync()
     } else if(typeof block === "function"){
@@ -58,7 +119,6 @@ Block.prototype = {
         return this
       }
     }
-    console.log('sync2', block)
     if(block instanceof Block){ 
       this.$posSize = _cloneDeep(block.$posSize)
       //.. this.$sync    = this.$sync || block.$sync
@@ -67,25 +127,13 @@ Block.prototype = {
     } else {
       this.$posSize = hashMap(_cloneDeep(block), function (posSize){ return !isArray(posSize) ? [posSize, 0] : posSize })
     }
-    console.log('sync3')
     return this 
   },
   clone      : function (){ return new Block(this) },
   setPosition: function (value, sel){ var $posSize = get(this.$posSize, sel); if($posSize instanceof Array) $posSize[0] = value; return this },
   setSize    : function (value, sel){ var $posSize = get(this.$posSize, sel); if($posSize instanceof Array) $posSize[1] = value; return this },
   get        : function (){ return _cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize) },
-  domainValue: function (){ return hashMap(_cloneDeep(this.get()), function (posSize){ return posSize[0] }) },
-  domainSize : function (){ return hashMap(_cloneDeep(this.get()), function (posSize){ return posSize[1] }) },
-  domainMap  : function (){
-    return hashMap(_cloneDeep(this.get()), function (posSize){
-      return {
-        start: posSize[0],
-        size : posSize[1],
-        end  : posSize[0] + posSize[1]
-      }
-    })
-  },
-  conflicts: function (otherBlocks, selector){
+  conflicts  : function (otherBlocks, selector){
     return asArray(otherBlocks).reduce(function (red, block){
       var selectOtherBlock = get(block, selector)
                   
@@ -113,8 +161,8 @@ Block.prototype = {
   hasConflicts: function (otherBlocks, selector){ return !!this.conflicts(otherBlocks, selector).length },
   overflow    : function (mask){
     var blockPosSize  = this.get()
-    var spaceDomain   = this.$space.getDomain()
-    var overflowDomain = (mask && _cloneDeep(mask)) || (this.$space && this.$space.getDomain()) || []
+    var spaceDomain   = this.$space.domain
+    var overflowDomain = (mask && _cloneDeep(mask)) || (this.$space && this.$space.domain) || []
     return hashMap(overflowDomain, function ($overflowSelected, sel){
       var $posSize = get(blockPosSize, sel)
       var $domain  = get(spaceDomain, sel)
@@ -128,44 +176,7 @@ Block.prototype = {
   },
   maskOverflow  : function (mask){ return this.overflow(this.$mask || mask) },
   isMaskOverflow: function (mask){ return this.isOverflow(this.$mask || mask) },
-  rangeStart    : function (){ return this.$space.domainRange(hashMap(this.get(), function (posSize){ return posSize[0] })) },
-  rangeSize     : function (){ return this.$space.domainRangeSize(hashMap(this.get(), function (posSize){ return posSize[1] })) },
-  rangeMap      : function (){
-    var rangeSize = this.rangeSize()
-              
-    return hashMap(this.rangeStart(), function ($start, sel){ 
-      var $size = sel ? rangeSize[sel] : rangeSize
-      return {
-        start: $start,
-        size : $size,
-        end  : $start + $size
-      }
-    })
-  },
-  map: function (){
-    var domainMap  = this.domainMap()
-    var rangeMap = this.rangeMap()
-              
-    var blockMap = hashMap(rangeMap, function (map, key){
-      map.rangeStart = map.start
-      map.rangeSize = map.size
-      map.rangeEnd = map.end
-                  
-      var $domainMap  = get(domainMap, key)
-      map.domainStart = $domainMap.start
-      map.domainSize = $domainMap.size
-      map.domainEnd = $domainMap.end
-      
-      delete map.start
-      delete map.size
-      delete map.end
-      return map
-    })
-              
-    return blockMap
-  },
-  rangeEnd: function (){ return this.rangeMap(this.rangeMap(), function (map){ return map.end }) },
-  compute : function (func){
+  compute       : function (func){
     if(typeof func === "function"){ 
       this.$compute = func 
     } else {
@@ -173,8 +184,10 @@ Block.prototype = {
     } 
     return this 
   },
-  call: function (f){ typeof f === "function" && f.call(this, this.rangeMap()) }
-}
+  call: function (f){ typeof f === "function" && f.call(this, this.rangeMap) }
+})
+
+Block.prototype = BlockPrototype 
       
 const Tracker = function (space, domainMask){
   this.$space = space
@@ -196,7 +209,7 @@ Tracker.prototype = {
     return block
   },
   domainBlock: function (cursor, callback){
-    var domainGrid = hashMap(this.$space.getRange(), function (range){ return range[2] })
+    var domainGrid = hashMap(this.$space.range, function (range){ return range[2] })
     var block      = this.block(hashMap(this.$space.rangeDomain(cursor), function (cursorPoint, key){ return [cursorPoint, get(domainGrid, key)] }))
     var blockMap   = block.map()
               
@@ -215,6 +228,7 @@ const Space = function (domain, range){
     $domain    : { enumerable: false, writable: true, value: undefined },
     $range     : { enumerable: false, writable: true, value: undefined },
     domain     : {
+      enumerable: true,
       set (domain){
         domain = hashMap(domain, function (domain){
           if(!domain[2]){ domain[2] = 1 }
@@ -230,6 +244,7 @@ const Space = function (domain, range){
       }
     },
     range: {
+      enumerable: true,
       set (range){
         range = hashMap(range, function (range){
           if(!range[2]){ range[2] = 1 }
@@ -253,13 +268,13 @@ const Space = function (domain, range){
 Space.prototype = {
   domainRangeSize: function (vs){
     return hashMap(vs, function (v, sel){
-      var $range  = sel ? this.getRange()[sel] : this.getRange()
-      var $domain = sel ? this.getDomain()[sel] : this.getDomain()
+      var $range  = sel ? this.range[sel] : this.range
+      var $domain = sel ? this.domain[sel] : this.domain
       return (v / ($domain[1] - $domain[0])) * ($range[1] - $range[0])
     }.bind(this))
   },
-  domainRange: function (vs){ return domainRangeValue(this.getDomain(), this.getRange(), vs, this.$niceRange) },
-  rangeDomain: function (vs){ return domainRangeValue(this.getRange(), this.getDomain(), vs, this.$niceDomain) },
+  domainRange: function (vs){ return domainRangeValue(this.domain, this.range, vs, this.$niceRange) },
+  rangeDomain: function (vs){ return domainRangeValue(this.range, this.domain, vs, this.$niceDomain) },
   block      : function (posSize, syncOpt){
     var block = new Block(posSize, syncOpt)
     block.$space = this

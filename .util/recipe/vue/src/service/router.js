@@ -11,6 +11,7 @@ import ControlsPage from '@/pages/ControlsPage.vue';
 import LinePage from '@/pages/LinePage.vue';
 import WowPage from '@/pages/WowPage.vue';
 import TabPage from '@/pages/TabPage.vue';
+import SpaceBlockPage from '@/pages/SpaceBlockPage.vue';
 
 
 Vue.use(Router);
@@ -52,6 +53,10 @@ export default new Router({
     {
       path     : '/line',
       component: LinePage
+    },
+    {
+      path     : '/space-block',
+      component: SpaceBlockPage
     },
     {
       path     : '/wow',

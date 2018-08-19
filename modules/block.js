@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "../functions", "../functions/isLike", "../functions/cast"], factory);
+    define(["exports", "core-js/modules/es6.object.assign", "../functions", "../functions/isLike", "../functions/cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("../functions"), require("../functions/isLike"), require("../functions/cast"));
+    factory(exports, require("core-js/modules/es6.object.assign"), require("../functions"), require("../functions/isLike"), require("../functions/cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.functions, global.isLike, global.cast);
+    factory(mod.exports, global.es6Object, global.functions, global.isLike, global.cast);
     global.block = mod.exports;
   }
-})(this, function (_exports, _functions, _isLike, _cast) {
+})(this, function (_exports, _es6Object, _functions, _isLike, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -66,15 +66,82 @@
         enumerable: false,
         writable: true,
         value: undefined
+      },
+      domainValue: {
+        enumerable: true,
+        get: function get() {
+          return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
+            return posSize[0];
+          });
+        }
+      },
+      domainSize: {
+        enumerable: true,
+        get: function get() {
+          return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
+            return posSize[1];
+          });
+        }
+      },
+      rangeStart: {
+        enumerable: true,
+        get: function get() {
+          return this.$space.domainRange((0, _functions.hashMap)(this.get(), function (posSize) {
+            return posSize[0];
+          }));
+        }
+      },
+      rangeSize: {
+        enumerable: true,
+        get: function get() {
+          return this.$space.domainRangeSize((0, _functions.hashMap)(this.get(), function (posSize) {
+            return posSize[1];
+          }));
+        }
       }
     });
     this.sync(posSize, syncOpt);
   };
 
-  Block.prototype = {
+  var BlockPrototype = {};
+  Object.defineProperties(BlockPrototype, {
+    domainMap: {
+      enumerable: false,
+      get: function get() {
+        return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
+          return {
+            start: posSize[0],
+            size: posSize[1],
+            end: posSize[0] + posSize[1]
+          };
+        });
+      }
+    },
+    rangeMap: {
+      enumerable: false,
+      get: function get() {
+        var rangeSize = this.rangeSize;
+        return (0, _functions.hashMap)(this.rangeStart, function ($start, sel) {
+          var $size = sel ? rangeSize[sel] : rangeSize;
+          return {
+            start: $start,
+            size: $size,
+            end: $start + $size
+          };
+        });
+      }
+    },
+    rangeEnd: {
+      enumerable: false,
+      get: function get() {
+        return this.rangeMap(this.rangeMap, function (map) {
+          return map.end;
+        });
+      }
+    }
+  });
+  Object.assign(BlockPrototype, {
     sync: function sync(block, syncOpt) {
-      console.log('sync1');
-
       if (!arguments.length && this.$sync) {
         block = this.$sync();
       } else if (typeof block === "function") {
@@ -87,8 +154,6 @@
         }
       }
 
-      console.log('sync2', block);
-
       if (block instanceof Block) {
         this.$posSize = (0, _cast.cloneDeep)(block.$posSize); //.. this.$sync    = this.$sync || block.$sync
 
@@ -100,7 +165,6 @@
         });
       }
 
-      console.log('sync3');
       return this;
     },
     clone: function clone() {
@@ -118,25 +182,6 @@
     },
     get: function get() {
       return (0, _cast.cloneDeep)(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
-    },
-    domainValue: function domainValue() {
-      return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
-        return posSize[0];
-      });
-    },
-    domainSize: function domainSize() {
-      return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
-        return posSize[1];
-      });
-    },
-    domainMap: function domainMap() {
-      return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
-        return {
-          start: posSize[0],
-          size: posSize[1],
-          end: posSize[0] + posSize[1]
-        };
-      });
     },
     conflicts: function conflicts(otherBlocks, selector) {
       return (0, _cast.asArray)(otherBlocks).reduce(function (red, block) {
@@ -167,8 +212,8 @@
     },
     overflow: function overflow(mask) {
       var blockPosSize = this.get();
-      var spaceDomain = this.$space.getDomain();
-      var overflowDomain = mask && (0, _cast.cloneDeep)(mask) || this.$space && this.$space.getDomain() || [];
+      var spaceDomain = this.$space.domain;
+      var overflowDomain = mask && (0, _cast.cloneDeep)(mask) || this.$space && this.$space.domain || [];
       return (0, _functions.hashMap)(overflowDomain, function ($overflowSelected, sel) {
         var $posSize = (0, _functions.get)(blockPosSize, sel);
         var $domain = (0, _functions.get)(spaceDomain, sel);
@@ -190,50 +235,6 @@
     isMaskOverflow: function isMaskOverflow(mask) {
       return this.isOverflow(this.$mask || mask);
     },
-    rangeStart: function rangeStart() {
-      return this.$space.domainRange((0, _functions.hashMap)(this.get(), function (posSize) {
-        return posSize[0];
-      }));
-    },
-    rangeSize: function rangeSize() {
-      return this.$space.domainRangeSize((0, _functions.hashMap)(this.get(), function (posSize) {
-        return posSize[1];
-      }));
-    },
-    rangeMap: function rangeMap() {
-      var rangeSize = this.rangeSize();
-      return (0, _functions.hashMap)(this.rangeStart(), function ($start, sel) {
-        var $size = sel ? rangeSize[sel] : rangeSize;
-        return {
-          start: $start,
-          size: $size,
-          end: $start + $size
-        };
-      });
-    },
-    map: function map() {
-      var domainMap = this.domainMap();
-      var rangeMap = this.rangeMap();
-      var blockMap = (0, _functions.hashMap)(rangeMap, function (map, key) {
-        map.rangeStart = map.start;
-        map.rangeSize = map.size;
-        map.rangeEnd = map.end;
-        var $domainMap = (0, _functions.get)(domainMap, key);
-        map.domainStart = $domainMap.start;
-        map.domainSize = $domainMap.size;
-        map.domainEnd = $domainMap.end;
-        delete map.start;
-        delete map.size;
-        delete map.end;
-        return map;
-      });
-      return blockMap;
-    },
-    rangeEnd: function rangeEnd() {
-      return this.rangeMap(this.rangeMap(), function (map) {
-        return map.end;
-      });
-    },
     compute: function compute(func) {
       if (typeof func === "function") {
         this.$compute = func;
@@ -244,9 +245,10 @@
       return this;
     },
     call: function call(f) {
-      typeof f === "function" && f.call(this, this.rangeMap());
+      typeof f === "function" && f.call(this, this.rangeMap);
     }
-  };
+  });
+  Block.prototype = BlockPrototype;
 
   var Tracker = function Tracker(space, domainMask) {
     this.$space = space;
@@ -272,7 +274,7 @@
       return block;
     },
     domainBlock: function domainBlock(cursor, callback) {
-      var domainGrid = (0, _functions.hashMap)(this.$space.getRange(), function (range) {
+      var domainGrid = (0, _functions.hashMap)(this.$space.range, function (range) {
         return range[2];
       });
       var block = this.block((0, _functions.hashMap)(this.$space.rangeDomain(cursor), function (cursorPoint, key) {
@@ -309,6 +311,7 @@
         value: undefined
       },
       domain: {
+        enumerable: true,
         set: function set(domain) {
           domain = (0, _functions.hashMap)(domain, function (domain) {
             if (!domain[2]) {
@@ -330,6 +333,7 @@
         }
       },
       range: {
+        enumerable: true,
         set: function set(range) {
           range = (0, _functions.hashMap)(range, function (range) {
             if (!range[2]) {
@@ -358,16 +362,16 @@
   Space.prototype = {
     domainRangeSize: function domainRangeSize(vs) {
       return (0, _functions.hashMap)(vs, function (v, sel) {
-        var $range = sel ? this.getRange()[sel] : this.getRange();
-        var $domain = sel ? this.getDomain()[sel] : this.getDomain();
+        var $range = sel ? this.range[sel] : this.range;
+        var $domain = sel ? this.domain[sel] : this.domain;
         return v / ($domain[1] - $domain[0]) * ($range[1] - $range[0]);
       }.bind(this));
     },
     domainRange: function domainRange(vs) {
-      return (0, _functions.domainRangeValue)(this.getDomain(), this.getRange(), vs, this.$niceRange);
+      return (0, _functions.domainRangeValue)(this.domain, this.range, vs, this.$niceRange);
     },
     rangeDomain: function rangeDomain(vs) {
-      return (0, _functions.domainRangeValue)(this.getRange(), this.getDomain(), vs, this.$niceDomain);
+      return (0, _functions.domainRangeValue)(this.range, this.domain, vs, this.$niceDomain);
     },
     block: function block(posSize, syncOpt) {
       var block = new Block(posSize, syncOpt);
