@@ -44,22 +44,27 @@
     Object.defineProperties(this, {
       $space: {
         enumerable: false,
+        writable: true,
         value: undefined
       },
       $posSize: {
         enumerable: false,
+        writable: true,
         value: undefined
       },
       $mask: {
         enumerable: false,
+        writable: true,
         value: undefined
       },
       $compute: {
         enumerable: false,
+        writable: true,
         value: undefined
       },
       $sync: {
         enumerable: false,
+        writable: true,
         value: undefined
       }
     });
@@ -68,6 +73,8 @@
 
   Block.prototype = {
     sync: function sync(block, syncOpt) {
+      console.log('sync1');
+
       if (!arguments.length && this.$sync) {
         block = this.$sync();
       } else if (typeof block === "function") {
@@ -80,17 +87,20 @@
         }
       }
 
+      console.log('sync2', block);
+
       if (block instanceof Block) {
         this.$posSize = (0, _cast.cloneDeep)(block.$posSize); //.. this.$sync    = this.$sync || block.$sync
 
         this.$space = this.$space || block.$space;
         this.$mask = this.$mask || block.$mask;
       } else {
-        this.$posSize = (0, _functions.forMap)((0, _cast.cloneDeep)(block), function (posSize) {
+        this.$posSize = (0, _functions.hashMap)((0, _cast.cloneDeep)(block), function (posSize) {
           return !(0, _isLike.isArray)(posSize) ? [posSize, 0] : posSize;
         });
       }
 
+      console.log('sync3');
       return this;
     },
     clone: function clone() {
@@ -110,17 +120,17 @@
       return (0, _cast.cloneDeep)(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
     },
     domainValue: function domainValue() {
-      return (0, _functions.forMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
+      return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
         return posSize[0];
       });
     },
     domainSize: function domainSize() {
-      return (0, _functions.forMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
+      return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
         return posSize[1];
       });
     },
     domainMap: function domainMap() {
-      return (0, _functions.forMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
+      return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
         return {
           start: posSize[0],
           size: posSize[1],
@@ -137,7 +147,7 @@
           if (selectOtherBlock === this || selectOtherBlock.$space != this.$space) return red; //
 
           var inspectResult = [];
-          (0, _functions.forMap)(this.get(), function (thisPos, key) {
+          (0, _functions.hashMap)(this.get(), function (thisPos, key) {
             var otherPos = (0, _functions.get)(selectOtherBlock.get(), key);
             if (otherPos[0] < thisPos[0] && otherPos[0] + otherPos[1] <= thisPos[0]) return inspectResult.push(false);
             if (otherPos[0] > thisPos[0] && thisPos[0] + thisPos[1] <= otherPos[0]) return inspectResult.push(false);
@@ -159,7 +169,7 @@
       var blockPosSize = this.get();
       var spaceDomain = this.$space.getDomain();
       var overflowDomain = mask && (0, _cast.cloneDeep)(mask) || this.$space && this.$space.getDomain() || [];
-      return (0, _functions.forMap)(overflowDomain, function ($overflowSelected, sel) {
+      return (0, _functions.hashMap)(overflowDomain, function ($overflowSelected, sel) {
         var $posSize = (0, _functions.get)(blockPosSize, sel);
         var $domain = (0, _functions.get)(spaceDomain, sel);
         return $posSize[0] < (0, _functions.get)($overflowSelected[0], $domain[0]) || $posSize[0] + $posSize[1] > (0, _functions.get)($overflowSelected[1], $domain[1]);
@@ -167,7 +177,7 @@
     },
     isOverflow: function isOverflow(mask) {
       var overflow = false;
-      (0, _functions.forMap)(this.overflow(mask), function (f) {
+      (0, _functions.hashMap)(this.overflow(mask), function (f) {
         if (f) {
           overflow = true;
         }
@@ -181,18 +191,18 @@
       return this.isOverflow(this.$mask || mask);
     },
     rangeStart: function rangeStart() {
-      return this.$space.domainRange((0, _functions.forMap)(this.get(), function (posSize) {
+      return this.$space.domainRange((0, _functions.hashMap)(this.get(), function (posSize) {
         return posSize[0];
       }));
     },
     rangeSize: function rangeSize() {
-      return this.$space.domainRangeSize((0, _functions.forMap)(this.get(), function (posSize) {
+      return this.$space.domainRangeSize((0, _functions.hashMap)(this.get(), function (posSize) {
         return posSize[1];
       }));
     },
     rangeMap: function rangeMap() {
       var rangeSize = this.rangeSize();
-      return (0, _functions.forMap)(this.rangeStart(), function ($start, sel) {
+      return (0, _functions.hashMap)(this.rangeStart(), function ($start, sel) {
         var $size = sel ? rangeSize[sel] : rangeSize;
         return {
           start: $start,
@@ -204,7 +214,7 @@
     map: function map() {
       var domainMap = this.domainMap();
       var rangeMap = this.rangeMap();
-      var blockMap = (0, _functions.forMap)(rangeMap, function (map, key) {
+      var blockMap = (0, _functions.hashMap)(rangeMap, function (map, key) {
         map.rangeStart = map.start;
         map.rangeSize = map.size;
         map.rangeEnd = map.end;
@@ -240,7 +250,7 @@
 
   var Tracker = function Tracker(space, domainMask) {
     this.$space = space;
-    this.$domainMask = (0, _functions.forMap)((0, _cast.cloneDeep)(domainMask), function (mask, sel) {
+    this.$domainMask = (0, _functions.hashMap)((0, _cast.cloneDeep)(domainMask), function (mask, sel) {
       if (typeof mask === "number") mask = [mask];
 
       if (mask instanceof Array) {
@@ -262,10 +272,10 @@
       return block;
     },
     domainBlock: function domainBlock(cursor, callback) {
-      var domainGrid = (0, _functions.forMap)(this.$space.getRange(), function (range) {
+      var domainGrid = (0, _functions.hashMap)(this.$space.getRange(), function (range) {
         return range[2];
       });
-      var block = this.block((0, _functions.forMap)(this.$space.rangeDomain(cursor), function (cursorPoint, key) {
+      var block = this.block((0, _functions.hashMap)(this.$space.rangeDomain(cursor), function (cursorPoint, key) {
         return [cursorPoint, (0, _functions.get)(domainGrid, key)];
       }));
       var blockMap = block.map();
@@ -275,54 +285,79 @@
   };
 
   var Space = function Space(domain, range) {
-    this.domain(domain);
-    this.range(range);
     this.$niceDomain = true;
     this.$niceRange = true;
+    Object.defineProperties(this, {
+      $niceDomain: {
+        enumerable: false,
+        writable: true,
+        value: true
+      },
+      $niceRange: {
+        enumerable: false,
+        writable: true,
+        value: true
+      },
+      $domain: {
+        enumerable: false,
+        writable: true,
+        value: undefined
+      },
+      $range: {
+        enumerable: false,
+        writable: true,
+        value: undefined
+      },
+      domain: {
+        set: function set(domain) {
+          domain = (0, _functions.hashMap)(domain, function (domain) {
+            if (!domain[2]) {
+              domain[2] = 1;
+            }
+
+            return domain;
+          });
+          this.$domain = domain;
+        },
+        get: function get() {
+          return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.$domain), function (domain) {
+            for (var i = 0, l = domain.length; i < l; i++) {
+              if (typeof domain[i] === "function") domain[i] = domain[i]();
+            }
+
+            return domain;
+          });
+        }
+      },
+      range: {
+        set: function set(range) {
+          range = (0, _functions.hashMap)(range, function (range) {
+            if (!range[2]) {
+              range[2] = 1;
+            }
+
+            return range;
+          });
+          this.$range = range;
+        },
+        get: function get() {
+          return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.$range), function (range) {
+            for (var i = 0, l = range.length; i < l; i++) {
+              if (typeof range[i] === "function") range[i] = range[i]();
+            }
+
+            return range;
+          });
+        }
+      }
+    });
+    this.$domain = domain;
+    this.$range = range;
   };
 
   Space.prototype = {
-    domain: function domain(_domain) {
-      //default grid scale
-      _domain = (0, _functions.forMap)(_domain, function (domain) {
-        if (!domain[2]) {
-          domain[2] = 1;
-        }
-
-        return domain;
-      });
-      this.$domain = _domain;
-    },
-    range: function range(_range) {
-      _range = (0, _functions.forMap)(_range, function (range) {
-        if (!range[2]) {
-          range[2] = 1;
-        }
-
-        return range;
-      });
-      this.$range = _range;
-    },
-    getRange: function getRange() {
-      return (0, _functions.forMap)((0, _cast.cloneDeep)(this.$range), function (range) {
-        for (var i = 0, l = range.length; i < l; i++) {
-          if (typeof range[i] === "function") range[i] = range[i]();
-        }
-
-        return range;
-      });
-    },
-    getDomain: function getDomain() {
-      return (0, _functions.forMap)((0, _cast.cloneDeep)(this.$domain), function (domain) {
-        for (var i = 0, l = domain.length; i < l; i++) {
-          if (typeof domain[i] === "function") domain[i] = domain[i]();
-        }
-
-        return domain;
-      });
-    },
     domainRangeSize: function domainRangeSize(vs) {
-      return (0, _functions.forMap)(vs, function (v, sel) {
+      return (0, _functions.hashMap)(vs, function (v, sel) {
         var $range = sel ? this.getRange()[sel] : this.getRange();
         var $domain = sel ? this.getDomain()[sel] : this.getDomain();
         return v / ($domain[1] - $domain[0]) * ($range[1] - $range[0]);

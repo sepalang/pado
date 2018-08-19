@@ -273,14 +273,6 @@
   _exports.transformStyleVariant = transformStyleVariant;
 
   var transformMatrixVariant = function transformMatrixVariant(variant) {
-    var RSIN = function RSIN(v) {
-      return Math.sin(Math.PI * (v / 180));
-    };
-
-    var RCOS = function RCOS(v) {
-      return Math.cos(Math.PI * (v / 180));
-    };
-
     var UDF = undefined;
     var multiplyMatrixList = [];
     var _variant$translateX = variant.translateX,
@@ -302,12 +294,21 @@
         _variant$rotateY = variant.rotateY,
         rotateY = _variant$rotateY === void 0 ? 0 : _variant$rotateY,
         _variant$rotateZ = variant.rotateZ,
-        rotateZ = _variant$rotateZ === void 0 ? 0 : _variant$rotateZ; //scaleX = scaleX === UDF ? scale : scaleX
-    //scaleY = scaleY === UDF ? scale : scaleY
-    //scaleZ = scaleZ === UDF ? scale : scaleZ
+        rotateZ = _variant$rotateZ === void 0 ? 0 : _variant$rotateZ;
+    scaleX = scaleX === UDF ? scale : scaleX;
+    scaleY = scaleY === UDF ? scale : scaleY;
+    scaleZ = scaleZ === UDF ? scale : scaleZ;
+
+    var RSIN = function RSIN(v) {
+      return Math.sin(Math.PI * (v / 180));
+    };
+
+    var RCOS = function RCOS(v) {
+      return Math.cos(Math.PI * (v / 180));
+    };
 
     multiplyMatrixList.push([[1, 0, 0, translateX / scaleX], [0, 1, 0, translateY / scaleY], [0, 0, 1, translateZ / scaleZ], [0, 0, 0, 1]]);
-    multiplyMatrixList.push([[scaleX === UDF ? scale : scaleX, 0, 0, 0], [0, scaleY === UDF ? scale : scaleY, 0, 0], [0, 0, scaleZ === UDF ? scale : scaleZ, 0], [0, 0, 0, 1]]);
+    multiplyMatrixList.push([[scaleX, 0, 0, 0], [0, scaleY, 0, 0], [0, 0, scaleZ, 0], [0, 0, 0, 1]]);
     rotateX && multiplyMatrixList.push([[1, 0, 0, 0], [0, RCOS(rotateX), -RSIN(rotateX), 0], [0, RSIN(rotateX), RCOS(rotateX), 0], [0, 0, 0, 1]]);
     rotateY && multiplyMatrixList.push([[RCOS(rotateY), 0, RSIN(rotateY), 0], [0, 1, 0, 0], [-RSIN(rotateY), 0, RCOS(rotateY), 0], [0, 0, 0, 1]]);
     rotateZ && multiplyMatrixList.push([[RCOS(rotateZ), -RSIN(rotateZ), 0, 0], [RSIN(rotateZ), RCOS(rotateZ), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]);

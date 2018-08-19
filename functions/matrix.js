@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.multiplyMatrix = _exports.asMatrix = _exports.validMatrix = _exports.matrixRange = _exports.domainRangeInterpolate = _exports.domainRangeValue = _exports.hashMap = _exports.range = _exports.rangeModel = void 0;
+  _exports.multiplyMatrix = _exports.asMatrix = _exports.validMatrix = _exports.matrixRange = _exports.domainRangeInterpolate = _exports.domainRangeValue = _exports.range = _exports.rangeModel = void 0;
 
   var rangeModel = function rangeModel(value, step, sizeBase) {
     var start, end, reverse;
@@ -96,27 +96,12 @@
     }
 
     return reverse ? r.reverse() : r;
-  }; //TODO : move to ?
-
+  };
 
   _exports.range = range;
 
-  var hashMap = function hashMap(d, f) {
-    if (typeof d === "object" && !(0, _isLike.isArray)(d)) {
-      for (var k in d) {
-        d[k] = f(d[k], k);
-      }
-    } else {
-      return f(d, void 0);
-    }
-
-    return d;
-  };
-
-  _exports.hashMap = hashMap;
-
   var domainRangeValue = function domainRangeValue(domain, range, vs, nice, limit) {
-    return hashMap((0, _cast.cloneDeep)(vs), function (v, sel) {
+    return (0, _enumerable.hashMap)((0, _cast.cloneDeep)(vs), function (v, sel) {
       var $range = sel ? range[sel] : range;
       var $domain = sel ? domain[sel] : domain;
 

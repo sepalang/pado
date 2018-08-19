@@ -1,4 +1,8 @@
 import {
+  isArray
+} from './isLike'
+
+import {
   asArray
 } from './cast'
 
@@ -30,9 +34,8 @@ export const times = function (length, fn){
   return result
 }
 
-export const forMap = function (object, fn){
-  return Object.keys(object).reduce((dest, key)=>{
-    dest[key] = fn(object[key], key)
-    return dest
-  }, object)
+export const hashMap = function (object, fn){
+  if(typeof object === "object" && !isArray(object)) for(var k in object) object[k] = fn(object[k], k)
+  else return fn(object, (void 0))
+  return object
 }

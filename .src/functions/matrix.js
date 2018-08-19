@@ -1,8 +1,8 @@
 import { asArray, cloneDeep } from './cast'
-import { isArray, likeArray, isNumber, isAbsoluteNaN } from './isLike'
+import { likeArray, isNumber, isAbsoluteNaN } from './isLike'
 import { top } from './reduce'
 import { turn, limitNumber } from './nice'
-import { times } from './enumerable'
+import { hashMap, times } from './enumerable'
 
 export const rangeModel = function (value, step, sizeBase){
   let start, end, reverse
@@ -67,16 +67,6 @@ export const range = function (value, stepSize, sizeBaseRange){
   if(step <= 0){ return console.warn("range::not support minus step"), r };
   if(sizeBase == false){ for(var i = start, l = end; i <= l; i = i + step) r.push(i) } else { for(var i = start, l = end; i < l; i = i + step) r.push(i) }
   return reverse ? r.reverse() : r
-}
-
-//TODO : move to ?
-export const hashMap = function (d, f){
-  if(typeof d === "object" && !isArray(d)){
-    for(let k in d) d[k] = f(d[k], k) 
-  } else {
-    return f(d, (void 0))
-  }
-  return d
 }
 
 export const domainRangeValue = function (domain, range, vs, nice, limit){

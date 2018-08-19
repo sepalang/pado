@@ -746,11 +746,11 @@
 
     return result;
   };
-  var forMap = function forMap(object, fn) {
-    return Object.keys(object).reduce(function (dest, key) {
-      dest[key] = fn(object[key], key);
-      return dest;
-    }, object);
+  var hashMap = function hashMap(object, fn) {
+    if (typeof object === "object" && !isArray(object)) for (var k in object) {
+      object[k] = fn(object[k], k);
+    } else return fn(object, void 0);
+    return object;
   };
 
   var readString = function () {
@@ -1693,18 +1693,6 @@
     }
 
     return reverse ? r.reverse() : r;
-  }; //TODO : move to ?
-
-  var hashMap = function hashMap(d, f) {
-    if (typeof d === "object" && !isArray(d)) {
-      for (var k in d) {
-        d[k] = f(d[k], k);
-      }
-    } else {
-      return f(d, void 0);
-    }
-
-    return d;
   };
   var domainRangeValue = function domainRangeValue(domain, range, vs, nice, limit) {
     return hashMap(cloneDeep(vs), function (v, sel) {
@@ -2122,22 +2110,27 @@
     Object.defineProperties(this, {
       $space: {
         enumerable: false,
+        writable: true,
         value: undefined
       },
       $posSize: {
         enumerable: false,
+        writable: true,
         value: undefined
       },
       $mask: {
         enumerable: false,
+        writable: true,
         value: undefined
       },
       $compute: {
         enumerable: false,
+        writable: true,
         value: undefined
       },
       $sync: {
         enumerable: false,
+        writable: true,
         value: undefined
       }
     });
@@ -2146,6 +2139,8 @@
 
   Block.prototype = {
     sync: function sync(block, syncOpt) {
+      console.log('sync1');
+
       if (!arguments.length && this.$sync) {
         block = this.$sync();
       } else if (typeof block === "function") {
@@ -2158,17 +2153,20 @@
         }
       }
 
+      console.log('sync2', block);
+
       if (block instanceof Block) {
         this.$posSize = cloneDeep(block.$posSize); //.. this.$sync    = this.$sync || block.$sync
 
         this.$space = this.$space || block.$space;
         this.$mask = this.$mask || block.$mask;
       } else {
-        this.$posSize = forMap(cloneDeep(block), function (posSize) {
+        this.$posSize = hashMap(cloneDeep(block), function (posSize) {
           return !isArray(posSize) ? [posSize, 0] : posSize;
         });
       }
 
+      console.log('sync3');
       return this;
     },
     clone: function clone$$1() {
@@ -2188,17 +2186,17 @@
       return cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
     },
     domainValue: function domainValue() {
-      return forMap(cloneDeep(this.get()), function (posSize) {
+      return hashMap(cloneDeep(this.get()), function (posSize) {
         return posSize[0];
       });
     },
     domainSize: function domainSize() {
-      return forMap(cloneDeep(this.get()), function (posSize) {
+      return hashMap(cloneDeep(this.get()), function (posSize) {
         return posSize[1];
       });
     },
     domainMap: function domainMap() {
-      return forMap(cloneDeep(this.get()), function (posSize) {
+      return hashMap(cloneDeep(this.get()), function (posSize) {
         return {
           start: posSize[0],
           size: posSize[1],
@@ -2215,7 +2213,7 @@
           if (selectOtherBlock === this || selectOtherBlock.$space != this.$space) return red; //
 
           var inspectResult = [];
-          forMap(this.get(), function (thisPos, key) {
+          hashMap(this.get(), function (thisPos, key) {
             var otherPos = get(selectOtherBlock.get(), key);
             if (otherPos[0] < thisPos[0] && otherPos[0] + otherPos[1] <= thisPos[0]) return inspectResult.push(false);
             if (otherPos[0] > thisPos[0] && thisPos[0] + thisPos[1] <= otherPos[0]) return inspectResult.push(false);
@@ -2237,7 +2235,7 @@
       var blockPosSize = this.get();
       var spaceDomain = this.$space.getDomain();
       var overflowDomain = mask && cloneDeep(mask) || this.$space && this.$space.getDomain() || [];
-      return forMap(overflowDomain, function ($overflowSelected, sel) {
+      return hashMap(overflowDomain, function ($overflowSelected, sel) {
         var $posSize = get(blockPosSize, sel);
         var $domain = get(spaceDomain, sel);
         return $posSize[0] < get($overflowSelected[0], $domain[0]) || $posSize[0] + $posSize[1] > get($overflowSelected[1], $domain[1]);
@@ -2245,7 +2243,7 @@
     },
     isOverflow: function isOverflow(mask) {
       var overflow = false;
-      forMap(this.overflow(mask), function (f) {
+      hashMap(this.overflow(mask), function (f) {
         if (f) {
           overflow = true;
         }
@@ -2259,18 +2257,18 @@
       return this.isOverflow(this.$mask || mask);
     },
     rangeStart: function rangeStart() {
-      return this.$space.domainRange(forMap(this.get(), function (posSize) {
+      return this.$space.domainRange(hashMap(this.get(), function (posSize) {
         return posSize[0];
       }));
     },
     rangeSize: function rangeSize() {
-      return this.$space.domainRangeSize(forMap(this.get(), function (posSize) {
+      return this.$space.domainRangeSize(hashMap(this.get(), function (posSize) {
         return posSize[1];
       }));
     },
     rangeMap: function rangeMap() {
       var rangeSize = this.rangeSize();
-      return forMap(this.rangeStart(), function ($start, sel) {
+      return hashMap(this.rangeStart(), function ($start, sel) {
         var $size = sel ? rangeSize[sel] : rangeSize;
         return {
           start: $start,
@@ -2282,7 +2280,7 @@
     map: function map() {
       var domainMap = this.domainMap();
       var rangeMap = this.rangeMap();
-      var blockMap = forMap(rangeMap, function (map, key) {
+      var blockMap = hashMap(rangeMap, function (map, key) {
         map.rangeStart = map.start;
         map.rangeSize = map.size;
         map.rangeEnd = map.end;
@@ -2318,7 +2316,7 @@
 
   var Tracker = function Tracker(space, domainMask) {
     this.$space = space;
-    this.$domainMask = forMap(cloneDeep(domainMask), function (mask, sel) {
+    this.$domainMask = hashMap(cloneDeep(domainMask), function (mask, sel) {
       if (typeof mask === "number") mask = [mask];
 
       if (mask instanceof Array) {
@@ -2340,10 +2338,10 @@
       return block;
     },
     domainBlock: function domainBlock(cursor, callback) {
-      var domainGrid = forMap(this.$space.getRange(), function (range$$1) {
+      var domainGrid = hashMap(this.$space.getRange(), function (range$$1) {
         return range$$1[2];
       });
-      var block = this.block(forMap(this.$space.rangeDomain(cursor), function (cursorPoint, key) {
+      var block = this.block(hashMap(this.$space.rangeDomain(cursor), function (cursorPoint, key) {
         return [cursorPoint, get(domainGrid, key)];
       }));
       var blockMap = block.map();
@@ -2353,54 +2351,79 @@
   };
 
   var Space = function Space(domain, range$$1) {
-    this.domain(domain);
-    this.range(range$$1);
     this.$niceDomain = true;
     this.$niceRange = true;
+    Object.defineProperties(this, {
+      $niceDomain: {
+        enumerable: false,
+        writable: true,
+        value: true
+      },
+      $niceRange: {
+        enumerable: false,
+        writable: true,
+        value: true
+      },
+      $domain: {
+        enumerable: false,
+        writable: true,
+        value: undefined
+      },
+      $range: {
+        enumerable: false,
+        writable: true,
+        value: undefined
+      },
+      domain: {
+        set: function set(domain) {
+          domain = hashMap(domain, function (domain) {
+            if (!domain[2]) {
+              domain[2] = 1;
+            }
+
+            return domain;
+          });
+          this.$domain = domain;
+        },
+        get: function get$$1() {
+          return hashMap(cloneDeep(this.$domain), function (domain) {
+            for (var i = 0, l = domain.length; i < l; i++) {
+              if (typeof domain[i] === "function") domain[i] = domain[i]();
+            }
+
+            return domain;
+          });
+        }
+      },
+      range: {
+        set: function set(range$$1) {
+          range$$1 = hashMap(range$$1, function (range$$1) {
+            if (!range$$1[2]) {
+              range$$1[2] = 1;
+            }
+
+            return range$$1;
+          });
+          this.$range = range$$1;
+        },
+        get: function get$$1() {
+          return hashMap(cloneDeep(this.$range), function (range$$1) {
+            for (var i = 0, l = range$$1.length; i < l; i++) {
+              if (typeof range$$1[i] === "function") range$$1[i] = range$$1[i]();
+            }
+
+            return range$$1;
+          });
+        }
+      }
+    });
+    this.$domain = domain;
+    this.$range = range$$1;
   };
 
   Space.prototype = {
-    domain: function domain(_domain) {
-      //default grid scale
-      _domain = forMap(_domain, function (domain) {
-        if (!domain[2]) {
-          domain[2] = 1;
-        }
-
-        return domain;
-      });
-      this.$domain = _domain;
-    },
-    range: function range$$1(_range) {
-      _range = forMap(_range, function (range$$1) {
-        if (!range$$1[2]) {
-          range$$1[2] = 1;
-        }
-
-        return range$$1;
-      });
-      this.$range = _range;
-    },
-    getRange: function getRange() {
-      return forMap(cloneDeep(this.$range), function (range$$1) {
-        for (var i = 0, l = range$$1.length; i < l; i++) {
-          if (typeof range$$1[i] === "function") range$$1[i] = range$$1[i]();
-        }
-
-        return range$$1;
-      });
-    },
-    getDomain: function getDomain() {
-      return forMap(cloneDeep(this.$domain), function (domain) {
-        for (var i = 0, l = domain.length; i < l; i++) {
-          if (typeof domain[i] === "function") domain[i] = domain[i]();
-        }
-
-        return domain;
-      });
-    },
     domainRangeSize: function domainRangeSize(vs) {
-      return forMap(vs, function (v, sel) {
+      return hashMap(vs, function (v, sel) {
         var $range = sel ? this.getRange()[sel] : this.getRange();
         var $domain = sel ? this.getDomain()[sel] : this.getDomain();
         return v / ($domain[1] - $domain[0]) * ($range[1] - $range[0]);
@@ -3618,6 +3641,46 @@
     return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y");
   };
 
+  var calcTransformedPoint = function calcTransformedPoint(__ref, _ref) {
+    var matrix = _ref.matrix,
+        perspectiveOrigin = _ref.perspectiveOrigin;
+    // yet support affin
+    //let perspectiveVar = (this.meta && this.meta.perspective)
+    //perspectiveVar = !isNumber(perspectiveVar) ? 0 : perspectiveVar;
+    //perspectiveVar = -1/perspectiveVar;
+    //perspectiveVar = isInfinity(perspectiveVar) ? 0 : (perspectiveVar || 0) ;
+    if (!matrix) return;
+    var transformPoint = {};
+
+    var _ref2 = perspectiveOrigin || {
+      x: 0,
+      y: 0,
+      z: 0
+    },
+        _ref2$x = _ref2.x,
+        px = _ref2$x === void 0 ? 0 : _ref2$x,
+        _ref2$y = _ref2.y,
+        py = _ref2$y === void 0 ? 0 : _ref2$y,
+        _ref2$z = _ref2.z,
+        pz = _ref2$z === void 0 ? 0 : _ref2$z;
+
+    var _multiplyMatrix = multiplyMatrix(matrix, [[__ref.x - px], [__ref.y - py], [__ref.z - pz], [__ref.w]]),
+        _multiplyMatrix$ = _multiplyMatrix[0],
+        x = _multiplyMatrix$[0],
+        _multiplyMatrix$2 = _multiplyMatrix[1],
+        y = _multiplyMatrix$2[0],
+        _multiplyMatrix$3 = _multiplyMatrix[2],
+        z = _multiplyMatrix$3[0],
+        _multiplyMatrix$4 = _multiplyMatrix[3],
+        w = _multiplyMatrix$4[0];
+
+    transformPoint.x = x + px + matrix[0][3];
+    transformPoint.y = y + py + matrix[1][3];
+    transformPoint.z = z + pz + matrix[2][3];
+    transformPoint.w = w;
+    return transformPoint;
+  };
+
   var Point = function Point(x, y, z, w, meta) {
     var _this = this;
 
@@ -3644,44 +3707,69 @@
       z: z,
       w: w
     };
+    var __meta = {};
 
-    var __meta;
+    var __transformedPoint;
 
     Object.defineProperties(this, {
       x: {
         enumerable: true,
         get: function get() {
+          if (_this.transform === true) {
+            !__transformedPoint && (__transformedPoint = calcTransformedPoint(__ref, _this.meta));
+            return __transformedPoint ? __transformedPoint.x : __ref.x;
+          }
+
           return __ref.x;
         },
         set: function set(v) {
-          return __ref.x = v;
+          __transformedPoint = undefined;
+          __ref.x = v;
         }
       },
       y: {
         enumerable: true,
         get: function get() {
+          if (_this.transform === true) {
+            !__transformedPoint && (__transformedPoint = calcTransformedPoint(__ref, _this.meta));
+            return __transformedPoint ? __transformedPoint.y : __ref.y;
+          }
+
           return __ref.y;
         },
         set: function set(v) {
-          return __ref.y = v;
+          __transformedPoint = undefined;
+          __ref.y = v;
         }
       },
       z: {
         enumerable: true,
         get: function get() {
+          if (_this.transform === true) {
+            !__transformedPoint && (__transformedPoint = calcTransformedPoint(__ref, _this.meta));
+            return __transformedPoint ? __transformedPoint.z : __ref.z;
+          }
+
           return __ref.z;
         },
         set: function set(v) {
-          return __ref.z = v;
+          __transformedPoint = undefined;
+          __ref.z = v;
         }
       },
       w: {
         enumerable: true,
         get: function get() {
+          if (_this.transform === true) {
+            !__transformedPoint && (__transformedPoint = calcTransformedPoint(__ref, _this.meta));
+            return __transformedPoint ? __transformedPoint.w : __ref.w;
+          }
+
           return __ref.w;
         },
         set: function set(v) {
-          return __ref.w = v;
+          __transformedPoint = undefined;
+          __ref.w = v;
         }
       },
       meta: {
@@ -3690,9 +3778,16 @@
           return __meta;
         },
         set: function set(it) {
-          __meta = typeof it === "object" ? it : null;
+          typeof it === "object" && Object.assign(__meta, it);
+          __transformedPoint = undefined;
           return __meta;
         }
+      },
+      transform: {
+        enumerable: false,
+        configurable: false,
+        writable: true,
+        value: false
       },
       rx: {
         enumerable: false,
@@ -3709,7 +3804,10 @@
         }
       }
     });
-    this.meta = meta;
+
+    if (typeof meta === "object") {
+      this.meta = meta;
+    }
   };
 
   Point.prototype = {
@@ -3775,57 +3873,33 @@
       points.unshift(this);
       return new Vertex(points);
     },
-    rectWith: function rectWith(_ref) {
-      var x = _ref.x,
-          y = _ref.y;
+    rectWith: function rectWith(_ref3) {
+      var x = _ref3.x,
+          y = _ref3.y;
 
-      var _ref2 = this.x > x ? [this.x, x] : [x, this.x],
-          largeX = _ref2[0],
-          smallX = _ref2[1];
+      var _ref4 = this.x > x ? [this.x, x] : [x, this.x],
+          largeX = _ref4[0],
+          smallX = _ref4[1];
 
-      var _ref3 = this.y > y ? [this.y, y] : [y, this.y],
-          largeY = _ref3[0],
-          smallY = _ref3[1];
+      var _ref5 = this.y > y ? [this.y, y] : [y, this.y],
+          largeY = _ref5[0],
+          smallY = _ref5[1];
 
       return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0);
     },
-    multiflyMatrix: function multiflyMatrix(matrix44) {
+    applyTransform: function applyTransform(matrix44) {
+      if (matrix44 === void 0) {
+        matrix44 = this.meta.matrix;
+      }
+
       if (!validMatrix(matrix44)) {
-        throw new Error('Point::multiflyMatrix invalid matrix', matrix44);
-      } // yet support affin
-      //let perspectiveVar = (this.meta && this.meta.perspective)
-      //perspectiveVar = !isNumber(perspectiveVar) ? 0 : perspectiveVar;
-      //perspectiveVar = -1/perspectiveVar;
-      //perspectiveVar = isInfinity(perspectiveVar) ? 0 : (perspectiveVar || 0) ;
+        this.transform = false;
+        throw new Error('Point::applyTransform invalid matrix', matrix44);
+        return this;
+      }
 
-
-      var _ref4 = this.meta && this.meta.perspectiveOrigin || {
-        x: 0,
-        y: 0,
-        z: 0
-      },
-          px = _ref4.x,
-          py = _ref4.y,
-          pz = _ref4.z;
-
-      var mx = px - matrix44[0][3],
-          my = py - matrix44[1][3],
-          mz = pz - matrix44[2][3];
-
-      var _multiplyMatrix = multiplyMatrix(matrix44, [[this.x - mx], [this.y - my], [this.z - mz], [this.w]]),
-          _multiplyMatrix$ = _multiplyMatrix[0],
-          x = _multiplyMatrix$[0],
-          _multiplyMatrix$2 = _multiplyMatrix[1],
-          y = _multiplyMatrix$2[0],
-          _multiplyMatrix$3 = _multiplyMatrix[2],
-          z = _multiplyMatrix$3[0],
-          _multiplyMatrix$4 = _multiplyMatrix[3],
-          w = _multiplyMatrix$4[0];
-
-      this.x = x + mx + matrix44[0][3];
-      this.y = y + my + matrix44[1][3];
-      this.z = z + mz + matrix44[2][3];
-      this.w = w;
+      this.meta.matrix = matrix44;
+      this.transform = true;
       return this;
     }
   };
@@ -3965,34 +4039,32 @@
           return new Point(x, y, z, w, this.meta);
       }
     },
-    transform: function transform(_transform, rect) {
-      var useRect = !!rect;
+    rect: function rect() {
+      var first = this[0];
 
-      if (useRect) {
-        var left = rect.left,
-            top = rect.top,
-            width = rect.width,
-            height = rect.height; //rotateOrigin
-
-        var originX = left + width / 2;
-        var originY = top + height / 2;
-        this.forEach(function (point) {
-          point.translate({
-            x: -originX,
-            y: -originY
-          });
-          point.transform(_transform);
-          point.translate({
-            x: originX,
-            y: originY
-          });
-        });
-      } else {
-        this.forEach(function (point) {
-          point.transform(_transform);
-        });
+      if (!first) {
+        return new Rect(0, 0, 0, 0);
       }
 
+      var left = first.x;
+      var right = first.x;
+      var top = first.y;
+      var bottom = first.y;
+
+      for (var d = this, i = 1, l = this.length; i < l; i++) {
+        var p = d[i];
+        p.x < left && (left = p.x);
+        p.x > right && (right = p.x);
+        p.y < top && (top = p.y);
+        p.y > bottom && (bottom = p.y);
+      }
+
+      return new Rect(left, top, right - left, bottom - top);
+    },
+    applyTransform: function applyTransform(param) {
+      this.forEach(function (p) {
+        return p.applyTransform(param);
+      });
       return this;
     }
   });
@@ -4024,9 +4096,7 @@
       width: width,
       height: height
     };
-
-    var __meta;
-
+    var __meta = {};
     Object.defineProperties(this, {
       width: {
         enumerable: true,
@@ -4082,12 +4152,15 @@
           return __meta;
         },
         set: function set(it) {
-          __meta = typeof it === "object" ? it : null;
+          typeof it === "object" && Object.assign(__meta, it);
           return __meta;
         }
       }
     });
-    this.meta = meta;
+
+    if (typeof meta === "object") {
+      this.meta = meta;
+    }
   };
 
   var splitCountParser = function splitCountParser(split) {
@@ -4124,22 +4197,25 @@
       if (withMeta === true && this.meta) json.meta = this.meta;
       return json;
     },
-    findPoint: function findPoint(findWord) {
-      var _ref5 = isArray(findWord) ? findWord : findWord.trim().split(/\s+/),
-          lineFind = _ref5[0],
-          pointFind = _ref5[1];
-
-      return this.vertex(lineFind).point(pointFind);
-    },
-    vertex: function vertex(order) {
-      var inheritMeta = Object.assign({
+    defaultPerspective: function defaultPerspective() {
+      return {
         perspective: 0,
         perspectiveOrigin: {
           x: this.left + this.width / 2,
           y: this.top + this.height / 2,
           z: 0
         }
-      }, this.meta);
+      };
+    },
+    findPoint: function findPoint(findWord) {
+      var _ref6 = isArray(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref6[0],
+          pointFind = _ref6[1];
+
+      return this.vertex(lineFind).point(pointFind);
+    },
+    vertex: function vertex(order) {
+      var inheritMeta = Object.assign(this.defaultPerspective(), this.meta);
 
       switch (order) {
         case "right":
@@ -4252,6 +4328,9 @@
           }], inheritMeta);
       }
     },
+    transformRect: function transformRect() {
+      this.vertex();
+    },
     piecesWithCount: function piecesWithCount(splitCount, eachResultHook) {
       var _splitCountParser = splitCountParser(splitCount),
           column = _splitCountParser.column,
@@ -4262,8 +4341,17 @@
       var pieceWidth = width / column;
       var pieceHeight = height / row;
       eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
+
+      var pacExt = _objectSpread({}, this.defaultPerspective());
+
+      if (this.meta.matrix && this.meta.matrix instanceof Array) {
+        Object.assign(pacExt, {
+          matrix: this.meta.matrix
+        });
+      }
+
       var pacResult = makeMatrixArray(column, row, function (index, colIndex, rowIndex) {
-        var pacMeta = {
+        var pacMeta = _objectSpread({
           column: colIndex,
           row: rowIndex,
           coords: [colIndex, rowIndex],
@@ -4271,11 +4359,116 @@
             width: width,
             height: height
           }
-        };
+        }, pacExt); //
+
+
         var result = new Rect(colIndex * pieceWidth, rowIndex * pieceHeight, pieceWidth, pieceHeight, pacMeta);
         return eachResultHook ? eachResultHook(result, index, colIndex, rowIndex) : result;
       });
       return pacResult;
+    },
+    diff: function diff(_ref7) {
+      var aleft = _ref7.left,
+          atop = _ref7.top,
+          awidth = _ref7.width,
+          aheight = _ref7.height,
+          aright = _ref7.right,
+          abottom = _ref7.bottom;
+      var diffResult = {};
+      var original = this.toJSON();
+      var offset = {
+        left: 0,
+        top: 0
+      };
+      Object.defineProperties(diffResult, {
+        left: {
+          enumerable: true,
+          get: function get() {
+            return original.left - aleft + offset.left;
+          },
+          set: function set(want) {
+            offset.left = typeof want === "number" ? -original.left + want : 0;
+          }
+        },
+        top: {
+          enumerable: true,
+          get: function get() {
+            return original.top - atop + offset.top;
+          },
+          set: function set(want) {
+            offset.top = typeof want === "number" ? -original.top + want : 0;
+          }
+        },
+        width: {
+          enumerable: true,
+          get: function get() {
+            return original.width - awidth;
+          }
+        },
+        height: {
+          enumerable: true,
+          get: function get() {
+            return original.height - aheight;
+          }
+        },
+        right: {
+          enumerable: true,
+          get: function get() {
+            return original.right - aright + offset.left;
+          }
+        },
+        bottom: {
+          enumerable: true,
+          get: function get() {
+            return original.bottom - abottom + offset.top;
+          }
+        },
+        x: {
+          enumerable: false,
+          get: function get() {
+            return offset.left;
+          }
+        },
+        y: {
+          enumerable: false,
+          get: function get() {
+            return offset.top;
+          }
+        },
+        offset: {
+          enumerable: false,
+          get: function get() {
+            return function () {
+              return {
+                x: offset.left,
+                y: offset.top,
+                right: diffResult.right,
+                bottom: diffResult.bottom,
+                over: diffResult.right > diffResult.bottom ? diffResult.right : diffResult.bottom
+              };
+            };
+          }
+        },
+        move: {
+          enumerable: false,
+          get: function get() {
+            return function (nleft, ntop) {
+              diffResult.left = typeof nleft === "number" ? nleft : aleft;
+              diffResult.top = typeof ntop === "number" ? ntop : atop;
+              return diffResult;
+            };
+          }
+        },
+        toJSON: {
+          enumerable: false,
+          get: function get() {
+            return function () {
+              return _objectSpread({}, diffResult);
+            };
+          }
+        }
+      });
+      return diffResult;
     },
     fit: function fit(rect) {
       if (typeof rect !== "object") {
@@ -4296,11 +4489,11 @@
       return this;
     },
     //TODO : incompleted sticky(parent, position, offset);
-    sticky: function sticky(_ref6, position) {
-      var refX = _ref6.left,
-          refY = _ref6.top,
-          refWidth = _ref6.width,
-          refHeight = _ref6.height;
+    sticky: function sticky(_ref8, position) {
+      var refX = _ref8.left,
+          refY = _ref8.top,
+          refWidth = _ref8.width,
+          refHeight = _ref8.height;
 
       if (position === void 0) {
         position = "bottom left";
@@ -4452,7 +4645,7 @@
     all: all,
     deep: deep,
     times: times,
-    forMap: forMap,
+    hashMap: hashMap,
     cut: cut,
     cuts: cuts,
     top: top,
@@ -4461,7 +4654,6 @@
     randRange: randRange,
     rangeModel: rangeModel,
     range: range,
-    hashMap: hashMap,
     domainRangeValue: domainRangeValue,
     domainRangeInterpolate: domainRangeInterpolate,
     matrixRange: matrixRange,

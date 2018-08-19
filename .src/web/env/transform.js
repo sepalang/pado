@@ -238,7 +238,6 @@ export const transformStyleVariant = (function (likeString, isArray){
 
 
 export const transformMatrixVariant = function (variant){
-  
   const UDF = undefined
   const multiplyMatrixList = []
   

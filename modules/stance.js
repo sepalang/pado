@@ -18,8 +18,52 @@
   });
   _exports.rect = _exports.vertex = _exports.point = void 0;
 
+  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+  function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
   var likePoint = function likePoint(p) {
     return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y");
+  };
+
+  var calcTransformedPoint = function calcTransformedPoint(__ref, _ref) {
+    var matrix = _ref.matrix,
+        perspectiveOrigin = _ref.perspectiveOrigin;
+    // yet support affin
+    //let perspectiveVar = (this.meta && this.meta.perspective)
+    //perspectiveVar = !isNumber(perspectiveVar) ? 0 : perspectiveVar;
+    //perspectiveVar = -1/perspectiveVar;
+    //perspectiveVar = isInfinity(perspectiveVar) ? 0 : (perspectiveVar || 0) ;
+    if (!matrix) return;
+    var transformPoint = {};
+
+    var _ref2 = perspectiveOrigin || {
+      x: 0,
+      y: 0,
+      z: 0
+    },
+        _ref2$x = _ref2.x,
+        px = _ref2$x === void 0 ? 0 : _ref2$x,
+        _ref2$y = _ref2.y,
+        py = _ref2$y === void 0 ? 0 : _ref2$y,
+        _ref2$z = _ref2.z,
+        pz = _ref2$z === void 0 ? 0 : _ref2$z;
+
+    var _multiplyMatrix = (0, _matrix.multiplyMatrix)(matrix, [[__ref.x - px], [__ref.y - py], [__ref.z - pz], [__ref.w]]),
+        _multiplyMatrix$ = _multiplyMatrix[0],
+        x = _multiplyMatrix$[0],
+        _multiplyMatrix$2 = _multiplyMatrix[1],
+        y = _multiplyMatrix$2[0],
+        _multiplyMatrix$3 = _multiplyMatrix[2],
+        z = _multiplyMatrix$3[0],
+        _multiplyMatrix$4 = _multiplyMatrix[3],
+        w = _multiplyMatrix$4[0];
+
+    transformPoint.x = x + px + matrix[0][3];
+    transformPoint.y = y + py + matrix[1][3];
+    transformPoint.z = z + pz + matrix[2][3];
+    transformPoint.w = w;
+    return transformPoint;
   };
 
   var Point = function Point(x, y, z, w, meta) {
@@ -48,44 +92,69 @@
       z: z,
       w: w
     };
+    var __meta = {};
 
-    var __meta;
+    var __transformedPoint;
 
     Object.defineProperties(this, {
       x: {
         enumerable: true,
         get: function get() {
+          if (_this.transform === true) {
+            !__transformedPoint && (__transformedPoint = calcTransformedPoint(__ref, _this.meta));
+            return __transformedPoint ? __transformedPoint.x : __ref.x;
+          }
+
           return __ref.x;
         },
         set: function set(v) {
-          return __ref.x = v;
+          __transformedPoint = undefined;
+          __ref.x = v;
         }
       },
       y: {
         enumerable: true,
         get: function get() {
+          if (_this.transform === true) {
+            !__transformedPoint && (__transformedPoint = calcTransformedPoint(__ref, _this.meta));
+            return __transformedPoint ? __transformedPoint.y : __ref.y;
+          }
+
           return __ref.y;
         },
         set: function set(v) {
-          return __ref.y = v;
+          __transformedPoint = undefined;
+          __ref.y = v;
         }
       },
       z: {
         enumerable: true,
         get: function get() {
+          if (_this.transform === true) {
+            !__transformedPoint && (__transformedPoint = calcTransformedPoint(__ref, _this.meta));
+            return __transformedPoint ? __transformedPoint.z : __ref.z;
+          }
+
           return __ref.z;
         },
         set: function set(v) {
-          return __ref.z = v;
+          __transformedPoint = undefined;
+          __ref.z = v;
         }
       },
       w: {
         enumerable: true,
         get: function get() {
+          if (_this.transform === true) {
+            !__transformedPoint && (__transformedPoint = calcTransformedPoint(__ref, _this.meta));
+            return __transformedPoint ? __transformedPoint.w : __ref.w;
+          }
+
           return __ref.w;
         },
         set: function set(v) {
-          return __ref.w = v;
+          __transformedPoint = undefined;
+          __ref.w = v;
         }
       },
       meta: {
@@ -94,9 +163,16 @@
           return __meta;
         },
         set: function set(it) {
-          __meta = typeof it === "object" ? it : null;
+          typeof it === "object" && Object.assign(__meta, it);
+          __transformedPoint = undefined;
           return __meta;
         }
+      },
+      transform: {
+        enumerable: false,
+        configurable: false,
+        writable: true,
+        value: false
       },
       rx: {
         enumerable: false,
@@ -113,7 +189,10 @@
         }
       }
     });
-    this.meta = meta;
+
+    if (typeof meta === "object") {
+      this.meta = meta;
+    }
   };
 
   Point.prototype = {
@@ -179,57 +258,33 @@
       points.unshift(this);
       return new Vertex(points);
     },
-    rectWith: function rectWith(_ref) {
-      var x = _ref.x,
-          y = _ref.y;
+    rectWith: function rectWith(_ref3) {
+      var x = _ref3.x,
+          y = _ref3.y;
 
-      var _ref2 = this.x > x ? [this.x, x] : [x, this.x],
-          largeX = _ref2[0],
-          smallX = _ref2[1];
+      var _ref4 = this.x > x ? [this.x, x] : [x, this.x],
+          largeX = _ref4[0],
+          smallX = _ref4[1];
 
-      var _ref3 = this.y > y ? [this.y, y] : [y, this.y],
-          largeY = _ref3[0],
-          smallY = _ref3[1];
+      var _ref5 = this.y > y ? [this.y, y] : [y, this.y],
+          largeY = _ref5[0],
+          smallY = _ref5[1];
 
       return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0);
     },
-    multiflyMatrix: function multiflyMatrix(matrix44) {
+    applyTransform: function applyTransform(matrix44) {
+      if (matrix44 === void 0) {
+        matrix44 = this.meta.matrix;
+      }
+
       if (!(0, _matrix.validMatrix)(matrix44)) {
-        throw new Error('Point::multiflyMatrix invalid matrix', matrix44);
-      } // yet support affin
-      //let perspectiveVar = (this.meta && this.meta.perspective)
-      //perspectiveVar = !isNumber(perspectiveVar) ? 0 : perspectiveVar;
-      //perspectiveVar = -1/perspectiveVar;
-      //perspectiveVar = isInfinity(perspectiveVar) ? 0 : (perspectiveVar || 0) ;
+        this.transform = false;
+        throw new Error('Point::applyTransform invalid matrix', matrix44);
+        return this;
+      }
 
-
-      var _ref4 = this.meta && this.meta.perspectiveOrigin || {
-        x: 0,
-        y: 0,
-        z: 0
-      },
-          px = _ref4.x,
-          py = _ref4.y,
-          pz = _ref4.z;
-
-      var mx = px - matrix44[0][3],
-          my = py - matrix44[1][3],
-          mz = pz - matrix44[2][3];
-
-      var _multiplyMatrix = (0, _matrix.multiplyMatrix)(matrix44, [[this.x - mx], [this.y - my], [this.z - mz], [this.w]]),
-          _multiplyMatrix$ = _multiplyMatrix[0],
-          x = _multiplyMatrix$[0],
-          _multiplyMatrix$2 = _multiplyMatrix[1],
-          y = _multiplyMatrix$2[0],
-          _multiplyMatrix$3 = _multiplyMatrix[2],
-          z = _multiplyMatrix$3[0],
-          _multiplyMatrix$4 = _multiplyMatrix[3],
-          w = _multiplyMatrix$4[0];
-
-      this.x = x + mx + matrix44[0][3];
-      this.y = y + my + matrix44[1][3];
-      this.z = z + mz + matrix44[2][3];
-      this.w = w;
+      this.meta.matrix = matrix44;
+      this.transform = true;
       return this;
     }
   };
@@ -369,34 +424,32 @@
           return new Point(x, y, z, w, this.meta);
       }
     },
-    transform: function transform(_transform, rect) {
-      var useRect = !!rect;
+    rect: function rect() {
+      var first = this[0];
 
-      if (useRect) {
-        var left = rect.left,
-            top = rect.top,
-            width = rect.width,
-            height = rect.height; //rotateOrigin
-
-        var originX = left + width / 2;
-        var originY = top + height / 2;
-        this.forEach(function (point) {
-          point.translate({
-            x: -originX,
-            y: -originY
-          });
-          point.transform(_transform);
-          point.translate({
-            x: originX,
-            y: originY
-          });
-        });
-      } else {
-        this.forEach(function (point) {
-          point.transform(_transform);
-        });
+      if (!first) {
+        return new Rect(0, 0, 0, 0);
       }
 
+      var left = first.x;
+      var right = first.x;
+      var top = first.y;
+      var bottom = first.y;
+
+      for (var d = this, i = 1, l = this.length; i < l; i++) {
+        var p = d[i];
+        p.x < left && (left = p.x);
+        p.x > right && (right = p.x);
+        p.y < top && (top = p.y);
+        p.y > bottom && (bottom = p.y);
+      }
+
+      return new Rect(left, top, right - left, bottom - top);
+    },
+    applyTransform: function applyTransform(param) {
+      this.forEach(function (p) {
+        return p.applyTransform(param);
+      });
       return this;
     }
   });
@@ -428,9 +481,7 @@
       width: width,
       height: height
     };
-
-    var __meta;
-
+    var __meta = {};
     Object.defineProperties(this, {
       width: {
         enumerable: true,
@@ -486,12 +537,15 @@
           return __meta;
         },
         set: function set(it) {
-          __meta = typeof it === "object" ? it : null;
+          typeof it === "object" && Object.assign(__meta, it);
           return __meta;
         }
       }
     });
-    this.meta = meta;
+
+    if (typeof meta === "object") {
+      this.meta = meta;
+    }
   };
 
   var splitCountParser = function splitCountParser(split) {
@@ -528,22 +582,25 @@
       if (withMeta === true && this.meta) json.meta = this.meta;
       return json;
     },
-    findPoint: function findPoint(findWord) {
-      var _ref5 = (0, _isLike.isArray)(findWord) ? findWord : findWord.trim().split(/\s+/),
-          lineFind = _ref5[0],
-          pointFind = _ref5[1];
-
-      return this.vertex(lineFind).point(pointFind);
-    },
-    vertex: function vertex(order) {
-      var inheritMeta = Object.assign({
+    defaultPerspective: function defaultPerspective() {
+      return {
         perspective: 0,
         perspectiveOrigin: {
           x: this.left + this.width / 2,
           y: this.top + this.height / 2,
           z: 0
         }
-      }, this.meta);
+      };
+    },
+    findPoint: function findPoint(findWord) {
+      var _ref6 = (0, _isLike.isArray)(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref6[0],
+          pointFind = _ref6[1];
+
+      return this.vertex(lineFind).point(pointFind);
+    },
+    vertex: function vertex(order) {
+      var inheritMeta = Object.assign(this.defaultPerspective(), this.meta);
 
       switch (order) {
         case "right":
@@ -656,6 +713,9 @@
           }], inheritMeta);
       }
     },
+    transformRect: function transformRect() {
+      this.vertex();
+    },
     piecesWithCount: function piecesWithCount(splitCount, eachResultHook) {
       var _splitCountParser = splitCountParser(splitCount),
           column = _splitCountParser.column,
@@ -666,8 +726,17 @@
       var pieceWidth = width / column;
       var pieceHeight = height / row;
       eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
+
+      var pacExt = _objectSpread({}, this.defaultPerspective());
+
+      if (this.meta.matrix && this.meta.matrix instanceof Array) {
+        Object.assign(pacExt, {
+          matrix: this.meta.matrix
+        });
+      }
+
       var pacResult = (0, _matrix2.makeMatrixArray)(column, row, function (index, colIndex, rowIndex) {
-        var pacMeta = {
+        var pacMeta = _objectSpread({
           column: colIndex,
           row: rowIndex,
           coords: [colIndex, rowIndex],
@@ -675,11 +744,116 @@
             width: width,
             height: height
           }
-        };
+        }, pacExt); //
+
+
         var result = new Rect(colIndex * pieceWidth, rowIndex * pieceHeight, pieceWidth, pieceHeight, pacMeta);
         return eachResultHook ? eachResultHook(result, index, colIndex, rowIndex) : result;
       });
       return pacResult;
+    },
+    diff: function diff(_ref7) {
+      var aleft = _ref7.left,
+          atop = _ref7.top,
+          awidth = _ref7.width,
+          aheight = _ref7.height,
+          aright = _ref7.right,
+          abottom = _ref7.bottom;
+      var diffResult = {};
+      var original = this.toJSON();
+      var offset = {
+        left: 0,
+        top: 0
+      };
+      Object.defineProperties(diffResult, {
+        left: {
+          enumerable: true,
+          get: function get() {
+            return original.left - aleft + offset.left;
+          },
+          set: function set(want) {
+            offset.left = typeof want === "number" ? -original.left + want : 0;
+          }
+        },
+        top: {
+          enumerable: true,
+          get: function get() {
+            return original.top - atop + offset.top;
+          },
+          set: function set(want) {
+            offset.top = typeof want === "number" ? -original.top + want : 0;
+          }
+        },
+        width: {
+          enumerable: true,
+          get: function get() {
+            return original.width - awidth;
+          }
+        },
+        height: {
+          enumerable: true,
+          get: function get() {
+            return original.height - aheight;
+          }
+        },
+        right: {
+          enumerable: true,
+          get: function get() {
+            return original.right - aright + offset.left;
+          }
+        },
+        bottom: {
+          enumerable: true,
+          get: function get() {
+            return original.bottom - abottom + offset.top;
+          }
+        },
+        x: {
+          enumerable: false,
+          get: function get() {
+            return offset.left;
+          }
+        },
+        y: {
+          enumerable: false,
+          get: function get() {
+            return offset.top;
+          }
+        },
+        offset: {
+          enumerable: false,
+          get: function get() {
+            return function () {
+              return {
+                x: offset.left,
+                y: offset.top,
+                right: diffResult.right,
+                bottom: diffResult.bottom,
+                over: diffResult.right > diffResult.bottom ? diffResult.right : diffResult.bottom
+              };
+            };
+          }
+        },
+        move: {
+          enumerable: false,
+          get: function get() {
+            return function (nleft, ntop) {
+              diffResult.left = typeof nleft === "number" ? nleft : aleft;
+              diffResult.top = typeof ntop === "number" ? ntop : atop;
+              return diffResult;
+            };
+          }
+        },
+        toJSON: {
+          enumerable: false,
+          get: function get() {
+            return function () {
+              return _objectSpread({}, diffResult);
+            };
+          }
+        }
+      });
+      return diffResult;
     },
     fit: function fit(rect) {
       if (typeof rect !== "object") {
@@ -700,11 +874,11 @@
       return this;
     },
     //TODO : incompleted sticky(parent, position, offset);
-    sticky: function sticky(_ref6, position) {
-      var refX = _ref6.left,
-          refY = _ref6.top,
-          refWidth = _ref6.width,
-          refHeight = _ref6.height;
+    sticky: function sticky(_ref8, position) {
+      var refX = _ref8.left,
+          refY = _ref8.top,
+          refWidth = _ref8.width,
+          refHeight = _ref8.height;
 
       if (position === void 0) {
         position = "bottom left";
