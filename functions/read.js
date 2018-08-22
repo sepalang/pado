@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.readDatum = _exports.hasValue = _exports.hasProperty = _exports.get = _exports.readPath = _exports.readString = void 0;
+  _exports.readDown = _exports.hasValue = _exports.hasProperty = _exports.get = _exports.readPath = _exports.readString = void 0;
 
   function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
@@ -398,9 +398,9 @@
 
   _exports.hasValue = hasValue;
 
-  var readDatum = function readDatum(rootValue, readFn, rootParam) {
+  var readDown = function readDown(rootValue, readFn, rootParam) {
     var enterScope = function enterScope(value, depth, param) {
-      return (0, _isLike.isObject)(value) ? objectScope(value, depth, param) : (0, _isLike.isArray)(value) ? arrayScope(value, depth, param) : primitiveScope(value, depth, param);
+      return (0, _isLike.isArray)(value) ? arrayScope(value, depth, param) : (0, _isLike.isObject)(value) ? objectScope(value, depth, param) : primitiveScope(value, depth, param);
     };
 
     var arrayScope = function arrayScope(array, depth, param) {
@@ -465,6 +465,6 @@
     return rootParam;
   };
 
-  _exports.readDatum = readDatum;
+  _exports.readDown = readDown;
 });
 //# sourceMappingURL=read.js.map

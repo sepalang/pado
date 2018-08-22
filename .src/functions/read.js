@@ -342,8 +342,8 @@ export const hasValue = (function (){
   }
 }())
 
-export const readDatum = function (rootValue, readFn, rootParam){
-  const enterScope = (value, depth, param)=>isObject(value) ? objectScope(value, depth, param) : isArray(value) ? arrayScope(value, depth, param) : primitiveScope(value, depth, param)
+export const readDown = function (rootValue, readFn, rootParam){
+  const enterScope = (value, depth, param)=>isArray(value) ? arrayScope(value, depth, param) : isObject(value) ? objectScope(value, depth, param) : primitiveScope(value, depth, param)
   
   const arrayScope = (array, depth, param)=>{
     return readFn({

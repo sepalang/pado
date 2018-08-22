@@ -1,4 +1,4 @@
-import { readPath, get, hasValue, readDatum } from './read'
+import { readPath, get, hasValue, readDown } from './read'
 
 describe('Functions read', ()=>{
   it('readPath', ()=>{
@@ -36,7 +36,7 @@ describe('Functions read', ()=>{
     expect(hasValue([{id: 2}, {id: 3}], {id: "2"}, function (a, b){ return a.id === b.id })).toEqual(false)
   })
   
-  it('readDatum', ()=>{
+  it('readDown - basic', ()=>{
     const allcase = {
       "Finn": {
         "the": {
@@ -50,7 +50,7 @@ describe('Functions read', ()=>{
       },
       "Jake": [
         {"the dog": 5},
-        {"what time is it?": 6},
+        {"what time is it!": 6},
         {
           "what": {
             "time is it?": 7
@@ -61,13 +61,22 @@ describe('Functions read', ()=>{
     
     const result = {}
     
-    readDatum(allcase, ({ value, key, type, param, enter })=>{
+    readDown(allcase, ({ value, key, type, param, enter })=>{
       if(type === "hash") return enter(param.concat(key))
       if(type === "value") result[param.join(" ")] = value
       return enter(param)
     }, [])
     
-    //console.log("result", result)
+    expect(result).toEqual({
+      "Finn the human": 1,
+      "Finn truth or dare": 2,
+      "Finn did you fun": 3,
+      "Finn did you sad?": 4,
+      "Jake the dog": 5,
+      "Jake what time is it!": 6,
+      "Jake what time is it?": 7
+    });
+    
   })
 })
 

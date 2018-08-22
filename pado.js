@@ -1112,9 +1112,9 @@
       return getKey ? void 0 : false;
     };
   }();
-  var readDatum = function readDatum(rootValue, readFn, rootParam) {
+  var readDown = function readDown(rootValue, readFn, rootParam) {
     var enterScope = function enterScope(value, depth, param) {
-      return isObject(value) ? objectScope(value, depth, param) : isArray(value) ? arrayScope(value, depth, param) : primitiveScope(value, depth, param);
+      return isArray(value) ? arrayScope(value, depth, param) : isObject(value) ? objectScope(value, depth, param) : primitiveScope(value, depth, param);
     };
 
     var arrayScope = function arrayScope(array, depth, param) {
@@ -4742,7 +4742,7 @@
     get: get,
     hasProperty: hasProperty,
     hasValue: hasValue,
-    readDatum: readDatum,
+    readDown: readDown,
     argumentNamesBy: argumentNamesBy,
     scopelizeBy: scopelizeBy,
     drawCircleVars: drawCircleVars,
