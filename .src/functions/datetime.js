@@ -1,7 +1,7 @@
 import { isArray } from './isLike'
 import { toNumber } from './cast'
 
-export const dateExp = function (dv, format, pad){
+export const dateExp = function (dv, format){
   if(isArray(dv)) dv = dv.join(' ')
 
   var dt = /(\d\d\d\d|)[^\d]?(\d\d|\d|).?(\d\d|\d|)[^\d]?(\d\d|\d|)[^\d]?(\d\d|\d|)[^\d]?(\d\d|\d|)/.exec(dv)

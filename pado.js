@@ -736,7 +736,6 @@
     }
     return true;
   };
-  var deep = function deep(data) {};
   var times = function times(length, fn) {
     var result = [];
 
@@ -956,7 +955,6 @@
                 matchExp = _ref5.matchExp,
                 castStart = _ref5.castStart,
                 castEnd = _ref5.castEnd,
-                castSize = _ref5.castSize,
                 skipSize = _ref5.skipSize,
                 enter = _ref5.enter,
                 next = _ref5.next;
@@ -1114,6 +1112,72 @@
       return getKey ? void 0 : false;
     };
   }();
+  var readDatum = function readDatum(rootValue, readFn, rootParam) {
+    var enterScope = function enterScope(value, depth, param) {
+      return isObject(value) ? objectScope(value, depth, param) : isArray(value) ? arrayScope(value, depth, param) : primitiveScope(value, depth, param);
+    };
+
+    var arrayScope = function arrayScope(array, depth, param) {
+      return readFn({
+        type: "array",
+        value: array,
+        key: null,
+        depth: depth,
+        param: param,
+        enter: function enter(param) {
+          var childrenDepth = depth + 1;
+          return Array(array.length).fill(void 0).map(function (v, i) {
+            return i;
+          }).map(function (key) {
+            var value = array[key];
+            return enterScope(value, childrenDepth, param);
+          });
+        }
+      });
+    };
+
+    var objectScope = function objectScope(object, depth, param) {
+      return readFn({
+        type: "object",
+        value: object,
+        key: null,
+        depth: depth,
+        param: param,
+        enter: function enter(param) {
+          var childrenDepth = depth + 1;
+          return Object.keys(object).map(function (key) {
+            var value = object[key];
+            return readFn({
+              type: "hash",
+              key: key,
+              value: value,
+              depth: depth,
+              param: param,
+              enter: function enter(param) {
+                return enterScope(value, childrenDepth, param);
+              }
+            });
+          });
+        }
+      });
+    };
+
+    var primitiveScope = function primitiveScope(value, depth, param) {
+      readFn({
+        type: "value",
+        key: null,
+        value: value,
+        depth: depth,
+        param: param,
+        enter: function enter(param) {
+          return param;
+        }
+      });
+    };
+
+    enterScope(rootValue, 0, rootParam);
+    return rootParam;
+  };
 
   var unique = function unique(array, findKey) {
     var result = [];
@@ -1837,20 +1901,20 @@
   var rand64 = function () {
     var rand64Token = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     return function (length, codeAt, codeLength) {
-      length = isAbsoluteNaN(length) ? 1 : parseInt(length);
-      codeAt = isAbsoluteNaN(codeAt) ? 0 : parseInt(codeAt);
-      codeLength = isAbsoluteNaN(codeLength) ? 62 - codeAt : parseInt(codeLength);
+      length = isAbsoluteNaN(length) ? 1 : parseInt(length, 10);
+      codeAt = isAbsoluteNaN(codeAt) ? 0 : parseInt(codeAt, 10);
+      codeLength = isAbsoluteNaN(codeLength) ? 62 - codeAt : parseInt(codeLength, 10);
       var result = "";
 
       for (var i = 0, l = length; i < l; i++) {
-        result = result + rand64Token.charAt(codeAt + parseInt(Math.random() * codeLength));
+        result = result + rand64Token.charAt(codeAt + parseInt(Math.random() * codeLength, 10));
       }
 
       return result;
     };
   }();
   var tokenize = function tokenize(seed, digits) {
-    return Math.floor(Math.abs(Math.sin(Number((seed + "").replace(/./g, function (s, i) {
+    return Math.floor(Math.abs(Math.sin(Number((seed + "").replace(/./g, function (s) {
       return s.charCodeAt(0);
     }))) * 16777215) % 16777215).toString(digits || 16);
   };
@@ -1863,7 +1927,7 @@
     return nice === true ? Math.ceil(result) : result;
   };
 
-  var dateExp = function dateExp(dv, format, pad) {
+  var dateExp = function dateExp(dv, format) {
     if (isArray(dv)) dv = dv.join(' ');
     var dt = /(\d\d\d\d|)[^\d]?(\d\d|\d|).?(\d\d|\d|)[^\d]?(\d\d|\d|)[^\d]?(\d\d|\d|)[^\d]?(\d\d|\d|)/.exec(dv);
     dt[1] = dt[1] || new Date().getYear() + 1900 + '';
@@ -2059,13 +2123,9 @@
       <path d="{d}" stroke-width="stroke"></path>
     </svg>
   */
-  var drawCircleVars = function drawCircleVars(circleWidth, strokeWidth, drawRatio) {
+  var drawCircleVars = function drawCircleVars(circleWidth, strokeWidth) {
     if (strokeWidth === void 0) {
       strokeWidth = 0;
-    }
-
-    if (drawRatio === void 0) {
-      drawRatio = 1;
     }
 
     var circumference = (circleWidth - strokeWidth) / 2 * (3.14159 * 2);
@@ -2911,9 +2971,9 @@
         }
       });
       Object.defineProperty(this, "clone", {
-        value: function value(deep$$1, parentOperate) {
-          if (deep$$1 === void 0) {
-            deep$$1 = true;
+        value: function value(deep, parentOperate) {
+          if (deep === void 0) {
+            deep = true;
           }
 
           var cloneOperate = operateFunction({
@@ -2924,7 +2984,7 @@
             limitInput: limitInput,
             limitOutput: limitOutput
           });
-          deep$$1 === true && _this.children.forEach(function (child) {
+          deep === true && _this.children.forEach(function (child) {
             child.clone(true, cloneOperate);
           });
           return cloneOperate;
@@ -4647,7 +4707,6 @@
     instance: instance,
     alloc: alloc,
     all: all,
-    deep: deep,
     times: times,
     hashMap: hashMap,
     cut: cut,
@@ -4683,6 +4742,7 @@
     get: get,
     hasProperty: hasProperty,
     hasValue: hasValue,
+    readDatum: readDatum,
     argumentNamesBy: argumentNamesBy,
     scopelizeBy: scopelizeBy,
     drawCircleVars: drawCircleVars,

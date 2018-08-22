@@ -6,9 +6,9 @@ describe('Functions hack', ()=>{
     // normal function
     
     const zeroFn   = function (){}
-    const oneFn    = function (foo){}
-    const multiFn  = function (foo, bar, kim){}
-    const prefixFn = function (_foo, $bar, $$ki__m){}
+    const oneFn    = function (foo){ return foo }
+    const multiFn  = function (foo, bar, kim){ return [foo, bar, kim] }
+    const prefixFn = function (_foo, $bar, $$ki__m){ return [_foo, $bar, $$ki__m] }
     
     expect(argumentNamesBy(zeroFn)).toEqual([])
     expect(argumentNamesBy(oneFn)).toEqual(['foo'])
@@ -18,11 +18,11 @@ describe('Functions hack', ()=>{
     //arrow function
     
     const arrowZeroFn   = ()=>{}
-    const arrowFitFn    = (a)=>{}
-    const arrowSpaceFn1 = (a)=>{}
-    const arrowSpaceFn2 = (a)=>{}
-    const arrowMultiFn  = (foo, bar, kim)=>{}
-    const arrowPrefixFn = (_foo, $bar, $$ki__m)=>{}
+    const arrowFitFn    = (a)=>{ return a }
+    const arrowSpaceFn1 = (a)=>{ return a }
+    const arrowSpaceFn2 = (a)=>{ return a }
+    const arrowMultiFn  = (foo, bar, kim)=>{ return [foo, bar, kim] }
+    const arrowPrefixFn = (_foo, $bar, $$ki__m)=>{ return [_foo, $bar, $$ki__m] }
     
     expect(argumentNamesBy(arrowZeroFn)).toEqual([])
     expect(argumentNamesBy(arrowFitFn)).toEqual(['a'])

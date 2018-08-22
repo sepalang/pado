@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.hashMap = _exports.times = _exports.deep = _exports.all = void 0;
+  _exports.hashMap = _exports.times = _exports.all = void 0;
 
   var all = function all(data, fn) {
     data = (0, _cast.asArray)(data);
@@ -36,10 +36,6 @@
   };
 
   _exports.all = all;
-
-  var deep = function deep(data) {};
-
-  _exports.deep = deep;
 
   var times = function times(length, fn) {
     var result = [];

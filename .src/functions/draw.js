@@ -13,7 +13,7 @@
     <path d="{d}" stroke-width="stroke"></path>
   </svg>
 */
-export const drawCircleVars = function (circleWidth, strokeWidth = 0, drawRatio = 1){
+export const drawCircleVars = function (circleWidth, strokeWidth = 0){
   const circumference = ((circleWidth - strokeWidth) / 2) * (3.14159 * 2)
   const radius        = (circumference / (3.14159 * 2))
   const diameter      = (radius * 2)

@@ -1,4 +1,4 @@
-import { readPath, get, hasValue } from './read'
+import { readPath, get, hasValue, readDatum } from './read'
 
 describe('Functions read', ()=>{
   it('readPath', ()=>{
@@ -34,6 +34,40 @@ describe('Functions read', ()=>{
     expect(hasValue([{id: 2, b: 3}, {id: 3}], {sid: 4}, ["id", "sid"])).toEqual(false)
     expect(hasValue([{id: 2}, {id: 3}], {id: "2"}, function (a, b){ return a.id == b.id })).toEqual(true)
     expect(hasValue([{id: 2}, {id: 3}], {id: "2"}, function (a, b){ return a.id === b.id })).toEqual(false)
+  })
+  
+  it('readDatum', ()=>{
+    const allcase = {
+      "Finn": {
+        "the": {
+          "human": 1
+        },
+        "truth or dare": 2,
+        "did you"      : [
+          {"fun": 3},
+          {"sad?": 4}
+        ]
+      },
+      "Jake": [
+        {"the dog": 5},
+        {"what time is it?": 6},
+        {
+          "what": {
+            "time is it?": 7
+          }
+        }
+      ]
+    }
+    
+    const result = {}
+    
+    readDatum(allcase, ({ value, key, type, param, enter })=>{
+      if(type === "hash") return enter(param.concat(key))
+      if(type === "value") result[param.join(" ")] = value
+      return enter(param)
+    }, [])
+    
+    //console.log("result", result)
   })
 })
 

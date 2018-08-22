@@ -18,7 +18,7 @@
   });
   _exports.timescaleExp = _exports.timestampExp = _exports.dateExp = void 0;
 
-  var dateExp = function dateExp(dv, format, pad) {
+  var dateExp = function dateExp(dv, format) {
     if ((0, _isLike.isArray)(dv)) dv = dv.join(' ');
     var dt = /(\d\d\d\d|)[^\d]?(\d\d|\d|).?(\d\d|\d|)[^\d]?(\d\d|\d|)[^\d]?(\d\d|\d|)[^\d]?(\d\d|\d|)/.exec(dv);
     dt[1] = dt[1] || new Date().getYear() + 1900 + '';

@@ -33,13 +33,9 @@
       <path d="{d}" stroke-width="stroke"></path>
     </svg>
   */
-  var drawCircleVars = function drawCircleVars(circleWidth, strokeWidth, drawRatio) {
+  var drawCircleVars = function drawCircleVars(circleWidth, strokeWidth) {
     if (strokeWidth === void 0) {
       strokeWidth = 0;
-    }
-
-    if (drawRatio === void 0) {
-      drawRatio = 1;
     }
 
     var circumference = (circleWidth - strokeWidth) / 2 * (3.14159 * 2);

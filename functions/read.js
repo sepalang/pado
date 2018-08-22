@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.function.name", "core-js/modules/es6.array.sort", "./isLike", "./remark", "./enumerable", "./cast"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.array.fill", "core-js/modules/es6.function.name", "core-js/modules/es6.array.sort", "./isLike", "./remark", "./enumerable", "./cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.function.name"), require("core-js/modules/es6.array.sort"), require("./isLike"), require("./remark"), require("./enumerable"), require("./cast"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.function.name"), require("core-js/modules/es6.array.sort"), require("./isLike"), require("./remark"), require("./enumerable"), require("./cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.es6Function, global.es6Array, global.isLike, global.remark, global.enumerable, global.cast);
+    factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.es6Array, global.es6Function, global.es6Array, global.isLike, global.remark, global.enumerable, global.cast);
     global.read = mod.exports;
   }
-})(this, function (_exports, _webDom, _es6Array, _es6Object, _es6Function, _es6Array2, _isLike, _remark, _enumerable, _cast) {
+})(this, function (_exports, _webDom, _es6Array, _es6Object, _es6Array2, _es6Function, _es6Array3, _isLike, _remark, _enumerable, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.hasValue = _exports.hasProperty = _exports.get = _exports.readPath = _exports.readString = void 0;
+  _exports.readDatum = _exports.hasValue = _exports.hasProperty = _exports.get = _exports.readPath = _exports.readString = void 0;
 
   function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
@@ -229,7 +229,6 @@
                 matchExp = _ref5.matchExp,
                 castStart = _ref5.castStart,
                 castEnd = _ref5.castEnd,
-                castSize = _ref5.castSize,
                 skipSize = _ref5.skipSize,
                 enter = _ref5.enter,
                 next = _ref5.next;
@@ -398,5 +397,74 @@
   }();
 
   _exports.hasValue = hasValue;
+
+  var readDatum = function readDatum(rootValue, readFn, rootParam) {
+    var enterScope = function enterScope(value, depth, param) {
+      return (0, _isLike.isObject)(value) ? objectScope(value, depth, param) : (0, _isLike.isArray)(value) ? arrayScope(value, depth, param) : primitiveScope(value, depth, param);
+    };
+
+    var arrayScope = function arrayScope(array, depth, param) {
+      return readFn({
+        type: "array",
+        value: array,
+        key: null,
+        depth: depth,
+        param: param,
+        enter: function enter(param) {
+          var childrenDepth = depth + 1;
+          return Array(array.length).fill(void 0).map(function (v, i) {
+            return i;
+          }).map(function (key) {
+            var value = array[key];
+            return enterScope(value, childrenDepth, param);
+          });
+        }
+      });
+    };
+
+    var objectScope = function objectScope(object, depth, param) {
+      return readFn({
+        type: "object",
+        value: object,
+        key: null,
+        depth: depth,
+        param: param,
+        enter: function enter(param) {
+          var childrenDepth = depth + 1;
+          return Object.keys(object).map(function (key) {
+            var value = object[key];
+            return readFn({
+              type: "hash",
+              key: key,
+              value: value,
+              depth: depth,
+              param: param,
+              enter: function enter(param) {
+                return enterScope(value, childrenDepth, param);
+              }
+            });
+          });
+        }
+      });
+    };
+
+    var primitiveScope = function primitiveScope(value, depth, param) {
+      readFn({
+        type: "value",
+        key: null,
+        value: value,
+        depth: depth,
+        param: param,
+        enter: function enter(param) {
+          return param;
+        }
+      });
+    };
+
+    enterScope(rootValue, 0, rootParam);
+    return rootParam;
+  };
+
+  _exports.readDatum = readDatum;
 });
 //# sourceMappingURL=read.js.map

@@ -22,10 +22,6 @@ export const all = function (data, fn){
   return true
 }
 
-export const deep = function (data){
-  
-}
-
 export const times = function (length, fn){
   const result = []
   for(var i = 0, l = length; i < l; i++){

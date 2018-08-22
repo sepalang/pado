@@ -1,6 +1,7 @@
 import {
   isArray,
   likeString,
+  isObject,
   likeObject,
   isNumber,
   isEmpty
@@ -204,7 +205,7 @@ export const readPath = (function (){
         
         //multiple depth
         const { props:{ path:result } } = readString(pathParam, [".", "["], ({
-          content, props:{ path }, matchExp, castStart, castEnd, castSize, skipSize, enter, next
+          content, props:{ path }, matchExp, castStart, castEnd, skipSize, enter, next
         })=>{
           if(matchExp === "."){
             skipSize && path.push(content.substr(castStart, skipSize))
@@ -340,3 +341,62 @@ export const hasValue = (function (){
     return getKey ? void 0 : false
   }
 }())
+
+export const readDatum = function (rootValue, readFn, rootParam){
+  const enterScope = (value, depth, param)=>isObject(value) ? objectScope(value, depth, param) : isArray(value) ? arrayScope(value, depth, param) : primitiveScope(value, depth, param)
+  
+  const arrayScope = (array, depth, param)=>{
+    return readFn({
+      type : "array",
+      value: array,
+      key  : null,
+      depth,
+      param,
+      enter: (param)=>{
+        const childrenDepth = depth + 1
+        return Array(array.length).fill(void 0).map((v, i)=>i).map(key=>{
+          const value = array[key]
+          return enterScope(value, childrenDepth, param)
+        })
+      }
+    })
+  }
+  
+  const objectScope = (object, depth, param)=>{
+    return readFn({
+      type : "object",
+      value: object,
+      key  : null,
+      depth,
+      param,
+      enter: (param)=>{
+        const childrenDepth = depth + 1
+        return Object.keys(object).map(key=>{
+          const value = object[key]
+          return readFn({
+            type : "hash",
+            key,
+            value,
+            depth,
+            param,
+            enter: (param)=>enterScope(value, childrenDepth, param)
+          })
+        })
+      }
+    })
+  }
+  
+  const primitiveScope = (value, depth, param)=>{
+    readFn({
+      type : "value",
+      key  : null,
+      value,
+      depth,
+      param,
+      enter: (param)=>param
+    })
+  }
+  
+  enterScope(rootValue, 0, rootParam)
+  return rootParam
+}
