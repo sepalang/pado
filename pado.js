@@ -3951,19 +3951,53 @@
 
       return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0);
     },
-    applyTransform: function applyTransform(matrix44) {
+    applyTransform: function applyTransform() {
+      var x = this.x,
+          y = this.y,
+          z = this.z,
+          w = this.w;
+      this.transform = false;
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.w = w;
+      return this;
+    },
+    setTransform: function setTransform(matrix44) {
       if (matrix44 === void 0) {
         matrix44 = this.meta.matrix;
       }
 
       if (!validMatrix(matrix44)) {
         this.transform = false;
-        throw new Error('Point::applyTransform invalid matrix', matrix44);
+        throw new Error('Point::setTransform invalid matrix', matrix44);
         return this;
       }
 
       this.meta.matrix = matrix44;
       this.transform = true;
+      return this;
+    },
+    add: function add(_ref6) {
+      var x = _ref6.x,
+          y = _ref6.y,
+          z = _ref6.z,
+          w = _ref6.w;
+      isNumber(x) && x && (this.x += x);
+      isNumber(y) && y && (this.y += y);
+      isNumber(z) && z && (this.z += z);
+      isNumber(w) && w && (this.w += w);
+      return this;
+    },
+    subtract: function subtract(_ref7) {
+      var x = _ref7.x,
+          y = _ref7.y,
+          z = _ref7.z,
+          w = _ref7.w;
+      isNumber(x) && x && (this.x -= x);
+      isNumber(y) && y && (this.y -= y);
+      isNumber(z) && z && (this.z -= z);
+      isNumber(w) && w && (this.w -= w);
       return this;
     }
   };
@@ -4125,9 +4159,9 @@
 
       return new Rect(left, top, right - left, bottom - top);
     },
-    applyTransform: function applyTransform(param) {
+    setTransform: function setTransform(param) {
       this.forEach(function (p) {
-        return p.applyTransform(param);
+        return p.setTransform(param);
       });
       return this;
     }
@@ -4272,9 +4306,9 @@
       };
     },
     findPoint: function findPoint(findWord) {
-      var _ref6 = isArray(findWord) ? findWord : findWord.trim().split(/\s+/),
-          lineFind = _ref6[0],
-          pointFind = _ref6[1];
+      var _ref8 = isArray(findWord) ? findWord : findWord.trim().split(/\s+/),
+          lineFind = _ref8[0],
+          pointFind = _ref8[1];
 
       return this.vertex(lineFind).point(pointFind);
     },
@@ -4431,13 +4465,17 @@
       });
       return pacResult;
     },
-    diff: function diff(_ref7) {
-      var aleft = _ref7.left,
-          atop = _ref7.top,
-          awidth = _ref7.width,
-          aheight = _ref7.height,
-          aright = _ref7.right,
-          abottom = _ref7.bottom;
+    diff: function diff(_ref9) {
+      var _ref9$left = _ref9.left,
+          aleft = _ref9$left === void 0 ? 0 : _ref9$left,
+          _ref9$top = _ref9.top,
+          atop = _ref9$top === void 0 ? 0 : _ref9$top,
+          _ref9$width = _ref9.width,
+          awidth = _ref9$width === void 0 ? 0 : _ref9$width,
+          _ref9$height = _ref9.height,
+          aheight = _ref9$height === void 0 ? 0 : _ref9$height,
+          aright = _ref9.right,
+          abottom = _ref9.bottom;
       var diffResult = {};
       var original = this.toJSON();
       var offset = {
@@ -4553,11 +4591,11 @@
       return this;
     },
     //TODO : incompleted sticky(parent, position, offset);
-    sticky: function sticky(_ref8, position) {
-      var refX = _ref8.left,
-          refY = _ref8.top,
-          refWidth = _ref8.width,
-          refHeight = _ref8.height;
+    sticky: function sticky(_ref10, position) {
+      var refX = _ref10.left,
+          refY = _ref10.top,
+          refWidth = _ref10.width,
+          refHeight = _ref10.height;
 
       if (position === void 0) {
         position = "bottom left";

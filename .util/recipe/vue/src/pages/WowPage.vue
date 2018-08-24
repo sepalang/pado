@@ -35,6 +35,22 @@
             </PadoScreen>
           </td>
         </tr>
+        <tr>
+          <td colspan="3">
+            <PadoScreen ref="main" style="width:100%;height:200px;">
+              <div :style="outsideStyle">
+                <div :style="mainRectStyle" ref="mainRect"></div>
+                <PadoPoint 
+                  v-for="(point, index) in gridPoints2"
+                  :key="index"
+                  :x="point.x"
+                  :y="point.y"
+                >
+                </PadoPoint>
+              </div>
+            </PadoScreen>
+          </td>
+        </tr>
       </tbody>
     </table>
     <div> main rect </div>
@@ -75,6 +91,7 @@ export default {
     rotateY   : 0,
     rotateZ   : 10,
     gridPoints: [],
+    gridPoints2: [],
     outSide   : {
       width : 0,
       height: 0
@@ -112,18 +129,23 @@ export default {
   methods: {
     mainDraw (){
       const { width, height } = this.mainRectSize;
-      const pointFrame = rect(0, 0, width, height, { matrix: transformMatrixVariant(this) });
+      const matrix = transformMatrixVariant(this);
+      const pointFrame = rect(0, 0, width, height, { matrix });
       
-      const outsideRect = pointFrame.vertex().applyTransform().rect();
-      const differenceValues = outsideRect.diff(pointFrame);
+      const outsideRect  = pointFrame.vertex().setTransform().rect();
+      const variatedRect = outsideRect.diff(pointFrame);
       
-      console.log('outsideRect', outsideRect.toJSON());
-      console.log('differenceValues', { ...differenceValues }, { ...differenceValues.move() }, { ...differenceValues.offset() });
-      
-      this.outSide = { ...differenceValues };
+      this.outSide = { ...variatedRect };
       
       this.gridPoints = pointFrame.piecesWithCount([this.column, this.row], (rect)=>{
-        return rect.findPoint("middle center").applyTransform();
+        return rect.findPoint("middle center").setTransform();
+      });
+      
+      this.gridPoints2 = pointFrame.piecesWithCount([this.column, this.row], (rect)=>{
+        return rect.findPoint("middle center")
+          .setTransform()
+          .applyTransform()
+          .subtract({ x:variatedRect.left, y:variatedRect.top });
       });
     }
   },

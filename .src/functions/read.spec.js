@@ -68,14 +68,14 @@ describe('Functions read', ()=>{
     }, [])
     
     expect(result).toEqual({
-      "Finn the human": 1,
-      "Finn truth or dare": 2,
-      "Finn did you fun": 3,
-      "Finn did you sad?": 4,
-      "Jake the dog": 5,
+      "Finn the human"       : 1,
+      "Finn truth or dare"   : 2,
+      "Finn did you fun"     : 3,
+      "Finn did you sad?"    : 4,
+      "Jake the dog"         : 5,
       "Jake what time is it!": 6,
       "Jake what time is it?": 7
-    });
+    })
     
   })
 })

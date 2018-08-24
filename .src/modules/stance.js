@@ -164,15 +164,39 @@ Point.prototype = {
     const [largeY, smallY] = this.y > y ? [ this.y, y ] : [ y, this.y ]
     return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0)
   },
-  applyTransform (matrix44 = this.meta.matrix){
+  applyTransform (){
+    const {x, y, z, w} = this
+    this.transform = false
+    this.x = x
+    this.y = y
+    this.z = z
+    this.w = w
+    return this
+  },
+  setTransform (matrix44 = this.meta.matrix){
     if(!validMatrix(matrix44)){
       this.transform = false
-      throw new Error('Point::applyTransform invalid matrix', matrix44)
+      throw new Error('Point::setTransform invalid matrix', matrix44)
       return this
     }
     
     this.meta.matrix = matrix44
     this.transform = true
+    
+    return this
+  },
+  add ({ x, y, z, w }){
+    isNumber(x) && x && (this.x += x)
+    isNumber(y) && y && (this.y += y)
+    isNumber(z) && z && (this.z += z)
+    isNumber(w) && w && (this.w += w)
+    return this
+  },
+  subtract ({ x, y, z, w }){
+    isNumber(x) && x && (this.x -= x)
+    isNumber(y) && y && (this.y -= y)
+    isNumber(z) && z && (this.z -= z)
+    isNumber(w) && w && (this.w -= w)
     return this
   }
 }
@@ -307,8 +331,8 @@ const Vertex = function (pointArray, meta){
     
     return new Rect(left, top, right - left, bottom - top)
   },
-  applyTransform (param){
-    this.forEach(p=>p.applyTransform(param))
+  setTransform (param){
+    this.forEach(p=>p.setTransform(param))
     return this
   }
 }))
@@ -474,7 +498,7 @@ Rect.prototype = {
     
     return pacResult
   },
-  diff ({ left:aleft, top:atop, width:awidth, height:aheight, right:aright, bottom:abottom }){
+  diff ({ left:aleft = 0, top:atop = 0, width:awidth = 0, height:aheight = 0, right:aright, bottom:abottom }){
     const diffResult = {}
     const original = this.toJSON()
     const offset = {left: 0, top: 0}
