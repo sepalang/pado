@@ -349,7 +349,6 @@ const Rect = function (left = 0, top = 0, width = 0, height = 0, meta = null){
       set (newValue){
         const oldValue = __ref.width
         __ref.width = newValue
-        __ref.right += newValue - oldValue
         return newValue
       }
     },
@@ -359,12 +358,25 @@ const Rect = function (left = 0, top = 0, width = 0, height = 0, meta = null){
       set (newValue){
         const oldValue = __ref.height
         __ref.height = newValue
-        __ref.bottom += newValue - oldValue
         return newValue
       }
     },
-    left  : { enumerable: true, get (){ return __ref.left } },
-    top   : { enumerable: true, get (){ return __ref.top } },
+    left: { enumerable: true,
+      get (){ return __ref.left },
+      set (newValue){
+        const oldValue = __ref.left
+        __ref.left = newValue
+        return newValue
+      }
+    },
+    top: { enumerable: true,
+      get (){ return __ref.top },
+      set (newValue){
+        const oldValue = __ref.top
+        __ref.top = newValue
+        return newValue
+      }
+    },
     right : { enumerable: true, get (){ return this.left + this.width } },
     bottom: { enumerable: true, get (){ return this.top + this.height } },
     meta  : {

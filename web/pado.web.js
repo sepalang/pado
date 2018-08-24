@@ -1006,9 +1006,7 @@
           return __ref.width;
         },
         set: function set(newValue) {
-          var oldValue = __ref.width;
           __ref.width = newValue;
-          __ref.right += newValue - oldValue;
           return newValue;
         }
       },
@@ -1018,9 +1016,7 @@
           return __ref.height;
         },
         set: function set(newValue) {
-          var oldValue = __ref.height;
           __ref.height = newValue;
-          __ref.bottom += newValue - oldValue;
           return newValue;
         }
       },
@@ -1028,12 +1024,20 @@
         enumerable: true,
         get: function get() {
           return __ref.left;
+        },
+        set: function set(newValue) {
+          __ref.left = newValue;
+          return newValue;
         }
       },
       top: {
         enumerable: true,
         get: function get() {
           return __ref.top;
+        },
+        set: function set(newValue) {
+          __ref.top = newValue;
+          return newValue;
         }
       },
       right: {
@@ -1443,6 +1447,28 @@
             height: height
           });
       }
+    },
+    add: function add(_ref11) {
+      var left = _ref11.left,
+          top = _ref11.top,
+          width = _ref11.width,
+          height = _ref11.height;
+      isNumber(left) && left && (this.left += left);
+      isNumber(top) && top && (this.top += top);
+      isNumber(width) && width && (this.width += width);
+      isNumber(height) && height && (this.height += height);
+      return this;
+    },
+    subtract: function subtract(_ref12) {
+      var left = _ref12.left,
+          top = _ref12.top,
+          width = _ref12.width,
+          height = _ref12.height;
+      isNumber(left) && left && (this.left -= left);
+      isNumber(top) && top && (this.top -= top);
+      isNumber(width) && width && (this.width -= width);
+      isNumber(height) && height && (this.height -= height);
+      return this;
     }
   };
   var rect = function rect(left, top, width, height, x, y, valid) {
