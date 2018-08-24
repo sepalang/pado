@@ -579,6 +579,20 @@ Rect.prototype = {
       default:
         return rect({ left, top, width, height })
     }
+  },
+  add ({ left, top, width, height }){
+    isNumber(left) && left && (this.left += left)
+    isNumber(top) && top && (this.top += top)
+    isNumber(width) && width && (this.width += width)
+    isNumber(height) && height && (this.height += height)
+    return this
+  },
+  subtract ({ left, top, width, height }){
+    isNumber(left) && left && (this.left -= left)
+    isNumber(top) && top && (this.top -= top)
+    isNumber(width) && width && (this.width -= width)
+    isNumber(height) && height && (this.height -= height)
+    return this
   }
 }
 
