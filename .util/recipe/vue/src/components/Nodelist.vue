@@ -146,6 +146,10 @@ export default {
             visibleChildren: {
               enumerable: true,
               get (){ return this.isOpen && this.hasChildren; }
+            },
+            parentScope: {
+              enumerable: false,
+              get (){ return ref.parentNodeComponent(); }
             }
           });
         }      
