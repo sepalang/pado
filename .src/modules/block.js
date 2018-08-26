@@ -11,8 +11,7 @@ import {
 } from '../functions/isLike'
 
 import {
-  asArray,
-  cloneDeep as _cloneDeep
+  asArray
 } from '../functions/cast'
 
 // ?
@@ -75,7 +74,7 @@ Object.defineProperties(BlockPrototype, {
   domainMap: { 
     enumerable: false,
     get (){
-      return hashMap(_cloneDeep(this.get()), function (posSize){
+      return hashMap(cloneDeep(this.get()), function (posSize){
         return {
           start: posSize[0],
           size : posSize[1],
@@ -120,19 +119,19 @@ Object.assign(BlockPrototype, {
       }
     }
     if(block instanceof Block){ 
-      this.$posSize = _cloneDeep(block.$posSize)
+      this.$posSize = cloneDeep(block.$posSize)
       //.. this.$sync    = this.$sync || block.$sync
       this.$space = this.$space || block.$space 
       this.$mask = this.$mask || block.$mask 
     } else {
-      this.$posSize = hashMap(_cloneDeep(block), function (posSize){ return !isArray(posSize) ? [posSize, 0] : posSize })
+      this.$posSize = hashMap(cloneDeep(block), function (posSize){ return !isArray(posSize) ? [posSize, 0] : posSize })
     }
     return this 
   },
   clone      : function (){ return new Block(this) },
   setPosition: function (value, sel){ var $posSize = get(this.$posSize, sel); if($posSize instanceof Array) $posSize[0] = value; return this },
   setSize    : function (value, sel){ var $posSize = get(this.$posSize, sel); if($posSize instanceof Array) $posSize[1] = value; return this },
-  get        : function (){ return _cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize) },
+  get        : function (){ return cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize) },
   conflicts  : function (otherBlocks, selector){
     return asArray(otherBlocks).reduce(function (red, block){
       var selectOtherBlock = get(block, selector)
@@ -162,7 +161,7 @@ Object.assign(BlockPrototype, {
   overflow    : function (mask){
     var blockPosSize  = this.get()
     var spaceDomain   = this.$space.domain
-    var overflowDomain = (mask && _cloneDeep(mask)) || (this.$space && this.$space.domain) || []
+    var overflowDomain = (mask && cloneDeep(mask)) || (this.$space && this.$space.domain) || []
     return hashMap(overflowDomain, function ($overflowSelected, sel){
       var $posSize = get(blockPosSize, sel)
       var $domain  = get(spaceDomain, sel)
@@ -191,7 +190,7 @@ Block.prototype = BlockPrototype
       
 const Tracker = function (space, domainMask){
   this.$space = space
-  this.$domainMask = hashMap(_cloneDeep(domainMask), function (mask, sel){
+  this.$domainMask = hashMap(cloneDeep(domainMask), function (mask, sel){
     if(typeof mask === "number") mask = [mask]
     if(mask instanceof Array){
       if(!mask[0]) mask[0] = 0
@@ -237,7 +236,7 @@ const Space = function (domain, range){
         this.$domain = domain
       },
       get (){
-        return hashMap(_cloneDeep(this.$domain), function (domain){
+        return hashMap(cloneDeep(this.$domain), function (domain){
           for(var i = 0, l = domain.length; i < l; i++) if(typeof domain[i] === "function") domain[i] = domain[i]()
           return domain
         })
@@ -253,7 +252,7 @@ const Space = function (domain, range){
         this.$range = range
       },
       get (){
-        return hashMap(_cloneDeep(this.$range), function (range){
+        return hashMap(cloneDeep(this.$range), function (range){
           for(var i = 0, l = range.length; i < l; i++) if(typeof range[i] === "function") range[i] = range[i]()
           return range
         })
