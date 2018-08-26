@@ -406,7 +406,7 @@
         break;
     }
   };
-  var cloneDeep = function cloneDeep(target) {
+  var cloneDeep$1 = function cloneDeep(target) {
     if (typeof target === "object") {
       var d;
 
@@ -435,7 +435,7 @@
     var dest = {};
     Object.keys(datum).forEach(function (key) {
       if (!/^\$/.test(key)) {
-        dest[key] = cloneDeep(datum[key]);
+        dest[key] = cloneDeep$1(datum[key]);
       }
     });
     return dest;
@@ -1759,7 +1759,7 @@
     return reverse ? r.reverse() : r;
   };
   var domainRangeValue = function domainRangeValue(domain, range, vs, nice, limit) {
-    return hashMap(cloneDeep(vs), function (v, sel) {
+    return hashMap(cloneDeep$1(vs), function (v, sel) {
       var $range = sel ? range[sel] : range;
       var $domain = sel ? domain[sel] : domain;
 
@@ -2167,6 +2167,8 @@
 
 
   var Block = function Block(posSize, syncOpt) {
+    var _this = this;
+
     Object.defineProperties(this, {
       $space: {
         enumerable: false,
@@ -2196,7 +2198,7 @@
       domainValue: {
         enumerable: true,
         get: function get$$1() {
-          return hashMap(cloneDeep(this.get()), function (posSize) {
+          return hashMap(cloneDeep(_this.get()), function (posSize) {
             return posSize[0];
           });
         }
@@ -2204,7 +2206,7 @@
       domainSize: {
         enumerable: true,
         get: function get$$1() {
-          return hashMap(cloneDeep(this.get()), function (posSize) {
+          return hashMap(cloneDeep(_this.get()), function (posSize) {
             return posSize[1];
           });
         }
@@ -2212,7 +2214,7 @@
       rangeStart: {
         enumerable: true,
         get: function get$$1() {
-          return this.$space.domainRange(hashMap(this.get(), function (posSize) {
+          return _this.$space.domainRange(hashMap(_this.get(), function (posSize) {
             return posSize[0];
           }));
         }
@@ -2220,7 +2222,7 @@
       rangeSize: {
         enumerable: true,
         get: function get$$1() {
-          return this.$space.domainRangeSize(hashMap(this.get(), function (posSize) {
+          return _this.$space.domainRangeSize(hashMap(_this.get(), function (posSize) {
             return posSize[1];
           }));
         }
@@ -2234,7 +2236,7 @@
     domainMap: {
       enumerable: false,
       get: function get$$1() {
-        return hashMap(cloneDeep(this.get()), function (posSize) {
+        return hashMap(cloneDeep$1(this.get()), function (posSize) {
           return {
             start: posSize[0],
             size: posSize[1],
@@ -2281,12 +2283,12 @@
       }
 
       if (block instanceof Block) {
-        this.$posSize = cloneDeep(block.$posSize); //.. this.$sync    = this.$sync || block.$sync
+        this.$posSize = cloneDeep$1(block.$posSize); //.. this.$sync    = this.$sync || block.$sync
 
         this.$space = this.$space || block.$space;
         this.$mask = this.$mask || block.$mask;
       } else {
-        this.$posSize = hashMap(cloneDeep(block), function (posSize) {
+        this.$posSize = hashMap(cloneDeep$1(block), function (posSize) {
           return !isArray(posSize) ? [posSize, 0] : posSize;
         });
       }
@@ -2307,7 +2309,7 @@
       return this;
     },
     get: function get$$1() {
-      return cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
+      return cloneDeep$1(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
     },
     conflicts: function conflicts(otherBlocks, selector) {
       return asArray(otherBlocks).reduce(function (red, block) {
@@ -2339,7 +2341,7 @@
     overflow: function overflow(mask) {
       var blockPosSize = this.get();
       var spaceDomain = this.$space.domain;
-      var overflowDomain = mask && cloneDeep(mask) || this.$space && this.$space.domain || [];
+      var overflowDomain = mask && cloneDeep$1(mask) || this.$space && this.$space.domain || [];
       return hashMap(overflowDomain, function ($overflowSelected, sel) {
         var $posSize = get(blockPosSize, sel);
         var $domain = get(spaceDomain, sel);
@@ -2378,7 +2380,7 @@
 
   var Tracker = function Tracker(space, domainMask) {
     this.$space = space;
-    this.$domainMask = hashMap(cloneDeep(domainMask), function (mask, sel) {
+    this.$domainMask = hashMap(cloneDeep$1(domainMask), function (mask, sel) {
       if (typeof mask === "number") mask = [mask];
 
       if (mask instanceof Array) {
@@ -2449,7 +2451,7 @@
           this.$domain = domain;
         },
         get: function get$$1() {
-          return hashMap(cloneDeep(this.$domain), function (domain) {
+          return hashMap(cloneDeep$1(this.$domain), function (domain) {
             for (var i = 0, l = domain.length; i < l; i++) {
               if (typeof domain[i] === "function") domain[i] = domain[i]();
             }
@@ -2471,7 +2473,7 @@
           this.$range = range$$1;
         },
         get: function get$$1() {
-          return hashMap(cloneDeep(this.$range), function (range$$1) {
+          return hashMap(cloneDeep$1(this.$range), function (range$$1) {
             for (var i = 0, l = range$$1.length; i < l; i++) {
               if (typeof range$$1[i] === "function") range$$1[i] = range$$1[i]();
             }
@@ -2536,7 +2538,7 @@
   };
 
   var putEditModel = function putEditModel(destModel, setModel) {
-    var putModel = cloneDeep(setModel);
+    var putModel = cloneDeep$1(setModel);
 
     Object.keys(destModel).forEach(function (key) {
       if (key !== EDITABLE_DEFAULT_KEY) {
@@ -2558,7 +2560,7 @@
         currentModelValues[key] = model[key];
       }
     });
-    return cloneDeep(currentModelValues);
+    return cloneDeep$1(currentModelValues);
   };
 
   var pushEditModel = function pushEditModel(model, pushModel) {
@@ -3141,7 +3143,7 @@
     var changeValue = function changeValue(watchman, newValue) {
       var countScope = watchman.$count;
 
-      var destOldValue = cloneDeep(newValue);
+      var destOldValue = cloneDeep$1(newValue);
 
       watchman.$setter.forEach(function (effect) {
         effect(newValue, watchman.$oldValue, countScope);
@@ -4698,7 +4700,7 @@
 
   ManualReactive.prototype = {
     beginAffect: function beginAffect(watchValue) {
-      this.effect(watchValue, cloneDeep(this.oldValue));
+      this.effect(watchValue, cloneDeep$1(this.oldValue));
       this.oldValue = watchValue;
     },
     digest: function digest() {
@@ -4765,7 +4767,7 @@
     toNumber: toNumber,
     cleanObject: cleanObject,
     clone: clone,
-    cloneDeep: cloneDeep,
+    cloneDeep: cloneDeep$1,
     free: free,
     removeValue: removeValue,
     instance: instance,

@@ -41,6 +41,8 @@
 
 
   var Block = function Block(posSize, syncOpt) {
+    var _this = this;
+
     Object.defineProperties(this, {
       $space: {
         enumerable: false,
@@ -70,7 +72,7 @@
       domainValue: {
         enumerable: true,
         get: function get() {
-          return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
+          return (0, _functions.hashMap)(cloneDeep(_this.get()), function (posSize) {
             return posSize[0];
           });
         }
@@ -78,7 +80,7 @@
       domainSize: {
         enumerable: true,
         get: function get() {
-          return (0, _functions.hashMap)((0, _cast.cloneDeep)(this.get()), function (posSize) {
+          return (0, _functions.hashMap)(cloneDeep(_this.get()), function (posSize) {
             return posSize[1];
           });
         }
@@ -86,7 +88,7 @@
       rangeStart: {
         enumerable: true,
         get: function get() {
-          return this.$space.domainRange((0, _functions.hashMap)(this.get(), function (posSize) {
+          return _this.$space.domainRange((0, _functions.hashMap)(_this.get(), function (posSize) {
             return posSize[0];
           }));
         }
@@ -94,7 +96,7 @@
       rangeSize: {
         enumerable: true,
         get: function get() {
-          return this.$space.domainRangeSize((0, _functions.hashMap)(this.get(), function (posSize) {
+          return _this.$space.domainRangeSize((0, _functions.hashMap)(_this.get(), function (posSize) {
             return posSize[1];
           }));
         }
