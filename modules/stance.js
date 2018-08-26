@@ -523,7 +523,6 @@
           return __ref.width;
         },
         set: function set(newValue) {
-          var oldValue = __ref.width;
           __ref.width = newValue;
           return newValue;
         }
@@ -534,7 +533,6 @@
           return __ref.height;
         },
         set: function set(newValue) {
-          var oldValue = __ref.height;
           __ref.height = newValue;
           return newValue;
         }
@@ -545,7 +543,6 @@
           return __ref.left;
         },
         set: function set(newValue) {
-          var oldValue = __ref.left;
           __ref.left = newValue;
           return newValue;
         }
@@ -556,7 +553,6 @@
           return __ref.top;
         },
         set: function set(newValue) {
-          var oldValue = __ref.top;
           __ref.top = newValue;
           return newValue;
         }

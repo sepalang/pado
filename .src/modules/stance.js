@@ -347,7 +347,6 @@ const Rect = function (left = 0, top = 0, width = 0, height = 0, meta = null){
       enumerable: true, 
       get (){ return __ref.width },
       set (newValue){
-        const oldValue = __ref.width
         __ref.width = newValue
         return newValue
       }
@@ -356,7 +355,6 @@ const Rect = function (left = 0, top = 0, width = 0, height = 0, meta = null){
       enumerable: true, 
       get (){ return __ref.height },
       set (newValue){
-        const oldValue = __ref.height
         __ref.height = newValue
         return newValue
       }
@@ -364,7 +362,6 @@ const Rect = function (left = 0, top = 0, width = 0, height = 0, meta = null){
     left: { enumerable: true,
       get (){ return __ref.left },
       set (newValue){
-        const oldValue = __ref.left
         __ref.left = newValue
         return newValue
       }
@@ -372,7 +369,6 @@ const Rect = function (left = 0, top = 0, width = 0, height = 0, meta = null){
     top: { enumerable: true,
       get (){ return __ref.top },
       set (newValue){
-        const oldValue = __ref.top
         __ref.top = newValue
         return newValue
       }
