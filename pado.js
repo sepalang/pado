@@ -517,7 +517,7 @@
     return rn;
   }; // TODO
 
-  /*
+  
   const syncData = (function (){
     const ENTER_HOOK  = (newDatum)=>Object.assign({}, newDatum)
     const UPDATE_HOOK = (oldDatum, newDatum)=>Object.assign({}, oldDatum, newDatum)
@@ -607,7 +607,7 @@
       return result
     }
   }())
-  */
+  
 
   var keys = function keys(target, filterExp, strict) {
     var result = [];
