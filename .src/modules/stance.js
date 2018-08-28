@@ -553,18 +553,22 @@ Rect.prototype = {
     
     return diffResult
   },
+  fitRatio (rect){
+    if(typeof rect !== "object"){ throw new Error("fit::argument[0] is not object"); }
+    const { width, height } = rect;
+    
+    if(!isNumber(width) || !isNumber(height)){ throw new Error("fit::argument[0] is not { width:Number, height:Number }"); }
+    const WHRatio = [ width / this.width, height / this.height ];
+    const transformRatio = WHRatio.sort()[0];
+    return transformRatio;
+  },
   fit (rect){
-    if(typeof rect !== "object"){ throw new Error("fit::argument[0] is not object") }
-    const { width, height } = rect
+    const transformRatio = this.fitRatio(rect);
     
-    if(!isNumber(width) || !isNumber(height)){ throw new Error("fit::argument[0] is not { width:Number, height:Number }") }
-    const WHRatio = [ width / this.width, height / this.height ]
-    const transformRatio = WHRatio.sort()[0]
+    this.width = (this.width * transformRatio) || 0;
+    this.height = (this.height * transformRatio) || 0;
     
-    this.width = (this.width * transformRatio) || 0
-    this.height = (this.height * transformRatio) || 0
-    
-    return this
+    return this;
   },
   //TODO : incompleted sticky(parent, position, offset);
   sticky ({left:refX, top:refY, width:refWidth, height:refHeight}, position = "bottom left"){
