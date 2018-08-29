@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.hashMap = _exports.times = _exports.all = void 0;
+  _exports.pairs = _exports.hashMap = _exports.times = _exports.all = void 0;
 
   var all = function all(data, fn) {
     data = (0, _cast.asArray)(data);
@@ -57,5 +57,21 @@
   };
 
   _exports.hashMap = hashMap;
+
+  var pairs = function pairs(inputArr, fn) {
+    var result = [];
+
+    for (var i = 0, l = inputArr.length; i < l; i++) {
+      for (var ai = 0, al = l; ai < al; i !== ai && result.push([inputArr[i], inputArr[ai]]), ai++) {
+        ;
+      }
+    }
+
+    return typeof fn === "function" ? result.map(function (applyArgs) {
+      return fn.apply(undefined, applyArgs);
+    }) : result;
+  };
+
+  _exports.pairs = pairs;
 });
 //# sourceMappingURL=enumerable.js.map

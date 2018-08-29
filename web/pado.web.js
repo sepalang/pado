@@ -1380,7 +1380,7 @@
       });
       return diffResult;
     },
-    fit: function fit(rect) {
+    fitRatio: function fitRatio(rect) {
       if (typeof rect !== "object") {
         throw new Error("fit::argument[0] is not object");
       }
@@ -1394,6 +1394,10 @@
 
       var WHRatio = [width / this.width, height / this.height];
       var transformRatio = WHRatio.sort()[0];
+      return transformRatio;
+    },
+    fit: function fit(rect) {
+      var transformRatio = this.fitRatio(rect);
       this.width = this.width * transformRatio || 0;
       this.height = this.height * transformRatio || 0;
       return this;

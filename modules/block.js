@@ -72,7 +72,7 @@
       domainValue: {
         enumerable: true,
         get: function get() {
-          return (0, _functions.hashMap)(cloneDeep(_this.get()), function (posSize) {
+          return (0, _functions.hashMap)((0, _cast.cloneDeep)(_this.get()), function (posSize) {
             return posSize[0];
           });
         }
@@ -80,7 +80,7 @@
       domainSize: {
         enumerable: true,
         get: function get() {
-          return (0, _functions.hashMap)(cloneDeep(_this.get()), function (posSize) {
+          return (0, _functions.hashMap)((0, _cast.cloneDeep)(_this.get()), function (posSize) {
             return posSize[1];
           });
         }
