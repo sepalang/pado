@@ -7,12 +7,12 @@ export const isNone = function (data){
   return isAbsoluteNaN(data) || data === undefined || data === null
 }
 
-export const isNumber = function (it){
-  return (typeof it === "number" && !isAbsoluteNaN(it))
-}
-
 export const isInfinity = function (it){
   return it === Number.POSITIVE_INFINITY || it === Number.NEGATIVE_INFINITY
+}
+
+export const isNumber = function (it){
+  return (typeof it === "number" && !isInfinity(it) && !isAbsoluteNaN(it))
 }
 
 export const isInteger = function (value){

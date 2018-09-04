@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.likePromise = _exports.notExsist = _exports.isExsist = _exports.eqeq = _exports.likeEqual = _exports.isEqual = _exports.eqof = _exports.likeRegexp = _exports.isPresence = _exports.isEmpty = _exports.isNode = _exports.isEnumerableObject = _exports.isPlainObject = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isInfinity = _exports.isNumber = _exports.isNone = _exports.isAbsoluteNaN = void 0;
+  _exports.likePromise = _exports.notExsist = _exports.isExsist = _exports.eqeq = _exports.likeEqual = _exports.isEqual = _exports.eqof = _exports.likeRegexp = _exports.isPresence = _exports.isEmpty = _exports.isNode = _exports.isEnumerableObject = _exports.isPlainObject = _exports.likeArray = _exports.likeNumber = _exports.likeString = _exports.likeObject = _exports.isFunction = _exports.isObject = _exports.isArray = _exports.isInteger = _exports.isNumber = _exports.isInfinity = _exports.isNone = _exports.isAbsoluteNaN = void 0;
 
   var isAbsoluteNaN = function isAbsoluteNaN(it) {
     // eslint-disable-next-line no-self-compare
@@ -31,17 +31,17 @@
 
   _exports.isNone = isNone;
 
-  var isNumber = function isNumber(it) {
-    return typeof it === "number" && !isAbsoluteNaN(it);
-  };
-
-  _exports.isNumber = isNumber;
-
   var isInfinity = function isInfinity(it) {
     return it === Number.POSITIVE_INFINITY || it === Number.NEGATIVE_INFINITY;
   };
 
   _exports.isInfinity = isInfinity;
+
+  var isNumber = function isNumber(it) {
+    return typeof it === "number" && !isInfinity(it) && !isAbsoluteNaN(it);
+  };
+
+  _exports.isNumber = isNumber;
 
   var isInteger = function isInteger(value) {
     //NaN, null, undefined

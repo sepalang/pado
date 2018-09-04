@@ -215,8 +215,11 @@
   var isNone = function isNone(data) {
     return isAbsoluteNaN(data) || data === undefined || data === null;
   };
+  var isInfinity = function isInfinity(it) {
+    return it === Number.POSITIVE_INFINITY || it === Number.NEGATIVE_INFINITY;
+  };
   var isNumber = function isNumber(it) {
-    return typeof it === "number" && !isAbsoluteNaN(it);
+    return typeof it === "number" && !isInfinity(it) && !isAbsoluteNaN(it);
   };
   var isArray = function isArray(data) {
     return Array.isArray(data) || data instanceof Array;
