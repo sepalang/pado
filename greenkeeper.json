@@ -1,0 +1,12 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        ".util/recipe/vue/package.json",
+        ".util/sample/web/package.json",
+        ".util/storybook/package.json",
+        "package.json"
+      ]
+    }
+  }
+}
