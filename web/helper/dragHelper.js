@@ -1,26 +1,24 @@
+require("core-js/modules/es6.array.find");
+
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "jquery", "../../functions"], factory);
+    define(["exports", "../finder", "../../functions"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("jquery"), require("../../functions"));
+    factory(exports, require("../finder"), require("../../functions"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.jquery, global.functions);
+    factory(mod.exports, global.finder, global.functions);
     global.dragHelper = mod.exports;
   }
-})(this, function (_exports, _jquery, _functions) {
+})(this, function (_exports, _finder, _functions) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
   _exports.default = DragHelper;
-  _jquery = _interopRequireDefault(_jquery);
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
   // eslint-disable-next-line no-undef
   var DEVICE_EVENT = 'ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch ? {
     TOUCH_DEVICE: true,
@@ -86,8 +84,7 @@
   };
 
   function DragHelper(element, option) {
-    var $element = (0, _jquery.default)(element).eq(0);
-    var dragElement = $element[0];
+    element = (0, _finder.find)(element, 0);
     var startFn;
     var moveFn;
     var endFn;
@@ -97,7 +94,7 @@
 
     var resetOptions = function resetOptions() {
       var getOptions = (0, _functions.rebase)(typeof option === "function" ? option({
-        element: $element
+        element: element
       }) : option);
       startFn = getOptions["start"];
       moveFn = getOptions["move"];
@@ -124,7 +121,7 @@
       //init
       resetOptions(); //
 
-      var elementOffset = $element.predict();
+      var elementOffset = (0, _finder.predict)(element);
       var pointerDrag = pointerParse(originalEvent);
       firstDrag = pointerDrag;
       lastDrag = pointerDrag;
@@ -166,11 +163,11 @@
       bindDraggingAttribute();
     };
 
-    dragElement.addEventListener("dragstart", function (e) {
+    element.addEventListener("dragstart", function (e) {
       e.preventDefault();
     });
-    dragElement.addEventListener(DEVICE_EVENT.START, dragEnter);
-    return $element;
+    element.addEventListener(DEVICE_EVENT.START, dragEnter);
+    return element;
   }
 });
 //# sourceMappingURL=dragHelper.js.map
