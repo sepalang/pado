@@ -1,0 +1,75 @@
+version: 2
+
+defaults: &defaults
+  working_directory: ~/project/pado
+  docker:
+    - image: labeldock/circleci-node:8.11
+
+jobs:
+  initialize:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: npm module
+          command: npm install
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - pado
+
+  test-functions:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: TEST
+          command: npm run test:functions
+
+  test-modules:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: TEST
+          command: npm run test:modules
+
+  test-web:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: TEST
+          command: npm run test:web
+
+  build:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: COMPILE
+          command: npm run build
+
+workflows:
+  version: 2
+  task:
+    jobs:
+      - initialize
+      - test-functions
+          requires:
+            - initialize
+      - test-modules
+          requires:
+            - initialize
+      - test-web
+          requires:
+            - initialize
+      - build
+          requires:
+            - test-functions
+            - test-modules
+            - test-web
