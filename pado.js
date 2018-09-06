@@ -81,11 +81,11 @@
   var isNone = function isNone(data) {
     return isAbsoluteNaN(data) || data === undefined || data === null;
   };
-  var isNumber = function isNumber(it) {
-    return typeof it === "number" && !isAbsoluteNaN(it);
-  };
   var isInfinity = function isInfinity(it) {
     return it === Number.POSITIVE_INFINITY || it === Number.NEGATIVE_INFINITY;
+  };
+  var isNumber = function isNumber(it) {
+    return typeof it === "number" && !isInfinity(it) && !isAbsoluteNaN(it);
   };
   var isInteger = function isInteger(value) {
     //NaN, null, undefined
@@ -4754,8 +4754,8 @@
     diffStructure: diffStructure,
     isAbsoluteNaN: isAbsoluteNaN,
     isNone: isNone,
-    isNumber: isNumber,
     isInfinity: isInfinity,
+    isNumber: isNumber,
     isInteger: isInteger,
     isArray: isArray,
     isObject: isObject,
