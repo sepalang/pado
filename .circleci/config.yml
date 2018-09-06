@@ -59,16 +59,16 @@ workflows:
   task:
     jobs:
       - initialize
-      - test-functions
+      - test-functions:
           requires:
             - initialize
-      - test-modules
+      - test-modules:
           requires:
             - initialize
-      - test-web
+      - test-web:
           requires:
             - initialize
-      - build
+      - build:
           requires:
             - test-functions
             - test-modules
