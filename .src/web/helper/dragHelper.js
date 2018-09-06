@@ -1,4 +1,4 @@
-import $ from '../plugins/jquery'
+import $ from 'jquery'
 import { rebase } from '../../functions'
 
 // eslint-disable-next-line no-undef

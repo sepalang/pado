@@ -1,8 +1,8 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "../plugins/jquery", "../../functions"], factory);
+    define(["exports", "jquery", "../../functions"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("../plugins/jquery"), require("../../functions"));
+    factory(exports, require("jquery"), require("../../functions"));
   } else {
     var mod = {
       exports: {}
