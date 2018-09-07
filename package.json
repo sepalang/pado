@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/pado",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -20,10 +20,10 @@
     "report:modules": "madge .src/modules/index.js --image .util/report/modules.report.png",
     "report:functions": "madge .src/functions/index.js --image .util/report/functions.report.png",
     "report": "npm run report:index & npm run report:pado & npm run report:modules & npm run report:functions",
-    "test:functions": "padoc --test .src/functions --verbose",
-    "test:modules": "padoc --test .src/modules --verbose",
-    "test:web": "padoc --test .src/web --verbose",
-    "test": "padoc --test .src --verbose",
+    "test:functions": "testpad .src/functions --verbose",
+    "test:modules": "testpad .src/modules --verbose",
+    "test:web": "testpad .src/web --verbose",
+    "test": "testpad .src --verbose",
     "pack:a": "padoc --pack '.util/fnpack/case-a/*.js' .util/fnpack/case-a/packed -m es",
     "pack:b": "padoc --pack '.util/fnpack/case-b/*.js' .util/fnpack/case-b/packed -m es",
     "repl": "padoc --exec .util/repl/index.js -i -g",
@@ -38,9 +38,9 @@
   ],
   "devDependencies": {
     "@sepalang/lintpad": "^0.0.10",
-    "@sepalang/padoc": "^0.8.18",
+    "@sepalang/testpad": "0.0.2",
+    "@sepalang/padoc": "^0.9.4",
     "madge": "^3.1.1",
     "rimraf": "^2.6.2"
-  },
-  "dependencies": {}
+  }
 }
