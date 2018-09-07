@@ -39,21 +39,6 @@ export const getKeyBy = function (object, value){
   }
 }
 
-export const clearOf = function (data, fillFn, sp){
-  if(data instanceof Array){
-    sp = Array.prototype.splice.call(data, 0, data.length)
-  } else if(typeof data == "object"){
-    sp = {}
-    for(var key in data){ sp[key] = data[key]; delete data[key] } 
-  }
-  return (fillFn && fillFn(data, sp)), data
-}
-
-export const insertOf = function (data, v, a){
-  isArray(data) && data.splice(typeof a === "number" ? a : 0, 0, v)
-  return data
-}
-
 export const moveOf = function (data, oldIndex, newIndex){
   if(oldIndex !== newIndex && isArray(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length){
     Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0])
@@ -85,6 +70,21 @@ export const filterOf = function (data, func, exitFn){
     }
   }
   
+  return data
+}
+
+export const clearOf = function (data, fillFn, sp){
+  if(data instanceof Array){
+    sp = Array.prototype.splice.call(data, 0, data.length)
+  } else if(typeof data == "object"){
+    sp = {}
+    for(var key in data){ sp[key] = data[key]; delete data[key] } 
+  }
+  return (fillFn && fillFn(data, sp)), data
+}
+
+export const insertOf = function (data, v, a){
+  isArray(data) && data.splice(typeof a === "number" ? a : 0, 0, v)
   return data
 }
 
