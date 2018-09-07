@@ -1,2 +1,2 @@
 export * from './easy.js';
-export * from './finder.js';
+export * from './query-finder.js';

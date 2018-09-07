@@ -1,4 +1,4 @@
-import { find, predict } from "../finder";
+import { queryFind, predict } from "../finder";
 import { rebase } from '../../functions';
 
 // eslint-disable-next-line no-undef
@@ -62,7 +62,7 @@ const pointerParse = ({ clientX, clientY, touches })=>{
 }
 
 export default function DragHelper (element, option){
-  element = find(element, 0);
+  element = queryFind(element, 0);
   
   let startFn
   let moveFn

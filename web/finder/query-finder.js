@@ -8,7 +8,7 @@
       exports: {}
     };
     factory(mod.exports, global.es6Array, global.webDom, global.functions, global.cast, global.isLike, global.querySelector);
-    global.finder = mod.exports;
+    global.queryFinder = mod.exports;
   }
 })(this, function (_exports, _es6Array, _webDom, _functions, _cast, _isLike, _querySelector) {
   "use strict";
@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.findMember = _exports.find = void 0;
+  _exports.queryFindMember = _exports.queryFind = void 0;
 
   var findLite = function findLite(find) {
     if (typeof find === 'string') {
@@ -73,8 +73,7 @@
     }
 
     return [];
-  }; //다수의 로트와 샐렉터를 받고 출력
-
+  };
 
   var findBySeveralPlaces = function findBySeveralPlaces(find, root) {
     if (arguments.length === 1 || typeof root === 'undefined' || root === null || root === W.document) return findLite(find); // find root
@@ -97,16 +96,15 @@
     }
 
     return (0, _functions.unique)(result);
-  }; //최적화 분기하여 샐랙터를 실행시킴
-
-
-  var find = function find(_find, root, eq) {
-    return typeof root === "number" ? findLite(_find)[root] : typeof eq === "number" ? findBySeveralPlaces(_find, root)[eq] : findBySeveralPlaces(_find, root);
   };
 
-  _exports.find = find;
+  var queryFind = function queryFind(find, root, eq) {
+    return typeof root === "number" ? findLite(find)[root] : typeof eq === "number" ? findBySeveralPlaces(find, root)[eq] : findBySeveralPlaces(find, root);
+  };
 
-  var findMember = function findMember(sel, offset) {
+  _exports.queryFind = queryFind;
+
+  var queryFindMember = function queryFindMember(sel, offset) {
     var target = findLite(sel)[0];
     if (!(0, _isLike.isNode)(target)) return;
     if (typeof offset !== "number") return (0, _cast.toArray)(target.parentElement.children);
@@ -120,42 +118,6 @@
     return target.parentNode.children[currentIndex + offset];
   };
 
-  _exports.findMember = findMember;
-
-  var getCurrentTarget = function getCurrentTarget(originalEvent, fallbackElement) {
-    var result = originalEvent.currentTarget || originalEvent.target;
-    return result && result.documentElement ? fallbackElement || result.documentElement : document.documentElement;
-  };
-
-  var isElementEvent = function isElementEvent(e) {
-    return typeof e.stopPropagation === "function";
-  };
-
-  var getElementPosition = function getElementPosition(el) {
-    var element = find(el, 0);
-    if (!element) return null;
-    var xPosition = 0;
-    var yPosition = 0;
-
-    while (element && !element.documentElement) {
-      xPosition += element.offsetLeft - element.scrollLeft + element.clientLeft;
-      yPosition += element.offsetTop - element.scrollTop + element.clientTop;
-      element = element.offsetParent;
-    }
-
-    return {
-      x: xPosition,
-      y: yPosition
-    };
-  };
-
-  var getPointerPosition = $.getPointerPosition = function (e, root) {
-    root = !root ? document.documentElement : root;
-    var pos = getElementPosition(root);
-    if (!pos) return;
-    pos.x = (e.touches ? e.targetTouches[0].pageX : e.pageX) - pos.x;
-    pos.y = (e.touches ? e.targetTouches[0].pageY : e.pageY) - pos.y;
-    return pos;
-  };
+  _exports.queryFindMember = queryFindMember;
 });
-//# sourceMappingURL=finder.js.map
+//# sourceMappingURL=query-finder.js.map

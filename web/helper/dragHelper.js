@@ -1,5 +1,3 @@
-require("core-js/modules/es6.array.find");
-
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "../finder", "../../functions"], factory);
@@ -84,7 +82,7 @@ require("core-js/modules/es6.array.find");
   };
 
   function DragHelper(element, option) {
-    element = (0, _finder.find)(element, 0);
+    element = (0, _finder.queryFind)(element, 0);
     var startFn;
     var moveFn;
     var endFn;

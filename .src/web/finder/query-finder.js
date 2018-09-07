@@ -47,7 +47,7 @@ const findByOnePlace = function(findse,rootNode){
   }
   return [];
 };
-//다수의 로트와 샐렉터를 받고 출력
+
 const findBySeveralPlaces = function(find,root){
   if(arguments.length === 1 || typeof root === 'undefined' || root === null || root === W.document ) return findLite(find);
   // find root
@@ -67,14 +67,13 @@ const findBySeveralPlaces = function(find,root){
   return unique(result);
 };
 
-//최적화 분기하여 샐랙터를 실행시킴
-export const find = function(find,root,eq){
+const queryFind = function(find,root,eq){
   return (typeof root === "number") ? findLite(find)[root] :
   (typeof eq === "number")   ? findBySeveralPlaces(find,root)[eq] :
   findBySeveralPlaces(find,root);
 };
 
-export const findMember = function(sel,offset){
+const queryFindMember = function(sel,offset){
   var target = findLite(sel)[0];
   if(!isNode(target)) return;
   if(typeof offset !== "number") return toArray(target.parentElement.children);
@@ -83,42 +82,7 @@ export const findMember = function(sel,offset){
   return target.parentNode.children[currentIndex+offset];
 };
 
-const getCurrentTarget = function (originalEvent, fallbackElement){
-  let result = originalEvent.currentTarget || originalEvent.target
-  return (result && result.documentElement) ? (fallbackElement || result.documentElement) : document.documentElement
-}
-
-const isElementEvent = function (e){
-  return typeof e.stopPropagation === "function"
-}
-
-const getElementPosition = function (el){
-  let element = find(el, 0);
-  
-  if(!element) return null
-  
-  let xPosition = 0
-  let yPosition = 0
-  
-  while(element && !element.documentElement){
-    xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft)
-    yPosition += (element.offsetTop - element.scrollTop + element.clientTop)
-    element = element.offsetParent
-  }
-  
-  return {x: xPosition, y: yPosition}
-}
-
-
-const getPointerPosition = $.getPointerPosition = function (e, root){
-  root = !root ? document.documentElement : root
-
-  const pos = getElementPosition(root)
-  
-  if(!pos) return
-  
-  pos.x = (e.touches ? e.targetTouches[0].pageX : e.pageX) - pos.x
-  pos.y = (e.touches ? e.targetTouches[0].pageY : e.pageY) - pos.y
-  
-  return pos
+export {
+  queryFind,
+  queryFindMember
 }
