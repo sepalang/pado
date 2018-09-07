@@ -38,7 +38,7 @@
   ],
   "devDependencies": {
     "@sepalang/lintpad": "^0.1.0",
-    "@sepalang/padoc": "^0.8.18",
+    "@sepalang/padoc": "^0.9.1",
     "madge": "^3.1.1",
     "rimraf": "^2.6.2"
   },
