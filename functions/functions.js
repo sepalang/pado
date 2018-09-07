@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.diffStructure = _exports.rebase = _exports.sortOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.insertOf = _exports.clearOf = _exports.getKeyBy = _exports.unique = void 0;
+  _exports.diffStructure = _exports.rebase = _exports.sortOf = _exports.insertOf = _exports.clearOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.getKeyBy = _exports.unique = void 0;
 
   var unique = function unique(array, findKey) {
     var result = [];
@@ -67,30 +67,6 @@
 
   _exports.getKeyBy = getKeyBy;
 
-  var clearOf = function clearOf(data, fillFn, sp) {
-    if (data instanceof Array) {
-      sp = Array.prototype.splice.call(data, 0, data.length);
-    } else if (typeof data == "object") {
-      sp = {};
-
-      for (var key in data) {
-        sp[key] = data[key];
-        delete data[key];
-      }
-    }
-
-    return fillFn && fillFn(data, sp), data;
-  };
-
-  _exports.clearOf = clearOf;
-
-  var insertOf = function insertOf(data, v, a) {
-    (0, _isLike.isArray)(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
-    return data;
-  };
-
-  _exports.insertOf = insertOf;
-
   var moveOf = function moveOf(data, oldIndex, newIndex) {
     if (oldIndex !== newIndex && (0, _isLike.isArray)(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
       Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
@@ -133,6 +109,30 @@
   };
 
   _exports.filterOf = filterOf;
+
+  var clearOf = function clearOf(data, fillFn, sp) {
+    if (data instanceof Array) {
+      sp = Array.prototype.splice.call(data, 0, data.length);
+    } else if (typeof data == "object") {
+      sp = {};
+
+      for (var key in data) {
+        sp[key] = data[key];
+        delete data[key];
+      }
+    }
+
+    return fillFn && fillFn(data, sp), data;
+  };
+
+  _exports.clearOf = clearOf;
+
+  var insertOf = function insertOf(data, v, a) {
+    (0, _isLike.isArray)(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
+    return data;
+  };
+
+  _exports.insertOf = insertOf;
 
   var sortOf = function sortOf(data, filter) {
     if (data.length == 0) {

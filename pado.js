@@ -1234,24 +1234,6 @@
       }
     }
   };
-  var clearOf = function clearOf(data, fillFn, sp) {
-    if (data instanceof Array) {
-      sp = Array.prototype.splice.call(data, 0, data.length);
-    } else if (typeof data == "object") {
-      sp = {};
-
-      for (var key in data) {
-        sp[key] = data[key];
-        delete data[key];
-      }
-    }
-
-    return fillFn && fillFn(data, sp), data;
-  };
-  var insertOf = function insertOf(data, v, a) {
-    isArray(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
-    return data;
-  };
   var moveOf = function moveOf(data, oldIndex, newIndex) {
     if (oldIndex !== newIndex && isArray(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
       Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
@@ -1284,6 +1266,24 @@
       }
     }
 
+    return data;
+  };
+  var clearOf = function clearOf(data, fillFn, sp) {
+    if (data instanceof Array) {
+      sp = Array.prototype.splice.call(data, 0, data.length);
+    } else if (typeof data == "object") {
+      sp = {};
+
+      for (var key in data) {
+        sp[key] = data[key];
+        delete data[key];
+      }
+    }
+
+    return fillFn && fillFn(data, sp), data;
+  };
+  var insertOf = function insertOf(data, v, a) {
+    isArray(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
     return data;
   };
   var sortOf = function sortOf(data, filter) {
@@ -4744,11 +4744,11 @@
   var functions = /*#__PURE__*/Object.freeze({
     unique: unique,
     getKeyBy: getKeyBy,
-    clearOf: clearOf,
-    insertOf: insertOf,
     moveOf: moveOf,
     concatOf: concatOf,
     filterOf: filterOf,
+    clearOf: clearOf,
+    insertOf: insertOf,
     sortOf: sortOf,
     rebase: rebase,
     diffStructure: diffStructure,
