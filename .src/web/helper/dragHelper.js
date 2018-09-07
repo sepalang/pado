@@ -1,5 +1,5 @@
-import $ from '../plugins/jquery'
-import { rebase } from '../../functions'
+import { find, predict } from "../finder";
+import { rebase } from '../../functions';
 
 // eslint-disable-next-line no-undef
 const DEVICE_EVENT = (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch)
@@ -62,8 +62,8 @@ const pointerParse = ({ clientX, clientY, touches })=>{
 }
 
 export default function DragHelper (element, option){
-  const $element = $(element).eq(0)
-  const [ dragElement ] = $element
+  element = find(element, 0);
+  
   let startFn
   let moveFn
   let endFn
@@ -73,7 +73,7 @@ export default function DragHelper (element, option){
   let lastDrag   = null
   
   const resetOptions = function (){
-    const getOptions = rebase(typeof option === "function" ? option({ element: $element }) : option)
+    const getOptions = rebase(typeof option === "function" ? option({ element }) : option)
     startFn = getOptions["start"]
     moveFn = getOptions["move"]
     endFn = getOptions["end"]
@@ -105,7 +105,7 @@ export default function DragHelper (element, option){
     resetOptions()
     
     //
-    const elementOffset = $element.predict()
+    const elementOffset = predict(element);
     const pointerDrag   = pointerParse(originalEvent)
     
     firstDrag = pointerDrag
@@ -150,11 +150,11 @@ export default function DragHelper (element, option){
     bindDraggingAttribute()
   }
   
-  dragElement.addEventListener("dragstart", function (e){
+  element.addEventListener("dragstart", function (e){
     e.preventDefault()
   })
   
-  dragElement.addEventListener(DEVICE_EVENT.START, dragEnter)
+  element.addEventListener(DEVICE_EVENT.START, dragEnter)
   
-  return $element
+  return element
 }

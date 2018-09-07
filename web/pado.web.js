@@ -235,14 +235,11 @@
   var likeArray = function likeArray(item) {
     return Array.isArray(item) || item !== null && typeof item === "object" && item.hasOwnProperty("length") && typeof item.length === "number" && item.length > 0;
   };
-  var isPlainObject = function isPlainObject(data) {
-    return typeof data === "object" && data.constructor === Object;
-  };
-  var isNode = function isNode(a) {
+  var isNode$1 = function isNode(a) {
     return isObject(a) && typeof a.nodeType === "number";
   };
 
-  var asArray = function asArray(data, defaultArray) {
+  var asArray$1 = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
       defaultArray = undefined;
     }
@@ -259,6 +256,13 @@
       return data.toArray();
     }
 
+    return [data];
+  };
+  var toArray = function toArray(data, option) {
+    if (typeof data === "undefined" || data === null || isAbsoluteNaN(data)) return [];
+    if (isArray(data)) return Array.prototype.slice.call(data);
+    if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
+    if (typeof data === "string" && typeof option === "string") return data.split(option);
     return [data];
   };
 
@@ -437,7 +441,7 @@
     var MatrixArray = function MatrixArray(data, column, row) {
       var _this = this;
 
-      asArray(data).forEach(function (datum) {
+      asArray$1(data).forEach(function (datum) {
         _this.push(datum);
       });
       Object.defineProperties(this, {
@@ -740,7 +744,7 @@
       }
     },
     vertexWith: function vertexWith(destPoint) {
-      var points = asArray(destPoint);
+      var points = asArray$1(destPoint);
       points.unshift(this);
       return new Vertex(points);
     },
@@ -827,7 +831,7 @@
       }
     });
     this.meta = meta;
-    asArray(pointArray).forEach(function (point) {
+    asArray$1(pointArray).forEach(function (point) {
       if (!likePoint(point)) return;
       var x = point.x,
           y = point.y,
@@ -1076,7 +1080,7 @@
     //splitCount [ horizental, vertical ]
     //1 = [ 1 ]
     //[1, 2] = [1, 2]
-    var _asArray = asArray(split),
+    var _asArray = asArray$1(split),
         columnOrder = _asArray[0],
         rowOrder = _asArray[1];
 
@@ -1484,7 +1488,7 @@
 
   var getNode = function getNode(el) {
     var select = likeArray(el) ? el[0] : el;
-    return isNode(select) ? select : undefined;
+    return isNode$1(select) ? select : undefined;
   };
   var isElement = function isElement(el) {
     return el instanceof Element;
@@ -1630,6 +1634,32 @@
     });
   };
 
+  var unique = function unique(array, findKey) {
+    var result = [];
+    var uniqueSet = new Set();
+
+    if (typeof findKey === "undefined") {
+      findKey = function findKey(v) {
+        return v;
+      };
+    }
+
+    if (typeof findKey === "string") {
+      var keyPath = findKey;
+
+      findKey = function findKey(v) {
+        return v[keyPath];
+      };
+    }
+
+    array.forEach(function (v) {
+      var key = findKey(v);
+      if (uniqueSet.has(key)) return;
+      uniqueSet.add(key);
+      result.push(v);
+    });
+    return result;
+  };
   var rebase = function rebase(obj, ref) {
     var result = {};
 
@@ -1643,7 +1673,7 @@
           if (typeof refValue === "function") {
             result[refKey] = obj[key];
           } else {
-            if (typeof refValue !== "object" && typeof refValue !== "object" || isNode(refValue)) {
+            if (typeof refValue !== "object" && typeof refValue !== "object" || isNode$1(refValue)) {
               result[refKey] = refValue;
             } else {
               result[refKey] = Object.assign(result[refKey], refValue);
@@ -1657,7 +1687,7 @@
           if (typeof obj[key] === "function") {
             result[deepKey] = obj[key];
           } else {
-            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode(obj[key])) {
+            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode$1(obj[key])) {
               result[deepKey] = obj[key];
             } else {
               result[deepKey] = Object.assign(result[deepKey] || (isArray(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
@@ -1668,7 +1698,7 @@
         if (typeof obj[key] === "function") {
           result[key] = obj[key];
         } else {
-          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || isNode(obj[key])) {
+          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || isNode$1(obj[key])) {
             result[key] = obj[key];
           } else {
             result[key] = Object.assign(result[key], obj[key]);
@@ -2144,21 +2174,232 @@
     return new SVGBuilder();
   };
 
-  var $ = require('jquery');
+  var predict = function predict(container, option, root) {
+    var element = nodeList(container, 0);
+    if (!isNode(element)) return;
 
-  var getCurrentTarget = function getCurrentTarget(originalEvent, fallbackElement) {
-    var result = originalEvent.currentTarget || originalEvent.target;
-    return result && result.documentElement ? fallbackElement || result.documentElement : document.documentElement;
+    var _ref = element["innerWidth"] ? {
+      offsetTop: 0,
+      offsetLeft: 0,
+      offsetWidth: window.innerWidth,
+      offsetHeight: window.innerHeight
+    } : element,
+        offsetTop = _ref.offsetTop,
+        offsetLeft = _ref.offsetLeft,
+        offsetWidth = _ref.offsetWidth,
+        offsetHeight = _ref.offsetHeight;
+
+    var result = {
+      top: offsetTop,
+      left: offsetLeft,
+      width: offsetWidth,
+      height: offsetHeight,
+      right: offsetLeft + offsetWidth,
+      bottom: offsetTop + offsetHeight,
+      center: offsetLeft + offsetWidth / 2,
+      middle: offsetTop + offsetHeight / 2 //if(isElementEvent(option)){
+      //  const { x:left, y:top } = getPointerPosition(offset);
+      //  option = { left, top };
+      //}
+
+    };
+
+    if (isPlainObject(option)) {
+      //console.log("option,",option)
+      var allProps = ["top", "left", "width", "height", "right", "bottom", "center", "middle"].filter(function (key) {
+        return option.hasOwnProperty(key);
+      }); //event option
+
+      allProps.forEach(function (key) {
+        var optionOfKey = option[key];
+        if (!isElementEvent(optionOfKey)) return;
+        var pointerPosition = getPointerPosition(optionOfKey, root || getCurrentTarget(optionOfKey, element) || element);
+        if (!pointerPosition) return;
+
+        if (/left|width|right|center/.test(key)) {
+          option[key] = pointerPosition["x"];
+        }
+
+        if (/top|middle|bottom|height/.test(key)) {
+          option[key] = pointerPosition["y"];
+        }
+      });
+      allProps.forEach(function (key) {
+        if (typeof option[key] !== "number") return;
+        var valueOfKey = result[key];
+        var equalize;
+
+        switch (key) {
+          case "top":
+          case "middle":
+            equalize = ["y", option[key] - valueOfKey];
+            break;
+
+          case "left":
+          case "center":
+            equalize = ["x", option[key] - valueOfKey];
+            break;
+
+          case "width":
+            equalize = ["width", option[key] - valueOfKey];
+            break;
+
+          case "height":
+            equalize = ["height", option[key] - valueOfKey];
+            break;
+
+          case "right":
+            break;
+
+          case "bottom":
+            break;
+        }
+
+        switch (equalize && equalize[0]) {
+          case "x":
+            result["left"] += equalize[1];
+            result["center"] += equalize[1];
+            result["right"] += equalize[1];
+            break;
+
+          case "y":
+            result["top"] += equalize[1];
+            result["middle"] += equalize[1];
+            result["bottom"] += equalize[1];
+            break;
+
+          case "width":
+            result["width"] += equalize[1];
+            result["right"] += equalize[1];
+            result["center"] += result["right"] - result["left"] / 2;
+            break;
+
+          case "height":
+            result["height"] += equalize[1];
+            result["bottom"] += equalize[1];
+            result["middle"] += result["bottom"] - result["top"] / 2;
+            break;
+        }
+      });
+    }
+
+    return result;
   };
 
-  var isElementEvent = $.isElementEvent = function (e) {
-    return typeof e.stopPropagation === "function";
+  var QUERY_SELECTOR_ENGINE = function QUERY_SELECTOR_ENGINE(node, selector) {
+    try {
+      return Array.from((node || document)[QUERY_SELECTOR_NAME](selector.replace(/\[[\w\-\_]+\=[^\'\"][^\]]+\]/g, function (s) {
+        return s.replace(/\=.+\]$/, function (s) {
+          return '=\"' + s.substr(1, s.length - 2) + '\"]';
+        });
+      })));
+    } catch (e) {
+      console.error("QUERY_SELECTOR_ENGINE error", node, selector);
+    }
   };
 
-  var getElementPosition = $.getElementPosition = function (el) {
-    var _$ = $(el),
-        element = _$[0];
+  var MATCHES_SELECTOR_ENGINE = function MATCHES_SELECTOR_ENGINE(node, selector) {
+    return node[MATCHES_SELECTOR_NAME](selector.replace(/\[[\w\-\_]+\=[^\'\"][^\]]+\]/g, function (s) {
+      return s.replace(/\=.+\]$/, function (s) {
+        return '=\"' + s.substr(1, s.length - 2) + '\"]';
+      });
+    }));
+  };
+  var query = function query(_query, root) {
+    //querySelectorSupport
+    if (typeof _query !== "string" || _query.trim().length == 0) return [];
+    root = typeof root === "undefined" ? document : isNode$1(root) ? root : document;
+    return root == document ? QUERY_SELECTOR_ENGINE(root, _query) : MATCHES_SELECTOR_ENGINE(root, _query) ? [root].concat(Array.prototype.slice.call(QUERY_SELECTOR_ENGINE(root, _query))) : QUERY_SELECTOR_ENGINE(root, _query);
+  };
 
+  var findLite = function findLite(find) {
+    if (typeof find === 'string') {
+      // [string,null]
+      return query(find);
+    } else if (isNode$1(find)) {
+      // [node]
+      return [find];
+    } else if (isArray(find)) {
+      // [array]
+      var fc = [];
+
+      for (var i = 0, l = find.length; i < l; i++) {
+        if (typeof find[i] === 'string') {
+          // [array][string]
+          var fs = query(find[i]);
+          if (fs.length) fc = fc.concat(fs);
+        } else if (isNode$1(find[i])) {
+          // [array][node]
+          fc.push(find[i]);
+        } else if (isArray(find[i])) {
+          var fa = findLite(find[i]);
+          if (fa.length) fc = fc.concat(fa);
+        }
+      }
+
+      return unique(fc);
+    }
+
+    return [];
+  }; //여러개의 셀럭터와 하나의 루트노드만 허용
+
+
+  var findByOnePlace = function findByOnePlace(findse, rootNode) {
+    if (typeof findse === 'string') return query(findse, rootNode);
+
+    if (isNode$1(findse)) {
+      var fs = query(N.node.trace(findse), rootNode);
+
+      for (var i = 0, l = fs.length; i < l; i++) {
+        if (findse === fs[i]) return [findse];
+      }
+    }
+
+    if (isArray(findse)) {
+      var result = [];
+
+      for (var i = 0, l = findse.length; i < l; i++) {
+        var fd = findByOnePlace(findse[i], rootNode);
+        if (fd.length) result = result.concat(fd);
+      }
+
+      return unique(result);
+    }
+
+    return [];
+  }; //다수의 로트와 샐렉터를 받고 출력
+
+
+  var findBySeveralPlaces = function findBySeveralPlaces(find, root) {
+    if (arguments.length === 1 || typeof root === 'undefined' || root === null || root === W.document) return findLite(find); // find root
+
+    var targetRoots = findLite(root);
+
+    if (targetRoots.length === 0) {
+      return findLite(find);
+    } //
+
+
+    var findes = toArray(find);
+    var result = [];
+
+    for (var i = 0, l = targetRoots.length; i < l; i++) {
+      for (var fi = 0, fl = findes.length; fi < fl; fi++) {
+        var fdr = findByOnePlace(findes[fi], targetRoots[i]);
+        if (fdr.length) result = result.concat(fdr);
+      }
+    }
+
+    return unique(result);
+  }; //최적화 분기하여 샐랙터를 실행시킴
+
+
+  var find = function find(_find, root, eq) {
+    return typeof root === "number" ? findLite(_find)[root] : typeof eq === "number" ? findBySeveralPlaces(_find, root)[eq] : findBySeveralPlaces(_find, root);
+  };
+
+  var getElementPosition = function getElementPosition(el) {
+    var element = find(el, 0);
     if (!element) return null;
     var xPosition = 0;
     var yPosition = 0;
@@ -2175,7 +2416,7 @@
     };
   };
 
-  var getPointerPosition = $.getPointerPosition = function (e, root) {
+  var getPointerPosition$1 = $.getPointerPosition = function (e, root) {
     root = !root ? document.documentElement : root;
     var pos = getElementPosition(root);
     if (!pos) return;
@@ -2183,151 +2424,6 @@
     pos.y = (e.touches ? e.targetTouches[0].pageY : e.pageY) - pos.y;
     return pos;
   };
-
-  $.fn.extend({
-    //파라메터 노드가 제이쿼리가 가진 노드 안에 있는지 확인
-    containsIn: function containsIn(node) {
-      var _$$eq = $(node).eq(0),
-          target = _$$eq[0];
-
-      if (target) {
-        for (var i = 0, l = this.length; i < l; i++) {
-          if (this[i] === target) return true;
-          if (this.eq(i).find(target).length) return true;
-        }
-      }
-
-      return false;
-    },
-    //파라메터 노드가 제이쿼리가 가진 노드 밖에 있는지 확인
-    containsOut: function containsOut(node) {
-      return !this.containsIn(node);
-    },
-
-    /*
-      //
-      $(window).predict()
-      $(window).predict({center:20});
-      $(window).predict({center:event});
-      
-      //TODO
-      $(window).predict(element)
-      $(window).predict(element, {center:20});
-    */
-    predict: function predict(option, root) {
-      var _this$eq = this.eq(0),
-          element = _this$eq[0];
-
-      if (!element) return;
-
-      var _ref = element["innerWidth"] ? {
-        offsetTop: 0,
-        offsetLeft: 0,
-        offsetWidth: window.innerWidth,
-        offsetHeight: window.innerHeight
-      } : element,
-          offsetTop = _ref.offsetTop,
-          offsetLeft = _ref.offsetLeft,
-          offsetWidth = _ref.offsetWidth,
-          offsetHeight = _ref.offsetHeight;
-
-      var result = {
-        top: offsetTop,
-        left: offsetLeft,
-        width: offsetWidth,
-        height: offsetHeight,
-        right: offsetLeft + offsetWidth,
-        bottom: offsetTop + offsetHeight,
-        center: offsetLeft + offsetWidth / 2,
-        middle: offsetTop + offsetHeight / 2 //if(isElementEvent(option)){
-        //  const { x:left, y:top } = getPointerPosition(offset);
-        //  option = { left, top };
-        //}
-
-      };
-
-      if (isPlainObject(option)) {
-        //console.log("option,",option)
-        var allProps = ["top", "left", "width", "height", "right", "bottom", "center", "middle"].filter(function (key) {
-          return option.hasOwnProperty(key);
-        }); //event option
-
-        allProps.forEach(function (key) {
-          var optionOfKey = option[key];
-          if (!isElementEvent(optionOfKey)) return;
-          var pointerPosition = getPointerPosition(optionOfKey, root || getCurrentTarget(optionOfKey, element) || element);
-          if (!pointerPosition) return;
-
-          if (/left|width|right|center/.test(key)) {
-            option[key] = pointerPosition["x"];
-          }
-
-          if (/top|middle|bottom|height/.test(key)) {
-            option[key] = pointerPosition["y"];
-          }
-        });
-        allProps.forEach(function (key) {
-          if (typeof option[key] !== "number") return;
-          var valueOfKey = result[key];
-          var equalize;
-
-          switch (key) {
-            case "top":
-            case "middle":
-              equalize = ["y", option[key] - valueOfKey];
-              break;
-
-            case "left":
-            case "center":
-              equalize = ["x", option[key] - valueOfKey];
-              break;
-
-            case "width":
-              equalize = ["width", option[key] - valueOfKey];
-              break;
-
-            case "height":
-              equalize = ["height", option[key] - valueOfKey];
-              break;
-
-            case "right":
-              break;
-
-            case "bottom":
-              break;
-          }
-
-          switch (equalize && equalize[0]) {
-            case "x":
-              result["left"] += equalize[1];
-              result["center"] += equalize[1];
-              result["right"] += equalize[1];
-              break;
-
-            case "y":
-              result["top"] += equalize[1];
-              result["middle"] += equalize[1];
-              result["bottom"] += equalize[1];
-              break;
-
-            case "width":
-              result["width"] += equalize[1];
-              result["right"] += equalize[1];
-              result["center"] += result["right"] - result["left"] / 2;
-              break;
-
-            case "height":
-              result["height"] += equalize[1];
-              result["bottom"] += equalize[1];
-              result["middle"] += result["bottom"] - result["top"] / 2;
-              break;
-          }
-        });
-      }
-
-      return result;
-    }
-  });
 
   var DEVICE_EVENT = 'ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch ? {
     TOUCH_DEVICE: true,
@@ -2391,8 +2487,7 @@
   };
 
   function DragHelper(element, option) {
-    var $element = $(element).eq(0);
-    var dragElement = $element[0];
+    element = find(element, 0);
     var startFn;
     var moveFn;
     var endFn;
@@ -2402,7 +2497,7 @@
 
     var resetOptions = function resetOptions() {
       var getOptions = rebase(typeof option === "function" ? option({
-        element: $element
+        element: element
       }) : option);
       startFn = getOptions["start"];
       moveFn = getOptions["move"];
@@ -2429,7 +2524,7 @@
       //init
       resetOptions(); //
 
-      var elementOffset = $element.predict();
+      var elementOffset = predict(element);
       var pointerDrag = pointerParse(originalEvent);
       firstDrag = pointerDrag;
       lastDrag = pointerDrag;
@@ -2471,11 +2566,11 @@
       bindDraggingAttribute();
     };
 
-    dragElement.addEventListener("dragstart", function (e) {
+    element.addEventListener("dragstart", function (e) {
       e.preventDefault();
     });
-    dragElement.addEventListener(DEVICE_EVENT.START, dragEnter);
-    return $element;
+    element.addEventListener(DEVICE_EVENT.START, dragEnter);
+    return element;
   }
 
   function RepeatHelper(_ref) {
@@ -2491,7 +2586,7 @@
     }; // ng-repeat, v-for와 같은 리피터 구현체 (d3의 data().enter().exit() 컨샙이 비슷함)
 
     var repeater = function repeater(data) {
-      var newData = asArray(data);
+      var newData = asArray$1(data);
       var newBag = []; //새 데이터를 검사합니다.
 
       newData.forEach(function (datum, index) {
@@ -2562,7 +2657,7 @@
   var dragHelper = DragHelper;
   var repeatHelper = RepeatHelper;
 
-
+  //export * from './finder'
 
   var helpers = /*#__PURE__*/Object.freeze({
     windowProps: windowProps,
