@@ -1,22 +1,58 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.from"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.from", "./query-finder"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.from"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.from"), require("./query-finder"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.es6Array);
+    factory(mod.exports, global.webDom, global.es6Array, global.queryFinder);
     global.easy = mod.exports;
   }
-})(this, function (_exports, _webDom, _es6Array) {
+})(this, function (_exports, _webDom, _es6Array, _queryFinder) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
   _exports.predict = _exports.containsOut = _exports.containsIn = void 0;
+
+  var getCurrentTarget = function getCurrentTarget(originalEvent, fallbackElement) {
+    var result = originalEvent.currentTarget || originalEvent.target;
+    return result && result.documentElement ? fallbackElement || result.documentElement : document.documentElement;
+  };
+
+  var isElementEvent = function isElementEvent(e) {
+    return typeof e.stopPropagation === "function";
+  };
+
+  var getElementPosition = function getElementPosition(el) {
+    var element = (0, _queryFinder.queryFind)(el, 0);
+    if (!element) return null;
+    var xPosition = 0;
+    var yPosition = 0;
+
+    while (element && !element.documentElement) {
+      xPosition += element.offsetLeft - element.scrollLeft + element.clientLeft;
+      yPosition += element.offsetTop - element.scrollTop + element.clientTop;
+      element = element.offsetParent;
+    }
+
+    return {
+      x: xPosition,
+      y: yPosition
+    };
+  };
+
+  var getPointerPosition = $.getPointerPosition = function (e, root) {
+    root = !root ? document.documentElement : root;
+    var pos = getElementPosition(root);
+    if (!pos) return;
+    pos.x = (e.touches ? e.targetTouches[0].pageX : e.pageX) - pos.x;
+    pos.y = (e.touches ? e.targetTouches[0].pageY : e.pageY) - pos.y;
+    return pos;
+  };
 
   var containsIn = function containsIn(container, subjects) {
     container = nodeList(container, 0);

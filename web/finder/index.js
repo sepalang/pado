@@ -6,17 +6,17 @@ require("core-js/modules/web.dom.iterable");
 
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./easy.js", "./finder.js"], factory);
+    define(["exports", "./easy.js", "./query-finder.js"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./easy.js"), require("./finder.js"));
+    factory(exports, require("./easy.js"), require("./query-finder.js"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.easy, global.finder);
+    factory(mod.exports, global.easy, global.queryFinder);
     global.index = mod.exports;
   }
-})(this, function (_exports, _easy, _finder) {
+})(this, function (_exports, _easy, _queryFinder) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -31,12 +31,12 @@ require("core-js/modules/web.dom.iterable");
       }
     });
   });
-  Object.keys(_finder).forEach(function (key) {
+  Object.keys(_queryFinder).forEach(function (key) {
     if (key === "default" || key === "__esModule") return;
     Object.defineProperty(_exports, key, {
       enumerable: true,
       get: function get() {
-        return _finder[key];
+        return _queryFinder[key];
       }
     });
   });
