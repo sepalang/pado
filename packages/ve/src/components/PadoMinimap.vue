@@ -13,7 +13,7 @@ import { limitNumber, top } from '@sepalang/pado/functions';
 import { dragHelper } from '@sepalang/pado/web';
 import { rect } from '@sepalang/pado/modules/stance';
 import { nextTick } from '@/utils';
-import HighOrderRect from './mixins/HighOrderRect';
+import HighOrderRect from '@sepalang/logic/vue/Rect';
 
 export default {
   mixins: [

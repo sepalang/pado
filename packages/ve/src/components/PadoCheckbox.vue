@@ -5,7 +5,7 @@
   </span>
 </template>
 <script>
-import HighOrderCheckbox from './mixins/HighOrderCheckbox.js';
+import HighOrderCheckbox from '@sepalang/logic/vue/Checkbox.js';
 export default {
   mixins: [ HighOrderCheckbox() ]
 };

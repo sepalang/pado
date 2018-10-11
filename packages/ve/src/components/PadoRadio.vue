@@ -5,7 +5,7 @@
   </span>
 </template>
 <script>
-import HighOrderRadio from './mixins/HighOrderRadio.js';
+import HighOrderRadio from '@sepalang/logic/vue/Radio.js';
 export default {
   mixins: [ HighOrderRadio() ]
 };

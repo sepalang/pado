@@ -7,7 +7,7 @@
 import { dragHelper } from '@sepalang/pado/web';
 import { limitNumber } from '@sepalang/pado/functions';
 import { nextTick, nextQueue } from '@/utils';
-import HighOrderRect from './mixins/HighOrderRect';
+import HighOrderRect from '@sepalang/logic/vue/Rect';
 
 export default {
   mixins: [

@@ -4,7 +4,7 @@
   </ul>
 </template>
 <script>
-import HighOrderSelect from './mixins/HighOrderSelect';
+import HighOrderSelect from '@sepalang/logic/vue/Select';
 
 export default {
   mixins: [ HighOrderSelect() ]

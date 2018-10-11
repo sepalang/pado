@@ -4,8 +4,8 @@
   </div>
 </template>
 <script>
-import HighOrderRect from './mixins/HighOrderRect';
-import HighOrderPoint from './mixins/HighOrderPoint';
+import HighOrderRect from '@sepalang/logic/vue/Rect';
+import HighOrderPoint from '@sepalang/logic/vue/Point';
 
 export default {
   mixins: [

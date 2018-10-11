@@ -6,8 +6,8 @@
 <script>
 import { dragHelper, getElementBoundingRect } from '@sepalang/pado/web';
 import { nextQueue } from '@/utils';
-import HighOrderRect from './mixins/HighOrderRect';
-import HighOrderPoint from './mixins/HighOrderPoint';
+import HighOrderRect from '@sepalang/logic/vue/Rect';
+import HighOrderPoint from '@sepalang/logic/vue/Point';
 
 export default {
   mixins: [

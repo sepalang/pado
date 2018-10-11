@@ -10,7 +10,7 @@
   </div>
 </template>
 <script>
-import HighOrderPoint from './mixins/HighOrderPoint';
+import HighOrderPoint from '@sepalang/logic/vue/Point';
 export default {
   mixins: [ HighOrderPoint([['x', 'y', 'point'], [0, 0]]) ],
   props : {
