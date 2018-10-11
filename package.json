@@ -38,7 +38,7 @@
     "functions"
   ],
   "devDependencies": {
-    "@sepalang/lintpad": "^0.1.3",
+    "@sepalang/lintpad": "^0.2.0",
     "@sepalang/testpad": "0.0.2",
     "@sepalang/padoc": "^0.9.4",
     "madge": "^3.2.0",
