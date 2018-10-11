@@ -10,25 +10,26 @@
   "scripts": {
     "start": "babel-node .util/test/src-test.js",
     "clear:dist": "rimraf ./*.js ./*.js.map ./functions ./modules ./web",
-    "build:default": "padoc .src ./ -m umd -s",
-    "build:pack:node": "padoc --pack .src/pado.js ./pado.js -m umd -n pado -s",
-    "build:pack:web": "padoc --pack .src/pado.web.js ./web/pado.web.js -m umd -n pado -s",
+    "build:default": "padoc packages/pado ./ -m umd -s",
+    "build:pack:node": "padoc --pack packages/pado/pado.js ./pado.js -m umd -n pado -s",
+    "build:pack:web": "padoc --pack packages/pado/pado.web.js ./web/pado.web.js -m umd -n pado -s",
     "build:pack": "npm run build:pack:node && npm run build:pack:web",
     "build": "npm run clear:dist && npm run build:default && npm run build:pack",
-    "report:index": "madge .src/index.js --image .util/report/index.report.png",
-    "report:pado": "madge .src/pado.js --image .util/report/pado.report.png",
-    "report:modules": "madge .src/modules/index.js --image .util/report/modules.report.png",
-    "report:functions": "madge .src/functions/index.js --image .util/report/functions.report.png",
+    "report:index": "madge packages/pado/index.js --image .util/report/index.report.png",
+    "report:pado": "madge packages/pado/pado.js --image .util/report/pado.report.png",
+    "report:modules": "madge packages/pado/modules/index.js --image .util/report/modules.report.png",
+    "report:functions": "madge packages/pado/functions/index.js --image .util/report/functions.report.png",
     "report": "npm run report:index & npm run report:pado & npm run report:modules & npm run report:functions",
-    "test:functions": "testpad .src/functions --verbose",
-    "test:modules": "testpad .src/modules --verbose",
-    "test:web": "testpad .src/web --verbose",
-    "test": "testpad .src --verbose",
+    "test:functions": "testpad packages/pado/functions --verbose",
+    "test:modules": "testpad packages/pado/modules --verbose",
+    "test:web": "testpad packages/pado/web --verbose",
+    "test": "testpad packages/pado --verbose",
     "pack:a": "padoc --pack '.util/fnpack/case-a/*.js' .util/fnpack/case-a/packed -m es",
     "pack:b": "padoc --pack '.util/fnpack/case-b/*.js' .util/fnpack/case-b/packed -m es",
     "repl": "padoc --exec .util/repl/index.js -i -g",
-    "lint": "lintpad .src -m lib --no-ignore",
-    "lint:fix": "npm run lint -- --fix"
+    "lint": "lintpad packages/pado -m lib --no-ignore",
+    "lint:fix": "npm run lint -- --fix",
+    "bootstrap": "lerna bootstrap --hoist"
   },
   "author": "AHN HO JUNG",
   "license": "MIT",
@@ -41,6 +42,7 @@
     "@sepalang/testpad": "0.0.2",
     "@sepalang/padoc": "^0.9.4",
     "madge": "^3.2.0",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "lerna": "^3.4.3"
   }
 }

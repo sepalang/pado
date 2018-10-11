@@ -2,3 +2,5 @@
 /.tm_properties
 /docs
 /.util
+/packages/storybook
+/packages/vue
