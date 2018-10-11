@@ -1,0 +1,16 @@
+{
+  "name": "@sepalang/pado",
+  "version": "0.3.0",
+  "author": "AHN HO JUNG",
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sepalang/pado"
+  },
+  "scripts": {},
+  "keywords": [
+    "function",
+    "functions"
+  ]
+}
