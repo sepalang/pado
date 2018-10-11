@@ -1,5 +1,5 @@
 <script>
-import { asArray, toggle } from '../../../../../.src/functions';
+import { asArray, toggle } from '@sepalang/pado/functions';
 
 export default {
   render (h){

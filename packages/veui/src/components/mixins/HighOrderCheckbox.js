@@ -1,4 +1,4 @@
-import { asArray, removeValue } from '../../../../../../.src/functions/cast';
+import { asArray, removeValue } from '@sepalang/pado/functions/cast';
 
 export default function (...options){
   const base = {

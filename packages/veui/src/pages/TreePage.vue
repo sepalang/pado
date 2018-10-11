@@ -40,7 +40,7 @@
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
 import Nodelist from '../components/Nodelist.vue';
-import { toggle } from '../../../../../.src/functions';
+import { toggle } from '@sepalang/pado/functions';
 
 export default {
   components: {

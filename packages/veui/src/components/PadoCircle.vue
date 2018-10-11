@@ -6,7 +6,7 @@
   </span>
 </template>
 <script>
-import { domainRangeValue, drawCircleVars } from '../../../../../.src/functions';
+import { domainRangeValue, drawCircleVars } from '@sepalang/pado/functions';
 
 export default {
   props: {

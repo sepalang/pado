@@ -7,7 +7,7 @@
 </template>
 <script>
 import ModalComponent from '@/components/bases/ModalComponent.vue';
-import { timeout } from '../../../../../.src/modules/promise';
+import { timeout } from '@sepalang/pado/modules/promise';
 
 // destroy 하면 모달이 자동으로 제거됨  
 export default {

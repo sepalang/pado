@@ -4,8 +4,8 @@
   </div>
 </template>
 <script>
-import { dragHelper } from '../../../../../.src/web';
-import { limitNumber } from '../../../../../.src/functions';
+import { dragHelper } from '@sepalang/pado/web';
+import { limitNumber } from '@sepalang/pado/functions';
 import { nextTick, nextQueue } from '@/utils';
 import HighOrderRect from './mixins/HighOrderRect';
 

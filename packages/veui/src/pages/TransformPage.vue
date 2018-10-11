@@ -164,11 +164,11 @@ import {
   getElementBoundingRect,
   getElementTransformMatrix,
   getElementTransform
-} from '../../../../../.src/web';
+} from '@sepalang/pado/web';
 
 import {
   rect
-} from '../../../../../.src/modules';
+} from '@sepalang/pado/modules';
 
 export default {
   components: {

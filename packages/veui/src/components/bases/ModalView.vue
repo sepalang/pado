@@ -1,5 +1,5 @@
 <script>
-import { promise } from '../../../../../../.src/modules/promise';
+import { promise } from '@sepalang/pado/modules/promise';
   
 export default {
   props: [

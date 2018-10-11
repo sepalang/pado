@@ -163,7 +163,7 @@ import Layer from '@/components/Layer.vue';
 import PadoSlider from '@/components/PadoSlider.vue';
 import PadoRect from '@/components/PadoRect.vue';
 import PadoPoint from '@/components/PadoPoint.vue';
-import { rect } from '@sepalang/pado/.src/modules/stance';
+import { rect } from '@sepalang/pado/modules/stance';
 
 export default {
   components: {

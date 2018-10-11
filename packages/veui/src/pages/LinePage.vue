@@ -15,7 +15,7 @@
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
 import PadoRect from '@/components/PadoRect.vue';
-import { getElementBoundingRect, makeSVG } from '../../../../../.src/web';
+import { getElementBoundingRect, makeSVG } from '@sepalang/pado/web';
 
 export default {
   components: {

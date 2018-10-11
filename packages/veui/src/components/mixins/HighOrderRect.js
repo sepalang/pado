@@ -1,4 +1,4 @@
-import { likeNumber } from '../../../../../../.src/functions';
+import { likeNumber } from '@sepalang/pado/functions';
 /*
   usage
   HighOrderRect([["width","height","size","rect"],[20,20]])

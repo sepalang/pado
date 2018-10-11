@@ -9,9 +9,9 @@
   </div>
 </template>
 <script>
-import { limitNumber, top } from '../../../../../.src/functions';
-import { dragHelper } from '../../../../../.src/web';
-import { rect } from '../../../../../.src/modules/stance';
+import { limitNumber, top } from '@sepalang/pado/functions';
+import { dragHelper } from '@sepalang/pado/web';
+import { rect } from '@sepalang/pado/modules/stance';
 import { nextTick } from '@/utils';
 import HighOrderRect from './mixins/HighOrderRect';
 

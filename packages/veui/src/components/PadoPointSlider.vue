@@ -5,9 +5,9 @@
   </div>
 </template>
 <script>
-import $ from '../../../../../.src/web/plugins/jquery';
-import { dragHelper } from '../../../../../.src/web';
-import { limitNumber, domainRangeValue } from '../../../../../.src/functions';
+import $ from 'jquery';
+import { dragHelper } from '@sepalang/pado/web';
+import { limitNumber, domainRangeValue } from '@sepalang/pado/functions';
 
 export default {
   props: {

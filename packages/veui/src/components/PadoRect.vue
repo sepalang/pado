@@ -4,7 +4,7 @@
   </span>
 </template>
 <script>
-import { dragHelper, getElementBoundingRect } from '../../../../../.src/web';
+import { dragHelper, getElementBoundingRect } from '@sepalang/pado/web';
 import { nextQueue } from '@/utils';
 import HighOrderRect from './mixins/HighOrderRect';
 import HighOrderPoint from './mixins/HighOrderPoint';

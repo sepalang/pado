@@ -65,7 +65,7 @@ import PadoRect from '@/components/PadoRect.vue';
 import PadoScreen from '@/components/PadoScreen.vue';
 import PadoMinimap from '@/components/PadoMinimap.vue';
 import PadoPoint from '@/components/PadoPoint.vue';
-import { rect } from '../../../../../.src/modules/stance';
+import { rect } from '@sepalang/pado/modules/stance';
 import {
   transformStyleVariant,
   transformMatrixVariant,
@@ -73,7 +73,7 @@ import {
   //getElementBoundingRect,
   getElementTransformMatrix,
   getElementTransform
-} from '../../../../../.src/web';
+} from '@sepalang/pado/web';
 
 export default {
   components: {

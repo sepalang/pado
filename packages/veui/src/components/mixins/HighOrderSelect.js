@@ -1,4 +1,4 @@
-import { asArray } from '../../../../../../.src/functions';
+import { asArray } from '@sepalang/pado/functions';
 
 export default function ({
   canMultiple = true

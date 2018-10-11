@@ -5,7 +5,7 @@
 </template>
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
-import { space, block } from '../../../../../.src/modules/block';
+import { space, block } from '@sepalang/pado/modules/block';
 export default {
   components: {
     AppLayout

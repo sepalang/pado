@@ -5,9 +5,10 @@
   </div>
 </template>
 <script>
-import $ from '../../../../../.src/web/plugins/jquery';
-import { dragHelper } from '../../../../../.src/web';
-import { limitNumber, domainRangeValue } from '../../../../../.src/functions';
+import $ from 'jquery';
+import { predict } from '@sepalang/pado/web/finder/easy';
+import { dragHelper } from '@sepalang/pado/web';
+import { limitNumber, domainRangeValue } from '@sepalang/pado/functions';
 
 export default {
   props: {
@@ -74,7 +75,7 @@ export default {
             event.preventDefault();
           }
 
-          let { left, width } = $scroller.predict({center: event}, element);
+          let { left, width } = predict({center: event}, element);
 
           const barLength = element.width() - width;
           const leftValue = limitNumber(left, barLength);

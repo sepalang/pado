@@ -1,6 +1,6 @@
 {
   "name": "recipe",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -9,146 +9,20 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@sepalang/pado":"0.3.0",
+    "@sepalang/pado": "0.3.0",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.0.0-beta.15",
-    "@vue/cli-plugin-eslint": "^3.0.0-beta.15",
-    "@vue/cli-service": "^3.0.0-beta.15",
-    "@vue/eslint-config-standard": "^3.0.0-rc.3",
+    "@vue/cli-plugin-babel": "^3.0.5",
+    "@vue/cli-service": "^3.0.5",
     "jquery": "^3.3.1",
     "moment": "^2.22.2",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",
     "tether": "^1.4.4",
     "vue-template-compiler": "^2.5.16"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "@vue/standard"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    },
-    "rules": {
-      "quotes": 0,
-      "semi": [
-        1,
-        "always"
-      ],
-      "eqeqeq": 0,
-      "indent": [
-        "error",
-        2,
-        {
-          "SwitchCase": 1,
-          "VariableDeclarator": {
-            "var": 2,
-            "let": 2,
-            "const": 3
-          },
-          "MemberExpression": 0,
-          "FunctionDeclaration": {
-            "parameters": "first"
-          },
-          "FunctionExpression": {
-            "parameters": "first"
-          },
-          "CallExpression": {
-            "arguments": "first"
-          },
-          "ArrayExpression": 1,
-          "ObjectExpression": 1,
-          "ImportDeclaration": 1,
-          "flatTernaryExpressions": true,
-          "ignoreComments": true
-        }
-      ],
-      "space-before-blocks": [
-        "error",
-        {
-          "functions": "never",
-          "keywords": "never",
-          "classes": "always"
-        }
-      ],
-      "spaced-comment": 0,
-      "arrow-spacing": [
-        "error",
-        {
-          "before": false,
-          "after": false
-        }
-      ],
-      "key-spacing": [
-        "error",
-        {
-          "beforeColon": false,
-          "afterColon": true,
-          "align": "colon"
-        }
-      ],
-      "keyword-spacing": [
-        "error",
-        {
-          "before": true,
-          "after": true,
-          "overrides": {
-            "if": {
-              "after": false
-            },
-            "for": {
-              "after": false
-            },
-            "while": {
-              "after": false
-            }
-          }
-        }
-      ],
-      "no-multi-spaces": [
-        "error",
-        {
-          "exceptions": {
-            "VariableDeclarator": true,
-            "ImportDeclaration": true
-          }
-        }
-      ],
-      "no-useless-escape": 0,
-      "new-cap": 0,
-      "no-redeclare": 0,
-      "camelcase": 0,
-      "no-sequences": 0,
-      "no-unused-vars": 1,
-      "no-fallthrough": 0,
-      "no-mixed-operators": 0,
-      "no-return-assign": 0,
-      "no-useless-return": 0,
-      "no-unreachable": 0,
-      "no-trailing-spaces": 0,
-      "no-return-await": 0,
-      "no-multiple-empty-lines": [
-        1,
-        {
-          "max": 2
-        }
-      ],
-      "standard/object-curly-even-spacing": 0
-    }
-  },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
   },
   "browserslist": [
     "> 1%",

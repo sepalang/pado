@@ -1,4 +1,4 @@
-import { affect } from '../../../../../../.src/modules';
+import { affect } from '@sepalang/pado/modules';
 
 export default function ({ name = '' } = {}){
   const HighOrderMixins = {
