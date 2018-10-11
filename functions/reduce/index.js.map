@@ -1,1 +1,1 @@
-{"version":3,"sources":["../../.src/functions/reduce/index.js"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA","sourcesContent":["export * from './reduce'\n"],"file":"index.js"}
+{"version":3,"sources":["../../packages/pado/functions/reduce/index.js"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA","sourcesContent":["export * from './reduce'\n"],"file":"index.js"}
