@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/es6.string.repeat", "core-js/modules/es6.number.constructor", "core-js/modules/web.dom.iterable", "core-js/modules/es6.promise", "core-js/modules/es6.array.from", "./promiseEngine", "./promise", "../../functions/cast", "../../functions/isLike", "../../functions/nice", "../../functions/hack", "../operate"], factory);
+    define(["exports", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/es6.string.repeat", "core-js/modules/es6.number.constructor", "core-js/modules/web.dom.iterable", "core-js/modules/es6.promise", "core-js/modules/es6.string.iterator", "core-js/modules/es6.array.from", "./promiseEngine", "./promise", "../../functions/cast", "../../functions/isLike", "../../functions/nice", "../../functions/hack", "../operate"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.string.repeat"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.promise"), require("core-js/modules/es6.array.from"), require("./promiseEngine"), require("./promise"), require("../../functions/cast"), require("../../functions/isLike"), require("../../functions/nice"), require("../../functions/hack"), require("../operate"));
+    factory(exports, require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.string.repeat"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.promise"), require("core-js/modules/es6.string.iterator"), require("core-js/modules/es6.array.from"), require("./promiseEngine"), require("./promise"), require("../../functions/cast"), require("../../functions/isLike"), require("../../functions/nice"), require("../../functions/hack"), require("../operate"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Object, global.runtime, global.es6Array, global.es6String, global.es6Number, global.webDom, global.es6, global.es6Array, global.promiseEngine, global.promise, global.cast, global.isLike, global.nice, global.hack, global.operate);
+    factory(mod.exports, global.es6Array, global.es6Object, global.runtime, global.es6Array, global.es6String, global.es6Number, global.webDom, global.es6, global.es6String, global.es6Array, global.promiseEngine, global.promise, global.cast, global.isLike, global.nice, global.hack, global.operate);
     global.promiseFunctions = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Object, _runtime, _es6Array2, _es6String, _es6Number, _webDom, _es, _es6Array3, _promiseEngine, _promise, _cast, _isLike, _nice, _hack, _operate) {
+})(this, function (_exports, _es6Array, _es6Object, _runtime, _es6Array2, _es6String, _es6Number, _webDom, _es, _es6String2, _es6Array3, _promiseEngine, _promise, _cast, _isLike, _nice, _hack, _operate) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

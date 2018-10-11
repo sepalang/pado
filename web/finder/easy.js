@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.from", "./query-finder"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.string.iterator", "core-js/modules/es6.array.from", "./query-finder", "./query-selector", "../../functions/isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.from"), require("./query-finder"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.string.iterator"), require("core-js/modules/es6.array.from"), require("./query-finder"), require("./query-selector"), require("../../functions/isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.es6Array, global.queryFinder);
+    factory(mod.exports, global.webDom, global.es6String, global.es6Array, global.queryFinder, global.querySelector, global.isLike);
     global.easy = mod.exports;
   }
-})(this, function (_exports, _webDom, _es6Array, _queryFinder) {
+})(this, function (_exports, _webDom, _es6String, _es6Array, _queryFinder, _querySelector, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -45,7 +45,7 @@
     };
   };
 
-  var getPointerPosition = $.getPointerPosition = function (e, root) {
+  var getPointerPosition = function getPointerPosition(e, root) {
     root = !root ? document.documentElement : root;
     var pos = getElementPosition(root);
     if (!pos) return;
@@ -55,11 +55,11 @@
   };
 
   var containsIn = function containsIn(container, subjects) {
-    container = nodeList(container, 0);
+    container = (0, _querySelector.nodeList)(container, 0);
     subjects = asArray(subjects);
 
-    if (!subjects.length || !isNode(container) || subjects.some(function (subject) {
-      return typeof subject === "string" ? false : !isNode(subject);
+    if (!subjects.length || !(0, _isLike.isNode)(container) || subjects.some(function (subject) {
+      return typeof subject === "string" ? false : !(0, _isLike.isNode)(subject);
     })) {
       return false;
     }
@@ -106,8 +106,8 @@
   _exports.containsOut = containsOut;
 
   var predict = function predict(container, option, root) {
-    var element = nodeList(container, 0);
-    if (!isNode(element)) return;
+    var element = (0, _querySelector.nodeList)(container, 0);
+    if (!(0, _isLike.isNode)(element)) return;
 
     var _ref = element["innerWidth"] ? {
       offsetTop: 0,
@@ -135,7 +135,7 @@
 
     };
 
-    if (isPlainObject(option)) {
+    if ((0, _isLike.isPlainObject)(option)) {
       //console.log("option,",option)
       var allProps = ["top", "left", "width", "height", "right", "bottom", "center", "middle"].filter(function (key) {
         return option.hasOwnProperty(key);

@@ -28,13 +28,13 @@ castingStart                   cursor -->>
 ____helloworld[thisismatchtarget]nexttext[nextmatchtarget]____
 re
 */
-import { readString } from '../../.src/functions/read'
-import { ranger } from '../../.src/modules/ranger'
+import { readString } from './read';
+import { ranger } from '../modules/ranger';
 
 describe('Functions read::readString', ()=>{
   it('readString matchIndex', ()=>{
     const text = `hello.world.!!.abc`
-    const { props:{ path:castPath } } = readString(text, ["."], ({ 
+    const { props:{ path:castPath } } = readString(text, ["."], ({
       content, props:{ path }, matchType, castStart, castEnd, matchIndex, next
     })=>{
       if(matchType === 0){
@@ -45,7 +45,7 @@ describe('Functions read::readString', ()=>{
         path.push(content.substring(castStart, castEnd))
       }
     }, { path: [] })
-  
+
     expect(castPath).toEqual(['hello', 'world', '!!', 'abc'])
   })
 
@@ -64,7 +64,7 @@ describe('Functions read::readString', ()=>{
           break
       }
     }, { path: [] })
-  
+
     expect(castPath).toEqual(['hello', 'world', '!!', 'abc'])
   })
 
@@ -92,7 +92,7 @@ describe('Functions read::readString', ()=>{
         path.push(content.substring(castStart, castEnd))
       }
     }, { path: [] })
-  
+
     expect(castPath).toEqual([ 'hello', '[world]', '[inner]', '[world]', '.props' ])
   })
 })

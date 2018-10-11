@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.from", "core-js/modules/web.dom.iterable", "../../functions/functions", "../../functions/cast", "../../functions/isLike", "./query-selector"], factory);
+    define(["exports", "core-js/modules/es6.string.iterator", "core-js/modules/es6.array.from", "core-js/modules/web.dom.iterable", "../../functions/functions", "../../functions/cast", "../../functions/isLike", "./query-selector"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.from"), require("core-js/modules/web.dom.iterable"), require("../../functions/functions"), require("../../functions/cast"), require("../../functions/isLike"), require("./query-selector"));
+    factory(exports, require("core-js/modules/es6.string.iterator"), require("core-js/modules/es6.array.from"), require("core-js/modules/web.dom.iterable"), require("../../functions/functions"), require("../../functions/cast"), require("../../functions/isLike"), require("./query-selector"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.webDom, global.functions, global.cast, global.isLike, global.querySelector);
+    factory(mod.exports, global.es6String, global.es6Array, global.webDom, global.functions, global.cast, global.isLike, global.querySelector);
     global.queryFinder = mod.exports;
   }
-})(this, function (_exports, _es6Array, _webDom, _functions, _cast, _isLike, _querySelector) {
+})(this, function (_exports, _es6String, _es6Array, _webDom, _functions, _cast, _isLike, _querySelector) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

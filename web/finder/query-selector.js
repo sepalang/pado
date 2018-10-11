@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.array.from", "../../functions/cast", "../../functions/isLike"], factory);
+    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.string.iterator", "core-js/modules/es6.array.from", "../../functions/cast", "../../functions/isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.array.from"), require("../../functions/cast"), require("../../functions/isLike"));
+    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.string.iterator"), require("core-js/modules/es6.array.from"), require("../../functions/cast"), require("../../functions/isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.es6Regexp, global.es6Array, global.cast, global.isLike);
+    factory(mod.exports, global.es6Regexp, global.es6Regexp, global.es6String, global.es6Array, global.cast, global.isLike);
     global.querySelector = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _es6Regexp2, _es6Array, _cast, _isLike) {
+})(this, function (_exports, _es6Regexp, _es6Regexp2, _es6String, _es6Array, _cast, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

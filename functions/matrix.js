@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.from", "core-js/modules/web.dom.iterable", "./cast", "./isLike", "./reduce", "./nice", "./enumerable"], factory);
+    define(["exports", "core-js/modules/es6.string.iterator", "core-js/modules/es6.array.from", "core-js/modules/web.dom.iterable", "./cast", "./isLike", "./reduce", "./nice", "./enumerable"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.from"), require("core-js/modules/web.dom.iterable"), require("./cast"), require("./isLike"), require("./reduce"), require("./nice"), require("./enumerable"));
+    factory(exports, require("core-js/modules/es6.string.iterator"), require("core-js/modules/es6.array.from"), require("core-js/modules/web.dom.iterable"), require("./cast"), require("./isLike"), require("./reduce"), require("./nice"), require("./enumerable"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.webDom, global.cast, global.isLike, global.reduce, global.nice, global.enumerable);
+    factory(mod.exports, global.es6String, global.es6Array, global.webDom, global.cast, global.isLike, global.reduce, global.nice, global.enumerable);
     global.matrix = mod.exports;
   }
-})(this, function (_exports, _es6Array, _webDom, _cast, _isLike, _reduce, _nice2, _enumerable) {
+})(this, function (_exports, _es6String, _es6Array, _webDom, _cast, _isLike, _reduce, _nice2, _enumerable) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

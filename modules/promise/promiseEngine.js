@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.promise", "../../functions"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.string.iterator", "core-js/modules/es6.promise", "../../functions"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.promise"), require("../../functions"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.string.iterator"), require("core-js/modules/es6.promise"), require("../../functions"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.es6Array, global.es6, global.functions);
+    factory(mod.exports, global.webDom, global.es6Array, global.es6String, global.es6, global.functions);
     global.promiseEngine = mod.exports;
   }
-})(this, function (_exports, _webDom, _es6Array, _es, _functions) {
+})(this, function (_exports, _webDom, _es6Array, _es6String, _es, _functions) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

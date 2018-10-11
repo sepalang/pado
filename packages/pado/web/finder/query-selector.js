@@ -1,16 +1,14 @@
 import { asArray } from '../../functions/cast'
 import { isNode } from '../../functions/isLike';
 
-
-
 const QUERY_SELECTOR_ENGINE = function(node,selector){
   try {
     return Array.from(
       (node||document)[QUERY_SELECTOR_NAME](
-        selector.replace(/\[[\w\-\_]+\=[^\'\"][^\]]+\]/g, function(s){ 
-          return s.replace(/\=.+\]$/,function(s){ 
-            return '=\"' + s.substr(1,s.length-2) + '\"]'; 
-          }) 
+        selector.replace(/\[[\w\-\_]+\=[^\'\"][^\]]+\]/g, function(s){
+          return s.replace(/\=.+\]$/,function(s){
+            return '=\"' + s.substr(1,s.length-2) + '\"]';
+          })
         })
       )
     );
@@ -21,10 +19,10 @@ const QUERY_SELECTOR_ENGINE = function(node,selector){
 
 const MATCHES_SELECTOR_ENGINE = function(node,selector){
   return node[MATCHES_SELECTOR_NAME](
-    selector.replace(/\[[\w\-\_]+\=[^\'\"][^\]]+\]/g, function(s){ 
-      return s.replace(/\=.+\]$/,function(s){ 
-        return '=\"' + s.substr(1,s.length-2) + '\"]'; 
-      }) 
+    selector.replace(/\[[\w\-\_]+\=[^\'\"][^\]]+\]/g, function(s){
+      return s.replace(/\=.+\]$/,function(s){
+        return '=\"' + s.substr(1,s.length-2) + '\"]';
+      })
     })
   );
 }
@@ -42,10 +40,10 @@ export const query = function(query,root){
   //querySelectorSupport
   if(typeof query !== "string" || (query.trim().length == 0)) return [];
   root = ((typeof root === "undefined") ? document : isNode(root) ? root : document);
-  return root == document ? 
+  return root == document ?
     QUERY_SELECTOR_ENGINE(root,query) :
-    MATCHES_SELECTOR_ENGINE(root,query) ? 
-    [root].concat(Array.prototype.slice.call(QUERY_SELECTOR_ENGINE(root,query))) : 
+    MATCHES_SELECTOR_ENGINE(root,query) ?
+    [root].concat(Array.prototype.slice.call(QUERY_SELECTOR_ENGINE(root,query))) :
     QUERY_SELECTOR_ENGINE(root,query);
 };
 
@@ -56,12 +54,12 @@ export const toCSSQueryString = function(node, detail){
   var tid = tclass = tname = tattr = tvalue = '';
   N.propEach(N.NODEKIT.attr(t),function(value,sign){
     switch(sign){
-    case "id"   : 
-      var id = t.getAttribute(sign); 
-      id.length && (tid='#'+id) ; 
+    case "id"   :
+      var id = t.getAttribute(sign);
+      id.length && (tid='#'+id) ;
       break;
-    case "class": 
-      tclass = t.getAttribute(sign).trim().replace(/\s\s/g,' ').split(' ').join('.'); 
+    case "class":
+      tclass = t.getAttribute(sign).trim().replace(/\s\s/g,' ').split(' ').join('.');
       if(tclass) tclass = "." + tclass;
       break;
       case "name" : tname  = "[name="+t.getAttribute(sign)+"]"; break;
@@ -71,10 +69,10 @@ export const toCSSQueryString = function(node, detail){
         attrValue = t.getAttribute(sign);
         tattr += ( (attrValue == '' || attrValue == null) ? ("["+sign+"]") : ("["+sign+"="+attrValue+"]") );
       }
-      break; 
+      break;
     }
   });
-  
+
   if(detail == true) {
     if(!/table|tbody|thead|tfoot|ul|ol/.test(tag)) {
       var tv = N.node.value(t);
@@ -82,6 +80,6 @@ export const toCSSQueryString = function(node, detail){
       if(typeof tvalue === 'string') tvalue = tvalue.trim();
     }
   }
-  
+
   return tag+tid+tclass+tname+tattr+tvalue;
 }

@@ -235,7 +235,10 @@
   var likeArray = function likeArray(item) {
     return Array.isArray(item) || item !== null && typeof item === "object" && item.hasOwnProperty("length") && typeof item.length === "number" && item.length > 0;
   };
-  var isNode$1 = function isNode(a) {
+  var isPlainObject = function isPlainObject(data) {
+    return typeof data === "object" && data.constructor === Object;
+  };
+  var isNode = function isNode(a) {
     return isObject(a) && typeof a.nodeType === "number";
   };
 
@@ -1488,7 +1491,7 @@
 
   var getNode = function getNode(el) {
     var select = likeArray(el) ? el[0] : el;
-    return isNode$1(select) ? select : undefined;
+    return isNode(select) ? select : undefined;
   };
   var isElement = function isElement(el) {
     return el instanceof Element;
@@ -1673,7 +1676,7 @@
           if (typeof refValue === "function") {
             result[refKey] = obj[key];
           } else {
-            if (typeof refValue !== "object" && typeof refValue !== "object" || isNode$1(refValue)) {
+            if (typeof refValue !== "object" && typeof refValue !== "object" || isNode(refValue)) {
               result[refKey] = refValue;
             } else {
               result[refKey] = Object.assign(result[refKey], refValue);
@@ -1687,7 +1690,7 @@
           if (typeof obj[key] === "function") {
             result[deepKey] = obj[key];
           } else {
-            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode$1(obj[key])) {
+            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode(obj[key])) {
               result[deepKey] = obj[key];
             } else {
               result[deepKey] = Object.assign(result[deepKey] || (isArray(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
@@ -1698,7 +1701,7 @@
         if (typeof obj[key] === "function") {
           result[key] = obj[key];
         } else {
-          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || isNode$1(obj[key])) {
+          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || isNode(obj[key])) {
             result[key] = obj[key];
           } else {
             result[key] = Object.assign(result[key], obj[key]);
@@ -2193,10 +2196,17 @@
       });
     }));
   };
+
+  var nodeList = function nodeList(node, eq) {
+    node = asArray$1(node).map(function (item) {
+      return isNode(item) ? item : undefined;
+    });
+    return typeof eq === "number" ? node[eq] : node;
+  };
   var query = function query(_query, root) {
     //querySelectorSupport
     if (typeof _query !== "string" || _query.trim().length == 0) return [];
-    root = typeof root === "undefined" ? document : isNode$1(root) ? root : document;
+    root = typeof root === "undefined" ? document : isNode(root) ? root : document;
     return root == document ? QUERY_SELECTOR_ENGINE(root, _query) : MATCHES_SELECTOR_ENGINE(root, _query) ? [root].concat(Array.prototype.slice.call(QUERY_SELECTOR_ENGINE(root, _query))) : QUERY_SELECTOR_ENGINE(root, _query);
   };
 
@@ -2204,7 +2214,7 @@
     if (typeof find === 'string') {
       // [string,null]
       return query(find);
-    } else if (isNode$1(find)) {
+    } else if (isNode(find)) {
       // [node]
       return [find];
     } else if (isArray(find)) {
@@ -2216,7 +2226,7 @@
           // [array][string]
           var fs = query(find[i]);
           if (fs.length) fc = fc.concat(fs);
-        } else if (isNode$1(find[i])) {
+        } else if (isNode(find[i])) {
           // [array][node]
           fc.push(find[i]);
         } else if (isArray(find[i])) {
@@ -2235,7 +2245,7 @@
   var findByOnePlace = function findByOnePlace(findse, rootNode) {
     if (typeof findse === 'string') return query(findse, rootNode);
 
-    if (isNode$1(findse)) {
+    if (isNode(findse)) {
       var fs = query(N.node.trace(findse), rootNode);
 
       for (var i = 0, l = fs.length; i < l; i++) {
@@ -2311,7 +2321,7 @@
     };
   };
 
-  var getPointerPosition = $.getPointerPosition = function (e, root) {
+  var getPointerPosition = function getPointerPosition(e, root) {
     root = !root ? document.documentElement : root;
     var pos = getElementPosition(root);
     if (!pos) return;
