@@ -36,15 +36,6 @@ jobs:
           name: TEST
           command: npm run test:modules
 
-  test-web:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/project
-      - run:
-          name: TEST
-          command: npm run test:web
-
   build:
     <<: *defaults
     steps:
@@ -72,4 +63,3 @@ workflows:
           requires:
             - test-functions
             - test-modules
-            - test-web
