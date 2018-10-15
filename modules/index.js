@@ -6,17 +6,17 @@ require("core-js/modules/web.dom.iterable");
 
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./block", "./editable", "./makeup", "./paginate", "./promise", "./operate", "./session", "./ranger", "./stance", "./affect", "./matrix"], factory);
+    define(["exports", "./promise", "./block", "./decorator", "./operate", "./session", "./ranger", "./stance", "./affect", "./matrix"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./block"), require("./editable"), require("./makeup"), require("./paginate"), require("./promise"), require("./operate"), require("./session"), require("./ranger"), require("./stance"), require("./affect"), require("./matrix"));
+    factory(exports, require("./promise"), require("./block"), require("./decorator"), require("./operate"), require("./session"), require("./ranger"), require("./stance"), require("./affect"), require("./matrix"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.block, global.editable, global.makeup, global.paginate, global.promise, global.operate, global.session, global.ranger, global.stance, global.affect, global.matrix);
+    factory(mod.exports, global.promise, global.block, global.decorator, global.operate, global.session, global.ranger, global.stance, global.affect, global.matrix);
     global.index = mod.exports;
   }
-})(this, function (_exports, _block, _editable, _makeup, _paginate, _promise, _operate, _session, _ranger, _stance, _affect, _matrix) {
+})(this, function (_exports, _promise, _block, _decorator, _operate, _session, _ranger, _stance, _affect, _matrix) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -41,33 +41,13 @@ require("core-js/modules/web.dom.iterable");
       }
     });
   });
-  Object.keys(_editable).forEach(function (key) {
+  Object.keys(_decorator).forEach(function (key) {
     if (key === "default" || key === "__esModule") return;
     if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
     Object.defineProperty(_exports, key, {
       enumerable: true,
       get: function get() {
-        return _editable[key];
-      }
-    });
-  });
-  Object.keys(_makeup).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-    Object.defineProperty(_exports, key, {
-      enumerable: true,
-      get: function get() {
-        return _makeup[key];
-      }
-    });
-  });
-  Object.keys(_paginate).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-    Object.defineProperty(_exports, key, {
-      enumerable: true,
-      get: function get() {
-        return _paginate[key];
+        return _decorator[key];
       }
     });
   });

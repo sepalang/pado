@@ -8,7 +8,7 @@
       exports: {}
     };
     factory(mod.exports, global.runtime, global.webDom, global.promise, global.cast, global.isLike);
-    global.makeup = mod.exports;
+    global.decorator = mod.exports;
   }
 })(this, function (_exports, _runtime, _webDom, _promise, _cast, _isLike) {
   "use strict";
@@ -169,4 +169,4 @@
 
   _exports.watchChange = watchChange;
 });
-//# sourceMappingURL=makeup.js.map
+//# sourceMappingURL=decorator.js.map

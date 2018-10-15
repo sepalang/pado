@@ -2157,6 +2157,349 @@
     };
   };
 
+  var PromiseClass = Promise;
+  var resolveFn = PromiseClass.resolve;
+  var rejectFn = PromiseClass.reject;
+  var newPromise = function newPromise(fn) {
+    return new PromiseClass(function (r, c) {
+      var maybeAwaiter = fn(r, c);
+      likePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
+    });
+  };
+  var promise = function promise(fn) {
+    return newPromise(fn);
+  };
+  var PromiseFunction = promise;
+  var all$1 = Promise.all;
+  PromiseFunction.all = all$1;
+  var resolve = resolveFn;
+  PromiseFunction.resolve = resolve;
+  var reject = rejectFn;
+  PromiseFunction.reject = reject;
+
+  var defer = function defer() {
+    var resolve$$1, reject$$1;
+    var promise$$1 = new PromiseClass(function () {
+      resolve$$1 = arguments[0];
+      reject$$1 = arguments[1];
+    });
+    return {
+      resolve: resolve$$1,
+      reject: reject$$1,
+      promise: promise$$1
+    };
+  };
+  promise.defer = defer;
+  var timeout = function timeout(fn, time) {
+    if (typeof fn === "number") {
+      return newPromise(function (resolve$$1) {
+        return setTimeout(function () {
+          return resolve$$1(time);
+        }, fn);
+      });
+    } else {
+      return newPromise(function (resolve$$1) {
+        return setTimeout(function () {
+          return resolve$$1(typeof fn === "function" ? fn() : fn);
+        }, time);
+      });
+    }
+  };
+  promise.timeout = timeout;
+  var valueOf = function valueOf(maybeQ) {
+    return newPromise(function (resolve$$1, reject$$1) {
+      likePromise(maybeQ) ? maybeQ.then(resolve$$1).catch(reject$$1) : resolve$$1(maybeQ);
+    });
+  };
+  promise.valueOf = valueOf;
+  var promise$1 = promise;
+
+  var operate = function () {
+    var PARENT_OUTPUT_UPDATED = "ParentOutputUpdated";
+
+    var operate = function operate(_ref) {
+      var _this = this;
+
+      var input = _ref.input,
+          output = _ref.output,
+          concurrent = _ref.concurrent,
+          rescue = _ref.rescue,
+          limitInput = _ref.limitInput,
+          limitOutput = _ref.limitOutput;
+      this.parent = undefined;
+      this.children = [];
+      this.inputs = [];
+      this.outputs = [];
+      this.limitInput = isNumber(limitInput) || limitInput > 0 ? limitInput : Number.POSITIVE_INFINITY;
+      this.limitOutput = isNumber(limitOutput) || limitOutput > 0 ? limitOutput : Number.POSITIVE_INFINITY; //
+
+      var current = 0;
+      concurrent = isNumber(concurrent) || concurrent > 0 ? concurrent : 1;
+      Object.defineProperty(this, "avaliablePullCount", {
+        get: function get$$1() {
+          var limit = _this.limitInput - _this.inputs.length;
+          if (limit < 0) limit = 0;
+          return limit;
+        }
+      });
+      Object.defineProperty(this, "avaliableOutputCount", {
+        get: function get$$1() {
+          return _this.limitOutput + current + _this.outputs.length;
+        }
+      });
+      var inputOutput = {
+        input: input,
+        output: output
+      };
+
+      var kickStart = function kickStart() {
+        var avaliableQueLength = concurrent - current; // 작동가능한 큐
+
+        if (avaliableQueLength < 1) {
+          return;
+        } // input의 길이로 확인하여 실행 가능한 큐
+
+
+        if (avaliableQueLength > _this.inputs.length) {
+          avaliableQueLength = _this.inputs.length;
+        } // output의 제한을 확인하여 사용 가능한 큐
+
+
+        if (avaliableQueLength > _this.avaliableOutputCount) {
+          avaliableQueLength = _this.avaliableOutputCount;
+        }
+
+        if (avaliableQueLength < 1) {
+          return;
+        }
+
+        Array(avaliableQueLength).fill(inputOutput).forEach(
+        /*#__PURE__*/
+        function () {
+          var _ref3 = _asyncToGenerator(
+          /*#__PURE__*/
+          regeneratorRuntime.mark(function _callee2(_ref2) {
+            var input, output, entry, outputHandle;
+            return regeneratorRuntime.wrap(function _callee2$(_context2) {
+              while (1) {
+                switch (_context2.prev = _context2.next) {
+                  case 0:
+                    input = _ref2.input, output = _ref2.output;
+                    entry = _this.inputs.shift();
+                    current++;
+
+                    outputHandle =
+                    /*#__PURE__*/
+                    function () {
+                      var _ref4 = _asyncToGenerator(
+                      /*#__PURE__*/
+                      regeneratorRuntime.mark(function _callee(formInputDataum) {
+                        return regeneratorRuntime.wrap(function _callee$(_context) {
+                          while (1) {
+                            switch (_context.prev = _context.next) {
+                              case 0:
+                                /* TODO:lint
+                                if(typeof output === "function"){
+                                  const out = await output({ entry: formInputDataum })
+                                }
+                                */
+                                _this.outputs.push(formInputDataum);
+
+                                current--;
+
+                                _this.children.forEach(function (child) {
+                                  return child.emit(PARENT_OUTPUT_UPDATED);
+                                });
+
+                                kickStart();
+
+                              case 4:
+                              case "end":
+                                return _context.stop();
+                            }
+                          }
+                        }, _callee, this);
+                      }));
+
+                      return function outputHandle(_x2) {
+                        return _ref4.apply(this, arguments);
+                      };
+                    }();
+
+                    if (!input) {
+                      _context2.next = 23;
+                      break;
+                    }
+
+                    _context2.prev = 5;
+                    _context2.t0 = outputHandle;
+                    _context2.next = 9;
+                    return input({
+                      entry: entry
+                    });
+
+                  case 9:
+                    _context2.t1 = _context2.sent;
+                    (0, _context2.t0)(_context2.t1);
+                    _context2.next = 21;
+                    break;
+
+                  case 13:
+                    _context2.prev = 13;
+                    _context2.t2 = _context2["catch"](5);
+
+                    if (!(typeof rescue === "function")) {
+                      _context2.next = 19;
+                      break;
+                    }
+
+                    rescue(_context2.t2);
+                    _context2.next = 20;
+                    break;
+
+                  case 19:
+                    throw _context2.t2;
+
+                  case 20:
+                    current--;
+
+                  case 21:
+                    _context2.next = 24;
+                    break;
+
+                  case 23:
+                    outputHandle(entry);
+
+                  case 24:
+                  case "end":
+                    return _context2.stop();
+                }
+              }
+            }, _callee2, this, [[5, 13]]);
+          }));
+
+          return function (_x) {
+            return _ref3.apply(this, arguments);
+          };
+        }());
+      };
+
+      Object.defineProperty(this, "push", {
+        value: function value(pushData) {
+          _this.inputs.push(pushData);
+
+          kickStart();
+          return _this;
+        }
+      });
+      Object.defineProperty(this, "concat", {
+        value: function value(pushData) {
+          asArray(pushData).forEach(function (d) {
+            return _this.inputs.push(d);
+          });
+          kickStart();
+          return _this;
+        }
+      });
+      Object.defineProperty(this, "emit", {
+        value: function value(eventName, payload) {
+          switch (eventName) {
+            case PARENT_OUTPUT_UPDATED:
+              if (_this.avaliablePullCount < 1) return;
+
+              var pullData = _this.parent.pull(_this.avaliablePullCount);
+
+              if (pullData.length < 1) return;
+              pullData.forEach(function (datum) {
+                return _this.inputs.push(datum);
+              });
+              kickStart();
+              break;
+          }
+        }
+      });
+      Object.defineProperty(this, "pull", {
+        value: function value(pullLength) {
+          if (!(isNumber(pullLength) || pullLength == Number.POSITIVE_INFINITY)) return [];
+
+          var pullData = _this.outputs.splice(0, pullLength); //pullData.length && kickStart();
+
+
+          return pullData;
+        }
+      });
+      Object.defineProperty(this, "clone", {
+        value: function value(deep, parentOperate) {
+          if (deep === void 0) {
+            deep = true;
+          }
+
+          var cloneOperate = operateFunction({
+            input: input,
+            output: output,
+            concurrent: concurrent,
+            rescue: rescue,
+            limitInput: limitInput,
+            limitOutput: limitOutput
+          });
+          deep === true && _this.children.forEach(function (child) {
+            child.clone(true, cloneOperate);
+          });
+          return cloneOperate;
+        }
+      });
+    };
+
+    operate.prototype = {
+      append: function append(child) {
+        child.parent = this;
+        this.children.push(child);
+        return this;
+      },
+      remove: function remove(child) {
+        var index = this.children.indexOf(child);
+        if (index < 0) return this;
+        child.parent = undefined;
+        this.children.splice(index, 1);
+      },
+      operate: function operate(option) {
+        return this.append(operateFunction(option));
+      }
+    };
+
+    var operateFunction = function operateFunction(option) {
+      return new operate(Object.assign({}, option));
+    };
+
+    return operateFunction;
+  }();
+
+  var abortMessage = new function () {
+    Object.defineProperty(this, "message", {
+      get: function get() {
+        return ":abort";
+      }
+    });
+    Object.defineProperty(this, "abort", {
+      get: function get() {
+        return true;
+      }
+    });
+  }();
+  var abort = function abort(notifyConsole) {
+    if (notifyConsole === void 0) {
+      notifyConsole = undefined;
+    }
+
+    return new PromiseClass(function (resolve$$1, reject$$1) {
+      if (notifyConsole === true) {
+        console.warn("abort promise");
+      }
+
+      reject$$1(abortMessage);
+    });
+  };
+
   var hasValueProperty = function hasValueProperty(obj, value, key) {
     if (arguments.length == 1 && likeObject(obj)) return isEmpty(obj);
     if (isArray(obj)) for (var i = 0, l = obj.length; i < l; i++) {
@@ -2534,528 +2877,6 @@
     };
   }();
 
-  var EDITABLE_DEFAULT_KEY = "$editable";
-
-  var isEditPossibleDataType = function isEditPossibleDataType(model) {
-    return isPlainObject(model);
-  };
-
-  var isEditableState = function isEditableState(model) {
-    return model[EDITABLE_DEFAULT_KEY] !== undefined;
-  };
-
-  var editableModelize = function editableModelize(model) {
-    model[EDITABLE_DEFAULT_KEY] = [];
-    return model;
-  };
-
-  var putEditModel = function putEditModel(destModel, setModel) {
-    var putModel = cloneDeep(setModel);
-
-    Object.keys(destModel).forEach(function (key) {
-      if (key !== EDITABLE_DEFAULT_KEY) {
-        destModel[key] = undefined;
-      }
-    });
-    Object.keys(putModel).forEach(function (key) {
-      if (key !== EDITABLE_DEFAULT_KEY) {
-        destModel[key] = putModel[key];
-      }
-    });
-    return destModel;
-  };
-
-  var cloneCurrentModel = function cloneCurrentModel(model) {
-    var currentModelValues = {};
-    Object.keys(model).forEach(function (key) {
-      if (key !== EDITABLE_DEFAULT_KEY) {
-        currentModelValues[key] = model[key];
-      }
-    });
-    return cloneDeep(currentModelValues);
-  };
-
-  var pushEditModel = function pushEditModel(model, pushModel) {
-    if (!isEditableState(model)) {
-      editableModelize(model);
-    }
-
-    var editableMeta = model[EDITABLE_DEFAULT_KEY];
-    editableMeta.push(cloneCurrentModel(pushModel));
-    return model;
-  };
-
-  var removeEditModel = function removeEditModel(model) {
-    if (isEditPossibleDataType(model) && isEditableState(model)) {
-      model[EDITABLE_DEFAULT_KEY] = undefined;
-    }
-
-    return model;
-  };
-
-  var getOriginalModel = function getOriginalModel(model) {
-    return get(model, "[" + EDITABLE_DEFAULT_KEY + "][0]");
-  };
-
-  var getLastModel = function getLastModel(model) {
-    var changeHistory = get(model, "[" + EDITABLE_DEFAULT_KEY + "]");
-
-    return changeHistory && changeHistory[changeHistory.length - 1];
-  };
-
-  var _isEditable = function isEditable(model) {
-    if (!isEditPossibleDataType(model)) return false;
-    return isEditableState(model);
-  };
-  var enterEditable = function enterEditable(model) {
-    if (!isEditPossibleDataType(model)) return model;
-
-    if (model[EDITABLE_DEFAULT_KEY] !== undefined) {
-      return model;
-    } else {
-      return pushEditModel(model, model);
-    }
-  };
-  var exitEditable = function exitEditable(model, extendModel) {
-    if (extendModel === void 0) {
-      extendModel = undefined;
-    }
-
-    if (!isEditPossibleDataType(model)) return model;
-
-    if (isEditPossibleDataType(extendModel)) {
-      var currentExtendModel = cloneCurrentModel(extendModel);
-      Object.keys(currentExtendModel).forEach(function (key) {
-        model[key] = currentExtendModel[key];
-      });
-    }
-
-    removeEditModel(model);
-    return model;
-  };
-  var cancleEditable = function cancleEditable(model) {
-    if (!isEditPossibleDataType(model)) return model;
-    var originalModel = getOriginalModel(model);
-    removeEditModel(model);
-    putEditModel(model, originalModel);
-  };
-  var commitEditable = function commitEditable(model) {
-    if (!isEditPossibleDataType(model)) return model;
-    return pushEditModel(model, model);
-  };
-  var changedEditable = function changedEditable(model) {
-    if (!isEditPossibleDataType(model) || !_isEditable(model)) return false;
-    return !isEqual(cloneCurrentModel(model), getLastModel(model));
-  };
-  var beginEditable = function beginEditable(model) {
-    if (!isEditPossibleDataType(model)) return model;
-
-    if (!isEditableState(model)) {
-      enterEditable(model);
-    } else {
-      var historyMeta = model[EDITABLE_DEFAULT_KEY];
-      var beginModel = historyMeta[0];
-      historyMeta.splice(0, historyMeta.length, beginModel);
-      putEditModel(model, beginModel);
-    }
-
-    return model;
-  };
-  var expandEditable = function expandEditable(model) {
-    if (!model.hasOwnProperty(EDITABLE_DEFAULT_KEY)) {
-      model[EDITABLE_DEFAULT_KEY] = undefined;
-    }
-
-    return model;
-  };
-  var editable = function editable(model) {
-    var editableQuery = {
-      isEditable: function isEditable() {
-        return _isEditable(model);
-      },
-      isChanged: function isChanged() {
-        return changedEditable(model);
-      },
-      output: function output() {
-        return cloneCurrentModel(model);
-      },
-      free: function free$$1() {
-        return free(model);
-      },
-      expand: function expand() {
-        return expandEditable(model);
-      },
-      begin: function begin() {
-        beginEditable(model);
-        return editableQuery;
-      },
-      enter: function enter() {
-        enterEditable(model);
-        return editableQuery;
-      },
-      exit: function exit(extendModel) {
-        if (extendModel === void 0) {
-          extendModel = undefined;
-        }
-
-        exitEditable(model, extendModel);
-        return editableQuery;
-      },
-      cancle: function cancle() {
-        cancleEditable(model);
-        return editableQuery;
-      },
-      commit: function commit() {
-        commitEditable(model);
-        return editableQuery;
-      }
-    };
-    return editableQuery;
-  };
-
-  var PromiseClass = Promise;
-  var resolveFn = PromiseClass.resolve;
-  var rejectFn = PromiseClass.reject;
-  var newPromise = function newPromise(fn) {
-    return new PromiseClass(function (r, c) {
-      var maybeAwaiter = fn(r, c);
-      likePromise(maybeAwaiter) && maybeAwaiter.then(r).catch(c);
-    });
-  };
-  var promise = function promise(fn) {
-    return newPromise(fn);
-  };
-  var PromiseFunction = promise;
-  var all$1 = Promise.all;
-  PromiseFunction.all = all$1;
-  var resolve = resolveFn;
-  PromiseFunction.resolve = resolve;
-  var reject = rejectFn;
-  PromiseFunction.reject = reject;
-
-  var defer = function defer() {
-    var resolve$$1, reject$$1;
-    var promise$$1 = new PromiseClass(function () {
-      resolve$$1 = arguments[0];
-      reject$$1 = arguments[1];
-    });
-    return {
-      resolve: resolve$$1,
-      reject: reject$$1,
-      promise: promise$$1
-    };
-  };
-  promise.defer = defer;
-  var timeout = function timeout(fn, time) {
-    if (typeof fn === "number") {
-      return newPromise(function (resolve$$1) {
-        return setTimeout(function () {
-          return resolve$$1(time);
-        }, fn);
-      });
-    } else {
-      return newPromise(function (resolve$$1) {
-        return setTimeout(function () {
-          return resolve$$1(typeof fn === "function" ? fn() : fn);
-        }, time);
-      });
-    }
-  };
-  promise.timeout = timeout;
-  var valueOf = function valueOf(maybeQ) {
-    return newPromise(function (resolve$$1, reject$$1) {
-      likePromise(maybeQ) ? maybeQ.then(resolve$$1).catch(reject$$1) : resolve$$1(maybeQ);
-    });
-  };
-  promise.valueOf = valueOf;
-  var promise$1 = promise;
-
-  var operate = function () {
-    var PARENT_OUTPUT_UPDATED = "ParentOutputUpdated";
-
-    var operate = function operate(_ref) {
-      var _this = this;
-
-      var input = _ref.input,
-          output = _ref.output,
-          concurrent = _ref.concurrent,
-          rescue = _ref.rescue,
-          limitInput = _ref.limitInput,
-          limitOutput = _ref.limitOutput;
-      this.parent = undefined;
-      this.children = [];
-      this.inputs = [];
-      this.outputs = [];
-      this.limitInput = isNumber(limitInput) || limitInput > 0 ? limitInput : Number.POSITIVE_INFINITY;
-      this.limitOutput = isNumber(limitOutput) || limitOutput > 0 ? limitOutput : Number.POSITIVE_INFINITY; //
-
-      var current = 0;
-      concurrent = isNumber(concurrent) || concurrent > 0 ? concurrent : 1;
-      Object.defineProperty(this, "avaliablePullCount", {
-        get: function get$$1() {
-          var limit = _this.limitInput - _this.inputs.length;
-          if (limit < 0) limit = 0;
-          return limit;
-        }
-      });
-      Object.defineProperty(this, "avaliableOutputCount", {
-        get: function get$$1() {
-          return _this.limitOutput + current + _this.outputs.length;
-        }
-      });
-      var inputOutput = {
-        input: input,
-        output: output
-      };
-
-      var kickStart = function kickStart() {
-        var avaliableQueLength = concurrent - current; // 작동가능한 큐
-
-        if (avaliableQueLength < 1) {
-          return;
-        } // input의 길이로 확인하여 실행 가능한 큐
-
-
-        if (avaliableQueLength > _this.inputs.length) {
-          avaliableQueLength = _this.inputs.length;
-        } // output의 제한을 확인하여 사용 가능한 큐
-
-
-        if (avaliableQueLength > _this.avaliableOutputCount) {
-          avaliableQueLength = _this.avaliableOutputCount;
-        }
-
-        if (avaliableQueLength < 1) {
-          return;
-        }
-
-        Array(avaliableQueLength).fill(inputOutput).forEach(
-        /*#__PURE__*/
-        function () {
-          var _ref3 = _asyncToGenerator(
-          /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee2(_ref2) {
-            var input, output, entry, outputHandle;
-            return regeneratorRuntime.wrap(function _callee2$(_context2) {
-              while (1) {
-                switch (_context2.prev = _context2.next) {
-                  case 0:
-                    input = _ref2.input, output = _ref2.output;
-                    entry = _this.inputs.shift();
-                    current++;
-
-                    outputHandle =
-                    /*#__PURE__*/
-                    function () {
-                      var _ref4 = _asyncToGenerator(
-                      /*#__PURE__*/
-                      regeneratorRuntime.mark(function _callee(formInputDataum) {
-                        return regeneratorRuntime.wrap(function _callee$(_context) {
-                          while (1) {
-                            switch (_context.prev = _context.next) {
-                              case 0:
-                                /* TODO:lint
-                                if(typeof output === "function"){
-                                  const out = await output({ entry: formInputDataum })
-                                }
-                                */
-                                _this.outputs.push(formInputDataum);
-
-                                current--;
-
-                                _this.children.forEach(function (child) {
-                                  return child.emit(PARENT_OUTPUT_UPDATED);
-                                });
-
-                                kickStart();
-
-                              case 4:
-                              case "end":
-                                return _context.stop();
-                            }
-                          }
-                        }, _callee, this);
-                      }));
-
-                      return function outputHandle(_x2) {
-                        return _ref4.apply(this, arguments);
-                      };
-                    }();
-
-                    if (!input) {
-                      _context2.next = 23;
-                      break;
-                    }
-
-                    _context2.prev = 5;
-                    _context2.t0 = outputHandle;
-                    _context2.next = 9;
-                    return input({
-                      entry: entry
-                    });
-
-                  case 9:
-                    _context2.t1 = _context2.sent;
-                    (0, _context2.t0)(_context2.t1);
-                    _context2.next = 21;
-                    break;
-
-                  case 13:
-                    _context2.prev = 13;
-                    _context2.t2 = _context2["catch"](5);
-
-                    if (!(typeof rescue === "function")) {
-                      _context2.next = 19;
-                      break;
-                    }
-
-                    rescue(_context2.t2);
-                    _context2.next = 20;
-                    break;
-
-                  case 19:
-                    throw _context2.t2;
-
-                  case 20:
-                    current--;
-
-                  case 21:
-                    _context2.next = 24;
-                    break;
-
-                  case 23:
-                    outputHandle(entry);
-
-                  case 24:
-                  case "end":
-                    return _context2.stop();
-                }
-              }
-            }, _callee2, this, [[5, 13]]);
-          }));
-
-          return function (_x) {
-            return _ref3.apply(this, arguments);
-          };
-        }());
-      };
-
-      Object.defineProperty(this, "push", {
-        value: function value(pushData) {
-          _this.inputs.push(pushData);
-
-          kickStart();
-          return _this;
-        }
-      });
-      Object.defineProperty(this, "concat", {
-        value: function value(pushData) {
-          asArray(pushData).forEach(function (d) {
-            return _this.inputs.push(d);
-          });
-          kickStart();
-          return _this;
-        }
-      });
-      Object.defineProperty(this, "emit", {
-        value: function value(eventName, payload) {
-          switch (eventName) {
-            case PARENT_OUTPUT_UPDATED:
-              if (_this.avaliablePullCount < 1) return;
-
-              var pullData = _this.parent.pull(_this.avaliablePullCount);
-
-              if (pullData.length < 1) return;
-              pullData.forEach(function (datum) {
-                return _this.inputs.push(datum);
-              });
-              kickStart();
-              break;
-          }
-        }
-      });
-      Object.defineProperty(this, "pull", {
-        value: function value(pullLength) {
-          if (!(isNumber(pullLength) || pullLength == Number.POSITIVE_INFINITY)) return [];
-
-          var pullData = _this.outputs.splice(0, pullLength); //pullData.length && kickStart();
-
-
-          return pullData;
-        }
-      });
-      Object.defineProperty(this, "clone", {
-        value: function value(deep, parentOperate) {
-          if (deep === void 0) {
-            deep = true;
-          }
-
-          var cloneOperate = operateFunction({
-            input: input,
-            output: output,
-            concurrent: concurrent,
-            rescue: rescue,
-            limitInput: limitInput,
-            limitOutput: limitOutput
-          });
-          deep === true && _this.children.forEach(function (child) {
-            child.clone(true, cloneOperate);
-          });
-          return cloneOperate;
-        }
-      });
-    };
-
-    operate.prototype = {
-      append: function append(child) {
-        child.parent = this;
-        this.children.push(child);
-        return this;
-      },
-      remove: function remove(child) {
-        var index = this.children.indexOf(child);
-        if (index < 0) return this;
-        child.parent = undefined;
-        this.children.splice(index, 1);
-      },
-      operate: function operate(option) {
-        return this.append(operateFunction(option));
-      }
-    };
-
-    var operateFunction = function operateFunction(option) {
-      return new operate(Object.assign({}, option));
-    };
-
-    return operateFunction;
-  }();
-
-  var abortMessage = new function () {
-    Object.defineProperty(this, "message", {
-      get: function get() {
-        return ":abort";
-      }
-    });
-    Object.defineProperty(this, "abort", {
-      get: function get() {
-        return true;
-      }
-    });
-  }();
-  var abort = function abort(notifyConsole) {
-    if (notifyConsole === void 0) {
-      notifyConsole = undefined;
-    }
-
-    return new PromiseClass(function (resolve$$1, reject$$1) {
-      if (notifyConsole === true) {
-        console.warn("abort promise");
-      }
-
-      reject$$1(abortMessage);
-    });
-  };
-
   var awaitLeadOnly = function awaitLeadOnly(func) {
     return alloc(function () {
       var $pending = false;
@@ -3200,330 +3021,6 @@
       return watch;
     };
   };
-
-  var PaginateClass = function PaginateClass(opts) {
-    // current page index
-    this.page = 0; // page per display item length
-
-    this.pagePer = 10; // paginate per display page length
-
-    this.paginatePer = 10; // totalItem count
-
-    this.totalItems = 0; // extra payload
-
-    this.parameters = {}; // pages ouput style ( all | existOnly )
-
-    this.pagesOutputStyle = 'existOnly';
-    this.$pending = false;
-    this.$fetchFn = opts.fetch;
-    this.$renderFn = opts.render;
-    this.update(opts);
-    this.$fetchState = -1;
-
-    if (typeof this.$fetchFn !== "function") {
-      console.error("paginate::fetch 초기 옵션에 반드시 합수를 선언해 주세요");
-    }
-
-    if (typeof this.$renderFn !== "function") {
-      console.error("paginate::render 초기 옵션에 반드시 함수를 선언해 주세요");
-    }
-  };
-
-  PaginateClass.prototype = {
-    isAllowPaginate: function isAllowPaginate(needTo) {
-      return needTo > -1 && needTo < this.paginateLimit;
-    },
-    isAllowIndex: function isAllowIndex(needTo, pagelimit) {
-      pagelimit = typeof pagelimit === "number" ? pagelimit : this.pageLimit;
-      if (pagelimit < 0) return false;
-      return needTo > -1 && needTo <= pagelimit;
-    },
-    fetch: function fetch(payload) {
-      var _this = this;
-
-      if (this.$fetchState != -1) {
-        return promise$1.reject(new Error("paginate::다른 페이징 작업 중에 페이징 처리를 할 수 없습니다."));
-      }
-
-      if (typeof payload === "object") {
-        payload = Object.assign(this.pageState, this.parameters, payload);
-      }
-
-      this.$fetchState = 0;
-      this.$pending = true;
-      return promise$1(function (resolve$$1, reject$$1) {
-        promise$1.valueOf(_this.$fetchFn(payload)).then(function (e) {
-          if (_this.$fetchState == 0) {
-            console.warn("paginate::fetch중엔 반드시 update를 해 주십시오");
-          }
-
-          _this.$fetchState = -1;
-          _this.$pending = true;
-          resolve$$1(e);
-        }).catch(function (e) {
-          _this.$fetchState = -1;
-          _this.$pending = true;
-          reject$$1(e);
-        });
-      });
-    },
-    update: function update(updateOpts) {
-      this.hasOwnProperty("$fetchState") && this.$fetchState++;
-
-      if (updateOpts === null || updateOpts === "abort") {
-        return;
-      }
-
-      this.page = updateOpts.page > -1 ? updateOpts.page : this.page;
-      this.pagePer = updateOpts.pagePer || this.pagePer;
-      this.paginatePer = updateOpts.paginatePer || this.paginatePer;
-      this.totalItems = typeof updateOpts.totalItems === "number" ? updateOpts.totalItems : this.totalItems;
-
-      if (typeof updateOpts.parameters === "object") {
-        this.parameters = Object.assign({}, this.parameters, updateOpts.parameters);
-      }
-
-      if (typeof this.$renderFn === "function") {
-        this.$renderFn(this);
-      } else {
-        console.warn("paginate::render 함수를 찾을수 없습니다. 반드시 설정해주세요.");
-      }
-    },
-    params: function params(parameters) {
-      if (parameters === null) {
-        this.parameters = {};
-      } else if (typeof parameters === "object") {
-        this.parameters = parameters;
-      } else {
-        console.warn("paginate:parameters는 object 파라메터만 받을수 있습니다.");
-      }
-
-      return this;
-    },
-    refresh: function refresh() {
-      return this.fetch({
-        page: this.page
-      });
-    },
-    fetchIndex: function fetchIndex(pageIndex) {
-      // 설정할수 있는 페이지보다 너무 높으면
-      if (pageIndex < 0) {
-        return promise$1.reject("paginate::-1 이하로 페이지네이션에 접근 할 수 없습니다.");
-      }
-
-      if (this.pageLimit < pageIndex) {
-        pageIndex = this.pageLimit;
-
-        if (pageIndex < 0) {
-          pageIndex = 0;
-        }
-      }
-
-      return this.fetch({
-        page: pageIndex
-      });
-    },
-    fetchNext: function fetchNext() {
-      return this.fetchIndex(this.page + 1);
-    },
-    fetchPrev: function fetchPrev() {
-      return this.fetchIndex(this.page - 1);
-    },
-    fetchTo: function fetchTo(command) {
-      var _this2 = this;
-
-      var action;
-
-      switch (command) {
-        case "next":
-        case "nextPage":
-          action = function action(e) {
-            return _this2.fetchNext();
-          };
-
-          break;
-
-        case "prev":
-        case "prevPage":
-          action = function action(e) {
-            return _this2.fetchPrev();
-          };
-
-          break;
-
-        case "firstPage":
-          action = function action(e) {
-            return _this2.fetchIndex(0);
-          };
-
-          break;
-
-        case "lastPage":
-          action = function action(e) {
-            return _this2.fetchIndex(_this2.pageLimit);
-          };
-
-          break;
-
-        /* TODO : if needed
-        case "nextPaginate":
-          break;
-        case "prevPaginate":
-          break;
-          */
-
-        default:
-          if (typeof command === "number") {
-            action = function action(e) {
-              return _this2.fetchIndex(command);
-            };
-          }
-
-      }
-
-      if (action) {
-        return action();
-      } else {
-        return promise$1.reject("paginate::unknown command", command);
-      }
-    }
-  }; // pagenation에서 이동 가능한 index의 크기를 반환함
-
-  Object.defineProperty(PaginateClass.prototype, "pageLimit", {
-    get: function get() {
-      var fixIndex = this.totalItems / this.pagePer; // polyfill Number.isInteger
-
-      if (typeof fixIndex === "number" && isFinite(fixIndex) && Math.floor(fixIndex) === fixIndex) {
-        return fixIndex - 1;
-      } else {
-        return Math.floor(fixIndex);
-      }
-    }
-  }); // pagenation에서 이동 가능한 paginate의 크기를 반환함
-
-  Object.defineProperty(PaginateClass.prototype, "paginateLimit", {
-    get: function get() {
-      return Math.ceil(this.totalItems / (this.pagePer * this.paginatePer));
-    }
-  }); // pagenation에서 이동 가능한 index의 크기를 반환함
-
-  Object.defineProperty(PaginateClass.prototype, "paginate", {
-    get: function get() {
-      var paginate = Math.floor(this.page / this.paginatePer);
-
-      if (paginate < 0) {
-        paginate = 0;
-      }
-
-      return paginate;
-    }
-  });
-  Object.defineProperty(PaginateClass.prototype, "pageState", {
-    get: function get() {
-      return {
-        page: this.page,
-        pagePer: this.pagePer,
-        paginatePer: this.paginatePer,
-        totalItems: this.totalItems
-      };
-    }
-  });
-  Object.defineProperty(PaginateClass.prototype, "pages", {
-    get: function get() {
-      // paginate 설정
-      var startPageIndex = this.paginatePer * this.paginate;
-      var endPageIndex = startPageIndex + this.paginatePer; // 렌더링에 필요한 numberItems 생성
-
-      var numberItems = [];
-      var pageLimit = this.pageLimit;
-
-      for (; startPageIndex < endPageIndex; startPageIndex++) {
-        numberItems.push({
-          index: startPageIndex,
-          number: startPageIndex + 1,
-          $disabled: !this.isAllowIndex(startPageIndex, pageLimit),
-          $active: this.page == startPageIndex
-        });
-      } // ui 페이지 번호 출력 보정
-
-
-      switch (this.pagesOutputStyle) {
-        case "existOnly":
-          if (pageLimit < 1) {
-            numberItems.splice(1, Number.POSITIVE_INFINITY);
-          } else {
-            var disabledStartIndex = 0;
-
-            for (var d = numberItems, i = 0, l = d.length; i < l; i++) {
-              if (d[i].$disabled == false) disabledStartIndex = i + 1;
-            }
-
-            if (disabledStartIndex) {
-              numberItems.splice(disabledStartIndex, Number.POSITIVE_INFINITY);
-            }
-          }
-
-          break;
-
-        case "all":
-        default:
-          // is ok
-          break;
-      }
-
-      return numberItems;
-    }
-  });
-  Object.defineProperty(PaginateClass.prototype, "allowNext", {
-    get: function get() {
-      return this.isAllowIndex(this.page + 1, this.pageLimit);
-    }
-  });
-  Object.defineProperty(PaginateClass.prototype, "allowPrev", {
-    get: function get() {
-      return this.isAllowIndex(this.page - 1, this.pageLimit);
-    }
-  });
-  Object.defineProperty(PaginateClass.prototype, "allowNextPaginate", {
-    get: function get() {
-      return this.isAllowPaginate(this.paginate + 1);
-    }
-  });
-  Object.defineProperty(PaginateClass.prototype, "allowPrevPaginate", {
-    get: function get() {
-      return this.isAllowPaginate(this.paginate - 1);
-    }
-  });
-  Object.defineProperty(PaginateClass.prototype, "viewmodel", {
-    enumerable: false,
-    get: function get() {
-      var _this3 = this;
-
-      return {
-        page: this.page,
-        pagePer: this.pagePer,
-        paginatePer: this.paginatePer,
-        totalItems: this.totalItems,
-        allowNext: this.allowNext,
-        allowPrev: this.allowPrev,
-        allowNextPaginate: this.allowNextPaginate,
-        allowPrevPaginate: this.allowPrevPaginate,
-        pages: this.pages,
-        parameters: Object.keys(this.parameters).reduce(function (dest, name) {
-          dest[name] = _this3.parameters[name];
-          return dest;
-        }, {})
-      };
-    }
-  });
-
-  var paginateFactory = function paginateFactory(e) {
-    return new PaginateClass(e);
-  };
-
-  paginateFactory.constructor = PaginateClass;
-  var Paginate = PaginateClass;
-  var paginate = paginateFactory;
 
   var SESSION_STORE = {};
   var STATE_STORE = {};
@@ -4833,20 +4330,9 @@
     promise: promise$1,
     space: space,
     block: block,
-    isEditable: _isEditable,
-    enterEditable: enterEditable,
-    exitEditable: exitEditable,
-    cancleEditable: cancleEditable,
-    commitEditable: commitEditable,
-    changedEditable: changedEditable,
-    beginEditable: beginEditable,
-    expandEditable: expandEditable,
-    editable: editable,
     awaitLeadOnly: awaitLeadOnly,
     awaitCompose: awaitCompose,
     watchChange: watchChange,
-    Paginate: Paginate,
-    paginate: paginate,
     operate: operate,
     session: session,
     Limitter: Limitter,
