@@ -1,0 +1,18 @@
+{
+  "name": "@sepalang/reborn",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "1": "padoc --pack 'test/1/*.js' test/1/packed -m es",
+    "2": "padoc --pack 'test/2/*.js' test/2/packed -m es",
+    "all": "npm run 1 && npm run 2"
+  },
+  "author": "AHN HO JUNG",
+  "license": "MIT",
+  "devDependencies": {
+    "@sepalang/padoc": "^0.9.4",
+    "@sepalang/logic": "^0.0.1",
+    "rimraf": "^2.6.2"
+  }
+}

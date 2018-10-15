@@ -2,8 +2,8 @@ export {
   windowRect,
   getElementBoundingRect,
   svgPathWithVertex
-} from '../../../.src/web/env/dom';
+} from '@sepalang/logic/web/env/dom';
 
 export { 
   rect
-} from '../../../.src/modules/stance';
+} from '@sepalang/pado/modules/stance';
