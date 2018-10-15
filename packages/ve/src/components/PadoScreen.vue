@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-import { dragHelper } from '@sepalang/pado/web';
+import { dragHelper } from '@sepalang/logic/web';
 import { limitNumber } from '@sepalang/pado/functions';
 import { nextTick, nextQueue } from '@/utils';
 import HighOrderRect from '@sepalang/logic/vue/Rect';

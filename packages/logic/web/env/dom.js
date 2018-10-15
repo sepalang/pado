@@ -1,5 +1,5 @@
-import { rect } from "../../modules/stance"
-import { likeArray, isNode } from "../../functions/isLike"
+import { rect } from "@sepalang/pado/modules/stance"
+import { likeArray, isNode } from "@sepalang/pado/functions/isLike"
 
 export const getNode = function (el){
   let select = likeArray(el) ? el[0] : el

@@ -6,7 +6,7 @@
 <script>
 import $ from 'jquery';
 import LinkComponent from '../mixins/LinkComponent';
-import { getElementBoundingRect } from '@sepalang/pado/web';
+import { getElementBoundingRect } from '@sepalang/logic/web';
 
 export default {
   mixins : [ LinkComponent ],

@@ -1,6 +1,6 @@
-import { unique } from '../../functions/functions'
-import { asArray, toArray } from '../../functions/cast'
-import { isPlainObject, isArray, isNode } from '../../functions/isLike'
+import { unique } from '@sepalang/pado/functions/functions'
+import { asArray, toArray } from '@sepalang/pado/functions/cast'
+import { isPlainObject, isArray, isNode } from '@sepalang/pado/functions/isLike'
 import { is, query, nodelist } from './query-selector'
 
 const findLite = function(find){

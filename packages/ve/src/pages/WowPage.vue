@@ -73,7 +73,7 @@ import {
   //getElementBoundingRect,
   getElementTransformMatrix,
   getElementTransform
-} from '@sepalang/pado/web';
+} from '@sepalang/logic/web';
 
 export default {
   components: {

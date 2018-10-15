@@ -1,5 +1,5 @@
-import { asArray } from '../../functions/cast'
-import { isNode } from '../../functions/isLike';
+import { asArray } from '@sepalang/pado/functions/cast'
+import { isNode } from '@sepalang/pado/functions/isLike';
 
 const QUERY_SELECTOR_ENGINE = function(node,selector){
   try {

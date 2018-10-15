@@ -6,8 +6,8 @@
 </template>
 <script>
 import $ from 'jquery';
-import { predict } from '@sepalang/pado/web/finder/easy';
-import { dragHelper } from '@sepalang/pado/web';
+import { predict } from '@sepalang/logic/web/finder/easy';
+import { dragHelper } from '@sepalang/logic/web';
 import { limitNumber, domainRangeValue } from '@sepalang/pado/functions';
 
 export default {

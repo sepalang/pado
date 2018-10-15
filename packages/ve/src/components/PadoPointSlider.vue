@@ -6,7 +6,7 @@
 </template>
 <script>
 import $ from 'jquery';
-import { dragHelper } from '@sepalang/pado/web';
+import { dragHelper } from '@sepalang/logic/web';
 import { limitNumber, domainRangeValue } from '@sepalang/pado/functions';
 
 export default {

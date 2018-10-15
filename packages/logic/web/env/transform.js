@@ -1,5 +1,5 @@
-import { likeString, isArray } from "../../functions/isLike"
-import { multiplyMatrix } from "../../functions/matrix"
+import { likeString, isArray } from "@sepalang/pado/functions/isLike"
+import { multiplyMatrix } from "@sepalang/pado/functions/matrix"
 
 export const getElementTransformMatrix = function (el){
   const computedStyle       = getComputedStyle(el, null)

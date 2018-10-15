@@ -4,7 +4,7 @@
   </span>
 </template>
 <script>
-import { dragHelper, getElementBoundingRect } from '@sepalang/pado/web';
+import { dragHelper, getElementBoundingRect } from '@sepalang/logic/web';
 import { nextQueue } from '@/utils';
 import HighOrderRect from '@sepalang/logic/vue/Rect';
 import HighOrderPoint from '@sepalang/logic/vue/Point';

@@ -1,6 +1,6 @@
 import { queryFind } from './query-finder'
 import { nodeList } from './query-selector'
-import { isNode, isPlainObject } from '../../functions/isLike';
+import { isNode, isPlainObject } from '@sepalang/pado/functions/isLike';
 
 const getCurrentTarget = function (originalEvent, fallbackElement){
   let result = originalEvent.currentTarget || originalEvent.target
