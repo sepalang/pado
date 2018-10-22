@@ -301,7 +301,7 @@ const removeKey = function(datum, rule){
   if(!isObject(datum)) return datum;
   
   const removeKeys = keys(datum, rule);
-  if(removeKeys.length) return datum;
+  if(!removeKeys.length) return datum;
   
   const allKeys = keys(datum);
   

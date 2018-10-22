@@ -4,12 +4,15 @@
   </div>
 </template>
 <script>
-  
-import { omit } from '@sepalang/pado/functions';
-
 export default {
   mounted(){
-    console.log('functions', omit);
+    const { omitOf, omit } = require('@sepalang/pado/functions');
+    
+    Object.assign(window, {
+      omitOf,
+      omit
+    })
+    
   }
 }
 </script>

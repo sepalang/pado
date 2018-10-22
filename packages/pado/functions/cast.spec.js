@@ -22,7 +22,7 @@ describe('Functions cast', ()=>{
   it('omitOf', ()=>{
     //
     const target = [1];
-    expect(omitOf([1],0)).toEqual([]);
+    expect(omitOf(target,0)).toEqual([]);
     expect(target).toEqual([]);
     
     //
@@ -30,7 +30,7 @@ describe('Functions cast', ()=>{
   it('omit', ()=>{
     //
     const target = [1];
-    expect(omit([1],0)).toEqual([]);
+    expect(omit(target,0)).toEqual([]);
     expect(target).toEqual([1]);
   });
   
