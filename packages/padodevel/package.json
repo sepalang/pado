@@ -4,6 +4,7 @@
   "description": "pado dev tool",
   "main": "index.js",
   "scripts": {
+    "start": "vue-cli-service serve",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -14,10 +15,14 @@
   "author": "AHN HO JUNG",
   "license": "MIT",
   "dependencies": {
+    "@sepalang/logic": "^0.0.2",
     "@sepalang/pado": "^0.3.0",
-    "@sepalang/logic": "^0.0.2"
+    "vue": "^2.5.16",
+    "vue-router": "^3.0.1"
   },
   "devDependencies": {
-    "parcel-bundler": "^1.10.3"
+    "@vue/cli-plugin-babel": "^3.0.5",
+    "@vue/cli-service": "^3.0.5",
+    "vue-template-compiler": "^2.5.16"
   }
 }
