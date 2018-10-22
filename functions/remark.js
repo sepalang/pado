@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.replace", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.regexp.constructor", "./isLike", "./cast"], factory);
+    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.replace", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.regexp.constructor", "./isLike", "./cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.regexp.constructor"), require("./isLike"), require("./cast"));
+    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.regexp.constructor"), require("./isLike"), require("./cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.webDom, global.es6Array, global.es6Object, global.es6Regexp, global.isLike, global.cast);
+    factory(mod.exports, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.webDom, global.es6Array, global.es6Object, global.es6Regexp, global.isLike, global.cast);
     global.remark = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _es6Regexp2, _es6Regexp3, _webDom, _es6Array, _es6Object, _es6Regexp4, _isLike, _cast) {
+})(this, function (_exports, _es6Regexp, _es6Regexp2, _es6Regexp3, _es6Regexp4, _webDom, _es6Array, _es6Object, _es6Regexp5, _isLike, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.findIndexes = _exports.findIndex = _exports.matchString = _exports.entries = _exports.deepKeys = _exports.keys = _exports.stringTest = _exports.valueOf = _exports.fallback = void 0;
+  _exports.diffStructure = _exports.findIndexes = _exports.findIndex = _exports.matchString = _exports.entries = _exports.deepKeys = _exports.keys = _exports.stringTest = _exports.valueOf = _exports.fallback = void 0;
 
   var fallback = function fallback(value, fallbackFn) {
     for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
@@ -38,16 +38,12 @@
 
   _exports.valueOf = valueOf;
 
-  var stringTest = function stringTest(string, filterExp, defaultResult) {
-    if (defaultResult === void 0) {
-      defaultResult = false;
-    }
-
+  var stringTest = function stringTest(string, rule) {
     if (!(0, _isLike.likeString)(string)) return false;
-    if (typeof filterExp === "undefined") return true;
-    return (0, _isLike.likeString)(filterExp) ? (string + '').indexOf(filterExp + '') > -1 : filterExp instanceof RegExp ? filterExp.test(string) : (0, _isLike.isArray)(filterExp) ? filterExp.some(function (filterKey) {
+    if (typeof rule === "undefined") return true;
+    return (0, _isLike.likeString)(rule) ? (string + '').indexOf(rule + '') > -1 : rule instanceof RegExp ? rule.test(string) : (0, _isLike.isArray)(rule) ? rule.some(function (filterKey) {
       return filterKey === string;
-    }) : typeof filterExp === "function" ? Boolean(filterExp(string)) : false;
+    }) : typeof rule === "function" ? Boolean(rule(string)) : false;
   };
 
   _exports.stringTest = stringTest;
@@ -178,8 +174,90 @@
         return idxs;
       }
     };
-  }();
+  }(); //TODO: Union hasValue
+
 
   _exports.findIndexes = findIndexes;
+
+  var NESTED_HAS_PROC = function NESTED_HAS_PROC(obj, key) {
+    var keys = key.split(".");
+    if (!keys.length) return false;
+    var pointer = obj;
+
+    for (var ki in keys) {
+      var k = keys[ki];
+
+      if (!pointer.hasOwnProperty(k)) {
+        return false;
+      } else {
+        pointer = pointer[k];
+      }
+    }
+
+    return true;
+  };
+
+  var diffStructure = function diffStructure(before, after) {
+    var afterKeys = Object.keys(after);
+    var beforeKeys;
+    var canDiff = false;
+
+    if (isObject(before)) {
+      if ((0, _isLike.isArray)(before)) {
+        beforeKeys = before;
+      } else {
+        beforeKeys = Object.keys(before);
+        canDiff = true;
+      }
+    } else {
+      beforeKeys = [];
+    }
+
+    var analysis = {
+      after: after,
+      before: before,
+      keys: unique(afterKeys.concat(beforeKeys)).reduce(function (dest, key) {
+        dest[key] = undefined;
+        return dest;
+      }, {}),
+      match: [],
+      missing: [],
+      surplus: [],
+      diff: [],
+      pass: false //match, missing
+
+    };
+
+    for (var ki in beforeKeys) {
+      if (!beforeKeys.hasOwnProperty(ki)) continue;
+      var key = beforeKeys[ki];
+
+      if (NESTED_HAS_PROC(after, key)) {
+        analysis.match.push(key);
+        analysis.keys[key] = "match";
+
+        if (canDiff && !isEqual(get(after, key), get(before, key))) {
+          analysis.diff.push(key);
+          analysis.keys[key] = "diff";
+        }
+      } else {
+        analysis.surplus.push(key);
+        analysis.keys[key] = "surplus";
+      }
+    } //surplus
+
+
+    (0, _cast.asArray)(afterKeys).forEach(function (key) {
+      if (!hasValue(analysis.match, key)) {
+        analysis.missing.push(key);
+        analysis.keys[key] = "missing";
+      }
+    }); //absolute
+
+    analysis.pass = !analysis.missing.length && !analysis.surplus.length;
+    return analysis;
+  };
+
+  _exports.diffStructure = diffStructure;
 });
 //# sourceMappingURL=remark.js.map

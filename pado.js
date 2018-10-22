@@ -104,10 +104,10 @@
   var isArray = function isArray(data) {
     return Array.isArray(data) || data instanceof Array;
   };
-  var isObject = function isObject(it) {
+  var isObject$1 = function isObject(it) {
     return !!(it !== null && typeof it === "object");
   };
-  var isFunction = function isFunction(it) {
+  var isFunction$1 = function isFunction(it) {
     return typeof it === "function";
   };
   /*
@@ -115,7 +115,7 @@
   */
 
   var likeObject = function likeObject(it) {
-    return isObject(it) || isFunction(it);
+    return isObject$1(it) || isFunction$1(it);
   };
   var likeString = function likeString(data) {
     if (typeof data === "string") return true;
@@ -136,8 +136,8 @@
   var isEnumerableObject = function isEnumerableObject(data) {
     return isPlainObject(data) || isArray(data);
   };
-  var isNode = function isNode(a) {
-    return isObject(a) && typeof a.nodeType === "number";
+  var isNode$1 = function isNode(a) {
+    return isObject$1(a) && typeof a.nodeType === "number";
   };
   var isEmpty = function isEmpty(it) {
     if (typeof it === "undefined") return true;
@@ -189,7 +189,7 @@
       case "object":
         if (isNone(it)) return "none";
         if (likeArray(it)) return "array";
-        if (isNode(it)) return "node";
+        if (isNode$1(it)) return "node";
         if (!isPlainObject(it)) return "object";
         return "hash";
         break;
@@ -252,7 +252,7 @@
     }
   };
 
-  var isEqual = function isEqual(value, other, filter, depth) {
+  var isEqual$1 = function isEqual(value, other, filter, depth) {
     return baseEq(value, other, filter, depth, true);
   };
   var likeEqual = function likeEqual(value, other, filter, depth) {
@@ -299,16 +299,12 @@
 
     return typeof value === "function" ? value.apply(void 0, args) : value;
   };
-  var stringTest = function stringTest(string, filterExp, defaultResult) {
-    if (defaultResult === void 0) {
-      defaultResult = false;
-    }
-
+  var stringTest = function stringTest(string, rule) {
     if (!likeString(string)) return false;
-    if (typeof filterExp === "undefined") return true;
-    return likeString(filterExp) ? (string + '').indexOf(filterExp + '') > -1 : filterExp instanceof RegExp ? filterExp.test(string) : isArray(filterExp) ? filterExp.some(function (filterKey) {
+    if (typeof rule === "undefined") return true;
+    return likeString(rule) ? (string + '').indexOf(rule + '') > -1 : rule instanceof RegExp ? rule.test(string) : isArray(rule) ? rule.some(function (filterKey) {
       return filterKey === string;
-    }) : typeof filterExp === "function" ? Boolean(filterExp(string)) : false;
+    }) : typeof rule === "function" ? Boolean(rule(string)) : false;
   };
   var keys = function keys(target, filterExp, strict) {
     var result = [];
@@ -421,7 +417,86 @@
         return idxs;
       }
     };
-  }();
+  }(); //TODO: Union hasValue
+
+  var NESTED_HAS_PROC = function NESTED_HAS_PROC(obj, key) {
+    var keys = key.split(".");
+    if (!keys.length) return false;
+    var pointer = obj;
+
+    for (var ki in keys) {
+      var k = keys[ki];
+
+      if (!pointer.hasOwnProperty(k)) {
+        return false;
+      } else {
+        pointer = pointer[k];
+      }
+    }
+
+    return true;
+  };
+
+  var diffStructure = function diffStructure(before, after) {
+    var afterKeys = Object.keys(after);
+    var beforeKeys;
+    var canDiff = false;
+
+    if (isObject(before)) {
+      if (isArray(before)) {
+        beforeKeys = before;
+      } else {
+        beforeKeys = Object.keys(before);
+        canDiff = true;
+      }
+    } else {
+      beforeKeys = [];
+    }
+
+    var analysis = {
+      after: after,
+      before: before,
+      keys: unique(afterKeys.concat(beforeKeys)).reduce(function (dest, key) {
+        dest[key] = undefined;
+        return dest;
+      }, {}),
+      match: [],
+      missing: [],
+      surplus: [],
+      diff: [],
+      pass: false //match, missing
+
+    };
+
+    for (var ki in beforeKeys) {
+      if (!beforeKeys.hasOwnProperty(ki)) continue;
+      var key = beforeKeys[ki];
+
+      if (NESTED_HAS_PROC(after, key)) {
+        analysis.match.push(key);
+        analysis.keys[key] = "match";
+
+        if (canDiff && !isEqual(get(after, key), get(before, key))) {
+          analysis.diff.push(key);
+          analysis.keys[key] = "diff";
+        }
+      } else {
+        analysis.surplus.push(key);
+        analysis.keys[key] = "surplus";
+      }
+    } //surplus
+
+
+    asArray(afterKeys).forEach(function (key) {
+      if (!hasValue(analysis.match, key)) {
+        analysis.missing.push(key);
+        analysis.keys[key] = "missing";
+      }
+    }); //absolute
+
+    analysis.pass = !analysis.missing.length && !analysis.surplus.length;
+    return analysis;
+  };
 
   var asArray = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
@@ -577,7 +652,7 @@
       }
     }
 
-    if (isObject(obj)) {
+    if (isObject$1(obj)) {
       for (var key in obj) {
         if (obj[key] === value) return key;
       }
@@ -606,38 +681,245 @@
 
     return obj;
   };
+  var unique$1 = function unique(array, findKey) {
+    var result = [];
+    var uniqueSet = new Set();
 
-  var OMIT_FN = function OMIT_FN(datum) {};
+    if (typeof findKey === "undefined") {
+      findKey = function findKey(v) {
+        return v;
+      };
+    }
 
-  var removeKey = OMIT_FN;
-  var omitOf = OMIT_FN;
-  var omit = function omit(datum) {};
-  var pickOf = function pickOf(datum) {};
-  var pick = function pick(datum) {}; // Clears key values starting with $
+    if (typeof findKey === "string") {
+      var keyPath = findKey;
+
+      findKey = function findKey(v) {
+        return v[keyPath];
+      };
+    }
+
+    array.forEach(function (v) {
+      var key = findKey(v);
+      if (uniqueSet.has(key)) return;
+      uniqueSet.add(key);
+      result.push(v);
+    });
+    return result;
+  };
+  var getKeyBy = function getKeyBy(object, value) {
+    if (isFunction(value)) {
+      if (isArray(object)) for (var i = 0, l = object.length; i < l; i++) {
+        if (value(object[i], i) === true) return i;
+      }
+      if (isObject$1(object)) for (var key in object) {
+        if (value(object[key], key) === true) return key;
+      }
+    } else {
+      if (isArray(object)) for (var i = 0, l = object.length; i < l; i++) {
+        if (object[i] === value) return i;
+      }
+      if (isObject$1(object)) for (var key in object) {
+        if (object[key] === value) return key;
+      }
+    }
+  };
+  var moveOf = function moveOf(data, oldIndex, newIndex) {
+    if (oldIndex !== newIndex && isArray(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
+      Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
+    }
+
+    return data;
+  };
+  var concatOf = function concatOf(data, appends) {
+    var data = asArray(data);
+    return asArray(appends).forEach(function (value) {
+      data.push(value);
+    }), data;
+  };
+  var filterOf = function filterOf(data, func, exitFn) {
+    var data = asArray(data);
+    var exitCnt = 0;
+
+    for (var i = 0, ri = 0, keys$$1 = Object.keys(data), l = keys$$1.length; i < l; i++, ri++) {
+      var key = keys$$1[i];
+      var value = data[key];
+      var result = func(value, key);
+
+      if (result == false) {
+        /*
+        var exit = Array.prototype.splice.call(data, i, 1)
+        */
+        i--;
+        l--;
+        typeof exitFn === "function" && exitFn(value, ri, exitCnt++);
+      }
+    }
+
+    return data;
+  };
+  var clearOf = function clearOf(data, fillFn, sp) {
+    if (data instanceof Array) {
+      sp = Array.prototype.splice.call(data, 0, data.length);
+    } else if (typeof data == "object") {
+      sp = {};
+
+      for (var key in data) {
+        sp[key] = data[key];
+        delete data[key];
+      }
+    }
+
+    return fillFn && fillFn(data, sp), data;
+  };
+  var insertOf = function insertOf(data, v, a) {
+    isArray(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
+    return data;
+  };
+  var sortOf = function sortOf(data, filter) {
+    if (data.length == 0) {
+      return data;
+    }
+
+    switch (filter) {
+      case 'desc':
+        filter = function filter(a, b) {
+          return a > b;
+        };
+
+        break;
+
+      case undefined:
+      case 'asc':
+      default:
+        if (typeof filter !== "function") {
+          filter = function filter(a, b) {
+            return a < b;
+          };
+        }
+
+        break;
+    }
+
+    var result = [data[0]];
+
+    for (var i = 1, l = data.length; i < l; i++) {
+      for (var ri = 0, rl = result.length; ri < rl; ri++) {
+        if (filter(data[i], result[ri]) === true) {
+          insertOf(result, data[i], ri);
+          break;
+        }
+
+        if (ri + 1 === result.length) {
+          result.push(data[i]);
+        }
+      }
+    }
+
+    clearOf(data);
+
+    for (var i = 0, l = result.length; i < l; data.push(result[i]), i++) {
+    }
+
+    return data;
+  };
+  var rebase = function rebase(obj, ref) {
+    var result = {};
+
+    for (var key in obj) {
+      if (key === ".*") {
+        var refValue = obj[key];
+
+        for (var i = 0, d = Object.keys(ref), l = d.length; i < l; i++) {
+          var refKey = d[i];
+
+          if (typeof refValue === "function") {
+            result[refKey] = obj[key];
+          } else {
+            if (typeof refValue !== "object" && typeof refValue !== "object" || isNode(refValue)) {
+              result[refKey] = refValue;
+            } else {
+              result[refKey] = Object.assign(result[refKey], refValue);
+            }
+          }
+        }
+      } else if (key.indexOf(",") > -1) {
+        key.split(",").forEach(function (deepKey) {
+          deepKey = deepKey.trim();
+
+          if (typeof obj[key] === "function") {
+            result[deepKey] = obj[key];
+          } else {
+            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode(obj[key])) {
+              result[deepKey] = obj[key];
+            } else {
+              result[deepKey] = Object.assign(result[deepKey] || (isArray(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
+            }
+          }
+        });
+      } else {
+        if (typeof obj[key] === "function") {
+          result[key] = obj[key];
+        } else {
+          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || isNode(obj[key])) {
+            result[key] = obj[key];
+          } else {
+            result[key] = Object.assign(result[key], obj[key]);
+          }
+        }
+      }
+    }
+
+    return result;
+  };
+
+  var removeKey = function removeKey(datum, rule) {
+    if (!isObject$1(datum)) return datum;
+    var removeKeys = keys(datum, rule);
+    if (!removeKeys.length) return datum;
+    var allKeys = keys(datum);
+    isArray(datum) ? removeKeys.forEach(function (originalIndex, offset) {
+      var removeIndex = originalIndex - offset;
+      datum.splice(removeIndex, 1);
+    }) : removeKeys.forEach(function (key) {
+      delete datum[key];
+    });
+    return datum;
+  }; // If the rule matches the rule, remove the key
+
+
+  var omitOf = function omitOf(datum, rule) {
+    return removeKey(datum, rule);
+  };
+  var omit = function omit(datum, rule) {
+    return omitOf(clone(datum), rule);
+  }; // If the rule matches the rule, preserve the key.
+
+  var pickOf = function pickOf(datum, rule) {
+    return removeKey(datum, function (key) {
+      return !stringTest(key, rule);
+    });
+  };
+  var pick = function pick(datum, rule) {
+    return pickOf(clone(datum), rule);
+  }; // Clears key values starting with $
 
   var FREE_MATCH_EXPRESSION = /^\$/;
   var freeOf = function freeOf(datum) {
     return omitOf(datum, FREE_MATCH_EXPRESSION);
   };
   var free = function free(datum) {
-    return omit(datum, FREE_MATCH_EXPRESSION);
-    var dest = {};
-    Object.keys(datum).forEach(function (key) {
-      if (!/^\$/.test(key)) {
-        dest[key] = cloneDeep(datum[key]);
-      }
-    });
-    return dest;
+    return freeOf(clone(datum));
   }; // Remove the key that begins with $ or has a value of undefined.
 
   var PURGE_FILTER = function PURGE_FILTER(value, key) {
     return FREE_MATCH_EXPRESSION.test(key) || typeof value === "undefined";
   };
   var purgeOf = function purgeOf(datum) {
-    return omitOf(datum, PURGE_FILTER);
+    return omitOf(datum, FREE_MATCH_EXPRESSION);
   };
   var purge = function purge(datum) {
-    return omitOf(datum, PURGE_FILTER);
+    return purgeOf(clone(datum));
   };
   var instance = function instance(func, proto) {
     var ins;
@@ -811,6 +1093,38 @@
     return typeof fn === "function" ? result.map(function (applyArgs) {
       return fn.apply(undefined, applyArgs);
     }) : result;
+  };
+
+  var fill = function fill(collection, fillLength, emptyDefault) {
+    if (emptyDefault === void 0) {
+      emptyDefault = undefined;
+    }
+
+    var data = asArray(collection);
+    var dataLength = data.length;
+    fillLength = isNumber(fillLength) ? fillLength : 0;
+    var fillFn = typeof emptyDefault !== "function" ? function () {
+      return emptyDefault;
+    } : emptyDefault;
+
+    for (var i = 0, l = fillLength - dataLength; i < l; data.push(fillFn(dataLength++, i++))) {
+    }
+
+    return collection;
+  };
+
+  var baseCut = function baseCut(collection, cutLength, emptyDefault, useFill) {
+    var data = asArray(collection);
+    var rest;
+    cutLength = isNumber(cutLength) ? cutLength : 1;
+
+    if (data.length > cutLength) {
+      rest = data.splice(cutLength, Number.POSITIVE_INFINITY);
+      return [data, rest];
+    }
+
+    useFill === true && (data = fill(data, cutLength, emptyDefault));
+    return [data, []];
   };
 
   var readString = function () {
@@ -1066,7 +1380,7 @@
       return [];
     };
   }();
-  var get = function get(target, path, defaultValue) {
+  var get$1 = function get(target, path, defaultValue) {
     if (typeof target === "object") {
       switch (typeof path) {
         case "number":
@@ -1111,7 +1425,7 @@
       return false;
     });
   };
-  var hasValue = function () {
+  var hasValue$1 = function () {
     var defaultObjectValueFunc = function defaultObjectValueFunc(object, value) {
       return object === value;
     };
@@ -1128,7 +1442,7 @@
       return function (object, value) {
         if (useLeftSelector && !object.hasOwnProperty(leftSelect)) return false;
         if (useRightSelector && !value.hasOwnProperty(rightSelect)) return false;
-        return (useLeftSelector ? get(object, leftSelect) : object) === (useRightSelector ? get(value, rightSelect) : value);
+        return (useLeftSelector ? get$1(object, leftSelect) : object) === (useRightSelector ? get$1(value, rightSelect) : value);
       };
     };
 
@@ -1175,7 +1489,7 @@
   }();
   var readDown = function readDown(rootValue, readFn, rootParam) {
     var enterScope = function enterScope(value, depth, param) {
-      return isArray(value) ? arrayScope(value, depth, param) : isObject(value) ? objectScope(value, depth, param) : primitiveScope(value, depth, param);
+      return isArray(value) ? arrayScope(value, depth, param) : isObject$1(value) ? objectScope(value, depth, param) : primitiveScope(value, depth, param);
     };
 
     var arrayScope = function arrayScope(array, depth, param) {
@@ -1240,309 +1554,6 @@
     return rootParam;
   };
 
-  var unique = function unique(array, findKey) {
-    var result = [];
-    var uniqueSet = new Set();
-
-    if (typeof findKey === "undefined") {
-      findKey = function findKey(v) {
-        return v;
-      };
-    }
-
-    if (typeof findKey === "string") {
-      var keyPath = findKey;
-
-      findKey = function findKey(v) {
-        return v[keyPath];
-      };
-    }
-
-    array.forEach(function (v) {
-      var key = findKey(v);
-      if (uniqueSet.has(key)) return;
-      uniqueSet.add(key);
-      result.push(v);
-    });
-    return result;
-  };
-  var getKeyBy = function getKeyBy(object, value) {
-    if (isFunction(value)) {
-      if (isArray(object)) for (var i = 0, l = object.length; i < l; i++) {
-        if (value(object[i], i) === true) return i;
-      }
-      if (isObject(object)) for (var key in object) {
-        if (value(object[key], key) === true) return key;
-      }
-    } else {
-      if (isArray(object)) for (var i = 0, l = object.length; i < l; i++) {
-        if (object[i] === value) return i;
-      }
-      if (isObject(object)) for (var key in object) {
-        if (object[key] === value) return key;
-      }
-    }
-  };
-  var moveOf = function moveOf(data, oldIndex, newIndex) {
-    if (oldIndex !== newIndex && isArray(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
-      Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
-    }
-
-    return data;
-  };
-  var concatOf = function concatOf(data, appends) {
-    var data = asArray(data);
-    return asArray(appends).forEach(function (value) {
-      data.push(value);
-    }), data;
-  };
-  var filterOf = function filterOf(data, func, exitFn) {
-    var data = asArray(data);
-    var exitCnt = 0;
-
-    for (var i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++) {
-      var key = keys[i];
-      var value = data[key];
-      var result = func(value, key);
-
-      if (result == false) {
-        /*
-        var exit = Array.prototype.splice.call(data, i, 1)
-        */
-        i--;
-        l--;
-        typeof exitFn === "function" && exitFn(value, ri, exitCnt++);
-      }
-    }
-
-    return data;
-  };
-  var clearOf = function clearOf(data, fillFn, sp) {
-    if (data instanceof Array) {
-      sp = Array.prototype.splice.call(data, 0, data.length);
-    } else if (typeof data == "object") {
-      sp = {};
-
-      for (var key in data) {
-        sp[key] = data[key];
-        delete data[key];
-      }
-    }
-
-    return fillFn && fillFn(data, sp), data;
-  };
-  var insertOf = function insertOf(data, v, a) {
-    isArray(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
-    return data;
-  };
-  var sortOf = function sortOf(data, filter) {
-    if (data.length == 0) {
-      return data;
-    }
-
-    switch (filter) {
-      case 'desc':
-        filter = function filter(a, b) {
-          return a > b;
-        };
-
-        break;
-
-      case undefined:
-      case 'asc':
-      default:
-        if (typeof filter !== "function") {
-          filter = function filter(a, b) {
-            return a < b;
-          };
-        }
-
-        break;
-    }
-
-    var result = [data[0]];
-
-    for (var i = 1, l = data.length; i < l; i++) {
-      for (var ri = 0, rl = result.length; ri < rl; ri++) {
-        if (filter(data[i], result[ri]) === true) {
-          insertOf(result, data[i], ri);
-          break;
-        }
-
-        if (ri + 1 === result.length) {
-          result.push(data[i]);
-        }
-      }
-    }
-
-    clearOf(data);
-
-    for (var i = 0, l = result.length; i < l; data.push(result[i]), i++) {
-    }
-
-    return data;
-  };
-  var rebase = function rebase(obj, ref) {
-    var result = {};
-
-    for (var key in obj) {
-      if (key === ".*") {
-        var refValue = obj[key];
-
-        for (var i = 0, d = Object.keys(ref), l = d.length; i < l; i++) {
-          var refKey = d[i];
-
-          if (typeof refValue === "function") {
-            result[refKey] = obj[key];
-          } else {
-            if (typeof refValue !== "object" && typeof refValue !== "object" || isNode(refValue)) {
-              result[refKey] = refValue;
-            } else {
-              result[refKey] = Object.assign(result[refKey], refValue);
-            }
-          }
-        }
-      } else if (key.indexOf(",") > -1) {
-        key.split(",").forEach(function (deepKey) {
-          deepKey = deepKey.trim();
-
-          if (typeof obj[key] === "function") {
-            result[deepKey] = obj[key];
-          } else {
-            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode(obj[key])) {
-              result[deepKey] = obj[key];
-            } else {
-              result[deepKey] = Object.assign(result[deepKey] || (isArray(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
-            }
-          }
-        });
-      } else {
-        if (typeof obj[key] === "function") {
-          result[key] = obj[key];
-        } else {
-          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || isNode(obj[key])) {
-            result[key] = obj[key];
-          } else {
-            result[key] = Object.assign(result[key], obj[key]);
-          }
-        }
-      }
-    }
-
-    return result;
-  }; //TODO: Union hasValue
-
-  var NESTED_HAS_PROC = function NESTED_HAS_PROC(obj, key) {
-    var keys = key.split(".");
-    if (!keys.length) return false;
-    var pointer = obj;
-
-    for (var ki in keys) {
-      var k = keys[ki];
-
-      if (!pointer.hasOwnProperty(k)) {
-        return false;
-      } else {
-        pointer = pointer[k];
-      }
-    }
-
-    return true;
-  };
-
-  var diffStructure = function diffStructure(before, after) {
-    var afterKeys = Object.keys(after);
-    var beforeKeys;
-    var canDiff = false;
-
-    if (isObject(before)) {
-      if (isArray(before)) {
-        beforeKeys = before;
-      } else {
-        beforeKeys = Object.keys(before);
-        canDiff = true;
-      }
-    } else {
-      beforeKeys = [];
-    }
-
-    var analysis = {
-      after: after,
-      before: before,
-      keys: unique(afterKeys.concat(beforeKeys)).reduce(function (dest, key) {
-        dest[key] = undefined;
-        return dest;
-      }, {}),
-      match: [],
-      missing: [],
-      surplus: [],
-      diff: [],
-      pass: false //match, missing
-
-    };
-
-    for (var ki in beforeKeys) {
-      if (!beforeKeys.hasOwnProperty(ki)) continue;
-      var key = beforeKeys[ki];
-
-      if (NESTED_HAS_PROC(after, key)) {
-        analysis.match.push(key);
-        analysis.keys[key] = "match";
-
-        if (canDiff && !isEqual(get(after, key), get(before, key))) {
-          analysis.diff.push(key);
-          analysis.keys[key] = "diff";
-        }
-      } else {
-        analysis.surplus.push(key);
-        analysis.keys[key] = "surplus";
-      }
-    } //surplus
-
-
-    asArray(afterKeys).forEach(function (key) {
-      if (!hasValue(analysis.match, key)) {
-        analysis.missing.push(key);
-        analysis.keys[key] = "missing";
-      }
-    }); //absolute
-
-    analysis.pass = !analysis.missing.length && !analysis.surplus.length;
-    return analysis;
-  };
-
-  var fill = function fill(collection, fillLength, emptyDefault) {
-    if (emptyDefault === void 0) {
-      emptyDefault = undefined;
-    }
-
-    var data = asArray(collection);
-    var dataLength = data.length;
-    fillLength = isNumber(fillLength) ? fillLength : 0;
-    var fillFn = typeof emptyDefault !== "function" ? function () {
-      return emptyDefault;
-    } : emptyDefault;
-
-    for (var i = 0, l = fillLength - dataLength; i < l; data.push(fillFn(dataLength++, i++))) {
-    }
-
-    return collection;
-  };
-
-  var baseCut = function baseCut(collection, cutLength, emptyDefault, useFill) {
-    var data = asArray(collection);
-    var rest;
-    cutLength = isNumber(cutLength) ? cutLength : 1;
-
-    if (data.length > cutLength) {
-      rest = data.splice(cutLength, Number.POSITIVE_INFINITY);
-      return [data, rest];
-    }
-
-    useFill === true && (data = fill(data, cutLength, emptyDefault));
-    return [data, []];
-  };
-
   var cut = function cut(collection, cutLength, fillContent) {
     var useFill = arguments.length > 2;
     return baseCut(collection, cutLength, fillContent, useFill)[0];
@@ -1580,7 +1591,7 @@
         var path = iteratee;
 
         iteratee = function iteratee(a, b) {
-          return get(a, path) < get(b, path);
+          return get$1(a, path) < get$1(b, path);
         };
 
         break;
@@ -2285,14 +2296,14 @@
       var current = 0;
       concurrent = isNumber(concurrent) || concurrent > 0 ? concurrent : 1;
       Object.defineProperty(this, "avaliablePullCount", {
-        get: function get$$1() {
+        get: function get() {
           var limit = _this.limitInput - _this.inputs.length;
           if (limit < 0) limit = 0;
           return limit;
         }
       });
       Object.defineProperty(this, "avaliableOutputCount", {
-        get: function get$$1() {
+        get: function get() {
           return _this.limitOutput + current + _this.outputs.length;
         }
       });
@@ -2557,10 +2568,10 @@
 
     if (likeObject(obj)) {
       if (key) {
-        return get(obj, key) === value;
+        return get$1(obj, key) === value;
       } else {
         for (var key in obj) {
-          if (get(obj, key) === value) return true;
+          if (get$1(obj, key) === value) return true;
         }
       }
     }
@@ -2601,7 +2612,7 @@
       },
       domainValue: {
         enumerable: true,
-        get: function get$$1() {
+        get: function get() {
           return hashMap(cloneDeep(_this.get()), function (posSize) {
             return posSize[0];
           });
@@ -2609,7 +2620,7 @@
       },
       domainSize: {
         enumerable: true,
-        get: function get$$1() {
+        get: function get() {
           return hashMap(cloneDeep(_this.get()), function (posSize) {
             return posSize[1];
           });
@@ -2617,7 +2628,7 @@
       },
       rangeStart: {
         enumerable: true,
-        get: function get$$1() {
+        get: function get() {
           return _this.$space.domainRange(hashMap(_this.get(), function (posSize) {
             return posSize[0];
           }));
@@ -2625,7 +2636,7 @@
       },
       rangeSize: {
         enumerable: true,
-        get: function get$$1() {
+        get: function get() {
           return _this.$space.domainRangeSize(hashMap(_this.get(), function (posSize) {
             return posSize[1];
           }));
@@ -2639,7 +2650,7 @@
   Object.defineProperties(BlockPrototype, {
     domainMap: {
       enumerable: false,
-      get: function get$$1() {
+      get: function get() {
         return hashMap(cloneDeep(this.get()), function (posSize) {
           return {
             start: posSize[0],
@@ -2651,7 +2662,7 @@
     },
     rangeMap: {
       enumerable: false,
-      get: function get$$1() {
+      get: function get() {
         var rangeSize = this.rangeSize;
         return hashMap(this.rangeStart, function ($start, sel) {
           var $size = sel ? rangeSize[sel] : rangeSize;
@@ -2665,7 +2676,7 @@
     },
     rangeEnd: {
       enumerable: false,
-      get: function get$$1() {
+      get: function get() {
         return this.rangeMap(this.rangeMap, function (map) {
           return map.end;
         });
@@ -2703,21 +2714,21 @@
       return new Block(this);
     },
     setPosition: function setPosition(value, sel) {
-      var $posSize = get(this.$posSize, sel);
+      var $posSize = get$1(this.$posSize, sel);
       if ($posSize instanceof Array) $posSize[0] = value;
       return this;
     },
     setSize: function setSize(value, sel) {
-      var $posSize = get(this.$posSize, sel);
+      var $posSize = get$1(this.$posSize, sel);
       if ($posSize instanceof Array) $posSize[1] = value;
       return this;
     },
-    get: function get$$1() {
+    get: function get() {
       return cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
     },
     conflicts: function conflicts(otherBlocks, selector) {
       return asArray(otherBlocks).reduce(function (red, block) {
-        var selectOtherBlock = get(block, selector);
+        var selectOtherBlock = get$1(block, selector);
 
         if (selectOtherBlock instanceof Block) {
           //다른 블럭이 현재 블럭과 같거나 space가 다를때는 평가하지 않음
@@ -2725,7 +2736,7 @@
 
           var inspectResult = [];
           hashMap(this.get(), function (thisPos, key) {
-            var otherPos = get(selectOtherBlock.get(), key);
+            var otherPos = get$1(selectOtherBlock.get(), key);
             if (otherPos[0] < thisPos[0] && otherPos[0] + otherPos[1] <= thisPos[0]) return inspectResult.push(false);
             if (otherPos[0] > thisPos[0] && thisPos[0] + thisPos[1] <= otherPos[0]) return inspectResult.push(false);
             return inspectResult.push(true);
@@ -2747,9 +2758,9 @@
       var spaceDomain = this.$space.domain;
       var overflowDomain = mask && cloneDeep(mask) || this.$space && this.$space.domain || [];
       return hashMap(overflowDomain, function ($overflowSelected, sel) {
-        var $posSize = get(blockPosSize, sel);
-        var $domain = get(spaceDomain, sel);
-        return $posSize[0] < get($overflowSelected[0], $domain[0]) || $posSize[0] + $posSize[1] > get($overflowSelected[1], $domain[1]);
+        var $posSize = get$1(blockPosSize, sel);
+        var $domain = get$1(spaceDomain, sel);
+        return $posSize[0] < get$1($overflowSelected[0], $domain[0]) || $posSize[0] + $posSize[1] > get$1($overflowSelected[1], $domain[1]);
       });
     },
     isOverflow: function isOverflow(mask) {
@@ -2810,7 +2821,7 @@
         return range$$1[2];
       });
       var block = this.block(hashMap(this.$space.rangeDomain(cursor), function (cursorPoint, key) {
-        return [cursorPoint, get(domainGrid, key)];
+        return [cursorPoint, get$1(domainGrid, key)];
       }));
       var blockMap = block.map();
       callback && callback.call(block, blockMap, block);
@@ -2854,7 +2865,7 @@
           });
           this.$domain = domain;
         },
-        get: function get$$1() {
+        get: function get() {
           return hashMap(cloneDeep(this.$domain), function (domain) {
             for (var i = 0, l = domain.length; i < l; i++) {
               if (typeof domain[i] === "function") domain[i] = domain[i]();
@@ -2876,7 +2887,7 @@
           });
           this.$range = range$$1;
         },
-        get: function get$$1() {
+        get: function get() {
           return hashMap(cloneDeep(this.$range), function (range$$1) {
             for (var i = 0, l = range$$1.length; i < l; i++) {
               if (typeof range$$1[i] === "function") range$$1[i] = range$$1[i]();
@@ -3054,7 +3065,7 @@
         var newValue;
 
         if (this.$equalityLogic) {
-          if (!isEqual(this.$oldValue, newValue)) {
+          if (!isEqual$1(this.$oldValue, newValue)) {
             changeValue(this, newValue);
           }
         } else {
@@ -3176,7 +3187,7 @@
   };
   Object.defineProperties(LimitterPrototype, {
     done: {
-      get: function get$$1() {
+      get: function get() {
         return this.value === limitNumber(this.value, this.maximum, this.minimum);
       }
     }
@@ -4288,36 +4299,26 @@
 
 
   var functions = /*#__PURE__*/Object.freeze({
-    unique: unique,
-    getKeyBy: getKeyBy,
-    moveOf: moveOf,
-    concatOf: concatOf,
-    filterOf: filterOf,
-    clearOf: clearOf,
-    insertOf: insertOf,
-    sortOf: sortOf,
-    rebase: rebase,
-    diffStructure: diffStructure,
     isAbsoluteNaN: isAbsoluteNaN,
     isNone: isNone,
     isInfinity: isInfinity,
     isNumber: isNumber,
     isInteger: isInteger,
     isArray: isArray,
-    isObject: isObject,
-    isFunction: isFunction,
+    isObject: isObject$1,
+    isFunction: isFunction$1,
     likeObject: likeObject,
     likeString: likeString,
     likeNumber: likeNumber,
     likeArray: likeArray,
     isPlainObject: isPlainObject,
     isEnumerableObject: isEnumerableObject,
-    isNode: isNode,
+    isNode: isNode$1,
     isEmpty: isEmpty,
     isPresence: isPresence,
     likeRegexp: likeRegexp,
     eqof: eqof,
-    isEqual: isEqual,
+    isEqual: isEqual$1,
     likeEqual: likeEqual,
     eqeq: eqeq,
     isExsist: isExsist,
@@ -4331,7 +4332,15 @@
     clone: clone,
     cloneDeep: cloneDeep,
     removeValue: removeValue,
-    removeKey: removeKey,
+    unique: unique$1,
+    getKeyBy: getKeyBy,
+    moveOf: moveOf,
+    concatOf: concatOf,
+    filterOf: filterOf,
+    clearOf: clearOf,
+    insertOf: insertOf,
+    sortOf: sortOf,
+    rebase: rebase,
     omitOf: omitOf,
     omit: omit,
     pickOf: pickOf,
@@ -4379,11 +4388,12 @@
     matchString: matchString,
     findIndex: findIndex,
     findIndexes: findIndexes,
+    diffStructure: diffStructure,
     readString: readString,
     readPath: readPath,
-    get: get,
+    get: get$1,
     hasProperty: hasProperty,
-    hasValue: hasValue,
+    hasValue: hasValue$1,
     readDown: readDown,
     argumentNamesBy: argumentNamesBy,
     scopelizeBy: scopelizeBy,

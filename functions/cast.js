@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike", "./remark"], factory);
+    define(["exports", "core-js/modules/es6.object.assign", "core-js/modules/es6.string.iterator", "core-js/modules/es6.set", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike", "./remark"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"), require("./remark"));
+    factory(exports, require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.string.iterator"), require("core-js/modules/es6.set"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"), require("./remark"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike, global.remark);
+    factory(mod.exports, global.es6Object, global.es6String, global.es6, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike, global.remark);
     global.cast = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Object, _webDom, _es6Regexp, _es6Regexp2, _isLike, _remark) {
+})(this, function (_exports, _es6Object, _es6String, _es, _es6Array, _es6Object2, _webDom, _es6Regexp, _es6Regexp2, _isLike, _remark) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.alloc = _exports.instance = _exports.purge = _exports.purgeOf = _exports.PURGE_FILTER = _exports.free = _exports.freeOf = _exports.FREE_MATCH_EXPRESSION = _exports.pick = _exports.pickOf = _exports.omit = _exports.omitOf = _exports.removeKey = _exports.removeValue = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
+  _exports.alloc = _exports.instance = _exports.purge = _exports.purgeOf = _exports.PURGE_FILTER = _exports.free = _exports.freeOf = _exports.FREE_MATCH_EXPRESSION = _exports.pick = _exports.pickOf = _exports.omit = _exports.omitOf = _exports.rebase = _exports.sortOf = _exports.insertOf = _exports.clearOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.getKeyBy = _exports.unique = _exports.removeValue = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
 
   var asArray = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
@@ -226,22 +226,264 @@
 
   _exports.removeValue = removeValue;
 
-  var OMIT_FN = function OMIT_FN(datum) {};
+  var unique = function unique(array, findKey) {
+    var result = [];
+    var uniqueSet = new Set();
 
-  var removeKey = OMIT_FN;
-  _exports.removeKey = removeKey;
-  var omitOf = OMIT_FN;
+    if (typeof findKey === "undefined") {
+      findKey = function findKey(v) {
+        return v;
+      };
+    }
+
+    if (typeof findKey === "string") {
+      var keyPath = findKey;
+
+      findKey = function findKey(v) {
+        return v[keyPath];
+      };
+    }
+
+    array.forEach(function (v) {
+      var key = findKey(v);
+      if (uniqueSet.has(key)) return;
+      uniqueSet.add(key);
+      result.push(v);
+    });
+    return result;
+  };
+
+  _exports.unique = unique;
+
+  var getKeyBy = function getKeyBy(object, value) {
+    if (isFunction(value)) {
+      if ((0, _isLike.isArray)(object)) for (var i = 0, l = object.length; i < l; i++) {
+        if (value(object[i], i) === true) return i;
+      }
+      if ((0, _isLike.isObject)(object)) for (var key in object) {
+        if (value(object[key], key) === true) return key;
+      }
+    } else {
+      if ((0, _isLike.isArray)(object)) for (var i = 0, l = object.length; i < l; i++) {
+        if (object[i] === value) return i;
+      }
+      if ((0, _isLike.isObject)(object)) for (var key in object) {
+        if (object[key] === value) return key;
+      }
+    }
+  };
+
+  _exports.getKeyBy = getKeyBy;
+
+  var moveOf = function moveOf(data, oldIndex, newIndex) {
+    if (oldIndex !== newIndex && (0, _isLike.isArray)(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
+      Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
+    }
+
+    return data;
+  };
+
+  _exports.moveOf = moveOf;
+
+  var concatOf = function concatOf(data, appends) {
+    var data = asArray(data);
+    return asArray(appends).forEach(function (value) {
+      data.push(value);
+    }), data;
+  };
+
+  _exports.concatOf = concatOf;
+
+  var filterOf = function filterOf(data, func, exitFn) {
+    var data = asArray(data);
+    var exitCnt = 0;
+
+    for (var i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++) {
+      var key = keys[i];
+      var value = data[key];
+      var result = func(value, key);
+
+      if (result == false) {
+        /*
+        var exit = Array.prototype.splice.call(data, i, 1)
+        */
+        i--;
+        l--;
+        typeof exitFn === "function" && exitFn(value, ri, exitCnt++);
+      }
+    }
+
+    return data;
+  };
+
+  _exports.filterOf = filterOf;
+
+  var clearOf = function clearOf(data, fillFn, sp) {
+    if (data instanceof Array) {
+      sp = Array.prototype.splice.call(data, 0, data.length);
+    } else if (typeof data == "object") {
+      sp = {};
+
+      for (var key in data) {
+        sp[key] = data[key];
+        delete data[key];
+      }
+    }
+
+    return fillFn && fillFn(data, sp), data;
+  };
+
+  _exports.clearOf = clearOf;
+
+  var insertOf = function insertOf(data, v, a) {
+    (0, _isLike.isArray)(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
+    return data;
+  };
+
+  _exports.insertOf = insertOf;
+
+  var sortOf = function sortOf(data, filter) {
+    if (data.length == 0) {
+      return data;
+    }
+
+    switch (filter) {
+      case 'desc':
+        filter = function filter(a, b) {
+          return a > b;
+        };
+
+        break;
+
+      case undefined:
+      case 'asc':
+      default:
+        if (typeof filter !== "function") {
+          filter = function filter(a, b) {
+            return a < b;
+          };
+        }
+
+        break;
+    }
+
+    var result = [data[0]];
+
+    for (var i = 1, l = data.length; i < l; i++) {
+      for (var ri = 0, rl = result.length; ri < rl; ri++) {
+        if (filter(data[i], result[ri]) === true) {
+          insertOf(result, data[i], ri);
+          break;
+        }
+
+        if (ri + 1 === result.length) {
+          result.push(data[i]);
+        }
+      }
+    }
+
+    clearOf(data);
+
+    for (var i = 0, l = result.length; i < l; data.push(result[i]), i++) {
+      ;
+    }
+
+    return data;
+  };
+
+  _exports.sortOf = sortOf;
+
+  var rebase = function rebase(obj, ref) {
+    var result = {};
+
+    for (var key in obj) {
+      if (key === ".*") {
+        var refValue = obj[key];
+
+        for (var i = 0, d = Object.keys(ref), l = d.length; i < l; i++) {
+          var refKey = d[i];
+
+          if (typeof refValue === "function") {
+            result[refKey] = obj[key];
+          } else {
+            if (typeof refValue !== "object" && typeof refValue !== "object" || isNode(refValue)) {
+              result[refKey] = refValue;
+            } else {
+              result[refKey] = Object.assign(result[refKey], refValue);
+            }
+          }
+        }
+      } else if (key.indexOf(",") > -1) {
+        key.split(",").forEach(function (deepKey) {
+          deepKey = deepKey.trim();
+
+          if (typeof obj[key] === "function") {
+            result[deepKey] = obj[key];
+          } else {
+            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode(obj[key])) {
+              result[deepKey] = obj[key];
+            } else {
+              result[deepKey] = Object.assign(result[deepKey] || ((0, _isLike.isArray)(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
+            }
+          }
+        });
+      } else {
+        if (typeof obj[key] === "function") {
+          result[key] = obj[key];
+        } else {
+          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || isNode(obj[key])) {
+            result[key] = obj[key];
+          } else {
+            result[key] = Object.assign(result[key], obj[key]);
+          }
+        }
+      }
+    }
+
+    return result;
+  };
+
+  _exports.rebase = rebase;
+
+  var removeKey = function removeKey(datum, rule) {
+    if (!(0, _isLike.isObject)(datum)) return datum;
+    var removeKeys = (0, _remark.keys)(datum, rule);
+    if (!removeKeys.length) return datum;
+    var allKeys = (0, _remark.keys)(datum);
+    (0, _isLike.isArray)(datum) ? removeKeys.forEach(function (originalIndex, offset) {
+      var removeIndex = originalIndex - offset;
+      datum.splice(removeIndex, 1);
+    }) : removeKeys.forEach(function (key) {
+      delete datum[key];
+    });
+    return datum;
+  }; // If the rule matches the rule, remove the key
+
+
+  var omitOf = function omitOf(datum, rule) {
+    return removeKey(datum, rule);
+  };
+
   _exports.omitOf = omitOf;
 
-  var omit = function omit(datum) {};
+  var omit = function omit(datum, rule) {
+    return omitOf(clone(datum), rule);
+  }; // If the rule matches the rule, preserve the key.
+
 
   _exports.omit = omit;
 
-  var pickOf = function pickOf(datum) {};
+  var pickOf = function pickOf(datum, rule) {
+    return removeKey(datum, function (key) {
+      return !(0, _remark.stringTest)(key, rule);
+    });
+  };
 
   _exports.pickOf = pickOf;
 
-  var pick = function pick(datum) {}; // Clears key values starting with $
+  var pick = function pick(datum, rule) {
+    return pickOf(clone(datum), rule);
+  }; // Clears key values starting with $
 
 
   _exports.pick = pick;
@@ -255,14 +497,7 @@
   _exports.freeOf = freeOf;
 
   var free = function free(datum) {
-    return omit(datum, FREE_MATCH_EXPRESSION);
-    var dest = {};
-    Object.keys(datum).forEach(function (key) {
-      if (!/^\$/.test(key)) {
-        dest[key] = cloneDeep(datum[key]);
-      }
-    });
-    return dest;
+    return freeOf(clone(datum));
   }; // Remove the key that begins with $ or has a value of undefined.
 
 
@@ -275,13 +510,13 @@
   _exports.PURGE_FILTER = PURGE_FILTER;
 
   var purgeOf = function purgeOf(datum) {
-    return omitOf(datum, PURGE_FILTER);
+    return omitOf(datum, FREE_MATCH_EXPRESSION);
   };
 
   _exports.purgeOf = purgeOf;
 
   var purge = function purge(datum) {
-    return omitOf(datum, PURGE_FILTER);
+    return purgeOf(clone(datum));
   };
 
   _exports.purge = purge;
