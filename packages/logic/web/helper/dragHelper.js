@@ -1,5 +1,5 @@
 import { queryFind, predict } from "../finder";
-import { rebase } from '../../functions';
+import { rebase } from '@sepalang/pado/functions';
 
 // eslint-disable-next-line no-undef
 const DEVICE_EVENT = (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch)

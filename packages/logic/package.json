@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/logic",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "UI component interface",
   "main": "index.js",
   "scripts": {
@@ -14,6 +14,6 @@
   "author": "AHN HO JUNG",
   "license": "MIT",
   "dependencies": {
-    "@sepalang/pado": "0.3.0"
+    "@sepalang/pado": "0.4.0"
   }
 }

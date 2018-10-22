@@ -1,4 +1,4 @@
-import { isArray } from '../../functions'
+import { isArray } from '@sepalang/pado/functions'
 
 export const readUrl = function (inputUrl){
   let info

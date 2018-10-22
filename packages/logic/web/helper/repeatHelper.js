@@ -1,4 +1,4 @@
-import { asArray } from '../../functions'
+import { asArray } from '@sepalang/pado/functions'
 
 export default function RepeatHelper ({ key, enter:enterFn, update:updateFn, exit:exitFn }){
   // {key:string, vm:Component}
