@@ -9,8 +9,8 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@sepalang/pado": "0.3.0",
-    "@sepalang/logic": "0.0.1",
+    "@sepalang/pado": "^0.3.0",
+    "@sepalang/logic": "^0.0.2",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"

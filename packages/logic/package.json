@@ -14,6 +14,6 @@
   "author": "AHN HO JUNG",
   "license": "MIT",
   "dependencies": {
-    "@sepalang/pado": "0.4.0"
+    "@sepalang/pado": "0.3.0"
   }
 }

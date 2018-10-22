@@ -14,8 +14,8 @@
   "author": "AHN HO JUNG",
   "license": "MIT",
   "dependencies": {
-    "@sepalang/pado": "0.4.0",
-    "@sepalang/logic": "0.0.1"
+    "@sepalang/pado": "^0.3.0",
+    "@sepalang/logic": "^0.0.2"
   },
   "devDependencies": {
     "parcel-bundler": "^1.10.3"
