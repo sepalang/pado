@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike"], factory);
+    define(["exports", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike", "./remark"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"));
+    factory(exports, require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"), require("./remark"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike);
+    factory(mod.exports, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike, global.remark);
     global.cast = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Object, _webDom, _es6Regexp, _es6Regexp2, _isLike) {
+})(this, function (_exports, _es6Array, _es6Object, _webDom, _es6Regexp, _es6Regexp2, _isLike, _remark) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.alloc = _exports.instance = _exports.removeValue = _exports.free = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
+  _exports.alloc = _exports.instance = _exports.purge = _exports.purgeOf = _exports.PURGE_FILTER = _exports.free = _exports.freeOf = _exports.FREE_MATCH_EXPRESSION = _exports.pick = _exports.pickOf = _exports.omit = _exports.omitOf = _exports.removeKey = _exports.removeValue = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
 
   var asArray = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
@@ -187,18 +187,6 @@
 
   _exports.cloneDeep = cloneDeep;
 
-  var free = function free(datum) {
-    var dest = {};
-    Object.keys(datum).forEach(function (key) {
-      if (!/^\$/.test(key)) {
-        dest[key] = cloneDeep(datum[key]);
-      }
-    });
-    return dest;
-  };
-
-  _exports.free = free;
-
   var getKeyWithValue = function getKeyWithValue(obj, value) {
     if ((0, _isLike.isArray)(obj)) {
       for (var i = 0, l = obj.length; i < l; i++) {
@@ -237,6 +225,66 @@
   };
 
   _exports.removeValue = removeValue;
+
+  var OMIT_FN = function OMIT_FN(datum) {};
+
+  var removeKey = OMIT_FN;
+  _exports.removeKey = removeKey;
+  var omitOf = OMIT_FN;
+  _exports.omitOf = omitOf;
+
+  var omit = function omit(datum) {};
+
+  _exports.omit = omit;
+
+  var pickOf = function pickOf(datum) {};
+
+  _exports.pickOf = pickOf;
+
+  var pick = function pick(datum) {}; // Clears key values starting with $
+
+
+  _exports.pick = pick;
+  var FREE_MATCH_EXPRESSION = /^\$/;
+  _exports.FREE_MATCH_EXPRESSION = FREE_MATCH_EXPRESSION;
+
+  var freeOf = function freeOf(datum) {
+    return omitOf(datum, FREE_MATCH_EXPRESSION);
+  };
+
+  _exports.freeOf = freeOf;
+
+  var free = function free(datum) {
+    return omit(datum, FREE_MATCH_EXPRESSION);
+    var dest = {};
+    Object.keys(datum).forEach(function (key) {
+      if (!/^\$/.test(key)) {
+        dest[key] = cloneDeep(datum[key]);
+      }
+    });
+    return dest;
+  }; // Remove the key that begins with $ or has a value of undefined.
+
+
+  _exports.free = free;
+
+  var PURGE_FILTER = function PURGE_FILTER(value, key) {
+    return FREE_MATCH_EXPRESSION.test(key) || typeof value === "undefined";
+  };
+
+  _exports.PURGE_FILTER = PURGE_FILTER;
+
+  var purgeOf = function purgeOf(datum) {
+    return omitOf(datum, PURGE_FILTER);
+  };
+
+  _exports.purgeOf = purgeOf;
+
+  var purge = function purge(datum) {
+    return omitOf(datum, PURGE_FILTER);
+  };
+
+  _exports.purge = purge;
 
   var instance = function instance(func, proto) {
     var ins;

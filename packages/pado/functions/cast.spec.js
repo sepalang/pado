@@ -1,35 +1,54 @@
-import { cloneDeep, free, removeValue, alloc } from './cast'
+import { cloneDeep, removeValue, omitOf, omit, pickOf, pick, freeOf, free, purgeOf, purge, alloc } from './cast'
 
 describe('Functions cast', ()=>{
-  const a = {name: 'a', id: 12}
   
   it('cloneDeep', ()=>{
-    expect(cloneDeep(a)).toEqual(a) 
-  })
-  
-  it('free', ()=>{
-    const a = {name: 'a', $checked: true}
-    const b = {name: 'b', $checked: true, $detail: { info: [], meta: [] }}
-    const c = {$checked: true, $detail: { info: [], meta: [] }}
-    const d = {name: 'b', id: 30, _check: false}
-    const e = {$$: 'double', $$$: 'triple'}
-    
-    expect(free(a)).toEqual({name: 'a'})
-    expect(free(b)).toEqual({name: 'b'})
-    expect(free(c)).toEqual({})
-    expect(free(d)).toEqual({name: 'b', id: 30, _check: false})
-    expect(free(e)).toEqual({})
+    const cloneA = cloneDeep(a)
+    expect(cloneA).toEqual(a) 
+    expect(cloneA === a).toEqual(false)
   })
   
   it('removeValue', ()=>{
     expect(removeValue([0, 1, 2], 1)).toEqual([0, 2])
-    expect(removeValue({a: 2, b: 3}, 3)).toEqual({a: 2})
+    expect(removeValue({ a: 2, b: 3 }, 3)).toEqual({ a: 2 })
     
-    const a = {name: 'a'}
-    const b = {name: 'b'}
-    const c = {name: 'c'}
+    const a = { name: 'a' }
+    const b = { name: 'b' }
+    const c = { name: 'c' }
     const list = [a, b, c]
     expect(removeValue(list, b)).toEqual([a, c])
+  })
+  
+  it('omitOf', ()=>{
+    //
+    const target = [1];
+    expect(omitOf([1],0)).toEqual([]);
+    expect(target).toEqual([]);
+    
+    //
+  });
+  it('omit', ()=>{
+    //
+    const target = [1];
+    expect(omit([1],0)).toEqual([]);
+    expect(target).toEqual([1]);
+  });
+  
+  
+  const a = { name: 'a', id: 12 }
+  
+  it('free', ()=>{
+    const a = { name: 'a', $checked: true }
+    const b = { name: 'b', $checked: true, $detail: { info: [], meta: [] } }
+    const c = { $checked: true, $detail: { info: [], meta: [] } }
+    const d = { name: 'b', id: 30, _check: false }
+    const e = { $$: 'double', $$$: 'triple' }
+    
+    expect(free(a)).toEqual({ name: 'a' })
+    expect(free(b)).toEqual({ name: 'b' })
+    expect(free(c)).toEqual({})
+    expect(free(d)).toEqual({ name: 'b', id: 30, _check: false })
+    expect(free(e)).toEqual({})
   })
   
   it('alloc - scope', ()=>{

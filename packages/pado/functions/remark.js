@@ -1,5 +1,6 @@
 import { 
   isNone,
+  likeString,
   isNumber,
   likeRegexp,
   isArray,
@@ -13,32 +14,44 @@ import {
   asArray
 } from './cast'
 
+
+export const fallback = function (value, fallbackFn, ...args){
+  return typeof value === "undefined" ? fallbackFn(...args) : value
+}
+
+export const valueOf = function (value, ...args){
+  return typeof value === "function" ? value(...args) : value
+}
+
+export const stringTest = function (string, rule){
+  if(!likeString(string)) return false
+  if(typeof rule === "undefined") return true
+  return likeString(rule) ? (string + '').indexOf(rule + '') > -1
+    : rule instanceof RegExp ? rule.test(string)
+    : isArray(rule) ? rule.some(filterKey=>filterKey === string)
+    : typeof rule === "function" ? Boolean(rule(string)) : false
+}
+
 export const keys = function (target, filterExp, strict){
   const result = []
   if(!likeObject(target)) return result
   
-  const filter = typeof filterExp === "function" ? filterExp : ()=>true;
+  const filter = typeof filterExp === "function" ? (key)=>filterExp(key, target) : filterExp;
   
   (strict === true ? isArray(target) : likeArray(target)) && 
-  Object.keys(target).filter(key=>{ if(isNaN(key)) return; const numberKey = parseInt(key, 10); filter(numberKey, target) && result.push(parseInt(numberKey, 10)) }) || 
+  Object.keys(target).filter(key=>{ 
+    if(isNaN(key)) return
+    const numberKey = parseInt(key, 10)
+    stringTest(numberKey, filter) && result.push(parseInt(numberKey, 10)) 
+  }) || 
   (strict === true ? isPlainObject(target) : likeObject(target)) && 
-  Object.keys(target).forEach(key=>{ filter(key, target) && result.push(key) })
+  Object.keys(target).forEach(key=>{ 
+    stringTest(key, filter) && result.push(key) 
+  })
   
   return result
 }
 
-export const entries = function (it){
-  const result = []
-  switch (typeof it){
-    case "object":
-      // eslint-disable-next-line no-unused-expressions
-      isNone(it) ? 0
-        : likeArray(it) ? asArray(it).forEach((v, k)=>{ result.push([k, v]) })
-        : Object.keys(it).forEach(key=>{ result.push([key, it[key]]) })
-      break
-  }
-  return result
-}
 
 export const deepKeys = (function (){
   const nestedDeepKeys = function (target, filter, scope, total){
@@ -63,6 +76,19 @@ export const deepKeys = (function (){
     return result
   }
 }())
+
+export const entries = function (it){
+  const result = []
+  switch (typeof it){
+    case "object":
+      // eslint-disable-next-line no-unused-expressions
+      isNone(it) ? 0
+        : likeArray(it) ? asArray(it).forEach((v, k)=>{ result.push([k, v]) })
+        : Object.keys(it).forEach(key=>{ result.push([key, it[key]]) })
+      break
+  }
+  return result
+}
 
 //remark.spec.js
 export const matchString = (it, search, at = 0)=>{
@@ -100,3 +126,82 @@ export const findIndexes = (function (){
     }
   }
 }())
+
+
+//TODO: Union hasValue
+const NESTED_HAS_PROC = function (obj, key){
+  var keys = key.split(".")
+  if(!keys.length) return false
+
+  var pointer = obj
+  for(var ki in keys){
+    var k = keys[ki]
+
+    if(!pointer.hasOwnProperty(k)){
+      return false
+    } else {
+      pointer = pointer[k]
+    }
+  }
+  return true
+}
+
+export const diffStructure = function (before, after){
+  var afterKeys = Object.keys(after)
+  var beforeKeys
+  var canDiff = false
+  if(isObject(before)){
+    if(isArray(before)){
+      beforeKeys = before
+    } else {
+      beforeKeys = Object.keys(before)
+      canDiff = true
+    }
+  } else {
+    beforeKeys = []
+  }
+
+  var analysis = {
+    after  : after,
+    before : before,
+    keys   : unique(afterKeys.concat(beforeKeys)).reduce((dest, key)=>{ dest[key] = undefined; return dest }, {}),
+    match  : [],
+    missing: [],
+    surplus: [],
+    diff   : [],
+    pass   : false
+  }
+  
+  //match, missing
+  for(var ki in beforeKeys){
+    if(!beforeKeys.hasOwnProperty(ki)) continue
+      
+    var key = beforeKeys[ki]
+      
+    if(NESTED_HAS_PROC(after, key)){
+      analysis.match.push(key)
+      analysis.keys[key] = "match"
+
+      if(canDiff && !isEqual(get(after, key), get(before, key))){
+        analysis.diff.push(key)
+        analysis.keys[key] = "diff"
+      }
+    } else {
+      analysis.surplus.push(key)
+      analysis.keys[key] = "surplus"
+    }
+  }
+
+  //surplus
+  asArray(afterKeys).forEach(key=>{
+    if(!hasValue(analysis.match, key)){
+      analysis.missing.push(key)
+      analysis.keys[key] = "missing"
+    }
+  })
+
+  //absolute
+  analysis.pass = !analysis.missing.length && !analysis.surplus.length
+
+  return analysis
+}

@@ -285,6 +285,144 @@
     return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";
   };
 
+  var fallback = function fallback(value, fallbackFn) {
+    for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+      args[_key - 2] = arguments[_key];
+    }
+
+    return typeof value === "undefined" ? fallbackFn.apply(void 0, args) : value;
+  };
+  var valueOf = function valueOf(value) {
+    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
+    }
+
+    return typeof value === "function" ? value.apply(void 0, args) : value;
+  };
+  var stringTest = function stringTest(string, filterExp, defaultResult) {
+    if (defaultResult === void 0) {
+      defaultResult = false;
+    }
+
+    if (!likeString(string)) return false;
+    if (typeof filterExp === "undefined") return true;
+    return likeString(filterExp) ? (string + '').indexOf(filterExp + '') > -1 : filterExp instanceof RegExp ? filterExp.test(string) : isArray(filterExp) ? filterExp.some(function (filterKey) {
+      return filterKey === string;
+    }) : typeof filterExp === "function" ? Boolean(filterExp(string)) : false;
+  };
+  var keys = function keys(target, filterExp, strict) {
+    var result = [];
+    if (!likeObject(target)) return result;
+    var filter = typeof filterExp === "function" ? function (key) {
+      return filterExp(key, target);
+    } : filterExp;
+    (strict === true ? isArray(target) : likeArray(target)) && Object.keys(target).filter(function (key) {
+      if (isNaN(key)) return;
+      var numberKey = parseInt(key, 10);
+      stringTest(numberKey, filter) && result.push(parseInt(numberKey, 10));
+    }) || (strict === true ? isPlainObject(target) : likeObject(target)) && Object.keys(target).forEach(function (key) {
+      stringTest(key, filter) && result.push(key);
+    });
+    return result;
+  };
+  var deepKeys = function () {
+    var nestedDeepKeys = function nestedDeepKeys(target, filter, scope, total) {
+      if (typeof target === "object") {
+        keys(target, function (key, target) {
+          var child = target[key];
+          var useKey = filter(child, key, scope.length);
+
+          if (!useKey) {
+            return;
+          }
+
+          var currentScope = clone(scope);
+          currentScope.push(key);
+          total.push(currentScope);
+          nestedDeepKeys(child, filter, currentScope, total);
+        }, true);
+      }
+    };
+
+    return function (target, filter) {
+      var result = [];
+      nestedDeepKeys(target, filter ? function (child, key) {
+        filter(child, key);
+      } : function () {
+        return true;
+      }, [], result);
+      return result;
+    };
+  }();
+  var entries = function entries(it) {
+    var result = [];
+
+    switch (typeof it) {
+      case "object":
+        // eslint-disable-next-line no-unused-expressions
+        isNone(it) ? 0 : likeArray(it) ? asArray(it).forEach(function (v, k) {
+          result.push([k, v]);
+        }) : Object.keys(it).forEach(function (key) {
+          result.push([key, it[key]]);
+        });
+        break;
+    }
+
+    return result;
+  }; //remark.spec.js
+
+  var matchString = function matchString(it, search, at) {
+    if (at === void 0) {
+      at = 0;
+    }
+
+    if (typeof it !== "string") throw new Error("matchString :: worng argument " + it);
+    if (typeof search === "string") search = search.replace(new RegExp("(\\.|\\[|\\])", "g"), function (s) {
+      return "\\" + s;
+    });
+    var result = it.substr(at).match(search);
+    return result ? [result.index + at, result[0].length] : [-1, 0];
+  };
+  var findIndex = function () {
+    var __find_string = function __find_string(it, search, at) {
+      return it.indexOf(search, at);
+    };
+
+    var __find_regexp = function __find_regexp(it, search, at) {
+      var i = it.substring(at || 0).search(search);
+      return i >= 0 ? i + (at || 0) : i;
+    };
+
+    return function (it, search, at) {
+      return (search instanceof RegExp ? __find_regexp : __find_string)(it, search, at);
+    };
+  }(); //remark.spec.js
+
+  var findIndexes = function () {
+    return function (c, s, at) {
+      if (typeof c === "string" || typeof c === "number") {
+        var idxs = [];
+        var s = likeRegexp(s) ? s : s + "";
+        var at = !at || !isNumber(at) || at < 0 ? 0 : at;
+        var next;
+
+        do {
+          var i = findIndex(c, s, at);
+
+          if (i > -1) {
+            at = (s.length || 1) + i;
+            idxs.push(i);
+            next = true;
+          } else {
+            next = false;
+          }
+        } while (next);
+
+        return idxs;
+      }
+    };
+  }();
+
   var asArray = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
       defaultArray = undefined;
@@ -431,15 +569,6 @@
       return clone(target);
     }
   };
-  var free = function free(datum) {
-    var dest = {};
-    Object.keys(datum).forEach(function (key) {
-      if (!/^\$/.test(key)) {
-        dest[key] = cloneDeep(datum[key]);
-      }
-    });
-    return dest;
-  };
 
   var getKeyWithValue = function getKeyWithValue(obj, value) {
     if (isArray(obj)) {
@@ -476,6 +605,39 @@
     }
 
     return obj;
+  };
+
+  var OMIT_FN = function OMIT_FN(datum) {};
+
+  var removeKey = OMIT_FN;
+  var omitOf = OMIT_FN;
+  var omit = function omit(datum) {};
+  var pickOf = function pickOf(datum) {};
+  var pick = function pick(datum) {}; // Clears key values starting with $
+
+  var FREE_MATCH_EXPRESSION = /^\$/;
+  var freeOf = function freeOf(datum) {
+    return omitOf(datum, FREE_MATCH_EXPRESSION);
+  };
+  var free = function free(datum) {
+    return omit(datum, FREE_MATCH_EXPRESSION);
+    var dest = {};
+    Object.keys(datum).forEach(function (key) {
+      if (!/^\$/.test(key)) {
+        dest[key] = cloneDeep(datum[key]);
+      }
+    });
+    return dest;
+  }; // Remove the key that begins with $ or has a value of undefined.
+
+  var PURGE_FILTER = function PURGE_FILTER(value, key) {
+    return FREE_MATCH_EXPRESSION.test(key) || typeof value === "undefined";
+  };
+  var purgeOf = function purgeOf(datum) {
+    return omitOf(datum, PURGE_FILTER);
+  };
+  var purge = function purge(datum) {
+    return omitOf(datum, PURGE_FILTER);
   };
   var instance = function instance(func, proto) {
     var ins;
@@ -608,119 +770,6 @@
     }
   }())
   */
-
-  var keys = function keys(target, filterExp, strict) {
-    var result = [];
-    if (!likeObject(target)) return result;
-    var filter = typeof filterExp === "function" ? filterExp : function () {
-      return true;
-    };
-    (strict === true ? isArray(target) : likeArray(target)) && Object.keys(target).filter(function (key) {
-      if (isNaN(key)) return;
-      var numberKey = parseInt(key, 10);
-      filter(numberKey, target) && result.push(parseInt(numberKey, 10));
-    }) || (strict === true ? isPlainObject(target) : likeObject(target)) && Object.keys(target).forEach(function (key) {
-      filter(key, target) && result.push(key);
-    });
-    return result;
-  };
-  var entries = function entries(it) {
-    var result = [];
-
-    switch (typeof it) {
-      case "object":
-        // eslint-disable-next-line no-unused-expressions
-        isNone(it) ? 0 : likeArray(it) ? asArray(it).forEach(function (v, k) {
-          result.push([k, v]);
-        }) : Object.keys(it).forEach(function (key) {
-          result.push([key, it[key]]);
-        });
-        break;
-    }
-
-    return result;
-  };
-  var deepKeys = function () {
-    var nestedDeepKeys = function nestedDeepKeys(target, filter, scope, total) {
-      if (typeof target === "object") {
-        keys(target, function (key, target) {
-          var child = target[key];
-          var useKey = filter(child, key, scope.length);
-
-          if (!useKey) {
-            return;
-          }
-
-          var currentScope = clone(scope);
-          currentScope.push(key);
-          total.push(currentScope);
-          nestedDeepKeys(child, filter, currentScope, total);
-        }, true);
-      }
-    };
-
-    return function (target, filter) {
-      var result = [];
-      nestedDeepKeys(target, filter ? function (child, key) {
-        filter(child, key);
-      } : function () {
-        return true;
-      }, [], result);
-      return result;
-    };
-  }(); //remark.spec.js
-
-  var matchString = function matchString(it, search, at) {
-    if (at === void 0) {
-      at = 0;
-    }
-
-    if (typeof it !== "string") throw new Error("matchString :: worng argument " + it);
-    if (typeof search === "string") search = search.replace(new RegExp("(\\.|\\[|\\])", "g"), function (s) {
-      return "\\" + s;
-    });
-    var result = it.substr(at).match(search);
-    return result ? [result.index + at, result[0].length] : [-1, 0];
-  };
-  var findIndex = function () {
-    var __find_string = function __find_string(it, search, at) {
-      return it.indexOf(search, at);
-    };
-
-    var __find_regexp = function __find_regexp(it, search, at) {
-      var i = it.substring(at || 0).search(search);
-      return i >= 0 ? i + (at || 0) : i;
-    };
-
-    return function (it, search, at) {
-      return (search instanceof RegExp ? __find_regexp : __find_string)(it, search, at);
-    };
-  }(); //remark.spec.js
-
-  var findIndexes = function () {
-    return function (c, s, at) {
-      if (typeof c === "string" || typeof c === "number") {
-        var idxs = [];
-        var s = likeRegexp(s) ? s : s + "";
-        var at = !at || !isNumber(at) || at < 0 ? 0 : at;
-        var next;
-
-        do {
-          var i = findIndex(c, s, at);
-
-          if (i > -1) {
-            at = (s.length || 1) + i;
-            idxs.push(i);
-            next = true;
-          } else {
-            next = false;
-          }
-        } while (next);
-
-        return idxs;
-      }
-    };
-  }();
 
   var all = function all(data, fn) {
     data = asArray(data);
@@ -2206,12 +2255,12 @@
     }
   };
   promise.timeout = timeout;
-  var valueOf = function valueOf(maybeQ) {
+  var valueOf$1 = function valueOf$$1(maybeQ) {
     return newPromise(function (resolve$$1, reject$$1) {
       likePromise(maybeQ) ? maybeQ.then(resolve$$1).catch(reject$$1) : resolve$$1(maybeQ);
     });
   };
-  promise.valueOf = valueOf;
+  promise.valueOf = valueOf$1;
   var promise$1 = promise;
 
   var operate = function () {
@@ -2892,7 +2941,7 @@
         } else {
           $pending = true;
           return promise$1(function (resolve$$1, reject$$1) {
-            return valueOf(func.apply(_this, args)).then(resolve$$1).catch(reject$$1);
+            return valueOf$1(func.apply(_this, args)).then(resolve$$1).catch(reject$$1);
           }).then(function (e) {
             $pending = false;
             return e;
@@ -2955,7 +3004,7 @@
             if (done) {
               resolve$$1(taskPayload);
             } else {
-              valueOf(proc.call(_this2, taskPayload)).then(function (nextPayload) {
+              valueOf$1(proc.call(_this2, taskPayload)).then(function (nextPayload) {
                 doWhile(iterator.next(), nextPayload);
               }).catch(reject$$1);
             }
@@ -4281,8 +4330,18 @@
     cleanObject: cleanObject,
     clone: clone,
     cloneDeep: cloneDeep,
-    free: free,
     removeValue: removeValue,
+    removeKey: removeKey,
+    omitOf: omitOf,
+    omit: omit,
+    pickOf: pickOf,
+    pick: pick,
+    FREE_MATCH_EXPRESSION: FREE_MATCH_EXPRESSION,
+    freeOf: freeOf,
+    free: free,
+    PURGE_FILTER: PURGE_FILTER,
+    purgeOf: purgeOf,
+    purge: purge,
     instance: instance,
     alloc: alloc,
     all: all,
@@ -4311,9 +4370,12 @@
     turn: turn,
     turnTime: turnTime,
     toggle: toggle,
+    fallback: fallback,
+    valueOf: valueOf,
+    stringTest: stringTest,
     keys: keys,
-    entries: entries,
     deepKeys: deepKeys,
+    entries: entries,
     matchString: matchString,
     findIndex: findIndex,
     findIndexes: findIndexes,

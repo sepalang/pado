@@ -25,7 +25,7 @@
     "vecom":"(cd packages/vecom && npm run serve)",
     "reborn":"(cd packages/reborn && npm run all)",
     "repl": "padoc --exec .util/repl/index.js -i -g",
-    "lint": "lintpad packages/pado -m lib --no-ignore",
+    "lint": "lintpad packages/pado -m lib",
     "lint:fix": "npm run lint -- --fix",
     "bootstrap": "lerna bootstrap --hoist"
   },

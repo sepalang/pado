@@ -1,5 +1,6 @@
 import { asArray } from '@sepalang/pado/functions/cast'
-import { isNode } from '@sepalang/pado/functions/isLike';
+import { isNode } from '@sepalang/pado/functions/isLike'
+
 
 const QUERY_SELECTOR_ENGINE = function(node,selector){
   try {
@@ -29,6 +30,7 @@ const MATCHES_SELECTOR_ENGINE = function(node,selector){
 
 export const nodeList = function(node, eq){
   node = asArray(node).map(item=>isNode(item)?item:undefined);
+  console.log("node", node)
   return typeof eq === "number" ? node[eq] : node;
 };
 

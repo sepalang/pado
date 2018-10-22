@@ -6,6 +6,11 @@ import {
   isObject
 } from './isLike'
 
+import {
+  stringTest,
+  keys
+} from './remark'
+
 export const asArray = function (data, defaultArray = undefined){
   if(isArray(data)){
     return data
@@ -105,16 +110,6 @@ export const cloneDeep = function (target){
   }
 }
 
-export const free = function (datum){
-  const dest = {}
-  Object.keys(datum).forEach(key=>{
-    if(!/^\$/.test(key)){
-      dest[key] = cloneDeep(datum[key])
-    }
-  })
-  return dest
-}
-
 const getKeyWithValue = function (obj, value){
   if(isArray(obj)){
     for(var i = 0, l = obj.length; i < l; i++) if(obj[i] === value) return i
@@ -144,6 +139,199 @@ export const removeValue = function (obj, value){
 
   return obj
 }
+
+export const unique = function (array, findKey){
+  const result    = []
+  const uniqueSet = new Set()
+  if(typeof findKey === "undefined"){ findKey = (v)=>v }
+  if(typeof findKey === "string"){ const keyPath = findKey; findKey = (v)=>v[keyPath] }
+  array.forEach((v)=>{
+    const key = findKey(v)
+    if(uniqueSet.has(key)) return
+    uniqueSet.add(key)
+    result.push(v)
+  })
+  return result
+}
+
+export const getKeyBy = function (object, value){
+  if(isFunction(value)){
+    if(isArray(object)) for(var i = 0, l = object.length; i < l; i++) if(value(object[i], i) === true) return i
+    if(isObject(object)) for(var key in object) if(value(object[key], key) === true) return key
+  } else {
+    if(isArray(object)) for(var i = 0, l = object.length; i < l; i++) if(object[i] === value) return i
+    if(isObject(object)) for(var key in object) if(object[key] === value) return key
+  }
+}
+
+export const moveOf = function (data, oldIndex, newIndex){
+  if(oldIndex !== newIndex && isArray(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length){
+    Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0])
+  }
+  return data
+}
+
+export const concatOf = function (data, appends){
+  var data = asArray(data)
+  return asArray(appends).forEach(value=>{ data.push(value) }), data
+}
+
+
+export const filterOf = function (data, func, exitFn){
+  var data    = asArray(data)
+  var exitCnt = 0
+
+  for(var i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++){
+    var key   = keys[i]
+    var value = data[key]
+    var result = func(value, key)
+    if(result == false){
+      /*
+      var exit = Array.prototype.splice.call(data, i, 1)
+      */
+      i--
+      l--
+      typeof exitFn === "function" && exitFn(value, ri, exitCnt++)
+    }
+  }
+  
+  return data
+}
+
+export const clearOf = function (data, fillFn, sp){
+  if(data instanceof Array){
+    sp = Array.prototype.splice.call(data, 0, data.length)
+  } else if(typeof data == "object"){
+    sp = {}
+    for(var key in data){ sp[key] = data[key]; delete data[key] } 
+  }
+  return (fillFn && fillFn(data, sp)), data
+}
+
+export const insertOf = function (data, v, a){
+  isArray(data) && data.splice(typeof a === "number" ? a : 0, 0, v)
+  return data
+}
+
+export const sortOf = function (data, filter){
+  if(data.length == 0){
+    return data
+  }
+  
+  switch (filter){
+    case 'desc':
+      filter = function (a, b){ return a > b }
+      break
+    case undefined:
+    case 'asc':
+    default:
+      if(typeof filter !== "function"){
+        filter = function (a, b){ return a < b }
+      }
+      break
+  }
+
+  var result = [data[0]]
+
+  for(var i = 1, l = data.length; i < l; i++){
+    for(var ri = 0, rl = result.length; ri < rl; ri++){
+      if(filter(data[i], result[ri]) === true){
+        insertOf(result, data[i], ri)
+        break
+      }
+      if((ri + 1) === result.length){
+        result.push(data[i])
+      }
+    }
+  }
+
+  clearOf(data)
+
+  for(var i = 0, l = result.length; i < l; data.push(result[i]), i++);
+  
+  return data
+}
+
+export const rebase = function (obj, ref){
+  var result = {}
+  for(var key in obj){
+    if(key === ".*"){
+      var refValue = obj[key]
+      for(var i = 0, d = Object.keys(ref), l = d.length; i < l; i++){
+        var refKey = d[i]
+        if(typeof refValue === "function"){
+          result[refKey] = obj[key]
+        } else {
+          if((typeof refValue !== "object" && typeof refValue !== "object") || isNode(refValue)){
+            result[refKey] = refValue
+          } else {
+            result[refKey] = Object.assign(result[refKey], refValue)
+          }
+        }
+      }
+    } else if(key.indexOf(",") > -1){
+      key.split(",").forEach(deepKey=>{
+        deepKey = deepKey.trim()
+        if(typeof obj[key] === "function"){
+          result[deepKey] = obj[key]
+        } else {
+          if((!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object") || isNode(obj[key])){
+            result[deepKey] = obj[key]
+          } else {
+            result[deepKey] = Object.assign(result[deepKey] || (isArray(obj[key]) ? [] : {}), obj[key], obj[deepKey])
+          }
+        }
+      })
+    } else {
+      if(typeof obj[key] === "function"){
+        result[key] = obj[key]
+      } else {
+        if((typeof result[key] !== "object" && typeof obj[key] !== "object") || isNode(obj[key])){
+          result[key] = obj[key]
+        } else {
+          result[key] = Object.assign(result[key], obj[key])
+        }
+      }
+    }
+  }
+  return result
+}
+
+const removeKey = function(datum, rule){
+  if(!isObject(datum)) return datum;
+  
+  const removeKeys = keys(datum, rule);
+  if(removeKeys.length) return datum;
+  
+  const allKeys = keys(datum);
+  
+  isArray(datum) ?
+  removeKeys.forEach((originalIndex,offset)=>{
+    const removeIndex = originalIndex - offset;
+    datum.splice(removeIndex,1);
+  }) :
+  removeKeys.forEach(key=>{ delete datum[key] });
+
+  return datum;
+}
+
+// If the rule matches the rule, remove the key
+export const omitOf = (datum, rule)=>removeKey(datum, rule)
+export const omit = (datum, rule)=>omitOf(clone(datum), rule)
+
+// If the rule matches the rule, preserve the key.
+export const pickOf = (datum, rule)=>removeKey(datum, (key)=>!stringTest(key, rule))
+export const pick = (datum, rule)=>pickOf(clone(datum), rule)
+
+// Clears key values starting with $
+export const FREE_MATCH_EXPRESSION = /^\$/
+export const freeOf = (datum)=>omitOf(datum, FREE_MATCH_EXPRESSION)
+export const free = (datum)=>freeOf(clone(datum))
+
+// Remove the key that begins with $ or has a value of undefined.
+export const PURGE_FILTER = (value, key)=>FREE_MATCH_EXPRESSION.test(key) || typeof value === "undefined"
+export const purgeOf = (datum)=>omitOf(datum, FREE_MATCH_EXPRESSION)
+export const purge = (datum)=>purgeOf(clone(datum))
 
 export const instance = function (func, proto){
   var ins; var DummyInstance = function (param){ if(typeof param === "object") for(var k in param) this[k] = param[k] }

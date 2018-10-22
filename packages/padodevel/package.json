@@ -1,0 +1,23 @@
+{
+  "name": "padodevel",
+  "version": "0.0.0",
+  "description": "pado dev tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pado",
+    "dev",
+    "tool"
+  ],
+  "author": "AHN HO JUNG",
+  "license": "MIT",
+  "dependencies": {
+    "@sepalang/pado": "0.4.0",
+    "@sepalang/logic": "0.0.1"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.10.3"
+  }
+}

@@ -1,4 +1,3 @@
-export * from './functions'
 export * from './isLike'
 export * from './cast'
 export * from './enumerable'

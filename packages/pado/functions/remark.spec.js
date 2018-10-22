@@ -1,9 +1,68 @@
-import { entries, keys, deepKeys, matchString, findIndex, findIndexes } from './remark'
+import { fallback, valueOf, stringTest, entries, keys, deepKeys, matchString, findIndex, findIndexes } from './remark'
 
 describe('Functions remark', ()=>{
+  
+  it('fallback', ()=>{
+    const fallbackValue = { fallback: "value" }
+    expect(fallback(1, ()=>fallbackValue)).toEqual(1)
+    expect(fallback('', ()=>fallbackValue)).toEqual('')
+    expect(fallback('a', ()=>fallbackValue)).toEqual('a')
+    expect(fallback({ foo: 'bar' }, ()=>fallbackValue)).toEqual({ foo: 'bar' })
+    expect(fallback(true, ()=>fallbackValue)).toEqual(true)
+    expect(fallback(false, ()=>fallbackValue)).toEqual(false)
+    expect(fallback(null, ()=>fallbackValue)).toEqual(null)
+    const fnValue = ()=>{}
+    expect(fallback(fnValue, ()=>fallbackValue)).toEqual(fnValue)
+    expect(fallback(undefined, ()=>fallbackValue)).toEqual(fallbackValue)
+    //
+  })
+  
+  it('valueOf', ()=>{
+    const arg1 = "bar"
+    const arg2 = "kim"
+    expect(valueOf(1, arg1)).toEqual(1)
+    expect(valueOf('', arg1)).toEqual('')
+    expect(valueOf('a', arg1)).toEqual('a')
+    expect(valueOf({ foo: 'bar' }, arg1)).toEqual({ foo: 'bar' })
+    expect(valueOf(true, arg1)).toEqual(true)
+    expect(valueOf(false, arg1)).toEqual(false)
+    expect(valueOf(null, arg1)).toEqual(null)
+    expect(valueOf(undefined, arg1)).toEqual(undefined)
+    expect(valueOf(()=>'foo', arg1)).toEqual('foo')
+    expect(valueOf((arg)=>'foo' + arg, arg1)).toEqual('foobar') 
+    expect(valueOf((...args)=>args.join(''), arg1, arg2)).toEqual('barkim') 
+  })
+  
+  it('stringTest', ()=>{
+    expect(stringTest(undefined)).toEqual(false)
+    expect(stringTest('nofilter')).toEqual(true)
+    expect(stringTest('true', ()=>true)).toEqual(true)
+    expect(stringTest('false', ()=>false)).toEqual(false)
+    expect(stringTest('false', 'false')).toEqual(true)
+    expect(stringTest('false', 'true')).toEqual(false)
+    expect(stringTest('false', ['false'])).toEqual(true)
+    expect(stringTest('false', ['false', 'true'])).toEqual(true)
+    expect(stringTest('123', '123')).toEqual(true)
+    expect(stringTest(123, 123)).toEqual(true)
+    expect(stringTest(123, '123')).toEqual(true)
+    expect(stringTest('123', 123)).toEqual(true)
+    expect(stringTest([123], 123)).toEqual(false)
+    expect(stringTest([123], [123])).toEqual(false)
+    expect(stringTest('123', /^12/)).toEqual(true)
+    expect(stringTest('123', /^123/)).toEqual(true)
+    expect(stringTest('123', /^1234/)).toEqual(false)
+    expect(stringTest(123, /^12/)).toEqual(true)
+    expect(stringTest(123, /^123/)).toEqual(true)
+    expect(stringTest(123, /^1234/)).toEqual(false)
+    expect(stringTest(123, (value)=>typeof value === "number")).toEqual(true)
+    expect(stringTest('123', (value)=>typeof value === "string")).toEqual(true)
+    expect(stringTest(123, (value)=>value > 100)).toEqual(true)
+    expect(stringTest(123, (value)=>value < 100)).toEqual(false)
+  })
+  
   it('entries', ()=>{
     expect(entries([1, 2, 3])).toEqual([[0, 1], [1, 2], [2, 3]])
-    expect(entries({foo: "bar"})).toEqual([["foo", "bar"]])
+    expect(entries({ foo: "bar" })).toEqual([["foo", "bar"]])
     
     //
     expect(entries(null)).toEqual([])
@@ -18,8 +77,14 @@ describe('Functions remark', ()=>{
     
     //
     expect(keys([1, 2, 3])).toEqual([0, 1, 2])
-    expect(keys({foo: "bar", kim: "chi"})).toEqual(["foo", "kim"])
+    expect(keys([1, 2])).toEqual([0, 1])
+    expect(keys({ foo: "bar", kim: "chi" })).toEqual(["foo", "kim"])
     expect(keys(dummyInstance)).toEqual(["name", "called", "now"])
+    
+    //
+    const arrKey = [2, 3]
+    arrKey["foo"] = 123
+    expect(keys(arrKey)).toEqual([0, 1])
     
     //
     expect(keys([])).toEqual([])
@@ -52,7 +117,7 @@ describe('Functions remark', ()=>{
   })
   
   it('deepKeys', ()=>{
-    expect(deepKeys({a: 1, b: {d: 1, e: 2}, c: [1, 2, 3]})).toEqual([ 
+    expect(deepKeys({ a: 1, b: { d: 1, e: 2 }, c: [1, 2, 3] })).toEqual([ 
       ['a'],
       ['b'],
       ['b', 'd'],
@@ -63,7 +128,7 @@ describe('Functions remark', ()=>{
       ['c', 2] 
     ])
     
-    expect(deepKeys([null, {}, {a: 1, b: 2, arr: [3, 4, [5, null]]}, 123, {the: "end"}])).toEqual([ 
+    expect(deepKeys([null, {}, { a: 1, b: 2, arr: [3, 4, [5, null]] }, 123, { the: "end" }])).toEqual([ 
       [0],
       [1],
       [2],

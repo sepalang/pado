@@ -75,7 +75,9 @@ export default {
             event.preventDefault();
           }
 
-          let { left, width } = predict({center: event}, element);
+          const centeredProps = predict({center: event}, element);
+          console.log("centeredProps", predict, centeredProps)
+          let { left, width } = centeredProps;
 
           const barLength = element.width() - width;
           const leftValue = limitNumber(left, barLength);
