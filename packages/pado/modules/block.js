@@ -42,26 +42,26 @@ const Block = function (posSize, syncOpt){
     $sync      : { enumerable: false, writable: true, value: undefined },
     domainValue: { 
       enumerable: true,
-      get:()=>{
-        return hashMap(cloneDeep(this.get()), function (posSize){ return posSize[0]; });
+      get       : ()=>{
+        return hashMap(cloneDeep(this.get()), function (posSize){ return posSize[0] })
       }
     },
     domainSize: { 
       enumerable: true,
-      get:()=>{
-        return hashMap(cloneDeep(this.get()), function (posSize){ return posSize[1]; });
+      get       : ()=>{
+        return hashMap(cloneDeep(this.get()), function (posSize){ return posSize[1] })
       }
     },
     rangeStart: { 
       enumerable: true,
-      get:()=>{
-        return this.$space.domainRange(hashMap(this.get(), function (posSize){ return posSize[0]; }));
+      get       : ()=>{
+        return this.$space.domainRange(hashMap(this.get(), function (posSize){ return posSize[0] }))
       }
     },
     rangeSize: { 
       enumerable: true,
-      get:()=>{
-        return this.$space.domainRangeSize(hashMap(this.get(), function (posSize){ return posSize[1]; }));
+      get       : ()=>{
+        return this.$space.domainRangeSize(hashMap(this.get(), function (posSize){ return posSize[1] }))
       }
     }
   })

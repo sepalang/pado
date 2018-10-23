@@ -17,7 +17,7 @@ const calcTransformedPoint = (__ref, { matrix, perspectiveOrigin })=>{
   if(!matrix) return
   
   const transformPoint = {}
-  const {x:px = 0, y:py = 0, z:pz = 0} = perspectiveOrigin || {x: 0, y: 0, z: 0}
+  const { x:px = 0, y:py = 0, z:pz = 0 } = perspectiveOrigin || { x: 0, y: 0, z: 0 }
   const [[x], [y], [z], [w]] = multiplyMatrix(matrix, [[__ref.x - px], [__ref.y - py], [__ref.z - pz], [__ref.w]])
   
   transformPoint.x = x + px + matrix[0][3]
@@ -150,7 +150,7 @@ Point.prototype = {
     switch (angle){
       case "h": case "horizontal":
         const xHalf = width <= 0 ? 0 : width / 2
-        return new Vertex([{x: x - xHalf, y, z, w}, {x: x + xHalf, y, z, w}])
+        return new Vertex([{ x: x - xHalf, y, z, w }, { x: x + xHalf, y, z, w }])
       default:
     }
   },
@@ -159,13 +159,13 @@ Point.prototype = {
     points.unshift(this)
     return new Vertex(points)
   },
-  rectWith ({x, y}){
+  rectWith ({ x, y }){
     const [largeX, smallX] = this.x > x ? [ this.x, x ] : [ x, this.x ]
     const [largeY, smallY] = this.y > y ? [ this.y, y ] : [ y, this.y ]
     return new Rect(smallX, smallY, largeX - smallX, largeY - smallY, 0, 0)
   },
   applyTransform (){
-    const {x, y, z, w} = this
+    const { x, y, z, w } = this
     this.transform = false
     this.x = x
     this.y = y
@@ -216,7 +216,7 @@ const Vertex = function (pointArray, meta){
   
   asArray(pointArray).forEach(point=>{
     if(!likePoint(point)) return
-    const {x, y, z, w} = point
+    const { x, y, z, w } = point
     this.push(new Point(x, y, z, w, __meta))
   })
 };
@@ -267,7 +267,7 @@ const Vertex = function (pointArray, meta){
       if(!this[i + 1]) return
       const newp = fn(refp, this[i + 1], i)
       if(!likePoint(newp)) return
-      const {x, y, z, w, meta} = newp
+      const { x, y, z, w, meta } = newp
       joins.push(new Point(x, y, z, w, meta))
     })
     this.splice(0, this.length)
@@ -410,7 +410,7 @@ Rect.prototype = {
     return new Rect(this.left, this.top, this.width, this.height, this.meta)
   },
   toJSON (withMeta){
-    const json = {width: this.width, height: this.height, left: this.left, top: this.top, right: this.right, bottom: this.bottom }
+    const json = { width: this.width, height: this.height, left: this.left, top: this.top, right: this.right, bottom: this.bottom }
     if(withMeta === true && this.meta) json.meta = this.meta
     return json
   },
@@ -433,19 +433,19 @@ Rect.prototype = {
     
     switch (order){
       case "right": case "r":
-        return new Vertex([{x: this.right, y: this.top, z: 0, w: 0}, {x: this.right, y: this.bottom, z: 0, w: 0}], inheritMeta)
+        return new Vertex([{ x: this.right, y: this.top, z: 0, w: 0 }, { x: this.right, y: this.bottom, z: 0, w: 0 }], inheritMeta)
       case "bottom": case "b":
-        return new Vertex([{x: this.left, y: this.bottom, z: 0, w: 0}, {x: this.right, y: this.bottom, z: 0, w: 0}], inheritMeta)
+        return new Vertex([{ x: this.left, y: this.bottom, z: 0, w: 0 }, { x: this.right, y: this.bottom, z: 0, w: 0 }], inheritMeta)
       case "left": case "l":
-        return new Vertex([{x: this.left, y: this.top, z: 0, w: 0}, {x: this.left, y: this.bottom, z: 0, w: 0}], inheritMeta)
+        return new Vertex([{ x: this.left, y: this.top, z: 0, w: 0 }, { x: this.left, y: this.bottom, z: 0, w: 0 }], inheritMeta)
       case "top": case "t":
-        return new Vertex([{x: this.left, y: this.top, z: 0, w: 0}, {x: this.right, y: this.top, z: 0, w: 0}], inheritMeta)
+        return new Vertex([{ x: this.left, y: this.top, z: 0, w: 0 }, { x: this.right, y: this.top, z: 0, w: 0 }], inheritMeta)
       case "middle": case "m":
         const middleY = this.height / 2 + this.top
         return new Vertex(
           [
-            {x: this.left, y: middleY, z: 0, w: 0},
-            {x: this.right, y: middleY, z: 0, w: 0}
+            { x: this.left, y: middleY, z: 0, w: 0 },
+            { x: this.right, y: middleY, z: 0, w: 0 }
           ],
           inheritMeta
         )
@@ -453,18 +453,18 @@ Rect.prototype = {
         const centerX = this.width / 2 + this.x
         return new Vertex(
           [
-            {x: centerX, y: this.top, z: 0, w: 0},
-            {x: centerX, y: this.bottom, z: 0, w: 0}
+            { x: centerX, y: this.top, z: 0, w: 0 },
+            { x: centerX, y: this.bottom, z: 0, w: 0 }
           ],
           inheritMeta
         )
       default:
         return new Vertex(
           [
-            {x: this.left, y: this.top, z: 0, w: 0},
-            {x: this.left, y: this.bottom, z: 0, w: 0},
-            {x: this.right, y: this.bottom, z: 0, w: 0},
-            {x: this.right, y: this.top, z: 0, w: 0}
+            { x: this.left, y: this.top, z: 0, w: 0 },
+            { x: this.left, y: this.bottom, z: 0, w: 0 },
+            { x: this.right, y: this.bottom, z: 0, w: 0 },
+            { x: this.right, y: this.top, z: 0, w: 0 }
           ],
           inheritMeta
         )
@@ -509,7 +509,7 @@ Rect.prototype = {
   diff ({ left:aleft = 0, top:atop = 0, width:awidth = 0, height:aheight = 0, right:aright, bottom:abottom }){
     const diffResult = {}
     const original = this.toJSON()
-    const offset = {left: 0, top: 0}
+    const offset = { left: 0, top: 0 }
     Object.defineProperties(diffResult, {
       left: {
         enumerable: true, 
@@ -521,12 +521,12 @@ Rect.prototype = {
         get       : ()=>original.top - atop + offset.top,
         set       : (want)=>{ offset.top = typeof want === "number" ? -original.top + want : 0 }
       },
-      width : { enumerable: true, get: ()=>original.width - awidth},
-      height: { enumerable: true, get: ()=>original.height - aheight},
-      right : { enumerable: true, get: ()=>original.right - aright + offset.left},
-      bottom: { enumerable: true, get: ()=>original.bottom - abottom + offset.top},
-      x     : { enumerable: false, get: ()=>offset.left},
-      y     : { enumerable: false, get: ()=>offset.top},
+      width : { enumerable: true, get: ()=>original.width - awidth },
+      height: { enumerable: true, get: ()=>original.height - aheight },
+      right : { enumerable: true, get: ()=>original.right - aright + offset.left },
+      bottom: { enumerable: true, get: ()=>original.bottom - abottom + offset.top },
+      x     : { enumerable: false, get: ()=>offset.left },
+      y     : { enumerable: false, get: ()=>offset.top },
       offset: {
         enumerable: false,
         get       : ()=>()=>({
@@ -554,24 +554,24 @@ Rect.prototype = {
     return diffResult
   },
   fitRatio (rect){
-    if(typeof rect !== "object"){ throw new Error("fit::argument[0] is not object"); }
-    const { width, height } = rect;
+    if(typeof rect !== "object"){ throw new Error("fit::argument[0] is not object") }
+    const { width, height } = rect
     
-    if(!isNumber(width) || !isNumber(height)){ throw new Error("fit::argument[0] is not { width:Number, height:Number }"); }
-    const WHRatio = [ width / this.width, height / this.height ];
-    const transformRatio = WHRatio.sort()[0];
-    return transformRatio;
+    if(!isNumber(width) || !isNumber(height)){ throw new Error("fit::argument[0] is not { width:Number, height:Number }") }
+    const WHRatio = [ width / this.width, height / this.height ]
+    const transformRatio = WHRatio.sort()[0]
+    return transformRatio
   },
   fit (rect){
-    const transformRatio = this.fitRatio(rect);
+    const transformRatio = this.fitRatio(rect)
     
-    this.width = (this.width * transformRatio) || 0;
-    this.height = (this.height * transformRatio) || 0;
+    this.width = (this.width * transformRatio) || 0
+    this.height = (this.height * transformRatio) || 0
     
-    return this;
+    return this
   },
   //TODO : incompleted sticky(parent, position, offset);
-  sticky ({left:refX, top:refY, width:refWidth, height:refHeight}, position = "bottom left"){
+  sticky ({ left:refX, top:refY, width:refWidth, height:refHeight }, position = "bottom left"){
     const { left, top, width, height } = this
     switch (position){
       case "bl": case "obl": case "bottom left": case "outer bottom left":
@@ -615,7 +615,7 @@ export const point = function (x, y, z, w){
 }
 
 export const vertex = function (start, end){
-  return new Vertex([{x: start.x, y: start.y, z: start.z, w: start.w}, {x: end.x, y: end.y, z: end.z, w: end.w}])
+  return new Vertex([{ x: start.x, y: start.y, z: start.z, w: start.w }, { x: end.x, y: end.y, z: end.z, w: end.w }])
 }
 
 export const rect = function (left, top, width, height, x, y, valid){

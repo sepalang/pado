@@ -1,4 +1,20 @@
-import { cloneDeep, removeValue, omitOf, omit, pickOf, pick, freeOf, free, purgeOf, purge, alloc } from './cast'
+import {
+  cloneDeep,
+  removeValue,
+  unique,
+  moveOf,
+  concatOf,
+  filterOf,
+  omitOf,
+  omit,
+  pickOf,
+  pick,
+  freeOf,
+  free,
+  purgeOf,
+  purge,
+  alloc
+} from './cast'
 
 describe('Functions cast', ()=>{
   
@@ -19,20 +35,48 @@ describe('Functions cast', ()=>{
     expect(removeValue(list, b)).toEqual([a, c])
   })
   
+  it('unique', ()=>{
+    expect(unique([1, 2, 3, 4])).toEqual([1, 2, 3, 4])
+    expect(unique([1, 1, 2, 2])).toEqual([1, 2])
+    expect(unique([2, 2, 1, 1, 3])).toEqual([2, 1, 3])
+  })
+  
+  it('moveOf', ()=>{
+    expect(moveOf([1, 2], 0, 1)).toEqual([2, 1])
+    expect(moveOf([1, 2], 0, 3)).toEqual([2, 1])
+    expect(moveOf(1, 0, 3)).toEqual([1])
+  })
+  
+  it('concatOf', ()=>{
+    expect(concatOf([1, 2], [0, 3])).toEqual([1, 2, 0, 3])
+    expect(concatOf([1, 2], 0, 3)).toEqual([1, 2, 0, 3])
+    expect(concatOf(1, 0, 3)).toEqual([1, 0, 3])
+  })
+  
+  it('filterOf', ()=>{
+    // const data_1 = [1, 2];
+    // expect(filterOf(data_1,n=>typeof n === 'number')).toEqual([1, 2])
+    // expect(data_1).toEqual([1, 2])
+    // 
+    // const data_2 = [1, 2];
+    // expect(filterOf(data_2,n=>typeof n === 'string')).toEqual([1, 2])
+    // expect(data_2).toEqual([])
+  })
+  
   it('omitOf', ()=>{
     //
-    const target = [1];
-    expect(omitOf(target,0)).toEqual([]);
-    expect(target).toEqual([]);
+    const target = [1]
+    expect(omitOf(target, 0)).toEqual([])
+    expect(target).toEqual([])
     
     //
-  });
+  })
   it('omit', ()=>{
     //
-    const target = [1];
-    expect(omit(target,0)).toEqual([]);
-    expect(target).toEqual([1]);
-  });
+    const target = [1]
+    expect(omit(target, 0)).toEqual([])
+    expect(target).toEqual([1])
+  })
   
   
   const a = { name: 'a', id: 12 }

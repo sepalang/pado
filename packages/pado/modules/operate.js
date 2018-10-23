@@ -56,7 +56,7 @@ export const operate = (function (){
         return
       }
       
-      Array(avaliableQueLength).fill(inputOutput).forEach(async ({input, output})=>{
+      Array(avaliableQueLength).fill(inputOutput).forEach(async ({ input, output })=>{
         let entry = this.inputs.shift()
         current++
         

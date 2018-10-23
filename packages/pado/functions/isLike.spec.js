@@ -56,7 +56,7 @@ describe('Functions isLike', ()=>{
     expect(isEmpty(0)).toEqual(false)
     expect(isEmpty(1)).toEqual(false)
     expect(isEmpty([1])).toEqual(false)
-    expect(isEmpty({'foo': 'bar'})).toEqual(false)
+    expect(isEmpty({ 'foo': 'bar' })).toEqual(false)
   })
   
   it('isObject', ()=>{
@@ -116,13 +116,13 @@ describe('Functions isLike', ()=>{
     //
     expect(eqeq(["1"], [1])).toEqual(true)
     expect(eqeq([47], ["47"])).toEqual(true)
-    expect(eqeq({foo: "bar"}, {foo: "bar"})).toEqual(true)
-    expect(eqeq([{foo: "bar"}], [{foo: "bar"}])).toEqual(true)
-    expect(eqeq({foo: 123}, {foo: "123"})).toEqual(true)
+    expect(eqeq({ foo: "bar" }, { foo: "bar" })).toEqual(true)
+    expect(eqeq([{ foo: "bar" }], [{ foo: "bar" }])).toEqual(true)
+    expect(eqeq({ foo: 123 }, { foo: "123" })).toEqual(true)
     
     //
-    expect(eqeq([{foo: 123, bar: [2, [3, 4]]}], [{foo: 123, bar: [2, [3, 4]]}])).toEqual(true)
-    expect(eqeq([{foo: 123, bar: [2, 3]}], [{foo: "123", bar: ["2", "3"]}])).toEqual(true)
+    expect(eqeq([{ foo: 123, bar: [2, [3, 4]] }], [{ foo: 123, bar: [2, [3, 4]] }])).toEqual(true)
+    expect(eqeq([{ foo: 123, bar: [2, 3] }], [{ foo: "123", bar: ["2", "3"] }])).toEqual(true)
     
     //
     expect(eqeq(false, true)).toEqual(false)
@@ -146,12 +146,12 @@ describe('Functions isLike', ()=>{
     expect(isEqual(["1"], [1])).toEqual(false)
     
     //
-    expect(isEqual({foo: "bar"}, {foo: "bar"})).toEqual(true)
-    expect(isEqual({foo: 123}, {foo: "123"})).toEqual(false)
+    expect(isEqual({ foo: "bar" }, { foo: "bar" })).toEqual(true)
+    expect(isEqual({ foo: 123 }, { foo: "123" })).toEqual(false)
     
     //
-    expect(isEqual([{foo: "123", bar: [2, 3]}], [{foo: "123", bar: [2, 3]}])).toEqual(true)
-    expect(isEqual([{foo: "123", bar: [2, 3]}], [{foo: "123", bar: ["2", "3"]}])).toEqual(false)
+    expect(isEqual([{ foo: "123", bar: [2, 3] }], [{ foo: "123", bar: [2, 3] }])).toEqual(true)
+    expect(isEqual([{ foo: "123", bar: [2, 3] }], [{ foo: "123", bar: ["2", "3"] }])).toEqual(false)
     
     //
     expect(isEqual("1", 1)).toEqual(false)
@@ -165,10 +165,10 @@ describe('Functions isLike', ()=>{
     expect(likeEqual({}, {})).toEqual(true)
     expect(likeEqual([[[2, 3], 4], 5], [[[2, 3], 4], 5])).toEqual(true)
     
-    expect(likeEqual({$edit: true}, {$edit: false})).toEqual(true)
-    expect(likeEqual({$history: [1, 2]}, {$history: [1, 2]})).toEqual(true)
-    expect(likeEqual({_history: [1, 2]}, {_history: [1, 2]})).toEqual(true)
-    expect(likeEqual({_history: [1, 2], name: "ana"}, {_history: [1, 2, 3], name: "ana"})).toEqual(true)
+    expect(likeEqual({ $edit: true }, { $edit: false })).toEqual(true)
+    expect(likeEqual({ $history: [1, 2] }, { $history: [1, 2] })).toEqual(true)
+    expect(likeEqual({ _history: [1, 2] }, { _history: [1, 2] })).toEqual(true)
+    expect(likeEqual({ _history: [1, 2], name: "ana" }, { _history: [1, 2, 3], name: "ana" })).toEqual(true)
   })
   
   it('isPresence', ()=>{

@@ -36,10 +36,10 @@ export const hashMap = function (object, fn){
   return object
 }
 
-export const pairs = (inputArr, fn) => {
-  let result = [];
-  for(let i=0,l=inputArr.length;i<l;i++){
-    for(let ai=0,al=l;ai<al;(i!==ai && result.push([inputArr[i],inputArr[ai]])),ai++);
+export const pairs = (inputArr, fn)=>{
+  let result = []
+  for(let i = 0, l = inputArr.length; i < l; i++){
+    for(let ai = 0, al = l; ai < al; (i !== ai && result.push([inputArr[i], inputArr[ai]])), ai++);
   }
-  return typeof fn === "function" ? result.map(applyArgs=>fn.apply(undefined,applyArgs)) : result;
+  return typeof fn === "function" ? result.map(applyArgs=>fn.apply(undefined, applyArgs)) : result
 }

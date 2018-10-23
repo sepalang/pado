@@ -41,9 +41,9 @@ describe('Functions hack', ()=>{
   it('scopelizeBy', ()=>{
     const fn = scopelizeBy("a + b")
     
-    expect(fn({a: 1, b: 2})).toEqual(3)
-    expect(fn({a: 2, b: 3})).toEqual(5)
-    expect(fn({a: "foo", b: "bar"})).toEqual("foobar")
+    expect(fn({ a: 1, b: 2 })).toEqual(3)
+    expect(fn({ a: 2, b: 3 })).toEqual(5)
+    expect(fn({ a: "foo", b: "bar" })).toEqual("foobar")
   })
 })
 

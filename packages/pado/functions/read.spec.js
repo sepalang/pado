@@ -26,14 +26,14 @@ describe('Functions read', ()=>{
   it('hasValue', ()=>{
     expect(hasValue([0, 1, 2], 0)).toEqual(true)
     expect(hasValue([0, 1, 2], 3)).toEqual(false)
-    expect(hasValue({a: 2, b: 3}, 3)).toEqual(true)
-    expect(hasValue({a: 2, b: 3}, "b")).toEqual(false)
-    expect(hasValue([{a: 2, b: 3}, {a: 5}], {a: 2}, "a")).toEqual(true)
-    expect(hasValue([{a: 2, b: 3}, {a: 5}], {a: 4}, "a")).toEqual(false)
-    expect(hasValue([{id: 2, b: 3}, {id: 3}], {sid: 2}, ["id", "sid"])).toEqual(true)
-    expect(hasValue([{id: 2, b: 3}, {id: 3}], {sid: 4}, ["id", "sid"])).toEqual(false)
-    expect(hasValue([{id: 2}, {id: 3}], {id: "2"}, function (a, b){ return a.id == b.id })).toEqual(true)
-    expect(hasValue([{id: 2}, {id: 3}], {id: "2"}, function (a, b){ return a.id === b.id })).toEqual(false)
+    expect(hasValue({ a: 2, b: 3 }, 3)).toEqual(true)
+    expect(hasValue({ a: 2, b: 3 }, "b")).toEqual(false)
+    expect(hasValue([{ a: 2, b: 3 }, { a: 5 }], { a: 2 }, "a")).toEqual(true)
+    expect(hasValue([{ a: 2, b: 3 }, { a: 5 }], { a: 4 }, "a")).toEqual(false)
+    expect(hasValue([{ id: 2, b: 3 }, { id: 3 }], { sid: 2 }, ["id", "sid"])).toEqual(true)
+    expect(hasValue([{ id: 2, b: 3 }, { id: 3 }], { sid: 4 }, ["id", "sid"])).toEqual(false)
+    expect(hasValue([{ id: 2 }, { id: 3 }], { id: "2" }, function (a, b){ return a.id == b.id })).toEqual(true)
+    expect(hasValue([{ id: 2 }, { id: 3 }], { id: "2" }, function (a, b){ return a.id === b.id })).toEqual(false)
   })
   
   it('readDown - basic', ()=>{
@@ -44,13 +44,13 @@ describe('Functions read', ()=>{
         },
         "truth or dare": 2,
         "did you"      : [
-          {"fun": 3},
-          {"sad?": 4}
+          { "fun": 3 },
+          { "sad?": 4 }
         ]
       },
       "Jake": [
-        {"the dog": 5},
-        {"what time is it!": 6},
+        { "the dog": 5 },
+        { "what time is it!": 6 },
         {
           "what": {
             "time is it?": 7

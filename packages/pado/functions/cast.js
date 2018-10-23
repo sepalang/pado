@@ -1,4 +1,5 @@
 import {
+  isNumber,
   isArray,
   isNone,
   isAbsoluteNaN,
@@ -140,6 +141,8 @@ export const removeValue = function (obj, value){
   return obj
 }
 
+
+// Only one unique value is left.
 export const unique = function (array, findKey){
   const result    = []
   const uniqueSet = new Set()
@@ -164,42 +167,56 @@ export const getKeyBy = function (object, value){
   }
 }
 
+// Change the positions of the specified indexes in the array
 export const moveOf = function (data, oldIndex, newIndex){
-  if(oldIndex !== newIndex && isArray(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length){
-    Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0])
-  }
+  data = asArray(data)
+  oldIndex !== newIndex && 
+  isNumber(oldIndex) &&
+  isNumber(newIndex) &&
+  oldIndex >= 0 && oldIndex < data.length && 
+  Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0])
   return data
 }
+export const move = (data, rule)=>moveOf(toArray(data), oldIndex, newIndex)
 
-export const concatOf = function (data, appends){
-  var data = asArray(data)
-  return asArray(appends).forEach(value=>{ data.push(value) }), data
+
+// Supports self concat.
+const baseConcatOf = (data, args)=>{
+  const result = asArray(data)
+  return (args.forEach(data=>{ asArray(data).forEach(value=>{ result.push(value) }) }), result)
 }
+export const concatOf = (data, ...args)=>baseConcatOf(data, args)
+export const concat = (data, ...args)=>baseConcatOf(toArray(data), args)
 
 
+// Removes the value of data that does not return a positive value to the filter function.
 export const filterOf = function (data, func, exitFn){
-  var data    = asArray(data)
-  var exitCnt = 0
+  data = asArray(data)
+  let exitCnt = 0
 
-  for(var i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++){
-    var key   = keys[i]
-    var value = data[key]
-    var result = func(value, key)
-    if(result == false){
-      /*
-      var exit = Array.prototype.splice.call(data, i, 1)
-      */
-      i--
-      l--
-      typeof exitFn === "function" && exitFn(value, ri, exitCnt++)
-    }
+  for(let i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++){
+    const key   = keys[i]
+    const value = data[key]
+    const result = func(value, key)
+    result == false && (i--, l--, typeof exitFn === "function" && exitFn(value, ri, exitCnt++))
   }
   
   return data
 }
+export const filter = (data, func, exitFn)=>filterOf(toArray(data), func, exitFn)
 
+
+// Put the specified value in the specified index.
+export const insertOf = function (data, v, a){
+  data = asArray(data)
+  return (data.splice(typeof a === "number" ? a : 0, 0, v), data)
+}
+export const insert = (data, v, a)=>insertOf(toArray(data), v, a)
+
+
+// Removes all contents of an array or object.
 export const clearOf = function (data, fillFn, sp){
-  if(data instanceof Array){
+  if(isArray(data)){
     sp = Array.prototype.splice.call(data, 0, data.length)
   } else if(typeof data == "object"){
     sp = {}
@@ -208,11 +225,7 @@ export const clearOf = function (data, fillFn, sp){
   return (fillFn && fillFn(data, sp)), data
 }
 
-export const insertOf = function (data, v, a){
-  isArray(data) && data.splice(typeof a === "number" ? a : 0, 0, v)
-  return data
-}
-
+// sort
 export const sortOf = function (data, filter){
   if(data.length == 0){
     return data
@@ -252,6 +265,10 @@ export const sortOf = function (data, filter){
   return data
 }
 
+export const sort = (data, filter)=>sortOf(toArray(data), filter)
+
+// If have defined multiple key names in one hash, change them appropriately.
+// rebase({ "a,b":1 }) => { "a":1, "b":1 }
 export const rebase = function (obj, ref){
   var result = {}
   for(var key in obj){
@@ -297,22 +314,22 @@ export const rebase = function (obj, ref){
   return result
 }
 
-const removeKey = function(datum, rule){
-  if(!isObject(datum)) return datum;
+const removeKey = function (datum, rule){
+  if(!isObject(datum)) return datum
   
-  const removeKeys = keys(datum, rule);
-  if(!removeKeys.length) return datum;
+  const removeKeys = keys(datum, rule)
+  if(!removeKeys.length) return datum
   
-  const allKeys = keys(datum);
+  const allKeys = keys(datum)
   
-  isArray(datum) ?
-  removeKeys.forEach((originalIndex,offset)=>{
-    const removeIndex = originalIndex - offset;
-    datum.splice(removeIndex,1);
-  }) :
-  removeKeys.forEach(key=>{ delete datum[key] });
+  isArray(datum)
+    ? removeKeys.forEach((originalIndex, offset)=>{
+      const removeIndex = originalIndex - offset
+      datum.splice(removeIndex, 1)
+    })
+    : removeKeys.forEach(key=>{ delete datum[key] })
 
-  return datum;
+  return datum
 }
 
 // If the rule matches the rule, remove the key

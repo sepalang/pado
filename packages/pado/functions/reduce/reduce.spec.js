@@ -64,8 +64,8 @@ describe('Functions reducer', ()=>{
     expect(top([1, 2, 3], (a, b)=>a > b, true)).toEqual([1, 2, 3])
     
     //
-    expect(top([{id: 1}, {id: 3}, {id: 2}], "id", true)).toEqual([{id: 3}, {id: 2}, {id: 1}])
-    expect(top([{id: 1}, {id: 3}, {id: 2}], "id")).toEqual({id: 3})
+    expect(top([{ id: 1 }, { id: 3 }, { id: 2 }], "id", true)).toEqual([{ id: 3 }, { id: 2 }, { id: 1 }])
+    expect(top([{ id: 1 }, { id: 3 }, { id: 2 }], "id")).toEqual({ id: 3 })
     
     //it's natural way
     expect(top([1, 2, 3], (a, b)=>a > b, false)).toEqual([])
