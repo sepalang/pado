@@ -6,13 +6,8 @@
 <script>
 export default {
   mounted(){
-    const { omitOf, omit } = require('@sepalang/pado/functions');
-    
-    Object.assign(window, {
-      omitOf,
-      omit
-    })
-    
+    const allFunctions = require('@sepalang/pado');
+    Object.assign(window, allFunctions);
   }
 }
 </script>

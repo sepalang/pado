@@ -23,31 +23,34 @@ export const valueOf = function (value, ...args){
   return typeof value === "function" ? value(...args) : value
 }
 
-export const stringTest = function (string, rule){
+export const stringTest = function (string, rule, meta){
   if(!likeString(string)) return false
   if(typeof rule === "undefined") return true
-  return likeString(rule) ? (string + '').indexOf(rule + '') > -1
+  return typeof rule === "function" ? Boolean(rule(string, meta))
+    : likeString(rule) ? (string + '').indexOf(rule + '') > -1
     : rule instanceof RegExp ? rule.test(string)
     : isArray(rule) ? rule.some(filterKey=>filterKey === string)
-    : typeof rule === "function" ? Boolean(rule(string)) : false
+    : false
 }
 
 export const keys = function (target, filterExp, strict){
   const result = []
-  if(!likeObject(target)) return result
   
-  const filter = typeof filterExp === "function" ? (key)=>filterExp(key, target) : filterExp;
+  if(!likeObject(target)){
+    return result
+  }
   
-  (strict === true ? isArray(target) : likeArray(target)) && 
-  Object.keys(target).filter(key=>{ 
-    if(isNaN(key)) return
-    const numberKey = parseInt(key, 10)
-    stringTest(numberKey, filter) && result.push(parseInt(numberKey, 10)) 
-  }) || 
-  (strict === true ? isPlainObject(target) : likeObject(target)) && 
-  Object.keys(target).forEach(key=>{ 
-    stringTest(key, filter) && result.push(key) 
-  })
+  if(strict === true ? isArray(target) : likeArray(target)){
+    Object.keys(target).filter(key=>{ 
+      if(isNaN(key)) return
+      const numberKey = parseInt(key, 10)
+      stringTest(numberKey, filterExp, target[key]) && result.push(parseInt(numberKey, 10)) 
+    })
+  } else if((strict === true ? isPlainObject(target) : likeObject(target))) {
+    Object.keys(target).forEach(key=>{ 
+      stringTest(key, filterExp, target[key]) && result.push(key) 
+    })
+  }
   
   return result
 }

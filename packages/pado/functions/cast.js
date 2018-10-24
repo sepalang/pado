@@ -4,7 +4,9 @@ import {
   isNone,
   isAbsoluteNaN,
   isPlainObject,
-  isObject
+  isObject,
+  isFunction,
+  isNode
 } from './isLike'
 
 import {
@@ -177,7 +179,7 @@ export const moveOf = function (data, oldIndex, newIndex){
   Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0])
   return data
 }
-export const move = (data, rule)=>moveOf(toArray(data), oldIndex, newIndex)
+export const move = (data, oldIndex, newIndex)=>moveOf(toArray(data), oldIndex, newIndex)
 
 
 // Supports self concat.
@@ -190,18 +192,23 @@ export const concat = (data, ...args)=>baseConcatOf(toArray(data), args)
 
 
 // Removes the value of data that does not return a positive value to the filter function.
-export const filterOf = function (data, func, exitFn){
-  data = asArray(data)
-  let exitCnt = 0
-
-  for(let i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++){
-    const key   = keys[i]
-    const value = data[key]
-    const result = func(value, key)
-    result == false && (i--, l--, typeof exitFn === "function" && exitFn(value, ri, exitCnt++))
+export const filterOf = function (data, filterFn, exitFn){
+  const dataArray = asArray(data)
+  const dataKeys = keys(data)
+  const isOnExit = typeof exitFn === "function"
+  const exitArray = isOnExit ? [] : null
+  for(let i = 0, removedIndex = 0, l = dataKeys.length; i < l; i++, removedIndex++){
+    const datumKey = dataKeys[i]
+    const datum = dataArray[datumKey]
+    if(filterFn(datum, datumKey) !== true){
+      const exitDatum = dataArray.splice(i, 1)
+      i--
+      l--
+      isOnExit && exitArray.push([removedIndex, exitDatum])
+    }
   }
-  
-  return data
+  isOnExit && exitFn(exitArray, dataArray)
+  return dataArray
 }
 export const filter = (data, func, exitFn)=>filterOf(toArray(data), func, exitFn)
 
@@ -316,11 +323,9 @@ export const rebase = function (obj, ref){
 
 const removeKey = function (datum, rule){
   if(!isObject(datum)) return datum
-  
-  const removeKeys = keys(datum, rule)
+  const removeRule = typeof rule === "function" ? (key, value)=>rule(value, key) : rule
+  const removeKeys = keys(datum, removeRule)
   if(!removeKeys.length) return datum
-  
-  const allKeys = keys(datum)
   
   isArray(datum)
     ? removeKeys.forEach((originalIndex, offset)=>{
@@ -337,17 +342,25 @@ export const omitOf = (datum, rule)=>removeKey(datum, rule)
 export const omit = (datum, rule)=>omitOf(clone(datum), rule)
 
 // If the rule matches the rule, preserve the key.
-export const pickOf = (datum, rule)=>removeKey(datum, (key)=>!stringTest(key, rule))
+export const pickOf = (datum, rule)=>removeKey(datum, (value, key)=>!stringTest(key, rule, value))
 export const pick = (datum, rule)=>pickOf(clone(datum), rule)
 
+// Remove the key that has a value of undefined
+//const COMPACT_MATCH_FN = value=>typeof value !== "undefined"
+const COMPACT_MATCH_FN = value=> {
+  console.log("value",value);
+  return typeof value !== "undefined"
+}
+export const compactOf = (datum)=>omitOf(datum, COMPACT_MATCH_FN)
+export const compact = (datum)=>omitOf(clone(datum))
+
 // Clears key values starting with $
-export const FREE_MATCH_EXPRESSION = /^\$/
+const FREE_MATCH_EXPRESSION = /^\$/
 export const freeOf = (datum)=>omitOf(datum, FREE_MATCH_EXPRESSION)
 export const free = (datum)=>freeOf(clone(datum))
 
 // Remove the key that begins with $ or has a value of undefined.
-export const PURGE_FILTER = (value, key)=>FREE_MATCH_EXPRESSION.test(key) || typeof value === "undefined"
-export const purgeOf = (datum)=>omitOf(datum, FREE_MATCH_EXPRESSION)
+export const purgeOf = (datum)=>omitOf(datum, (value, key)=>FREE_MATCH_EXPRESSION.test(key) || COMPACT_MATCH_FN(value))
 export const purge = (datum)=>purgeOf(clone(datum))
 
 export const instance = function (func, proto){
