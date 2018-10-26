@@ -71,6 +71,7 @@ describe('Functions read::readString', ()=>{
   it('readString - matchBlock - enter, exit, more', ()=>{
     const text = `hello[world][inner][world].props`
     const { props:{ path:castPath } } = readString(text, ["["], ({
+      // eslint-disable-next-line no-unused-vars
       content, props:{ path }, matchExp, castStart, castEnd, castSize, skipSize, enter, next
     })=>{
       if(matchExp === "["){

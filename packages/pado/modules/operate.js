@@ -56,7 +56,7 @@ export const operate = (function (){
         return
       }
       
-      Array(avaliableQueLength).fill(inputOutput).forEach(async ({ input, output })=>{
+      Array(avaliableQueLength).fill(inputOutput).forEach(async ({ input })=>{
         let entry = this.inputs.shift()
         current++
         
@@ -108,7 +108,7 @@ export const operate = (function (){
     })
     
     Object.defineProperty(this, "emit", {
-      value: (eventName, payload)=>{
+      value: (eventName)=>{
         switch (eventName){
           case PARENT_OUTPUT_UPDATED:
             if(this.avaliablePullCount < 1) return
@@ -131,7 +131,7 @@ export const operate = (function (){
     })
     
     Object.defineProperty(this, "clone", {
-      value: (deep = true, parentOperate)=>{
+      value: (deep = true)=>{
         let cloneOperate = operateFunction({ input, output, concurrent, rescue, limitInput, limitOutput })
         
         deep === true && this.children.forEach(child=>{

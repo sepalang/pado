@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.replace", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.regexp.constructor", "./isLike", "./cast"], factory);
+    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.replace", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.regexp.constructor", "./isLike", "./read", "./cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.regexp.constructor"), require("./isLike"), require("./cast"));
+    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.regexp.constructor"), require("./isLike"), require("./read"), require("./cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.webDom, global.es6Array, global.es6Object, global.es6Regexp, global.isLike, global.cast);
+    factory(mod.exports, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.webDom, global.es6Array, global.es6Object, global.es6Regexp, global.isLike, global.read, global.cast);
     global.remark = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _es6Regexp2, _es6Regexp3, _es6Regexp4, _webDom, _es6Array, _es6Object, _es6Regexp5, _isLike, _cast) {
+})(this, function (_exports, _es6Regexp, _es6Regexp2, _es6Regexp3, _es6Regexp4, _webDom, _es6Array, _es6Object, _es6Regexp5, _isLike, _read, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -208,7 +208,7 @@
     var beforeKeys;
     var canDiff = false;
 
-    if (isObject(before)) {
+    if ((0, _isLike.isObject)(before)) {
       if ((0, _isLike.isArray)(before)) {
         beforeKeys = before;
       } else {
@@ -222,7 +222,7 @@
     var analysis = {
       after: after,
       before: before,
-      keys: unique(afterKeys.concat(beforeKeys)).reduce(function (dest, key) {
+      keys: (0, _cast.unique)(afterKeys.concat(beforeKeys)).reduce(function (dest, key) {
         dest[key] = undefined;
         return dest;
       }, {}),
@@ -242,7 +242,7 @@
         analysis.match.push(key);
         analysis.keys[key] = "match";
 
-        if (canDiff && !isEqual(get(after, key), get(before, key))) {
+        if (canDiff && !(0, _isLike.isEqual)((0, _read.get)(after, key), (0, _read.get)(before, key))) {
           analysis.diff.push(key);
           analysis.keys[key] = "diff";
         }
@@ -254,7 +254,7 @@
 
 
     (0, _cast.asArray)(afterKeys).forEach(function (key) {
-      if (!hasValue(analysis.match, key)) {
+      if (!(0, _read.hasValue)(analysis.match, key)) {
         analysis.missing.push(key);
         analysis.keys[key] = "missing";
       }

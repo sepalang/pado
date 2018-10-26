@@ -6,17 +6,17 @@ require("core-js/modules/web.dom.iterable");
 
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "./promise", "./block", "./decorator", "./operate", "./session", "./ranger", "./stance", "./affect", "./matrix"], factory);
+    define(["exports", "./promise", "./block", "./operate", "./session", "./ranger", "./stance", "./affect", "./matrix", "./decorator"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("./promise"), require("./block"), require("./decorator"), require("./operate"), require("./session"), require("./ranger"), require("./stance"), require("./affect"), require("./matrix"));
+    factory(exports, require("./promise"), require("./block"), require("./operate"), require("./session"), require("./ranger"), require("./stance"), require("./affect"), require("./matrix"), require("./decorator"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.promise, global.block, global.decorator, global.operate, global.session, global.ranger, global.stance, global.affect, global.matrix);
+    factory(mod.exports, global.promise, global.block, global.operate, global.session, global.ranger, global.stance, global.affect, global.matrix, global.decorator);
     global.index = mod.exports;
   }
-})(this, function (_exports, _promise, _block, _decorator, _operate, _session, _ranger, _stance, _affect, _matrix) {
+})(this, function (_exports, _promise, _block, _operate, _session, _ranger, _stance, _affect, _matrix, _decorator) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -38,16 +38,6 @@ require("core-js/modules/web.dom.iterable");
       enumerable: true,
       get: function get() {
         return _block[key];
-      }
-    });
-  });
-  Object.keys(_decorator).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-    Object.defineProperty(_exports, key, {
-      enumerable: true,
-      get: function get() {
-        return _decorator[key];
       }
     });
   });
@@ -108,6 +98,16 @@ require("core-js/modules/web.dom.iterable");
       enumerable: true,
       get: function get() {
         return _matrix[key];
+      }
+    });
+  });
+  Object.keys(_decorator).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+    Object.defineProperty(_exports, key, {
+      enumerable: true,
+      get: function get() {
+        return _decorator[key];
       }
     });
   });

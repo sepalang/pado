@@ -104,7 +104,7 @@
   var isArray = function isArray(data) {
     return Array.isArray(data) || data instanceof Array;
   };
-  var isObject$1 = function isObject(it) {
+  var isObject = function isObject(it) {
     return !!(it !== null && typeof it === "object");
   };
   var isFunction = function isFunction(it) {
@@ -115,7 +115,7 @@
   */
 
   var likeObject = function likeObject(it) {
-    return isObject$1(it) || isFunction(it);
+    return isObject(it) || isFunction(it);
   };
   var likeString = function likeString(data) {
     if (typeof data === "string") return true;
@@ -137,7 +137,7 @@
     return isPlainObject(data) || isArray(data);
   };
   var isNode = function isNode(a) {
-    return isObject$1(a) && typeof a.nodeType === "number";
+    return isObject(a) && typeof a.nodeType === "number";
   };
   var isEmpty = function isEmpty(it) {
     if (typeof it === "undefined") return true;
@@ -252,7 +252,7 @@
     }
   };
 
-  var isEqual$1 = function isEqual(value, other, filter, depth) {
+  var isEqual = function isEqual(value, other, filter, depth) {
     return baseEq(value, other, filter, depth, true);
   };
   var likeEqual = function likeEqual(value, other, filter, depth) {
@@ -283,6 +283,475 @@
   };
   var likePromise = function likePromise(target) {
     return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";
+  };
+
+  var all = function all(data, fn) {
+    data = asArray(data);
+
+    if (data.length === 0) {
+      return false;
+    }
+
+    for (var i = 0, l = data.length; i < l; i++) {
+      if (!fn(data[i], i)) {
+        return false;
+      }
+    }
+    return true;
+  };
+  var times = function times(length, fn) {
+    var result = [];
+
+    for (var i = 0, l = length; i < l; i++) {
+      result.push(fn(i));
+    }
+
+    return result;
+  };
+  var hashMap = function hashMap(object, fn) {
+    if (typeof object === "object" && !isArray(object)) for (var k in object) {
+      object[k] = fn(object[k], k);
+    } else return fn(object, void 0);
+    return object;
+  };
+  var pairs = function pairs(inputArr, fn) {
+    var result = [];
+
+    for (var i = 0, l = inputArr.length; i < l; i++) {
+      for (var ai = 0, al = l; ai < al; i !== ai && result.push([inputArr[i], inputArr[ai]]), ai++) {
+      }
+    }
+
+    return typeof fn === "function" ? result.map(function (applyArgs) {
+      return fn.apply(undefined, applyArgs);
+    }) : result;
+  };
+
+  var readString = function () {
+    var rebaseMatches = function rebaseMatches(matches) {
+      return entries(asArray(matches));
+    };
+
+    return function (text, matches, castFn, props) {
+      var payload = {
+        content: text,
+        props: props
+      };
+      var newMatchEntries = rebaseMatches(matches);
+      var castingState = {
+        firstIndex: 0,
+        lastIndex: text.length,
+        castingStart: 0,
+        cursor: 0
+      };
+
+      if (typeof props === "object" && isNumber(props.start)) {
+        castingState.castingStart = props.start;
+        castingState.cursor = props.start;
+      }
+
+      var open = function open(_ref) {
+        var _ref$castingState = _ref.castingState,
+            firstIndex = _ref$castingState.firstIndex,
+            lastIndex = _ref$castingState.lastIndex,
+            castingStart = _ref$castingState.castingStart,
+            cursor = _ref$castingState.cursor,
+            matchEntries = _ref.matchEntries,
+            castFn = _ref.castFn,
+            parentScope = _ref.parentScope;
+
+        if (cursor >= lastIndex) {
+          return false;
+        } //find match
+
+
+        var matchesMap = matchEntries.map(function (_ref2) {
+          var matchType = _ref2[0],
+              matchExp = _ref2[1];
+          return [matchString(text, matchExp, cursor), matchType, matchExp];
+        });
+        var firstMatch = asArray(matchesMap).sort(function (_ref3, _ref4) {
+          var a = _ref3[0],
+              aPriority = _ref3[1];
+          var b = _ref4[0],
+              bPriority = _ref4[1];
+          return a[0] < 0 ? true : b[0] < 0 ? false : a[0] == b[0] ? aPriority < bPriority : a[0] > b[0];
+        })[0]; // top match is not exsist
+
+        if (!firstMatch) {
+          return false;
+        } // unmatched
+
+
+        if (firstMatch[0][0] === -1) {
+          firstMatch = [[-1, 0], -1, null];
+        } //next variant
+
+
+        var _firstMatch = firstMatch,
+            _firstMatch$ = _firstMatch[0],
+            matchIndex = _firstMatch$[0],
+            matchSize = _firstMatch$[1],
+            matchType = _firstMatch[1],
+            matchExp = _firstMatch[2];
+        var castStart = castingStart;
+        var castEnd = matchType === -1 ? lastIndex : matchIndex + matchSize;
+        var castSize = castEnd - castStart;
+        var skipSize = castSize - matchSize; //next params
+
+        var matching = {
+          matchType: matchType,
+          matchExp: matchExp,
+          matchIndex: matchIndex,
+          matchSize: matchSize,
+          skipSize: skipSize
+        };
+        var casting = {
+          firstIndex: firstIndex,
+          lastIndex: lastIndex,
+          castStart: castStart,
+          castEnd: castEnd,
+          castSize: castSize
+        };
+        var scope = {
+          fork: function fork(matchEntries, castFn) {
+            var newMatchEntries = rebaseMatches(matches);
+            open({
+              castingState: {
+                firstIndex: matching.matchIndex,
+                lastIndex: matching.matchIndex + matchSize,
+                castingStart: matching.matchIndex,
+                cursor: matching.matchIndex
+              },
+              matchEntries: newMatchEntries,
+              castFn: castFn,
+              parentScope: parentScope
+            });
+          },
+          next: function next(needCursor) {
+            var cursorTo = isNumber(needCursor) ? needCursor : casting.castEnd;
+            open({
+              castingState: {
+                firstIndex: firstIndex,
+                lastIndex: lastIndex,
+                castingStart: cursorTo,
+                cursor: cursorTo
+              },
+              matchEntries: matchEntries,
+              castFn: castFn,
+              parentScope: parentScope
+            });
+          },
+          enter: function enter(enterMatches, enterCastFn) {
+            open({
+              castingState: {
+                firstIndex: firstIndex,
+                lastIndex: lastIndex,
+                castingStart: matching.matchIndex,
+                cursor: matching.matchIndex
+              },
+              matchEntries: rebaseMatches(enterMatches),
+              castFn: enterCastFn,
+              parentScope: {
+                next: scope.next
+              }
+            });
+          },
+          exit: function exit(needCursor) {
+            parentScope && parentScope.next(isNumber(needCursor) ? needCursor : casting.castEnd);
+          },
+          more: function more() {
+            open({
+              castingState: {
+                firstIndex: firstIndex,
+                lastIndex: lastIndex,
+                castingStart: castStart,
+                cursor: casting.castEnd
+              },
+              matchEntries: matchEntries,
+              castFn: castFn,
+              parentScope: parentScope
+            });
+          }
+        };
+        castFn(_objectSpread({}, payload, matching, casting, scope));
+        return true;
+      };
+
+      open({
+        castingState: castingState,
+        matchEntries: newMatchEntries,
+        castFn: castFn
+      });
+      return payload;
+    };
+  }();
+  var readPath = function () {
+    var __filterDotPath = function __filterDotPath(dotPath, removeFirstDot) {
+      return removeFirstDot && dotPath.indexOf(".") === 0 ? dotPath.substr(1) : dotPath;
+    };
+
+    var __filterBlockPath = function __filterBlockPath(blockPath) {
+      //remove []
+      blockPath = blockPath.substring(1, blockPath.length - 1); //interger
+
+      if (/^[0-9]+$/.test(blockPath)) {
+        return parseInt(blockPath, 10);
+      } //remove ''
+
+
+      if (/^\'.*\'$/.test(blockPath) || /^\".*\"$/.test(blockPath)) {
+        blockPath = blockPath.substring(1, blockPath.length - 1);
+      }
+
+      return blockPath;
+    };
+
+    return function (pathParam) {
+      if (isArray(pathParam)) {
+        return pathParam;
+      }
+
+      if (likeString(pathParam)) {
+        if (isNumber(pathParam)) {
+          return [pathParam];
+        }
+
+        if (typeof pathParam === "string") {
+          //one depth
+          if (!/\.|\[/.test(pathParam)) {
+            return [pathParam];
+          } //multiple depth
+
+
+          var _readString = readString(pathParam, [".", "["], function (_ref5) {
+            var content = _ref5.content,
+                path = _ref5.props.path,
+                matchExp = _ref5.matchExp,
+                castStart = _ref5.castStart,
+                castEnd = _ref5.castEnd,
+                skipSize = _ref5.skipSize,
+                enter = _ref5.enter,
+                next = _ref5.next;
+
+            if (matchExp === ".") {
+              skipSize && path.push(content.substr(castStart, skipSize));
+              next();
+            }
+
+            if (matchExp === "[") {
+              var stackCount = 0;
+
+              if (skipSize) {
+                path.push(__filterDotPath(content.substr(castStart, skipSize), castStart !== 0));
+              }
+
+              enter(["[", "]"], function (_ref6) {
+                var matchExp = _ref6.matchExp,
+                    castStart = _ref6.castStart,
+                    castEnd = _ref6.castEnd,
+                    more = _ref6.more,
+                    exit = _ref6.exit;
+                if (matchExp === "[") stackCount++;
+                if (matchExp === "]") stackCount--;
+                if (matchExp === null) return;
+
+                if (stackCount === 0) {
+                  path.push(__filterBlockPath(content.substring(castStart, castEnd)));
+                  exit();
+                } else {
+                  more();
+                }
+              });
+            }
+
+            if (matchExp === null) {
+              path.push(__filterDotPath(content.substr(castStart, castEnd), castStart !== 0));
+            }
+          }, {
+            path: []
+          }),
+              result = _readString.props.path;
+
+          return result;
+        }
+      }
+
+      return [];
+    };
+  }();
+  var get = function get(target, path, defaultValue) {
+    if (typeof target === "object") {
+      switch (typeof path) {
+        case "number":
+          path += "";
+
+        case "string":
+          path = readPath(path);
+
+        case "object":
+          if (isArray(path)) {
+            var allget = all(path, function (name) {
+              if (likeObject(target) && (target.hasOwnProperty(name) || target[name])) {
+                target = target[name];
+                return true;
+              } else {
+                return false;
+              }
+            });
+            return allget ? target : defaultValue;
+          } else {
+            return;
+          }
+
+          break;
+
+        case "function":
+          return path.call(this, target);
+      }
+    } else if (typeof target === "function") {
+      return target.apply(this, Array.prototype.slice.call(arguments, 1));
+    }
+
+    return target;
+  };
+  var hasProperty = function hasProperty(target, pathParam) {
+    return all(readPath(pathParam), function (path) {
+      if (likeObject(target) && likeString(path) && target.hasOwnProperty(path)) {
+        target = target[path];
+        return true;
+      }
+
+      return false;
+    });
+  };
+  var hasValue = function () {
+    var defaultObjectValueFunc = function defaultObjectValueFunc(object, value) {
+      return object === value;
+    };
+
+    var functionKeyObjectValueProc = function functionKeyObjectValueProc(functionKey) {
+      return function (object, value) {
+        return Boolean(functionKey(object, value));
+      };
+    };
+
+    var selectKeyObjectValueProc = function selectKeyObjectValueProc(leftSelect, rightSelect) {
+      var useLeftSelector = typeof leftSelect === "string" || typeof leftSelect === "number";
+      var useRightSelector = leftSelect === rightSelect ? useLeftSelector : typeof rightSelect === "string" || typeof rightSelect === "number";
+      return function (object, value) {
+        if (useLeftSelector && !object.hasOwnProperty(leftSelect)) return false;
+        if (useRightSelector && !value.hasOwnProperty(rightSelect)) return false;
+        return (useLeftSelector ? get(object, leftSelect) : object) === (useRightSelector ? get(value, rightSelect) : value);
+      };
+    };
+
+    return function (obj, value, key, getKey) {
+      if (typeof key === "boolean") {
+        if (typeof getKey !== "boolean") {
+          getKey = key;
+        }
+
+        key = void 0;
+      }
+
+      if (obj === value) {
+        return true;
+      } else if (likeObject(obj)) {
+        if (value === void 0 && key === void 0) return !isEmpty(obj);
+        var proc;
+
+        if (key) {
+          if (typeof key === "function") {
+            proc = functionKeyObjectValueProc(key);
+          } else if (isArray(key) && key.length > 1) {
+            proc = selectKeyObjectValueProc(key[0], key[1]);
+          } else if (typeof key === "string" || typeof key === "number") {
+            proc = selectKeyObjectValueProc(key, key);
+          }
+        } else {
+          proc = defaultObjectValueFunc;
+        }
+
+        if (isArray(obj)) {
+          for (var i = 0, l = obj.length; i < l; i++) {
+            if (proc(obj[i], value)) return getKey ? i : true;
+          }
+        } else {
+          for (var objKey in obj) {
+            if (obj.hasOwnProperty(objKey) && proc(obj[objKey], value)) return getKey ? objKey : true;
+          }
+        }
+      }
+
+      return getKey ? void 0 : false;
+    };
+  }();
+  var readDown = function readDown(rootValue, readFn, rootParam) {
+    var enterScope = function enterScope(value, depth, param) {
+      return isArray(value) ? arrayScope(value, depth, param) : isObject(value) ? objectScope(value, depth, param) : primitiveScope(value, depth, param);
+    };
+
+    var arrayScope = function arrayScope(array, depth, param) {
+      return readFn({
+        type: "array",
+        value: array,
+        key: null,
+        depth: depth,
+        param: param,
+        enter: function enter(param) {
+          var childrenDepth = depth + 1;
+          return Array(array.length).fill(void 0).map(function (v, i) {
+            return i;
+          }).map(function (key) {
+            var value = array[key];
+            return enterScope(value, childrenDepth, param);
+          });
+        }
+      });
+    };
+
+    var objectScope = function objectScope(object, depth, param) {
+      return readFn({
+        type: "object",
+        value: object,
+        key: null,
+        depth: depth,
+        param: param,
+        enter: function enter(param) {
+          var childrenDepth = depth + 1;
+          return Object.keys(object).map(function (key) {
+            var value = object[key];
+            return readFn({
+              type: "hash",
+              key: key,
+              value: value,
+              depth: depth,
+              param: param,
+              enter: function enter(param) {
+                return enterScope(value, childrenDepth, param);
+              }
+            });
+          });
+        }
+      });
+    };
+
+    var primitiveScope = function primitiveScope(value, depth, param) {
+      readFn({
+        type: "value",
+        key: null,
+        value: value,
+        depth: depth,
+        param: param,
+        enter: function enter(param) {
+          return param;
+        }
+      });
+    };
+
+    enterScope(rootValue, 0, rootParam);
+    return rootParam;
   };
 
   var fallback = function fallback(value, fallbackFn) {
@@ -658,7 +1127,7 @@
       }
     }
 
-    if (isObject$1(obj)) {
+    if (isObject(obj)) {
       for (var key in obj) {
         if (obj[key] === value) return key;
       }
@@ -688,7 +1157,7 @@
     return obj;
   }; // Only one unique value is left.
 
-  var unique$1 = function unique(array, findKey) {
+  var unique = function unique(array, findKey) {
     var result = [];
     var uniqueSet = new Set();
 
@@ -719,14 +1188,14 @@
       if (isArray(object)) for (var i = 0, l = object.length; i < l; i++) {
         if (value(object[i], i) === true) return i;
       }
-      if (isObject$1(object)) for (var key in object) {
+      if (isObject(object)) for (var key in object) {
         if (value(object[key], key) === true) return key;
       }
     } else {
       if (isArray(object)) for (var i = 0, l = object.length; i < l; i++) {
         if (object[i] === value) return i;
       }
-      if (isObject$1(object)) for (var key in object) {
+      if (isObject(object)) for (var key in object) {
         if (object[key] === value) return key;
       }
     }
@@ -916,7 +1385,7 @@
   };
 
   var removeKey = function removeKey(datum, rule) {
-    if (!isObject$1(datum)) return datum;
+    if (!isObject(datum)) return datum;
     var removeRule = typeof rule === "function" ? function (key, value) {
       return rule(value, key);
     } : rule;
@@ -1108,48 +1577,6 @@
   }())
   */
 
-  var all = function all(data, fn) {
-    data = asArray(data);
-
-    if (data.length === 0) {
-      return false;
-    }
-
-    for (var i = 0, l = data.length; i < l; i++) {
-      if (!fn(data[i], i)) {
-        return false;
-      }
-    }
-    return true;
-  };
-  var times = function times(length, fn) {
-    var result = [];
-
-    for (var i = 0, l = length; i < l; i++) {
-      result.push(fn(i));
-    }
-
-    return result;
-  };
-  var hashMap = function hashMap(object, fn) {
-    if (typeof object === "object" && !isArray(object)) for (var k in object) {
-      object[k] = fn(object[k], k);
-    } else return fn(object, void 0);
-    return object;
-  };
-  var pairs = function pairs(inputArr, fn) {
-    var result = [];
-
-    for (var i = 0, l = inputArr.length; i < l; i++) {
-      for (var ai = 0, al = l; ai < al; i !== ai && result.push([inputArr[i], inputArr[ai]]), ai++) {
-      }
-    }
-
-    return typeof fn === "function" ? result.map(function (applyArgs) {
-      return fn.apply(undefined, applyArgs);
-    }) : result;
-  };
-
   var fill = function fill(collection, fillLength, emptyDefault) {
     if (emptyDefault === void 0) {
       emptyDefault = undefined;
@@ -1180,433 +1607,6 @@
 
     useFill === true && (data = fill(data, cutLength, emptyDefault));
     return [data, []];
-  };
-
-  var readString = function () {
-    var rebaseMatches = function rebaseMatches(matches) {
-      return entries(asArray(matches));
-    };
-
-    return function (text, matches, castFn, props) {
-      var payload = {
-        content: text,
-        props: props
-      };
-      var newMatchEntries = rebaseMatches(matches);
-      var castingState = {
-        firstIndex: 0,
-        lastIndex: text.length,
-        castingStart: 0,
-        cursor: 0
-      };
-
-      if (typeof props === "object" && isNumber(props.start)) {
-        castingState.castingStart = props.start;
-        castingState.cursor = props.start;
-      }
-
-      var open = function open(_ref) {
-        var _ref$castingState = _ref.castingState,
-            firstIndex = _ref$castingState.firstIndex,
-            lastIndex = _ref$castingState.lastIndex,
-            castingStart = _ref$castingState.castingStart,
-            cursor = _ref$castingState.cursor,
-            matchEntries = _ref.matchEntries,
-            castFn = _ref.castFn,
-            parentScope = _ref.parentScope;
-
-        if (cursor >= lastIndex) {
-          return false;
-        } //find match
-
-
-        var matchesMap = matchEntries.map(function (_ref2) {
-          var matchType = _ref2[0],
-              matchExp = _ref2[1];
-          return [matchString(text, matchExp, cursor), matchType, matchExp];
-        });
-        var firstMatch = asArray(matchesMap).sort(function (_ref3, _ref4) {
-          var a = _ref3[0],
-              aPriority = _ref3[1];
-          var b = _ref4[0],
-              bPriority = _ref4[1];
-          return a[0] < 0 ? true : b[0] < 0 ? false : a[0] == b[0] ? aPriority < bPriority : a[0] > b[0];
-        })[0]; // top match is not exsist
-
-        if (!firstMatch) {
-          return false;
-        } // unmatched
-
-
-        if (firstMatch[0][0] === -1) {
-          firstMatch = [[-1, 0], -1, null];
-        } //next variant
-
-
-        var _firstMatch = firstMatch,
-            _firstMatch$ = _firstMatch[0],
-            matchIndex = _firstMatch$[0],
-            matchSize = _firstMatch$[1],
-            matchType = _firstMatch[1],
-            matchExp = _firstMatch[2];
-        var castStart = castingStart;
-        var castEnd = matchType === -1 ? lastIndex : matchIndex + matchSize;
-        var castSize = castEnd - castStart;
-        var skipSize = castSize - matchSize; //next params
-
-        var matching = {
-          matchType: matchType,
-          matchExp: matchExp,
-          matchIndex: matchIndex,
-          matchSize: matchSize,
-          skipSize: skipSize
-        };
-        var casting = {
-          firstIndex: firstIndex,
-          lastIndex: lastIndex,
-          castStart: castStart,
-          castEnd: castEnd,
-          castSize: castSize
-        };
-        var scope = {
-          fork: function fork(matchEntries, castFn) {
-            var newMatchEntries = rebaseMatches(matches);
-            open({
-              castingState: {
-                firstIndex: matching.matchIndex,
-                lastIndex: matching.matchIndex + matchSize,
-                castingStart: matching.matchIndex,
-                cursor: matching.matchIndex
-              },
-              matchEntries: newMatchEntries,
-              castFn: castFn,
-              parentScope: parentScope
-            });
-          },
-          next: function next(needCursor) {
-            var cursorTo = isNumber(needCursor) ? needCursor : casting.castEnd;
-            open({
-              castingState: {
-                firstIndex: firstIndex,
-                lastIndex: lastIndex,
-                castingStart: cursorTo,
-                cursor: cursorTo
-              },
-              matchEntries: matchEntries,
-              castFn: castFn,
-              parentScope: parentScope
-            });
-          },
-          enter: function enter(enterMatches, enterCastFn) {
-            open({
-              castingState: {
-                firstIndex: firstIndex,
-                lastIndex: lastIndex,
-                castingStart: matching.matchIndex,
-                cursor: matching.matchIndex
-              },
-              matchEntries: rebaseMatches(enterMatches),
-              castFn: enterCastFn,
-              parentScope: {
-                next: scope.next
-              }
-            });
-          },
-          exit: function exit(needCursor) {
-            parentScope && parentScope.next(isNumber(needCursor) ? needCursor : casting.castEnd);
-          },
-          more: function more() {
-            open({
-              castingState: {
-                firstIndex: firstIndex,
-                lastIndex: lastIndex,
-                castingStart: castStart,
-                cursor: casting.castEnd
-              },
-              matchEntries: matchEntries,
-              castFn: castFn,
-              parentScope: parentScope
-            });
-          }
-        };
-        castFn(_objectSpread({}, payload, matching, casting, scope));
-        return true;
-      };
-
-      open({
-        castingState: castingState,
-        matchEntries: newMatchEntries,
-        castFn: castFn
-      });
-      return payload;
-    };
-  }();
-  var readPath = function () {
-    var __filterDotPath = function __filterDotPath(dotPath, removeFirstDot) {
-      return removeFirstDot && dotPath.indexOf(".") === 0 ? dotPath.substr(1) : dotPath;
-    };
-
-    var __filterBlockPath = function __filterBlockPath(blockPath) {
-      //remove []
-      blockPath = blockPath.substring(1, blockPath.length - 1); //interger
-
-      if (/^[0-9]+$/.test(blockPath)) {
-        return parseInt(blockPath, 10);
-      } //remove ''
-
-
-      if (/^\'.*\'$/.test(blockPath) || /^\".*\"$/.test(blockPath)) {
-        blockPath = blockPath.substring(1, blockPath.length - 1);
-      }
-
-      return blockPath;
-    };
-
-    return function (pathParam) {
-      if (isArray(pathParam)) {
-        return pathParam;
-      }
-
-      if (likeString(pathParam)) {
-        if (isNumber(pathParam)) {
-          return [pathParam];
-        }
-
-        if (typeof pathParam === "string") {
-          //one depth
-          if (!/\.|\[/.test(pathParam)) {
-            return [pathParam];
-          } //multiple depth
-
-
-          var _readString = readString(pathParam, [".", "["], function (_ref5) {
-            var content = _ref5.content,
-                path = _ref5.props.path,
-                matchExp = _ref5.matchExp,
-                castStart = _ref5.castStart,
-                castEnd = _ref5.castEnd,
-                skipSize = _ref5.skipSize,
-                enter = _ref5.enter,
-                next = _ref5.next;
-
-            if (matchExp === ".") {
-              skipSize && path.push(content.substr(castStart, skipSize));
-              next();
-            }
-
-            if (matchExp === "[") {
-              var stackCount = 0;
-
-              if (skipSize) {
-                path.push(__filterDotPath(content.substr(castStart, skipSize), castStart !== 0));
-              }
-
-              enter(["[", "]"], function (_ref6) {
-                var matchExp = _ref6.matchExp,
-                    castStart = _ref6.castStart,
-                    castEnd = _ref6.castEnd,
-                    more = _ref6.more,
-                    exit = _ref6.exit;
-                if (matchExp === "[") stackCount++;
-                if (matchExp === "]") stackCount--;
-                if (matchExp === null) return;
-
-                if (stackCount === 0) {
-                  path.push(__filterBlockPath(content.substring(castStart, castEnd)));
-                  exit();
-                } else {
-                  more();
-                }
-              });
-            }
-
-            if (matchExp === null) {
-              path.push(__filterDotPath(content.substr(castStart, castEnd), castStart !== 0));
-            }
-          }, {
-            path: []
-          }),
-              result = _readString.props.path;
-
-          return result;
-        }
-      }
-
-      return [];
-    };
-  }();
-  var get$1 = function get(target, path, defaultValue) {
-    if (typeof target === "object") {
-      switch (typeof path) {
-        case "number":
-          path += "";
-
-        case "string":
-          path = readPath(path);
-
-        case "object":
-          if (isArray(path)) {
-            var allget = all(path, function (name) {
-              if (likeObject(target) && (target.hasOwnProperty(name) || target[name])) {
-                target = target[name];
-                return true;
-              } else {
-                return false;
-              }
-            });
-            return allget ? target : defaultValue;
-          } else {
-            return;
-          }
-
-          break;
-
-        case "function":
-          return path.call(this, target);
-      }
-    } else if (typeof target === "function") {
-      return target.apply(this, Array.prototype.slice.call(arguments, 1));
-    }
-
-    return target;
-  };
-  var hasProperty = function hasProperty(target, pathParam) {
-    return all(readPath(pathParam), function (path) {
-      if (likeObject(target) && likeString(path) && target.hasOwnProperty(path)) {
-        target = target[path];
-        return true;
-      }
-
-      return false;
-    });
-  };
-  var hasValue$1 = function () {
-    var defaultObjectValueFunc = function defaultObjectValueFunc(object, value) {
-      return object === value;
-    };
-
-    var functionKeyObjectValueProc = function functionKeyObjectValueProc(functionKey) {
-      return function (object, value) {
-        return Boolean(functionKey(object, value));
-      };
-    };
-
-    var selectKeyObjectValueProc = function selectKeyObjectValueProc(leftSelect, rightSelect) {
-      var useLeftSelector = typeof leftSelect === "string" || typeof leftSelect === "number";
-      var useRightSelector = leftSelect === rightSelect ? useLeftSelector : typeof rightSelect === "string" || typeof rightSelect === "number";
-      return function (object, value) {
-        if (useLeftSelector && !object.hasOwnProperty(leftSelect)) return false;
-        if (useRightSelector && !value.hasOwnProperty(rightSelect)) return false;
-        return (useLeftSelector ? get$1(object, leftSelect) : object) === (useRightSelector ? get$1(value, rightSelect) : value);
-      };
-    };
-
-    return function (obj, value, key, getKey) {
-      if (typeof key === "boolean") {
-        if (typeof getKey !== "boolean") {
-          getKey = key;
-        }
-
-        key = void 0;
-      }
-
-      if (obj === value) {
-        return true;
-      } else if (likeObject(obj)) {
-        if (value === void 0 && key === void 0) return !isEmpty(obj);
-        var proc;
-
-        if (key) {
-          if (typeof key === "function") {
-            proc = functionKeyObjectValueProc(key);
-          } else if (isArray(key) && key.length > 1) {
-            proc = selectKeyObjectValueProc(key[0], key[1]);
-          } else if (typeof key === "string" || typeof key === "number") {
-            proc = selectKeyObjectValueProc(key, key);
-          }
-        } else {
-          proc = defaultObjectValueFunc;
-        }
-
-        if (isArray(obj)) {
-          for (var i = 0, l = obj.length; i < l; i++) {
-            if (proc(obj[i], value)) return getKey ? i : true;
-          }
-        } else {
-          for (var objKey in obj) {
-            if (obj.hasOwnProperty(objKey) && proc(obj[objKey], value)) return getKey ? objKey : true;
-          }
-        }
-      }
-
-      return getKey ? void 0 : false;
-    };
-  }();
-  var readDown = function readDown(rootValue, readFn, rootParam) {
-    var enterScope = function enterScope(value, depth, param) {
-      return isArray(value) ? arrayScope(value, depth, param) : isObject$1(value) ? objectScope(value, depth, param) : primitiveScope(value, depth, param);
-    };
-
-    var arrayScope = function arrayScope(array, depth, param) {
-      return readFn({
-        type: "array",
-        value: array,
-        key: null,
-        depth: depth,
-        param: param,
-        enter: function enter(param) {
-          var childrenDepth = depth + 1;
-          return Array(array.length).fill(void 0).map(function (v, i) {
-            return i;
-          }).map(function (key) {
-            var value = array[key];
-            return enterScope(value, childrenDepth, param);
-          });
-        }
-      });
-    };
-
-    var objectScope = function objectScope(object, depth, param) {
-      return readFn({
-        type: "object",
-        value: object,
-        key: null,
-        depth: depth,
-        param: param,
-        enter: function enter(param) {
-          var childrenDepth = depth + 1;
-          return Object.keys(object).map(function (key) {
-            var value = object[key];
-            return readFn({
-              type: "hash",
-              key: key,
-              value: value,
-              depth: depth,
-              param: param,
-              enter: function enter(param) {
-                return enterScope(value, childrenDepth, param);
-              }
-            });
-          });
-        }
-      });
-    };
-
-    var primitiveScope = function primitiveScope(value, depth, param) {
-      readFn({
-        type: "value",
-        key: null,
-        value: value,
-        depth: depth,
-        param: param,
-        enter: function enter(param) {
-          return param;
-        }
-      });
-    };
-
-    enterScope(rootValue, 0, rootParam);
-    return rootParam;
   };
 
   var cut = function cut(collection, cutLength, fillContent) {
@@ -1646,7 +1646,7 @@
         var path = iteratee;
 
         iteratee = function iteratee(a, b) {
-          return get$1(a, path) < get$1(b, path);
+          return get(a, path) < get(b, path);
         };
 
         break;
@@ -2351,14 +2351,14 @@
       var current = 0;
       concurrent = isNumber(concurrent) || concurrent > 0 ? concurrent : 1;
       Object.defineProperty(this, "avaliablePullCount", {
-        get: function get() {
+        get: function get$$1() {
           var limit = _this.limitInput - _this.inputs.length;
           if (limit < 0) limit = 0;
           return limit;
         }
       });
       Object.defineProperty(this, "avaliableOutputCount", {
-        get: function get() {
+        get: function get$$1() {
           return _this.limitOutput + current + _this.outputs.length;
         }
       });
@@ -2394,12 +2394,12 @@
           var _ref3 = _asyncToGenerator(
           /*#__PURE__*/
           regeneratorRuntime.mark(function _callee2(_ref2) {
-            var input, output, entry, outputHandle;
+            var input, entry, outputHandle;
             return regeneratorRuntime.wrap(function _callee2$(_context2) {
               while (1) {
                 switch (_context2.prev = _context2.next) {
                   case 0:
-                    input = _ref2.input, output = _ref2.output;
+                    input = _ref2.input;
                     entry = _this.inputs.shift();
                     current++;
 
@@ -2517,7 +2517,7 @@
         }
       });
       Object.defineProperty(this, "emit", {
-        value: function value(eventName, payload) {
+        value: function value(eventName) {
           switch (eventName) {
             case PARENT_OUTPUT_UPDATED:
               if (_this.avaliablePullCount < 1) return;
@@ -2544,7 +2544,7 @@
         }
       });
       Object.defineProperty(this, "clone", {
-        value: function value(deep, parentOperate) {
+        value: function value(deep) {
           if (deep === void 0) {
             deep = true;
           }
@@ -2623,10 +2623,10 @@
 
     if (likeObject(obj)) {
       if (key) {
-        return get$1(obj, key) === value;
+        return get(obj, key) === value;
       } else {
         for (var key in obj) {
-          if (get$1(obj, key) === value) return true;
+          if (get(obj, key) === value) return true;
         }
       }
     }
@@ -2667,7 +2667,7 @@
       },
       domainValue: {
         enumerable: true,
-        get: function get() {
+        get: function get$$1() {
           return hashMap(cloneDeep(_this.get()), function (posSize) {
             return posSize[0];
           });
@@ -2675,7 +2675,7 @@
       },
       domainSize: {
         enumerable: true,
-        get: function get() {
+        get: function get$$1() {
           return hashMap(cloneDeep(_this.get()), function (posSize) {
             return posSize[1];
           });
@@ -2683,7 +2683,7 @@
       },
       rangeStart: {
         enumerable: true,
-        get: function get() {
+        get: function get$$1() {
           return _this.$space.domainRange(hashMap(_this.get(), function (posSize) {
             return posSize[0];
           }));
@@ -2691,7 +2691,7 @@
       },
       rangeSize: {
         enumerable: true,
-        get: function get() {
+        get: function get$$1() {
           return _this.$space.domainRangeSize(hashMap(_this.get(), function (posSize) {
             return posSize[1];
           }));
@@ -2705,7 +2705,7 @@
   Object.defineProperties(BlockPrototype, {
     domainMap: {
       enumerable: false,
-      get: function get() {
+      get: function get$$1() {
         return hashMap(cloneDeep(this.get()), function (posSize) {
           return {
             start: posSize[0],
@@ -2717,7 +2717,7 @@
     },
     rangeMap: {
       enumerable: false,
-      get: function get() {
+      get: function get$$1() {
         var rangeSize = this.rangeSize;
         return hashMap(this.rangeStart, function ($start, sel) {
           var $size = sel ? rangeSize[sel] : rangeSize;
@@ -2731,7 +2731,7 @@
     },
     rangeEnd: {
       enumerable: false,
-      get: function get() {
+      get: function get$$1() {
         return this.rangeMap(this.rangeMap, function (map) {
           return map.end;
         });
@@ -2769,21 +2769,21 @@
       return new Block(this);
     },
     setPosition: function setPosition(value, sel) {
-      var $posSize = get$1(this.$posSize, sel);
+      var $posSize = get(this.$posSize, sel);
       if ($posSize instanceof Array) $posSize[0] = value;
       return this;
     },
     setSize: function setSize(value, sel) {
-      var $posSize = get$1(this.$posSize, sel);
+      var $posSize = get(this.$posSize, sel);
       if ($posSize instanceof Array) $posSize[1] = value;
       return this;
     },
-    get: function get() {
+    get: function get$$1() {
       return cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
     },
     conflicts: function conflicts(otherBlocks, selector) {
       return asArray(otherBlocks).reduce(function (red, block) {
-        var selectOtherBlock = get$1(block, selector);
+        var selectOtherBlock = get(block, selector);
 
         if (selectOtherBlock instanceof Block) {
           //다른 블럭이 현재 블럭과 같거나 space가 다를때는 평가하지 않음
@@ -2791,7 +2791,7 @@
 
           var inspectResult = [];
           hashMap(this.get(), function (thisPos, key) {
-            var otherPos = get$1(selectOtherBlock.get(), key);
+            var otherPos = get(selectOtherBlock.get(), key);
             if (otherPos[0] < thisPos[0] && otherPos[0] + otherPos[1] <= thisPos[0]) return inspectResult.push(false);
             if (otherPos[0] > thisPos[0] && thisPos[0] + thisPos[1] <= otherPos[0]) return inspectResult.push(false);
             return inspectResult.push(true);
@@ -2813,9 +2813,9 @@
       var spaceDomain = this.$space.domain;
       var overflowDomain = mask && cloneDeep(mask) || this.$space && this.$space.domain || [];
       return hashMap(overflowDomain, function ($overflowSelected, sel) {
-        var $posSize = get$1(blockPosSize, sel);
-        var $domain = get$1(spaceDomain, sel);
-        return $posSize[0] < get$1($overflowSelected[0], $domain[0]) || $posSize[0] + $posSize[1] > get$1($overflowSelected[1], $domain[1]);
+        var $posSize = get(blockPosSize, sel);
+        var $domain = get(spaceDomain, sel);
+        return $posSize[0] < get($overflowSelected[0], $domain[0]) || $posSize[0] + $posSize[1] > get($overflowSelected[1], $domain[1]);
       });
     },
     isOverflow: function isOverflow(mask) {
@@ -2850,7 +2850,7 @@
 
   var Tracker = function Tracker(space, domainMask) {
     this.$space = space;
-    this.$domainMask = hashMap(cloneDeep(domainMask), function (mask, sel) {
+    this.$domainMask = hashMap(cloneDeep(domainMask), function (mask) {
       if (typeof mask === "number") mask = [mask];
 
       if (mask instanceof Array) {
@@ -2876,7 +2876,7 @@
         return range$$1[2];
       });
       var block = this.block(hashMap(this.$space.rangeDomain(cursor), function (cursorPoint, key) {
-        return [cursorPoint, get$1(domainGrid, key)];
+        return [cursorPoint, get(domainGrid, key)];
       }));
       var blockMap = block.map();
       callback && callback.call(block, blockMap, block);
@@ -2920,7 +2920,7 @@
           });
           this.$domain = domain;
         },
-        get: function get() {
+        get: function get$$1() {
           return hashMap(cloneDeep(this.$domain), function (domain) {
             for (var i = 0, l = domain.length; i < l; i++) {
               if (typeof domain[i] === "function") domain[i] = domain[i]();
@@ -2942,7 +2942,7 @@
           });
           this.$range = range$$1;
         },
-        get: function get() {
+        get: function get$$1() {
           return hashMap(cloneDeep(this.$range), function (range$$1) {
             for (var i = 0, l = range$$1.length; i < l; i++) {
               if (typeof range$$1[i] === "function") range$$1[i] = range$$1[i]();
@@ -2991,151 +2991,6 @@
       return new Block(posSize, syncOpt);
     };
   }();
-
-  var awaitLeadOnly = function awaitLeadOnly(func) {
-    return alloc(function () {
-      var $pending = false;
-      return function () {
-        var _this = this;
-
-        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-          args[_key] = arguments[_key];
-        }
-
-        if ($pending === true) {
-          return abort();
-        } else {
-          $pending = true;
-          return promise$1(function (resolve$$1, reject$$1) {
-            return valueOf$1(func.apply(_this, args)).then(resolve$$1).catch(reject$$1);
-          }).then(function (e) {
-            $pending = false;
-            return e;
-          }).catch(function (e) {
-            $pending = false;
-            return reject(e);
-          });
-        }
-      };
-    });
-  };
-  var awaitCompose = function awaitCompose(funcArgs) {
-    return alloc(function () {
-      var composeFuncs = [];
-      asArray(funcArgs).forEach(function (f) {
-        typeof f === "function" && composeFuncs.push(f);
-      });
-      return function (payload) {
-        var _this2 = this;
-
-        return promise$1(function (resolve$$1, reject$$1) {
-          var _marked =
-          /*#__PURE__*/
-          regeneratorRuntime.mark(iterator);
-
-          function iterator() {
-            var d, i, l;
-            return regeneratorRuntime.wrap(function iterator$(_context) {
-              while (1) {
-                switch (_context.prev = _context.next) {
-                  case 0:
-                    d = composeFuncs, i = 0, l = d.length;
-
-                  case 1:
-                    if (!(i < l)) {
-                      _context.next = 7;
-                      break;
-                    }
-
-                    _context.next = 4;
-                    return d[i];
-
-                  case 4:
-                    i++;
-                    _context.next = 1;
-                    break;
-
-                  case 7:
-                  case "end":
-                    return _context.stop();
-                }
-              }
-            }, _marked, this);
-          }
-
-          var doWhile = function doWhile(_ref, taskPayload) {
-            var proc = _ref.value,
-                done = _ref.done;
-
-            if (done) {
-              resolve$$1(taskPayload);
-            } else {
-              valueOf$1(proc.call(_this2, taskPayload)).then(function (nextPayload) {
-                doWhile(iterator.next(), nextPayload);
-              }).catch(reject$$1);
-            }
-          };
-
-          doWhile.apply(iterator.next(), payload);
-        });
-      };
-    });
-  };
-  /*
-    수동 watch로직 입니다.
-    let watcher = watchChange(newValue=>{ doSomething... })
-    watcher.change("newValue")
-  */
-
-  var watchChange = function watchChange() {
-    var changeValue = function changeValue(watchman, newValue) {
-      var countScope = watchman.$count;
-
-      var destOldValue = cloneDeep(newValue);
-
-      watchman.$setter.forEach(function (effect) {
-        effect(newValue, watchman.$oldValue, countScope);
-      });
-      watchman.$oldValue = destOldValue;
-    };
-
-    var Watchman = function Watchman(equalityLogic) {
-      this.$setter = [];
-      this.$oldValue = undefined;
-      this.$count = 0;
-      this.$equalityLogic = equalityLogic;
-    };
-
-    Watchman.prototype = {
-      setter: function setter(changeListeners) {
-        var _this3 = this;
-
-        asArray(changeListeners).forEach(function (fn) {
-          if (typeof fn === "function") {
-            _this3.$setter.push(fn);
-          }
-        });
-      },
-      change: function change(newValue) {
-        var newValue;
-
-        if (this.$equalityLogic) {
-          if (!isEqual$1(this.$oldValue, newValue)) {
-            changeValue(this, newValue);
-          }
-        } else {
-          if (this.$oldValue != newValue) {
-            changeValue(this, newValue);
-          }
-        }
-      }
-    };
-    return function (effect, equalityLogic) {
-      var watch = new Watchman(equalityLogic);
-      watch.setter(effect);
-      return watch;
-    };
-  };
 
   var SESSION_STORE = {};
   var STATE_STORE = {};
@@ -3242,7 +3097,7 @@
   };
   Object.defineProperties(LimitterPrototype, {
     done: {
-      get: function get() {
+      get: function get$$1() {
         return this.value === limitNumber(this.value, this.maximum, this.minimum);
       }
     }
@@ -4351,6 +4206,151 @@
     };
   };
 
+  var awaitLeadOnly = function awaitLeadOnly(func) {
+    return alloc(function () {
+      var $pending = false;
+      return function () {
+        var _this = this;
+
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
+        }
+
+        if ($pending === true) {
+          return abort();
+        } else {
+          $pending = true;
+          return promise$1(function (resolve$$1, reject$$1) {
+            return valueOf$1(func.apply(_this, args)).then(resolve$$1).catch(reject$$1);
+          }).then(function (e) {
+            $pending = false;
+            return e;
+          }).catch(function (e) {
+            $pending = false;
+            return reject(e);
+          });
+        }
+      };
+    });
+  };
+  var awaitCompose = function awaitCompose(funcArgs) {
+    return alloc(function () {
+      var composeFuncs = [];
+      asArray(funcArgs).forEach(function (f) {
+        typeof f === "function" && composeFuncs.push(f);
+      });
+      return function (payload) {
+        var _this2 = this;
+
+        return promise$1(function (resolve$$1, reject$$1) {
+          var _marked =
+          /*#__PURE__*/
+          regeneratorRuntime.mark(iterator);
+
+          function iterator() {
+            var d, i, l;
+            return regeneratorRuntime.wrap(function iterator$(_context) {
+              while (1) {
+                switch (_context.prev = _context.next) {
+                  case 0:
+                    d = composeFuncs, i = 0, l = d.length;
+
+                  case 1:
+                    if (!(i < l)) {
+                      _context.next = 7;
+                      break;
+                    }
+
+                    _context.next = 4;
+                    return d[i];
+
+                  case 4:
+                    i++;
+                    _context.next = 1;
+                    break;
+
+                  case 7:
+                  case "end":
+                    return _context.stop();
+                }
+              }
+            }, _marked, this);
+          }
+
+          var doWhile = function doWhile(_ref, taskPayload) {
+            var proc = _ref.value,
+                done = _ref.done;
+
+            if (done) {
+              resolve$$1(taskPayload);
+            } else {
+              valueOf$1(proc.call(_this2, taskPayload)).then(function (nextPayload) {
+                doWhile(iterator.next(), nextPayload);
+              }).catch(reject$$1);
+            }
+          };
+
+          doWhile.apply(iterator.next(), payload);
+        });
+      };
+    });
+  };
+  /*
+    수동 watch로직 입니다.
+    let watcher = watchChange(newValue=>{ doSomething... })
+    watcher.change("newValue")
+  */
+
+  var watchChange = function watchChange() {
+    var changeValue = function changeValue(watchman, newValue) {
+      var countScope = watchman.$count;
+
+      var destOldValue = cloneDeep(newValue);
+
+      watchman.$setter.forEach(function (effect) {
+        effect(newValue, watchman.$oldValue, countScope);
+      });
+      watchman.$oldValue = destOldValue;
+    };
+
+    var Watchman = function Watchman(equalityLogic) {
+      this.$setter = [];
+      this.$oldValue = undefined;
+      this.$count = 0;
+      this.$equalityLogic = equalityLogic;
+    };
+
+    Watchman.prototype = {
+      setter: function setter(changeListeners) {
+        var _this3 = this;
+
+        asArray(changeListeners).forEach(function (fn) {
+          if (typeof fn === "function") {
+            _this3.$setter.push(fn);
+          }
+        });
+      },
+      change: function change(newValue) {
+        var newValue;
+
+        if (this.$equalityLogic) {
+          if (!isEqual(this.$oldValue, newValue)) {
+            changeValue(this, newValue);
+          }
+        } else {
+          if (this.$oldValue != newValue) {
+            changeValue(this, newValue);
+          }
+        }
+      }
+    };
+    return function (effect, equalityLogic) {
+      var watch = new Watchman(equalityLogic);
+      watch.setter(effect);
+      return watch;
+    };
+  };
+
 
 
   var functions = /*#__PURE__*/Object.freeze({
@@ -4360,7 +4360,7 @@
     isNumber: isNumber,
     isInteger: isInteger,
     isArray: isArray,
-    isObject: isObject$1,
+    isObject: isObject,
     isFunction: isFunction,
     likeObject: likeObject,
     likeString: likeString,
@@ -4373,7 +4373,7 @@
     isPresence: isPresence,
     likeRegexp: likeRegexp,
     eqof: eqof,
-    isEqual: isEqual$1,
+    isEqual: isEqual,
     likeEqual: likeEqual,
     eqeq: eqeq,
     isExsist: isExsist,
@@ -4387,7 +4387,7 @@
     clone: clone,
     cloneDeep: cloneDeep,
     removeValue: removeValue,
-    unique: unique$1,
+    unique: unique,
     getKeyBy: getKeyBy,
     moveOf: moveOf,
     move: move,
@@ -4451,9 +4451,9 @@
     diffStructure: diffStructure,
     readString: readString,
     readPath: readPath,
-    get: get$1,
+    get: get,
     hasProperty: hasProperty,
-    hasValue: hasValue$1,
+    hasValue: hasValue,
     readDown: readDown,
     argumentNamesBy: argumentNamesBy,
     scopelizeBy: scopelizeBy,
@@ -4462,9 +4462,6 @@
     promise: promise$1,
     space: space,
     block: block,
-    awaitLeadOnly: awaitLeadOnly,
-    awaitCompose: awaitCompose,
-    watchChange: watchChange,
     operate: operate,
     session: session,
     Limitter: Limitter,
@@ -4474,7 +4471,10 @@
     rect: rect,
     affect: affect,
     MatrixArray: MatrixArray,
-    makeMatrixArray: makeMatrixArray
+    makeMatrixArray: makeMatrixArray,
+    awaitLeadOnly: awaitLeadOnly,
+    awaitCompose: awaitCompose,
+    watchChange: watchChange
   });
 
   var Bow = function Bow() {};

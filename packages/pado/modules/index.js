@@ -1,6 +1,5 @@
 export { promise } from './promise'
 export * from './block'
-export * from './decorator'
 
 //export * from './timeline'
 export * from './operate'

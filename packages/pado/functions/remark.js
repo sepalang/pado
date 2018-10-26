@@ -3,14 +3,22 @@ import {
   likeString,
   isNumber,
   likeRegexp,
+  isObject,
   isArray,
   likeArray,
   likeObject,
-  isPlainObject
+  isPlainObject,
+  isEqual
 } from './isLike'
 
 import {
+  get,
+  hasValue
+} from './read'
+
+import {
   clone,
+  unique,
   asArray
 } from './cast'
 

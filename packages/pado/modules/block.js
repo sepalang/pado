@@ -191,7 +191,7 @@ Block.prototype = BlockPrototype
       
 const Tracker = function (space, domainMask){
   this.$space = space
-  this.$domainMask = hashMap(cloneDeep(domainMask), function (mask, sel){
+  this.$domainMask = hashMap(cloneDeep(domainMask), function (mask){
     if(typeof mask === "number") mask = [mask]
     if(mask instanceof Array){
       if(!mask[0]) mask[0] = 0

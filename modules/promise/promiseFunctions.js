@@ -187,7 +187,7 @@
   _exports.until = until;
 
   var batch = function batch(funcArray, opts) {
-    return (0, _promiseEngine.newPromise)(function (resolve, reject) {
+    return (0, _promiseEngine.newPromise)(function (resolve) {
       var option = (0, _cast.asObject)(opts, "concurrent");
 
       if (option.concurrent === true) {

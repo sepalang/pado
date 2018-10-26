@@ -155,7 +155,7 @@ export const until = function (tasks, option){
 }
 
 export const batch = function (funcArray, opts){
-  return newPromise(function (resolve, reject){
+  return newPromise(function (resolve){
     const option = asObject(opts, "concurrent")
       
     if(option.concurrent === true){

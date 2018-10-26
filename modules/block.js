@@ -254,7 +254,7 @@
 
   var Tracker = function Tracker(space, domainMask) {
     this.$space = space;
-    this.$domainMask = (0, _functions.hashMap)((0, _cast.cloneDeep)(domainMask), function (mask, sel) {
+    this.$domainMask = (0, _functions.hashMap)((0, _cast.cloneDeep)(domainMask), function (mask) {
       if (typeof mask === "number") mask = [mask];
 
       if (mask instanceof Array) {

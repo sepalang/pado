@@ -28,11 +28,11 @@ describe('Functions reducer', ()=>{
     expect(cuts([1, 2, 3], 2, 555)).toEqual([[1, 2], [3, 555]])
     
     //index
-    expect(cuts([1, 2, 3], 2, (index, column, row)=>index)).toEqual([[1, 2], [3, 3]])
-    expect(cuts([1, 2, 3, 4, 5], 2, (index, column, row)=>index)).toEqual([[1, 2], [3, 4], [5, 5]])
+    expect(cuts([1, 2, 3], 2, (index)=>index)).toEqual([[1, 2], [3, 3]])
+    expect(cuts([1, 2, 3, 4, 5], 2, (index)=>index)).toEqual([[1, 2], [3, 4], [5, 5]])
     //col
-    expect(cuts([1, 2, 3], 2, (index, column, row)=>column)).toEqual([[1, 2], [3, 1]])
-    expect(cuts([1, 2, 3, 4, 5], 2, (index, column, row)=>column)).toEqual([[1, 2], [3, 4], [5, 1]])
+    expect(cuts([1, 2, 3], 2, (index, column)=>column)).toEqual([[1, 2], [3, 1]])
+    expect(cuts([1, 2, 3, 4, 5], 2, (index, column)=>column)).toEqual([[1, 2], [3, 4], [5, 1]])
     //row
     expect(cuts([1], 2, (index, column, row)=>row)).toEqual([[1, 0]])
     expect(cuts([1, 2, 3], 2, (index, column, row)=>row)).toEqual([[1, 2], [3, 1]])

@@ -87,12 +87,12 @@
           var _ref3 = _asyncToGenerator(
           /*#__PURE__*/
           regeneratorRuntime.mark(function _callee2(_ref2) {
-            var input, output, entry, outputHandle;
+            var input, entry, outputHandle;
             return regeneratorRuntime.wrap(function _callee2$(_context2) {
               while (1) {
                 switch (_context2.prev = _context2.next) {
                   case 0:
-                    input = _ref2.input, output = _ref2.output;
+                    input = _ref2.input;
                     entry = _this.inputs.shift();
                     current++;
 
@@ -210,7 +210,7 @@
         }
       });
       Object.defineProperty(this, "emit", {
-        value: function value(eventName, payload) {
+        value: function value(eventName) {
           switch (eventName) {
             case PARENT_OUTPUT_UPDATED:
               if (_this.avaliablePullCount < 1) return;
@@ -237,7 +237,7 @@
         }
       });
       Object.defineProperty(this, "clone", {
-        value: function value(deep, parentOperate) {
+        value: function value(deep) {
           if (deep === void 0) {
             deep = true;
           }
