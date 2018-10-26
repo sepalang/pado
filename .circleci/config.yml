@@ -56,9 +56,6 @@ workflows:
       - test-modules:
           requires:
             - initialize
-      - test-web:
-          requires:
-            - initialize
       - build:
           requires:
             - test-functions
