@@ -46,7 +46,7 @@ export const keys = function (target, filterExp, strict){
       const numberKey = parseInt(key, 10)
       stringTest(numberKey, filterExp, target[key]) && result.push(parseInt(numberKey, 10)) 
     })
-  } else if((strict === true ? isPlainObject(target) : likeObject(target))) {
+  } else if((strict === true ? isPlainObject(target) : likeObject(target))){
     Object.keys(target).forEach(key=>{ 
       stringTest(key, filterExp, target[key]) && result.push(key) 
     })
@@ -59,7 +59,7 @@ export const keys = function (target, filterExp, strict){
 export const deepKeys = (function (){
   const nestedDeepKeys = function (target, filter, scope, total){
     if(typeof target === "object"){
-      keys(target, (key, target)=>{
+      keys(target, (key)=>{
         const child  = target[key]
         const useKey = filter(child, key, scope.length)
         if(!useKey){

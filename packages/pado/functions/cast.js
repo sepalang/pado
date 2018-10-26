@@ -347,12 +347,11 @@ export const pick = (datum, rule)=>pickOf(clone(datum), rule)
 
 // Remove the key that has a value of undefined
 //const COMPACT_MATCH_FN = value=>typeof value !== "undefined"
-const COMPACT_MATCH_FN = value=> {
-  console.log("value",value);
-  return typeof value !== "undefined"
+const COMPACT_MATCH_FN = value=>{
+  return typeof value === "undefined"
 }
 export const compactOf = (datum)=>omitOf(datum, COMPACT_MATCH_FN)
-export const compact = (datum)=>omitOf(clone(datum))
+export const compact = (datum)=>compactOf(clone(datum))
 
 // Clears key values starting with $
 const FREE_MATCH_EXPRESSION = /^\$/

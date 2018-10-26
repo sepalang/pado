@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.alloc = _exports.instance = _exports.purge = _exports.purgeOf = _exports.PURGE_FILTER = _exports.free = _exports.freeOf = _exports.FREE_MATCH_EXPRESSION = _exports.pick = _exports.pickOf = _exports.omit = _exports.omitOf = _exports.rebase = _exports.sortOf = _exports.insertOf = _exports.clearOf = _exports.filterOf = _exports.concatOf = _exports.moveOf = _exports.getKeyBy = _exports.unique = _exports.removeValue = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
+  _exports.alloc = _exports.instance = _exports.purge = _exports.purgeOf = _exports.free = _exports.freeOf = _exports.compact = _exports.compactOf = _exports.pick = _exports.pickOf = _exports.omit = _exports.omitOf = _exports.rebase = _exports.sort = _exports.sortOf = _exports.clearOf = _exports.insert = _exports.insertOf = _exports.filter = _exports.filterOf = _exports.concat = _exports.concatOf = _exports.move = _exports.moveOf = _exports.getKeyBy = _exports.unique = _exports.removeValue = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
 
   var asArray = function asArray(data, defaultArray) {
     if (defaultArray === void 0) {
@@ -222,7 +222,8 @@
     }
 
     return obj;
-  };
+  }; // Only one unique value is left.
+
 
   _exports.removeValue = removeValue;
 
@@ -256,7 +257,7 @@
   _exports.unique = unique;
 
   var getKeyBy = function getKeyBy(object, value) {
-    if (isFunction(value)) {
+    if ((0, _isLike.isFunction)(value)) {
       if ((0, _isLike.isArray)(object)) for (var i = 0, l = object.length; i < l; i++) {
         if (value(object[i], i) === true) return i;
       }
@@ -271,55 +272,103 @@
         if (object[key] === value) return key;
       }
     }
-  };
+  }; // Change the positions of the specified indexes in the array
+
 
   _exports.getKeyBy = getKeyBy;
 
   var moveOf = function moveOf(data, oldIndex, newIndex) {
-    if (oldIndex !== newIndex && (0, _isLike.isArray)(data) && typeof oldIndex === "number" && typeof newIndex === "number" && oldIndex >= 0 && oldIndex < data.length) {
-      Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
-    }
-
+    data = asArray(data);
+    oldIndex !== newIndex && (0, _isLike.isNumber)(oldIndex) && (0, _isLike.isNumber)(newIndex) && oldIndex >= 0 && oldIndex < data.length && Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
     return data;
   };
 
   _exports.moveOf = moveOf;
 
-  var concatOf = function concatOf(data, appends) {
-    var data = asArray(data);
-    return asArray(appends).forEach(function (value) {
-      data.push(value);
-    }), data;
+  var move = function move(data, oldIndex, newIndex) {
+    return moveOf(toArray(data), oldIndex, newIndex);
+  }; // Supports self concat.
+
+
+  _exports.move = move;
+
+  var baseConcatOf = function baseConcatOf(data, args) {
+    var result = asArray(data);
+    return args.forEach(function (data) {
+      asArray(data).forEach(function (value) {
+        result.push(value);
+      });
+    }), result;
+  };
+
+  var concatOf = function concatOf(data) {
+    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    return baseConcatOf(data, args);
   };
 
   _exports.concatOf = concatOf;
 
-  var filterOf = function filterOf(data, func, exitFn) {
-    var data = asArray(data);
-    var exitCnt = 0;
+  var concat = function concat(data) {
+    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
+    }
 
-    for (var i = 0, ri = 0, keys = Object.keys(data), l = keys.length; i < l; i++, ri++) {
-      var key = keys[i];
-      var value = data[key];
-      var result = func(value, key);
+    return baseConcatOf(toArray(data), args);
+  }; // Removes the value of data that does not return a positive value to the filter function.
 
-      if (result == false) {
-        /*
-        var exit = Array.prototype.splice.call(data, i, 1)
-        */
+
+  _exports.concat = concat;
+
+  var filterOf = function filterOf(data, filterFn, exitFn) {
+    var dataArray = asArray(data);
+    var dataKeys = (0, _remark.keys)(data);
+    var isOnExit = typeof exitFn === "function";
+    var exitArray = isOnExit ? [] : null;
+
+    for (var i = 0, removedIndex = 0, l = dataKeys.length; i < l; i++, removedIndex++) {
+      var datumKey = dataKeys[i];
+      var datum = dataArray[datumKey];
+
+      if (filterFn(datum, datumKey) !== true) {
+        var exitDatum = dataArray.splice(i, 1);
         i--;
         l--;
-        typeof exitFn === "function" && exitFn(value, ri, exitCnt++);
+        isOnExit && exitArray.push([removedIndex, exitDatum]);
       }
     }
 
-    return data;
+    isOnExit && exitFn(exitArray, dataArray);
+    return dataArray;
   };
 
   _exports.filterOf = filterOf;
 
+  var filter = function filter(data, func, exitFn) {
+    return filterOf(toArray(data), func, exitFn);
+  }; // Put the specified value in the specified index.
+
+
+  _exports.filter = filter;
+
+  var insertOf = function insertOf(data, v, a) {
+    data = asArray(data);
+    return data.splice(typeof a === "number" ? a : 0, 0, v), data;
+  };
+
+  _exports.insertOf = insertOf;
+
+  var insert = function insert(data, v, a) {
+    return insertOf(toArray(data), v, a);
+  }; // Removes all contents of an array or object.
+
+
+  _exports.insert = insert;
+
   var clearOf = function clearOf(data, fillFn, sp) {
-    if (data instanceof Array) {
+    if ((0, _isLike.isArray)(data)) {
       sp = Array.prototype.splice.call(data, 0, data.length);
     } else if (typeof data == "object") {
       sp = {};
@@ -331,16 +380,10 @@
     }
 
     return fillFn && fillFn(data, sp), data;
-  };
+  }; // sort
+
 
   _exports.clearOf = clearOf;
-
-  var insertOf = function insertOf(data, v, a) {
-    (0, _isLike.isArray)(data) && data.splice(typeof a === "number" ? a : 0, 0, v);
-    return data;
-  };
-
-  _exports.insertOf = insertOf;
 
   var sortOf = function sortOf(data, filter) {
     if (data.length == 0) {
@@ -393,6 +436,14 @@
 
   _exports.sortOf = sortOf;
 
+  var sort = function sort(data, filter) {
+    return sortOf(toArray(data), filter);
+  }; // If have defined multiple key names in one hash, change them appropriately.
+  // rebase({ "a,b":1 }) => { "a":1, "b":1 }
+
+
+  _exports.sort = sort;
+
   var rebase = function rebase(obj, ref) {
     var result = {};
 
@@ -406,7 +457,7 @@
           if (typeof refValue === "function") {
             result[refKey] = obj[key];
           } else {
-            if (typeof refValue !== "object" && typeof refValue !== "object" || isNode(refValue)) {
+            if (typeof refValue !== "object" && typeof refValue !== "object" || (0, _isLike.isNode)(refValue)) {
               result[refKey] = refValue;
             } else {
               result[refKey] = Object.assign(result[refKey], refValue);
@@ -420,7 +471,7 @@
           if (typeof obj[key] === "function") {
             result[deepKey] = obj[key];
           } else {
-            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode(obj[key])) {
+            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || (0, _isLike.isNode)(obj[key])) {
               result[deepKey] = obj[key];
             } else {
               result[deepKey] = Object.assign(result[deepKey] || ((0, _isLike.isArray)(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
@@ -431,7 +482,7 @@
         if (typeof obj[key] === "function") {
           result[key] = obj[key];
         } else {
-          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || isNode(obj[key])) {
+          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || (0, _isLike.isNode)(obj[key])) {
             result[key] = obj[key];
           } else {
             result[key] = Object.assign(result[key], obj[key]);
@@ -447,9 +498,11 @@
 
   var removeKey = function removeKey(datum, rule) {
     if (!(0, _isLike.isObject)(datum)) return datum;
-    var removeKeys = (0, _remark.keys)(datum, rule);
+    var removeRule = typeof rule === "function" ? function (key, value) {
+      return rule(value, key);
+    } : rule;
+    var removeKeys = (0, _remark.keys)(datum, removeRule);
     if (!removeKeys.length) return datum;
-    var allKeys = (0, _remark.keys)(datum);
     (0, _isLike.isArray)(datum) ? removeKeys.forEach(function (originalIndex, offset) {
       var removeIndex = originalIndex - offset;
       datum.splice(removeIndex, 1);
@@ -474,8 +527,8 @@
   _exports.omit = omit;
 
   var pickOf = function pickOf(datum, rule) {
-    return removeKey(datum, function (key) {
-      return !(0, _remark.stringTest)(key, rule);
+    return removeKey(datum, function (value, key) {
+      return !(0, _remark.stringTest)(key, rule, value);
     });
   };
 
@@ -483,12 +536,29 @@
 
   var pick = function pick(datum, rule) {
     return pickOf(clone(datum), rule);
-  }; // Clears key values starting with $
+  }; // Remove the key that has a value of undefined
+  //const COMPACT_MATCH_FN = value=>typeof value !== "undefined"
 
 
   _exports.pick = pick;
+
+  var COMPACT_MATCH_FN = function COMPACT_MATCH_FN(value) {
+    return typeof value === "undefined";
+  };
+
+  var compactOf = function compactOf(datum) {
+    return omitOf(datum, COMPACT_MATCH_FN);
+  };
+
+  _exports.compactOf = compactOf;
+
+  var compact = function compact(datum) {
+    return compactOf(clone(datum));
+  }; // Clears key values starting with $
+
+
+  _exports.compact = compact;
   var FREE_MATCH_EXPRESSION = /^\$/;
-  _exports.FREE_MATCH_EXPRESSION = FREE_MATCH_EXPRESSION;
 
   var freeOf = function freeOf(datum) {
     return omitOf(datum, FREE_MATCH_EXPRESSION);
@@ -503,14 +573,10 @@
 
   _exports.free = free;
 
-  var PURGE_FILTER = function PURGE_FILTER(value, key) {
-    return FREE_MATCH_EXPRESSION.test(key) || typeof value === "undefined";
-  };
-
-  _exports.PURGE_FILTER = PURGE_FILTER;
-
   var purgeOf = function purgeOf(datum) {
-    return omitOf(datum, FREE_MATCH_EXPRESSION);
+    return omitOf(datum, function (value, key) {
+      return FREE_MATCH_EXPRESSION.test(key) || COMPACT_MATCH_FN(value);
+    });
   };
 
   _exports.purgeOf = purgeOf;
@@ -549,8 +615,8 @@
     var fn = init();
 
     var rn = function rn() {
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
+      for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
       }
 
       return fn.apply(this, args);

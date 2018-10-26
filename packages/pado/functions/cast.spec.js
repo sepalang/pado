@@ -1,4 +1,4 @@
-import {
+export const {
   cloneDeep,
   removeValue,
   unique,
@@ -16,9 +16,18 @@ import {
   purgeOf,
   purge,
   alloc
-} from './cast'
+} = require('./cast')
 
-describe('Functions cast', ()=>{
+export const getTestModel = function (){
+  return {
+    a: { name: 'a', $checked: true, $detail: { info: [], meta: [] } },
+    b: { _name: 'a', age: undefined, job: null },
+    c: { $checked: true, $detail: undefined },
+    d: { $$: 'double', $$$: 'triple' }
+  }
+}
+
+typeof describe === "function" && describe('Functions cast', ()=>{
   
   it('cloneDeep', ()=>{
     const data_1 = { my: "name", $is: "foo", data: { bar: "kim" } }
@@ -121,15 +130,6 @@ describe('Functions cast', ()=>{
     expect(picked_2).toEqual({ "foo": 1, "kim": 3 })
     expect(picked_2 !== data_2).toEqual(true)
   })
-  
-  function getTestModel (){
-    return {
-      a: { name: 'a', $checked: true, $detail: { info: [], meta: [] } },
-      b: { _name: 'a', age: undefined, job: null },
-      c: { $checked: true, $detail: undefined },
-      d: { $$: 'double', $$$: 'triple' }
-    }
-  }
   
   it('compactOf', ()=>{
     const { a, b, c, d } = getTestModel()

@@ -38,29 +38,35 @@
 
   _exports.valueOf = valueOf;
 
-  var stringTest = function stringTest(string, rule) {
+  var stringTest = function stringTest(string, rule, meta) {
     if (!(0, _isLike.likeString)(string)) return false;
     if (typeof rule === "undefined") return true;
-    return (0, _isLike.likeString)(rule) ? (string + '').indexOf(rule + '') > -1 : rule instanceof RegExp ? rule.test(string) : (0, _isLike.isArray)(rule) ? rule.some(function (filterKey) {
+    return typeof rule === "function" ? Boolean(rule(string, meta)) : (0, _isLike.likeString)(rule) ? (string + '').indexOf(rule + '') > -1 : rule instanceof RegExp ? rule.test(string) : (0, _isLike.isArray)(rule) ? rule.some(function (filterKey) {
       return filterKey === string;
-    }) : typeof rule === "function" ? Boolean(rule(string)) : false;
+    }) : false;
   };
 
   _exports.stringTest = stringTest;
 
   var keys = function keys(target, filterExp, strict) {
     var result = [];
-    if (!(0, _isLike.likeObject)(target)) return result;
-    var filter = typeof filterExp === "function" ? function (key) {
-      return filterExp(key, target);
-    } : filterExp;
-    (strict === true ? (0, _isLike.isArray)(target) : (0, _isLike.likeArray)(target)) && Object.keys(target).filter(function (key) {
-      if (isNaN(key)) return;
-      var numberKey = parseInt(key, 10);
-      stringTest(numberKey, filter) && result.push(parseInt(numberKey, 10));
-    }) || (strict === true ? (0, _isLike.isPlainObject)(target) : (0, _isLike.likeObject)(target)) && Object.keys(target).forEach(function (key) {
-      stringTest(key, filter) && result.push(key);
-    });
+
+    if (!(0, _isLike.likeObject)(target)) {
+      return result;
+    }
+
+    if (strict === true ? (0, _isLike.isArray)(target) : (0, _isLike.likeArray)(target)) {
+      Object.keys(target).filter(function (key) {
+        if (isNaN(key)) return;
+        var numberKey = parseInt(key, 10);
+        stringTest(numberKey, filterExp, target[key]) && result.push(parseInt(numberKey, 10));
+      });
+    } else if (strict === true ? (0, _isLike.isPlainObject)(target) : (0, _isLike.likeObject)(target)) {
+      Object.keys(target).forEach(function (key) {
+        stringTest(key, filterExp, target[key]) && result.push(key);
+      });
+    }
+
     return result;
   };
 
@@ -69,7 +75,7 @@
   var deepKeys = function () {
     var nestedDeepKeys = function nestedDeepKeys(target, filter, scope, total) {
       if (typeof target === "object") {
-        keys(target, function (key, target) {
+        keys(target, function (key) {
           var child = target[key];
           var useKey = filter(child, key, scope.length);
 

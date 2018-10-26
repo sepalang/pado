@@ -1,6 +1,17 @@
-import { fallback, valueOf, stringTest, entries, keys, deepKeys, matchString, findIndex, findIndexes } from './remark'
+export const {
+  fallback,
+  valueOf,
+  stringTest,
+  entries,
+  keys,
+  deepKeys,
+  matchString,
+  findIndex,
+  findIndexes
+} = require('./remark')
 
-describe('Functions remark', ()=>{
+
+typeof describe === "function" && describe('Functions remark', ()=>{
   
   it('fallback', ()=>{
     const fallbackValue = { fallback: "value" }

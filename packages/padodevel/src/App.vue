@@ -6,8 +6,10 @@
 <script>
 export default {
   mounted(){
-    const allFunctions = require('@sepalang/pado');
-    Object.assign(window, allFunctions);
+    const a = require('@sepalang/pado');
+    const cast = require('@sepalang/pado/functions/cast.spec.js');
+    const remark = require('@sepalang/pado/functions/remark.spec.js');
+    Object.assign(window, { a, cast, remark });
   }
 }
 </script>
