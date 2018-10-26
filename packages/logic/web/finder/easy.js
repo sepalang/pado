@@ -1,5 +1,5 @@
 import { queryFind } from './query-finder'
-import { nodeList } from './query-selector'
+import { nodeList } from './core/query-selector'
 import { isNode, isPlainObject } from '@sepalang/pado/functions/isLike'
 import { asArray } from '@sepalang/pado/functions/cast'
 
@@ -73,6 +73,12 @@ export const containsIn = function (container, subjects){
 export const containsOut = function (container, subjects){
   return containsIn(container, subjects)
 }
+
+/*
+  predict(element)
+  predict(element,{center:20});
+  predict(element,{center:event});
+*/
 
 export const predict = function (container, option, root){
   const element = nodeList(container, 0)

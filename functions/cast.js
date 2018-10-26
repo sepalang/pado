@@ -584,6 +584,15 @@
   var purge = function purge(datum) {
     return purgeOf(clone(datum));
   };
+  /* Experimental
+  export const injectOf = (data,injectFn)=>keys(data).reduce((dest, key)=>((dest[key] = injectFn(dest[key], key)), dest),asObject(data))
+  export const inject = (data, injectFn)=>injectOf(clone(data), injectFn);
+  
+  export const mapOf = (data, mapFn)=>asArray(data).map(mapFn);
+  export const map = (data, mapFn)=>mapOf(clone(data), mapFn);
+  */
+  //
+
 
   _exports.purge = purge;
 

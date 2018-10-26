@@ -1,5 +1,6 @@
 export * from './isLike'
 export * from './cast'
+export * from './castString'
 export * from './enumerable'
 export * from './reduce'
 export * from './random'

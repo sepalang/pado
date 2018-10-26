@@ -4,7 +4,7 @@
   </span>
 </template>
 <script>
-import { dragHelper, getElementBoundingRect } from '@sepalang/logic/web';
+import { dragHelper, getElementBoundingRect, nodeCss } from '@sepalang/logic/web';
 import { nextQueue } from '@/utils';
 import HighOrderRect from '@sepalang/logic/vue/Rect';
 import HighOrderPoint from '@sepalang/logic/vue/Point';
@@ -51,7 +51,8 @@ export default {
           left: startOffset.left + x,
           top : startOffset.top + y
         };
-        element.css(result);
+        console.log('result', nodeCss, result)
+        nodeCss(element, result);
         return result;
       };
 

@@ -1445,6 +1445,15 @@
   var purge = function purge(datum) {
     return purgeOf(clone(datum));
   };
+  /* Experimental
+  export const injectOf = (data,injectFn)=>keys(data).reduce((dest, key)=>((dest[key] = injectFn(dest[key], key)), dest),asObject(data))
+  export const inject = (data, injectFn)=>injectOf(clone(data), injectFn);
+
+  export const mapOf = (data, mapFn)=>asArray(data).map(mapFn);
+  export const map = (data, mapFn)=>mapOf(clone(data), mapFn);
+  */
+  //
+
   var instance = function instance(func, proto) {
     var ins;
 
@@ -1576,6 +1585,43 @@
     }
   }())
   */
+
+  var baseCaseSplit = function baseCaseSplit(s) {
+    s = s.replace(/^\#/, "").trim();
+    var e = s.split(/\s+/);
+    if (e.length > 1) return e;
+    var k = s.split(/\-+/);
+    if (k.length > 1) return k;
+
+    var _ = s.split(/\_+/);
+
+    if (_.length > 1) return _;
+    return s.replace(/[A-Z][a-z]/g, function (s) {
+      return "%@" + s;
+    }).replace(/^\%\@/, "").split("%@");
+  };
+
+  var pascalCase = function pascalCase(string, joinString) {
+    if (joinString === void 0) {
+      joinString = "";
+    }
+
+    var words = baseCaseSplit(string);
+
+    for (var i = 0, l = words.length; i < l; i++) {
+      words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1).toLowerCase();
+    }
+
+    return words.join(joinString);
+  };
+  var camelCase = function camelCase(string, joinString) {
+    if (joinString === void 0) {
+      joinString = "";
+    }
+
+    var pascalCaseString = pascalCase(string, joinString);
+    return "" + (pascalCaseString.substr(0, 1) || '') + (pascalCaseString.substr(1) || '');
+  };
 
   var fill = function fill(collection, fillLength, emptyDefault) {
     if (emptyDefault === void 0) {
@@ -4413,6 +4459,8 @@
     purge: purge,
     instance: instance,
     alloc: alloc,
+    pascalCase: pascalCase,
+    camelCase: camelCase,
     all: all,
     times: times,
     hashMap: hashMap,

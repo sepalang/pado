@@ -1,7 +1,8 @@
-import { unique } from '@sepalang/pado/functions/functions'
-import { toArray } from '@sepalang/pado/functions/cast'
+import { toArray, unique } from '@sepalang/pado/functions/cast'
 import { isArray, isNode } from '@sepalang/pado/functions/isLike'
-import { toCSSQueryString, query, document } from './query-selector'
+import { DOCUMENT } from './core/webenv'
+import { toCSSQueryString, query } from './core/query-selector'
+
 
 const findLite = function (find){
   if(typeof find === 'string'){
@@ -49,7 +50,7 @@ const findByOnePlace = function (findse, rootNode){
 }
 
 const findBySeveralPlaces = function (find, root){
-  if(arguments.length === 1 || typeof root === 'undefined' || root === null || root === document) return findLite(find)
+  if(arguments.length === 1 || typeof root === 'undefined' || root === null || root === DOCUMENT) return findLite(find)
   // find root
   var targetRoots = findLite(root)
   if(targetRoots.length === 0){

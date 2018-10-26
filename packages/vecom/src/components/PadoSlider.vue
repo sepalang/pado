@@ -75,11 +75,10 @@ export default {
             event.preventDefault();
           }
 
-          const centeredProps = predict({center: event}, element);
-          console.log("centeredProps", predict, centeredProps)
+          const centeredProps = predict($scroller[0] , {center: event}, element);
           let { left, width } = centeredProps;
 
-          const barLength = element.width() - width;
+          const barLength = element.offsetWidth - width;
           const leftValue = limitNumber(left, barLength);
           finalValue = Math.round(domainRangeValue([0, barLength], [this.xMin, this.xMax], leftValue));
           this.$emit('enter', finalValue);
