@@ -32,7 +32,7 @@ SVGBuilder.prototype = {
     let realMaxWidth  = 0
     let realMaxHeigth = 0 
     
-    this.drawVariants.forEach(({ tag, attributes, params})=>{
+    this.drawVariants.forEach(({ tag, attributes, params })=>{
       if(tag === "path"){
         const pathElement = document.createElementNS('http://www.w3.org/2000/svg', "path")
         

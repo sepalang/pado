@@ -41,10 +41,10 @@ describe('Dom::env url', ()=>{
   })
   
   it("readUrl", ()=>{
-    expect(serialize({foo: "bar"})).toEqual("foo=bar")
-    expect(serialize({foo: "bar", kim: 11})).toEqual("foo=bar&kim=11")
-    expect(serialize({foo: "bar", kim: undefined})).toEqual("foo=bar")
-    expect(serialize({foo: "bar", kim: null})).toEqual("foo=bar&kim=")
+    expect(serialize({ foo: "bar" })).toEqual("foo=bar")
+    expect(serialize({ foo: "bar", kim: 11 })).toEqual("foo=bar&kim=11")
+    expect(serialize({ foo: "bar", kim: undefined })).toEqual("foo=bar")
+    expect(serialize({ foo: "bar", kim: null })).toEqual("foo=bar&kim=")
   })
 })
 

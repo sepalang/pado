@@ -1,6 +1,7 @@
 import { queryFind } from './query-finder'
 import { nodeList } from './query-selector'
-import { isNode, isPlainObject } from '@sepalang/pado/functions/isLike';
+import { isNode, isPlainObject } from '@sepalang/pado/functions/isLike'
+import { asArray } from '@sepalang/pado/functions/cast'
 
 const getCurrentTarget = function (originalEvent, fallbackElement){
   let result = originalEvent.currentTarget || originalEvent.target
@@ -12,7 +13,7 @@ const isElementEvent = function (e){
 }
 
 const getElementPosition = function (el){
-  let element = queryFind(el, 0);
+  let element = queryFind(el, 0)
 
   if(!element) return null
 
@@ -25,7 +26,7 @@ const getElementPosition = function (el){
     element = element.offsetParent
   }
 
-  return {x: xPosition, y: yPosition}
+  return { x: xPosition, y: yPosition }
 }
 
 
@@ -43,39 +44,39 @@ const getPointerPosition = function (e, root){
 }
 
 export const containsIn = function (container, subjects){
-  container = nodeList(container, 0);
-  subjects = asArray(subjects);
+  container = nodeList(container, 0)
+  subjects = asArray(subjects)
 
   if(!subjects.length || !isNode(container) || subjects.some(subject=>typeof subject === "string" ? false : !isNode(subject))){
-    return false;
+    return false
   }
 
-  let allChildrens = null;
+  let allChildrens = null
 
-  for(let i=0,l=subjects.length;i<l;i++){
-    const selector = subjects[i];
+  for(let i = 0, l = subjects.length; i < l; i++){
+    const selector = subjects[i]
 
     if(typeof selector === "string"){
       if(container.querySelector(selector)){
-        return true;
+        return true
       }
     } else {
-      if(!allChildrens) allChildrens = Array.from(container.querySelectorAll("*"));
-      if(allChildrens.some(child=>child===selector)){
-        return true;
+      if(!allChildrens) allChildrens = Array.from(container.querySelectorAll("*"))
+      if(allChildrens.some(child=>child === selector)){
+        return true
       }
     }
   }
-  return false;
+  return false
 }
 
 export const containsOut = function (container, subjects){
-  return containsIn(container, subjects);
+  return containsIn(container, subjects)
 }
 
 export const predict = function (container, option, root){
-  const element = nodeList(container, 0);
-  if(!isNode(element)) return;
+  const element = nodeList(container, 0)
+  if(!isNode(element)) return
 
   const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = element["innerWidth"] ? {
     offsetTop   : 0,
@@ -174,4 +175,4 @@ export const predict = function (container, option, root){
   }
 
   return result
-};
+}

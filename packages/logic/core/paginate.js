@@ -127,16 +127,16 @@ PaginateClass.prototype = {
     let action
     switch (command){
       case "next": case "nextPage":
-        action = e=>this.fetchNext()
+        action = ()=>this.fetchNext()
         break
       case "prev": case "prevPage":
-        action = e=>this.fetchPrev()
+        action = ()=>this.fetchPrev()
         break
       case "firstPage":
-        action = e=>this.fetchIndex(0)
+        action = ()=>this.fetchIndex(0)
         break
       case "lastPage":
-        action = e=>this.fetchIndex(this.pageLimit)
+        action = ()=>this.fetchIndex(this.pageLimit)
         break
       /* TODO : if needed
       case "nextPaginate":
@@ -146,7 +146,7 @@ PaginateClass.prototype = {
         */
       default:
         if(typeof command === "number"){
-          action = e=>this.fetchIndex(command)
+          action = ()=>this.fetchIndex(command)
         }
     }
     if(action){

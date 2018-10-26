@@ -362,6 +362,16 @@ export const free = (datum)=>freeOf(clone(datum))
 export const purgeOf = (datum)=>omitOf(datum, (value, key)=>FREE_MATCH_EXPRESSION.test(key) || COMPACT_MATCH_FN(value))
 export const purge = (datum)=>purgeOf(clone(datum))
 
+/* Experimental
+export const injectOf = (data,injectFn)=>keys(data).reduce((dest, key)=>((dest[key] = injectFn(dest[key], key)), dest),asObject(data))
+export const inject = (data, injectFn)=>injectOf(clone(data), injectFn);
+
+export const mapOf = (data, mapFn)=>asArray(data).map(mapFn);
+export const map = (data, mapFn)=>mapOf(clone(data), mapFn);
+*/
+
+
+//
 export const instance = function (func, proto){
   var ins; var DummyInstance = function (param){ if(typeof param === "object") for(var k in param) this[k] = param[k] }
   if(typeof func == "object"){

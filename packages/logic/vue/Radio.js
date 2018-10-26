@@ -1,4 +1,4 @@
-export default function (...options){
+export default function (/*...options*/){
   const base = {
     model: {
       prop : "model",
@@ -12,23 +12,23 @@ export default function (...options){
     computed: {
       modelValue: {
         get: function (){
-          return this.model;
+          return this.model
         },
         set: function (value){
-          this.$emit("change", value);
+          this.$emit("change", value)
         }
       },
       positiveValue (){
-        return !this.$options.propsData.hasOwnProperty("value") ? true : this.value;
+        return !this.$options.propsData.hasOwnProperty("value") ? true : this.value
       },
       negativeValue (){
-        return !this.$options.propsData.hasOwnProperty("unvalue") ? undefined : this.unvalue;
+        return !this.$options.propsData.hasOwnProperty("unvalue") ? undefined : this.unvalue
       },
       isToggleActive (){
-        return this.$options.propsData.hasOwnProperty("unvalue");
+        return this.$options.propsData.hasOwnProperty("unvalue")
       },
       isChecked (){
-        return this.modelValue === this.positiveValue;
+        return this.modelValue === this.positiveValue
       }
     },
     methods: {
@@ -37,17 +37,17 @@ export default function (...options){
           typeof this.$el.getAttribute("disabled") === "string" || 
           typeof this.$el.getAttribute("readOnly") === "string"
         ){
-          return;
+          return
         }
         
         if(this.modelValue !== this.positiveValue){
-          this.modelValue = this.positiveValue;
+          this.modelValue = this.positiveValue
         } else if(this.isToggleActive){
-          this.modelValue = this.negativeValue;
+          this.modelValue = this.negativeValue
         }
       }
     }
-  };
+  }
   
-  return base;
+  return base
 }

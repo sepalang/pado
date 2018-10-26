@@ -1,5 +1,5 @@
-import { queryFind, predict } from "../finder";
-import { rebase } from '@sepalang/pado/functions';
+import { queryFind, predict } from "../finder"
+import { rebase } from '@sepalang/pado/functions'
 
 // eslint-disable-next-line no-undef
 const DEVICE_EVENT = (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch)
@@ -31,7 +31,7 @@ const bindDraggingAttribute = function (){
 //
 DEVICE_EVENT.TOUCH_DEVICE && window.addEventListener("touchmove", (e)=>{
   dragRetainCount > 0 && e.preventDefault()
-}, {passive: false})
+}, { passive: false })
 
 
 //드래그
@@ -62,7 +62,7 @@ const pointerParse = ({ clientX, clientY, touches })=>{
 }
 
 export default function DragHelper (element, option){
-  element = queryFind(element, 0);
+  element = queryFind(element, 0)
 
   let startFn
   let moveFn
@@ -105,7 +105,7 @@ export default function DragHelper (element, option){
     resetOptions()
 
     //
-    const elementOffset = predict(element);
+    const elementOffset = predict(element)
     const pointerDrag   = pointerParse(originalEvent)
 
     firstDrag = pointerDrag
