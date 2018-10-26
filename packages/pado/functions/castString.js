@@ -21,5 +21,5 @@ export const pascalCase = function (string, joinString = ""){
 
 export const camelCase = function (string, joinString = ""){
   const pascalCaseString = pascalCase(string, joinString)
-  return `${pascalCaseString.substr(0, 1) || ''}${pascalCaseString.substr(1) || ''}`
+  return `${(pascalCaseString.substr(0, 1) || '').toLowerCase()}${pascalCaseString.substr(1) || ''}`
 }
