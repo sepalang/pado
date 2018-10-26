@@ -4,7 +4,9 @@
   "description": "UI component interface",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "testpad src --verbose",
+    "lint": "lintpad src -m lib",
+    "lint:fix": "npm run lint -- --fix"
   },
   "keywords": [
     "ui",
@@ -14,6 +16,8 @@
   "author": "AHN HO JUNG",
   "license": "MIT",
   "dependencies": {
+    "@sepalang/lintpad": "^0.1.3",
+    "@sepalang/testpad": "0.0.2",
     "@sepalang/pado": "0.3.0"
   }
 }
