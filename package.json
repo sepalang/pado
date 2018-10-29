@@ -22,7 +22,7 @@
     "test:functions": "testpad packages/pado/functions --verbose",
     "test:modules": "testpad packages/pado/modules --verbose",
     "test": "testpad packages/pado --verbose",
-    "devel": "(cd packages/padodevel && npm run start)",
+    "devel": "(cd packages/devel && npm run start)",
     "vecom": "(cd packages/vecom && npm run serve)",
     "reborn": "(cd packages/reborn && npm run all)",
     "repl": "padoc --exec .util/repl/index.js -i -g",
