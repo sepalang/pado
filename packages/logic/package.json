@@ -17,7 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "@sepalang/lintpad": "^0.2.1",
-    "@sepalang/testpad": "0.0.3",
+    "@sepalang/testpad": "0.1.1",
     "@sepalang/pado": "0.3.0"
   }
 }
