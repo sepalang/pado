@@ -1,13 +1,8 @@
-import { 
-  isNone,
-  likeString,
+import {
   isNumber,
   likeRegexp,
   isObject,
   isArray,
-  likeArray,
-  likeObject,
-  isPlainObject,
   isEqual
 } from './isLike'
 
@@ -22,6 +17,11 @@ import {
   asArray
 } from './cast'
 
+import {
+  baseEntries,
+  baseKeys
+} from './baseFunction'
+
 
 export const fallback = function (value, fallbackFn, ...args){
   return typeof value === "undefined" ? fallbackFn(...args) : value
@@ -31,38 +31,7 @@ export const valueOf = function (value, ...args){
   return typeof value === "function" ? value(...args) : value
 }
 
-export const stringTest = function (string, rule, meta){
-  if(!likeString(string)) return false
-  if(typeof rule === "undefined") return true
-  return typeof rule === "function" ? Boolean(rule(string, meta))
-    : likeString(rule) ? (string + '').indexOf(rule + '') > -1
-    : rule instanceof RegExp ? rule.test(string)
-    : isArray(rule) ? rule.some(filterKey=>filterKey === string)
-    : false
-}
-
-export const keys = function (target, filterExp, strict){
-  const result = []
-  
-  if(!likeObject(target)){
-    return result
-  }
-  
-  if(strict === true ? isArray(target) : likeArray(target)){
-    Object.keys(target).filter(key=>{ 
-      if(isNaN(key)) return
-      const numberKey = parseInt(key, 10)
-      stringTest(numberKey, filterExp, target[key]) && result.push(parseInt(numberKey, 10)) 
-    })
-  } else if((strict === true ? isPlainObject(target) : likeObject(target))){
-    Object.keys(target).forEach(key=>{ 
-      stringTest(key, filterExp, target[key]) && result.push(key) 
-    })
-  }
-  
-  return result
-}
-
+export const keys = baseKeys
 
 export const deepKeys = (function (){
   const nestedDeepKeys = function (target, filter, scope, total){
@@ -88,26 +57,7 @@ export const deepKeys = (function (){
   }
 }())
 
-export const entries = function (it){
-  const result = []
-  switch (typeof it){
-    case "object":
-      // eslint-disable-next-line no-unused-expressions
-      isNone(it) ? 0
-        : likeArray(it) ? asArray(it).forEach((v, k)=>{ result.push([k, v]) })
-        : Object.keys(it).forEach(key=>{ result.push([key, it[key]]) })
-      break
-  }
-  return result
-}
-
-//remark.spec.js
-export const matchString = (it, search, at = 0)=>{
-  if(typeof it !== "string") throw new Error(`matchString :: worng argument ${it}`)
-  if(typeof search === "string") search = search.replace(new RegExp("(\\.|\\[|\\])", "g"), s=>`\\${s}`)
-  const result = it.substr(at).match(search)
-  return result ? [result.index + at, result[0].length] : [-1, 0]
-}
+export const entries = baseEntries
 
 export const findIndex = (function (){
   const __find_string = (it, search, at)=>it.indexOf(search, at)

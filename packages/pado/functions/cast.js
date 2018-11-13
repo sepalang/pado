@@ -1,7 +1,6 @@
 import {
   isNumber,
   isArray,
-  isNone,
   isAbsoluteNaN,
   isPlainObject,
   isObject,
@@ -10,23 +9,12 @@ import {
 } from './isLike'
 
 import {
+  baseAsArray,
   stringTest,
-  keys
-} from './remark'
+  baseKeys
+} from './baseFunction'
 
-export const asArray = function (data, defaultArray = undefined){
-  if(isArray(data)){
-    return data
-  }
-  if(isNone(data)){
-    return isArray(defaultArray) ? defaultArray
-      : isNone(defaultArray) ? [] : [defaultArray]
-  }
-  if(typeof data === "object" && typeof data.toArray === "function"){
-    return data.toArray()
-  }
-  return [data]
-}
+export const asArray = baseAsArray
 
 export const toArray = function (data, option){
   if(typeof data === "undefined" || data === null || isAbsoluteNaN(data)) return []
@@ -194,7 +182,7 @@ export const concat = (data, ...args)=>baseConcatOf(toArray(data), args)
 // Removes the value of data that does not return a positive value to the filter function.
 export const filterOf = function (data, filterFn, exitFn){
   const dataArray = asArray(data)
-  const dataKeys = keys(data)
+  const dataKeys = baseKeys(data)
   const isOnExit = typeof exitFn === "function"
   const exitArray = isOnExit ? [] : null
   for(let i = 0, removedIndex = 0, l = dataKeys.length; i < l; i++, removedIndex++){
@@ -324,7 +312,7 @@ export const rebase = function (obj, ref){
 const removeKey = function (datum, rule){
   if(!isObject(datum)) return datum
   const removeRule = typeof rule === "function" ? (key, value)=>rule(value, key) : rule
-  const removeKeys = keys(datum, removeRule)
+  const removeKeys = baseKeys(datum, removeRule)
   if(!removeKeys.length) return datum
   
   isArray(datum)

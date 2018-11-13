@@ -8,9 +8,9 @@ import {
 } from './isLike'
 
 import {
-  entries,
-  matchString
-} from './remark'
+  matchString,
+  baseEntries
+} from './baseFunction'
 
 import {
   all
@@ -23,7 +23,7 @@ import {
 
 //read.readString.spec.js
 export const readString = (function (){
-  const rebaseMatches = matches=>entries(asArray(matches))
+  const rebaseMatches = matches=>baseEntries(asArray(matches))
   return function (text, matches, castFn, props){
     const payload = {
       content: text,
