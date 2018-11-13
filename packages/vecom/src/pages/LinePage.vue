@@ -2,12 +2,12 @@
   <AppLayout>
     <div>LinePage</div>
     <div class="yaaa" style="position:relative;">
-      <VERect class="root-rect" size="40" left="100" top="100"></VERect>
-      <VERect class="rect-upside" size="40" left="100" top="0" @drawPoint="drawLine" dragmove></VERect>
-      <VERect class="rect-upright" size="40" left="200" top="50" @drawPoint="drawLine" dragmove></VERect>
-      <VERect class="rect-downright" size="40" left="150" top="150" @drawPoint="drawLine" dragmove></VERect>
-      <VERect class="rect-downside" size="40" left="50" top="200" @drawPoint="drawLine" dragmove></VERect>
-      <VERect class="rect-angledown" size="40" left="200" top="200" @drawPoint="drawLine" dragmove></VERect>
+      <VERect mixins="print" class="root-rect" size="40" left="100" top="100"></VERect>
+      <VERect mixins="print" class="rect-upside" size="40" left="100" top="0" @drawPoint="drawLine" dragmove></VERect>
+      <VERect mixins="print" class="rect-upright" size="40" left="200" top="50" @drawPoint="drawLine" dragmove></VERect>
+      <VERect mixins="print" class="rect-downright" size="40" left="150" top="150" @drawPoint="drawLine" dragmove></VERect>
+      <VERect mixins="print" class="rect-downside" size="40" left="50" top="200" @drawPoint="drawLine" dragmove></VERect>
+      <VERect mixins="print" class="rect-angledown" size="40" left="200" top="200" @drawPoint="drawLine" dragmove></VERect>
       <div class="path-placeholder"></div>
     </div>
   </AppLayout>

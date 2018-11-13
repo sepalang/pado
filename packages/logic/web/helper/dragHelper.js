@@ -114,8 +114,6 @@ export default function DragHelper (element, option){
     dragParams = { offset: elementOffset, pointer: undefined, event: originalEvent }
     dragParams.pointer = getCurrentPointerDrag(originalEvent)
 
-
-    console.log('dragParams', dragParams)
     startFn && startFn(dragParams)
 
     document.addEventListener(DEVICE_EVENT.MOVE, dragMove)

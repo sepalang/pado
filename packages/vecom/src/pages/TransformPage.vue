@@ -7,7 +7,7 @@
       </layer>
       <layer v-if="boxBoundingRect.width">
         <VERect
-          theme="frame"
+          mixins="frame"
           :left="boxBoundingRect.left"
           :top="boxBoundingRect.top"
           :width="boxBoundingRect.width"
@@ -16,7 +16,7 @@
         </VERect>
       </layer>
       <layer class="no-pointer-events">
-        <VERect size="150" label="" theme="frame"></VERect>
+        <VERect size="150" label="" mixins="frame"></VERect>
       </layer>
       <layer class="no-pointer-events">
         <VEPoint

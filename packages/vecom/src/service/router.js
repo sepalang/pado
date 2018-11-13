@@ -9,6 +9,8 @@ import SliderPage from '@/pages/SliderPage.vue';
 import ScreenPage from '@/pages/ScreenPage.vue';
 import PanzoomPage from '@/pages/PanzoomPage.vue';
 import ControlsPage from '@/pages/ControlsPage.vue';
+import RectPage from '@/pages/RectPage.vue';
+import PointPage from '@/pages/PointPage.vue';
 import LinePage from '@/pages/LinePage.vue';
 import WowPage from '@/pages/WowPage.vue';
 import TabPage from '@/pages/TabPage.vue';
@@ -54,6 +56,14 @@ export default new Router({
     {
       path     : '/transform',
       component: TransformPage
+    },
+    {
+      path     : '/rect',
+      component: RectPage
+    },
+    {
+      path     : '/point',
+      component: PointPage
     },
     {
       path     : '/line',

@@ -14,6 +14,8 @@
         <li><router-link to="/panzoom">Panzoom</router-link></li>
         <li><router-link to="/grid-map">GridMap</router-link></li>
         <li><router-link to="/transform">Transform</router-link></li>
+        <li><router-link to="/point">Point</router-link></li>
+        <li><router-link to="/rect">Rect</router-link></li>
         <li><router-link to="/line">Line</router-link></li>
         <li><router-link to="/space-block">SpaceBlock</router-link></li>
         <li><router-link to="/wow">WOW</router-link></li>

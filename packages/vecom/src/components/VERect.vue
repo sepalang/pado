@@ -1,6 +1,13 @@
 <template>
-  <span class="v-pado-rect" :style="rectStyle">
-    <span><slot :rect="rectStyle">{{ contentValue }}</slot></span>
+  <span class="ve-rect" :mixins="mixins" :style="rectStyle">
+    <template v-if="hasMixins('print')">
+      <span>
+        <slot :rect="rectStyle">{{ contentValue }}</slot>
+      </span>
+    </template>
+    <template v-else>
+      <slot :rect="rectStyle">{{ contentValue }}</slot>
+    </template>
   </span>
 </template>
 <script>
@@ -8,9 +15,11 @@ import { dragHelper, getElementBoundingRect, nodeCss } from '@sepalang/logic/web
 import { nextQueue } from '@/utils';
 import HighOrderRect from '@sepalang/logic/vue/Rect';
 import HighOrderPoint from '@sepalang/logic/vue/Point';
+import HighOrderMultipleValue from '@sepalang/logic/vue/MultipleValue';
 
 export default {
   mixins: [
+    HighOrderMultipleValue(['mixins']),
     HighOrderRect([['width', 'height', 'size', 'rect'], [20, 20]]),
     HighOrderPoint([['left', 'top', 'point'], [0, 0]])
   ],
@@ -21,7 +30,9 @@ export default {
   computed: {
     contentValue (){
       const { width, height } = this.rectValue;
-      return typeof this.label === 'string' ? this.label : `${width}x${height}`;
+      const labelValue = this.label;
+      const printMode = this.hasMixins('print');
+      return typeof labelValue === 'string' ? labelValue : printMode ? `${width}x${height}` : '';
     },
     rectStyle (){
       const { width, height } = this.rectValue;
@@ -51,7 +62,7 @@ export default {
           left: startOffset.left + x,
           top : startOffset.top + y
         };
-        console.log('result', nodeCss, result)
+        
         nodeCss(element, result);
         return result;
       };
@@ -71,37 +82,42 @@ export default {
 };
 </script>
 <style lang="scss">
-  .v-pado-rect {
+  .ve-rect {
     display:inline-block;
-    background-color:#eee;
     position:relative;
-
-    > span {
-      display:inline-block;
-      font-size:10px;
-      position:absolute;
-      top:50%;
-      left:50%;
-      transform:translate(-50%,-50%);
-      word-break:keep-all;
-      white-space: nowrap;
-      text-shadow:0px 0px 2px rgba(0,0,0,.5);
-      color:gray;
+    
+    &[mixins~="block"] {
+      display:block;
     }
     
-    &[theme="frame"]{
+    &[mixins~="line"] {
+      border:1px solid #ddd;
+    }
+    
+    &[mixins~="bg"] {
+      background-color:#eee;
+    }
+    
+    &[mixins~="print"] {
+      background-color:#eee;
+      > span {
+        display:inline-block;
+        font-size:10px;
+        position:absolute;
+        top:50%;
+        left:50%;
+        transform:translate(-50%,-50%);
+        word-break:keep-all;
+        white-space: nowrap;
+        text-shadow:0px 0px 2px rgba(0,0,0,.5);
+        color:gray;
+      }
+    }
+    
+    &[mixins~="frame"]{
       background-color:transparent;
       border:1px dashed gray;
     }
     
-    &[theme="selectable"]{
-      &:hover {
-        
-      };
-      &[selected] {
-        
-      };
-    }
-
   }
 </style>
