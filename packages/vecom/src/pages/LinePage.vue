@@ -2,25 +2,25 @@
   <AppLayout>
     <div>LinePage</div>
     <div class="yaaa" style="position:relative;">
-      <PadoRect class="root-rect" size="40" left="100" top="100"></PadoRect>
-      <PadoRect class="rect-upside" size="40" left="100" top="0" @drawPoint="drawLine" dragmove></PadoRect>
-      <PadoRect class="rect-upright" size="40" left="200" top="50" @drawPoint="drawLine" dragmove></PadoRect>
-      <PadoRect class="rect-downright" size="40" left="150" top="150" @drawPoint="drawLine" dragmove></PadoRect>
-      <PadoRect class="rect-downside" size="40" left="50" top="200" @drawPoint="drawLine" dragmove></PadoRect>
-      <PadoRect class="rect-angledown" size="40" left="200" top="200" @drawPoint="drawLine" dragmove></PadoRect>
+      <VERect class="root-rect" size="40" left="100" top="100"></VERect>
+      <VERect class="rect-upside" size="40" left="100" top="0" @drawPoint="drawLine" dragmove></VERect>
+      <VERect class="rect-upright" size="40" left="200" top="50" @drawPoint="drawLine" dragmove></VERect>
+      <VERect class="rect-downright" size="40" left="150" top="150" @drawPoint="drawLine" dragmove></VERect>
+      <VERect class="rect-downside" size="40" left="50" top="200" @drawPoint="drawLine" dragmove></VERect>
+      <VERect class="rect-angledown" size="40" left="200" top="200" @drawPoint="drawLine" dragmove></VERect>
       <div class="path-placeholder"></div>
     </div>
   </AppLayout>
 </template>
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
-import PadoRect from '@/components/PadoRect.vue';
+import VERect from '@/components/VERect.vue';
 import { getElementBoundingRect, makeSVG } from '@sepalang/logic/web';
 
 export default {
   components: {
     AppLayout,
-    PadoRect
+    VERect
   },
   data (){
     return {

@@ -24,13 +24,13 @@
             <PadoScreen ref="main" style="width:100%;height:200px;">
               <div :style="outsideStyle">
                 <div :style="mainRectStyle" ref="mainRect"></div>
-                <PadoPoint 
+                <VEPoint 
                   v-for="(point, index) in gridPoints"
                   :key="index"
                   :x="point.x"
                   :y="point.y"
                 >
-                </PadoPoint>
+                </VEPoint>
               </div>
             </PadoScreen>
           </td>
@@ -40,13 +40,13 @@
             <PadoScreen ref="main" style="width:100%;height:200px;">
               <div :style="outsideStyle">
                 <div :style="mainRectStyle" ref="mainRect"></div>
-                <PadoPoint 
+                <VEPoint 
                   v-for="(point, index) in gridPoints2"
                   :key="index"
                   :x="point.x"
                   :y="point.y"
                 >
-                </PadoPoint>
+                </VEPoint>
               </div>
             </PadoScreen>
           </td>
@@ -61,10 +61,10 @@
 </template>
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
-import PadoRect from '@/components/PadoRect.vue';
+import VERect from '@/components/VERect.vue';
 import PadoScreen from '@/components/PadoScreen.vue';
 import PadoMinimap from '@/components/PadoMinimap.vue';
-import PadoPoint from '@/components/PadoPoint.vue';
+import VEPoint from '@/components/VEPoint.vue';
 import { rect } from '@sepalang/pado/modules/stance';
 import {
   transformStyleVariant,
@@ -78,10 +78,10 @@ import {
 export default {
   components: {
     AppLayout,
-    PadoRect,
+    VERect,
     PadoScreen,
     PadoMinimap,
-    PadoPoint
+    VEPoint
   },
   data: ()=>({
     gridSize  : 50,

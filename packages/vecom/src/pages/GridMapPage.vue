@@ -45,7 +45,7 @@
             <td>
               <Layer root :size="rectSize">
                 <Layer root @click="selectRect(';ayer')">
-                  <PadoRect 
+                  <VERect 
                     v-for="item in piecesRects"
                     :key="item.meta.coords+''"
                     :left="item.rect.left"
@@ -55,24 +55,24 @@
                     style="border:1px solid silver"
                     @click.native="selectRect(item)"
                   >
-                  </PadoRect>
+                  </VERect>
                 </Layer>
               </Layer>
             </td>
             <td>
               <Layer root :size="rectSize">
                 <Layer>
-                  <PadoRect :size="rectSize">
+                  <VERect :size="rectSize">
                     <template slot-scope="scope">Root Size<br>{{scope.rect.width}}</template>
-                  </PadoRect>
+                  </VERect>
                 </Layer>
                 <Layer>
-                  <PadoPoint
+                  <VEPoint
                     v-for="point in piecesPoints"
                     :key="point.key"
                     :x="point.x"
                     :y="point.y"
-                  ></PadoPoint>
+                  ></VEPoint>
                 </Layer>
               </Layer>
             </td>
@@ -80,7 +80,7 @@
           <tr>
             <td>
               <Layer root :size="rectSize">
-                <PadoRect 
+                <VERect 
                   v-for="item in selectedRects"
                   :key="item.meta.coords+''"
                   :left="item.rect.left"
@@ -90,25 +90,25 @@
                   style="border:1px solid silver"
                   @click.native="selectRect(item)"
                 >
-                </PadoRect>
+                </VERect>
               </Layer>
             </td>
             <td>
               <Layer root :size="rectSize">
-                <PadoPoint
+                <VEPoint
                   v-for="item in selectedPoints"
                   :key="item.meta.coords+''"
                   :x="item.point.x"
                   :y="item.point.y"
                 >
-                </PadoPoint>
+                </VEPoint>
               </Layer>
             </td>
           </tr>
           <tr>
             <td>
               <Layer root :size="rectSize">
-                <PadoPoint
+                <VEPoint
                   v-for="item in selectedPoints"
                   :key="item.meta.coords+''"
                   :x="item.point.x"
@@ -116,12 +116,12 @@
                   placement="top"
                 >
                   <div style="width:50px;height:20px;border:1px solid blue;">{{item.meta.coords}}</div>
-                </PadoPoint>
+                </VEPoint>
               </Layer>
             </td>
             <td>
               <Layer root :size="rectSize">
-                <PadoPoint
+                <VEPoint
                   v-for="item in selectedPoints"
                   :key="item.meta.coords+''"
                   :x="item.point.x"
@@ -130,14 +130,14 @@
                   pointer="true"
                 >
                   <div style="width:50px;height:20px;border:1px solid blue;">{{item.meta.coords}}</div>
-                </PadoPoint>
+                </VEPoint>
               </Layer>
             </td>
           </tr>
           <tr>
             <td colspan="2">
               <Layer root :size="rectSize*2">
-                <PadoPoint
+                <VEPoint
                   v-for="item in relativePoints"
                   :key="item.meta.coords+''"
                   :rx="item.point.rx"
@@ -148,7 +148,7 @@
                   <div style="width:50px;height:20px;border:1px solid blue;">
                     asdf
                   </div>
-                </PadoPoint>
+                </VEPoint>
               </Layer>
             </td>
           </tr>
@@ -161,8 +161,8 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import Layer from '@/components/Layer.vue';
 import PadoSlider from '@/components/PadoSlider.vue';
-import PadoRect from '@/components/PadoRect.vue';
-import PadoPoint from '@/components/PadoPoint.vue';
+import VERect from '@/components/VERect.vue';
+import VEPoint from '@/components/VEPoint.vue';
 import { rect } from '@sepalang/pado/modules/stance';
 
 export default {
@@ -170,8 +170,8 @@ export default {
     AppLayout,
     Layer,
     PadoSlider,
-    PadoRect,
-    PadoPoint
+    VERect,
+    VEPoint
   },
   data: ()=>({
     rectSize    : 150,

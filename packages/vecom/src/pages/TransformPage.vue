@@ -3,23 +3,23 @@
     <div>Affine</div>
     <section>
       <layer class="no-pointer-events" :style="{left:`${boxMoveDistance}px`}">
-        <PadoRect ref="box" class="box" :size="boxSize" label="transform" :style="transformedBoxStyle"></PadoRect>
+        <VERect ref="box" class="box" :size="boxSize" label="transform" :style="transformedBoxStyle"></VERect>
       </layer>
       <layer v-if="boxBoundingRect.width">
-        <PadoRect
+        <VERect
           theme="frame"
           :left="boxBoundingRect.left"
           :top="boxBoundingRect.top"
           :width="boxBoundingRect.width"
           :height="boxBoundingRect.height"
         >
-        </PadoRect>
+        </VERect>
       </layer>
       <layer class="no-pointer-events">
-        <PadoRect size="150" label="" theme="frame"></PadoRect>
+        <VERect size="150" label="" theme="frame"></VERect>
       </layer>
       <layer class="no-pointer-events">
-        <PadoPoint
+        <VEPoint
           v-for="(vertex, index) in boxVertexPointArray"
           :key="index"
           :x="vertex.x"
@@ -27,10 +27,10 @@
           :label="vertex.key"
         >
           v{{ index }}
-        </PadoPoint>
+        </VEPoint>
       </layer>
       <layer class="no-pointer-events" >
-        <PadoPoint :x="perspectiveOrigin.x" :y="perspectiveOrigin.y" label="perspective-origin" style="opacity:.4"></PadoPoint>
+        <VEPoint :x="perspectiveOrigin.x" :y="perspectiveOrigin.y" label="perspective-origin" style="opacity:.4"></VEPoint>
       </layer>
       <div style="min-height:170px;"></div>
       <div class="no-word-break"></div>
@@ -97,12 +97,12 @@
                   </tr>
                   <tr>
                     <th colspan="3">
-                      <PadoPointSlider
+                      <VEPointSlider
                         v-model="perspectiveOrigin"
                         input-cycle="enter"
                         x-max-value="150"
                         y-max-value="150"
-                      ></PadoPointSlider>
+                      ></VEPointSlider>
                     </th>
                   </tr>
                   <tr>
@@ -156,7 +156,7 @@
 </template>
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
-import { Layer, PadoRect, PadoSlider, PadoPoint, PadoPointSlider } from '../components';
+import { Layer, VERect, PadoSlider, VEPoint, VEPointSlider } from '../components';
 import {
   transformStyleVariant,
   transformMatrixVariant,
@@ -174,10 +174,10 @@ export default {
   components: {
     AppLayout,
     Layer,
-    PadoPoint,
-    PadoRect,
+    VEPoint,
+    VERect,
     PadoSlider,
-    PadoPointSlider
+    VEPointSlider
   },
   computed: {
     perspectiveOrigin (){
