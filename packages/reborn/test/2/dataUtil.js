@@ -5,4 +5,4 @@ export { top, cut, cuts } from '@sepalang/pado/functions/reduce';
 export { fill } from '@sepalang/pado/functions/reform';
 export { domainRangeValue } from '@sepalang/pado/functions/matrix';
 export { times } from '@sepalang/pado/functions/enumerable';
-export { sortOf } from '@sepalang/pado/pado/functions';
+export { sortOf } from '@sepalang/pado/functions';

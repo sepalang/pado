@@ -3,7 +3,9 @@ export {
 } from '@sepalang/logic/web/env/dom';
 
 export { 
-  rect
+  rect,
+  point,
+  movement
 } from '@sepalang/pado/modules/stance';
 
 export { 

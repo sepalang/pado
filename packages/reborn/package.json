@@ -12,6 +12,7 @@
   "license": "MIT",
   "devDependencies": {
     "@sepalang/padoc": "^0.10.0",
+    "@sepalang/pado": "^0.3.0",
     "@sepalang/logic": "^0.0.2",
     "rimraf": "^2.6.2"
   }
