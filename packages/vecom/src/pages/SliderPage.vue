@@ -4,30 +4,30 @@
     
     <div>
       <h4>input-cycle</h4>
-      <PadoSlider v-model="sliderValue" input-cycle="enter" style="width:40%"></PadoSlider>
+      <VESlider v-model="sliderValue" input-cycle="enter" style="width:40%"></VESlider>
     </div>
     
     <div>
       <h4>min-value max-value</h4>
       <div>{{sliderValue}}</div>
       <div>
-        <PadoSlider v-model="sliderValue" input-cycle="enter" style="width:40%" min-value="20" max-value="50"></PadoSlider>
+        <VESlider v-model="sliderValue" input-cycle="enter" style="width:40%" min-value="20" max-value="50"></VESlider>
       </div>
       <div>
-        <PadoSlider v-model="sliderValue" input-cycle="enter" style="width:40%" min-value="0" max-value="20"></PadoSlider>
+        <VESlider v-model="sliderValue" input-cycle="enter" style="width:40%" min-value="0" max-value="20"></VESlider>
       </div>
     </div>
     
     <div>
       <h4>share model</h4>
       <div>
-        <PadoSlider v-model="sliderValue" @input="s2Value=$event" style="width:40%"></PadoSlider>
+        <VESlider v-model="sliderValue" @input="s2Value=$event" style="width:40%"></VESlider>
       </div>
       <div>
-        <PadoSlider v-model="sliderValue" @input="s2Value=$event" style="width:100px"></PadoSlider>
+        <VESlider v-model="sliderValue" @input="s2Value=$event" style="width:100px"></VESlider>
       </div>
       <div>
-        <PadoSlider v-model="s2Value" @enter="sliderValue=$event" style="width:150px"></PadoSlider>
+        <VESlider v-model="s2Value" @enter="sliderValue=$event" style="width:150px"></VESlider>
       </div>
       <div>
         {{ sliderValue }}
@@ -36,7 +36,7 @@
     
     <div>
       <h4>no model</h4>
-      <PadoSlider @enter="nomodelValue=$event"></PadoSlider>
+      <VESlider @enter="nomodelValue=$event"></VESlider>
       <br>
       {{ nomodelValue }}
     </div>
@@ -44,12 +44,12 @@
 </template>
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
-import PadoSlider from '@/components/PadoSlider.vue';
+import VESlider from '@/components/VESlider.vue';
 
 export default {
   components: {
     AppLayout,
-    PadoSlider
+    VESlider
   },
   data (){
     return {

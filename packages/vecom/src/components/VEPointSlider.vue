@@ -1,7 +1,7 @@
 <template>
   <div class="v-pado-xy-slider">
-    <div class="v-pado-slider-scrollbar"></div>
-    <div class="v-pado-slider-scroller"></div>
+    <div class="ve-slider-scrollbar"></div>
+    <div class="ve-slider-scroller"></div>
   </div>
 </template>
 <script>
@@ -60,8 +60,8 @@ export default {
   },
   mounted (){
     const $element = $(this.$el);
-    // const $scrollbar = $element.find('.v-pado-slider-scrollbar')
-    const $scroller = $element.find('.v-pado-slider-scroller');
+    // const $scrollbar = $element.find('.ve-slider-scrollbar')
+    const $scroller = $element.find('.ve-slider-scroller');
 
     this.$on('enter', ({ x: xValue, y: yValue })=>{
       const xModelValue = typeof xValue === 'number' ? xValue : this.xValue;

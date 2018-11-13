@@ -33,9 +33,10 @@ export default {
       return {left: x, top: y};
     },
     pointerRectStyle (){
+      const size = this.size;
       return {
-        width: `${this.size}px`,
-        height: `${this.size}px`
+        width: `${size}px`,
+        height: `${size}px`
       };
     },
     labelValue (){

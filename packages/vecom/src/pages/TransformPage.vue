@@ -47,52 +47,52 @@
                 <tbody>
                   <tr>
                     <th>rotateX</th>
-                    <td><PadoSlider v-model="rotateX" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+                    <td><VESlider v-model="rotateX" input-cycle="enter" min-value="-360" max-value="360"></VESlider></td>
                     <td><a @click="rotateX+=1">u</a><a @click="rotateX-=1">d</a> {{rotateX}}</td>
                   </tr>
                   <tr>
                     <th>rotateY</th>
-                    <td><PadoSlider v-model="rotateY" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+                    <td><VESlider v-model="rotateY" input-cycle="enter" min-value="-360" max-value="360"></VESlider></td>
                     <td><a @click="rotateY+=1">u</a><a @click="rotateY-=1">d</a> {{rotateY}}</td>
                   </tr>
                   <tr>
                     <th>rotateZ</th>
-                    <td><PadoSlider v-model="rotateZ" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+                    <td><VESlider v-model="rotateZ" input-cycle="enter" min-value="-360" max-value="360"></VESlider></td>
                     <td><a @click="rotateZ+=1">u</a><a @click="rotateZ-=1">d</a> {{rotateZ}}</td>
                   </tr>
                   <tr>
                     <th>translateX</th>
-                    <td><PadoSlider v-model="translateX" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+                    <td><VESlider v-model="translateX" input-cycle="enter" min-value="-360" max-value="360"></VESlider></td>
                     <td>{{translateX}}</td>
                   </tr>
                   <tr>
                     <th>translateY</th>
-                    <td><PadoSlider v-model="translateY" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+                    <td><VESlider v-model="translateY" input-cycle="enter" min-value="-360" max-value="360"></VESlider></td>
                     <td>{{translateY}}</td>
                   </tr>
                   <tr>
                     <th>translateZ</th>
-                    <td><PadoSlider v-model="translateZ" input-cycle="enter" min-value="-360" max-value="360"></PadoSlider></td>
+                    <td><VESlider v-model="translateZ" input-cycle="enter" min-value="-360" max-value="360"></VESlider></td>
                     <td>{{translateZ}}</td>
                   </tr>
                   <tr>
                     <th>scaleX</th>
-                    <td><PadoSlider v-model="scaleX" input-cycle="enter" min-value="-1" max-value="3"></PadoSlider></td>
+                    <td><VESlider v-model="scaleX" input-cycle="enter" min-value="-1" max-value="3"></VESlider></td>
                     <td>{{scaleX}}</td>
                   </tr>
                   <tr>
                     <th>scaleY</th>
-                    <td><PadoSlider v-model="scaleY" input-cycle="enter" min-value="-1" max-value="3"></PadoSlider></td>
+                    <td><VESlider v-model="scaleY" input-cycle="enter" min-value="-1" max-value="3"></VESlider></td>
                     <td>{{scaleY}}</td>
                   </tr>
                   <tr>
                     <th>scaleZ</th>
-                    <td><PadoSlider v-model="scaleZ" input-cycle="enter" min-value="-1" max-value="3"></PadoSlider></td>
+                    <td><VESlider v-model="scaleZ" input-cycle="enter" min-value="-1" max-value="3"></VESlider></td>
                     <td>{{scaleZ}}</td>
                   </tr>
                   <tr>
                     <th>perspective</th>
-                    <td><PadoSlider v-model="perspective" input-cycle="enter" min-value="0" max-value="500"></PadoSlider></td>
+                    <td><VESlider v-model="perspective" input-cycle="enter" min-value="0" max-value="500"></VESlider></td>
                     <td>{{perspective}}</td>
                   </tr>
                   <tr>
@@ -107,7 +107,7 @@
                   </tr>
                   <tr>
                     <th>target move</th>
-                    <td><PadoSlider v-model="boxMoveDistance" input-cycle="enter" min-value="0" max-value="500"></PadoSlider></td>
+                    <td><VESlider v-model="boxMoveDistance" input-cycle="enter" min-value="0" max-value="500"></VESlider></td>
                     <td>{{boxMoveDistance}}</td>
                   </tr>
                 </tbody>
@@ -156,7 +156,7 @@
 </template>
 <script>
 import AppLayout from '../layouts/AppLayout.vue';
-import { Layer, VERect, PadoSlider, VEPoint, VEPointSlider } from '../components';
+import { Layer, VERect, VESlider, VEPoint, VEPointSlider } from '../components';
 import {
   transformStyleVariant,
   transformMatrixVariant,
@@ -176,7 +176,7 @@ export default {
     Layer,
     VEPoint,
     VERect,
-    PadoSlider,
+    VESlider,
     VEPointSlider
   },
   computed: {

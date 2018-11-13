@@ -12,28 +12,28 @@
           <tr>
             <th>root size</th>
             <td>
-              <PadoSlider v-model="rectSize" input-cycle="enter" min-value="100" max-value="250" @input="drawRect"></PadoSlider>
+              <VESlider v-model="rectSize" input-cycle="enter" min-value="100" max-value="250" @input="drawRect"></VESlider>
             </td>
             <td>{{ rectSize }}</td>
           </tr>
           <tr>
             <th>col count</th>
             <td>
-              <PadoSlider v-model="colCount" input-cycle="enter" min-value="1" max-value="20" @input="drawRect"></PadoSlider>
+              <VESlider v-model="colCount" input-cycle="enter" min-value="1" max-value="20" @input="drawRect"></VESlider>
             </td>
             <td>{{ colCount }}</td>
           </tr>
           <tr>
             <th>row count</th>
             <td>
-              <PadoSlider v-model="rowCount" input-cycle="enter" min-value="1" max-value="20"  @input="drawRect"></PadoSlider>
+              <VESlider v-model="rowCount" input-cycle="enter" min-value="1" max-value="20"  @input="drawRect"></VESlider>
             </td>
             <td>{{ rowCount }}</td>
           </tr>
           <tr>
             <th>addEachCol</th>
             <td>
-              <PadoSlider v-model="addEachCol" input-cycle="enter" min-value="1" max-value="20"  @input="drawRect"></PadoSlider>
+              <VESlider v-model="addEachCol" input-cycle="enter" min-value="1" max-value="20"  @input="drawRect"></VESlider>
             </td>
             <td>{{ addEachCol }}</td>
           </tr>
@@ -160,7 +160,7 @@
 <script>
 import AppLayout from '@/layouts/AppLayout.vue';
 import Layer from '@/components/Layer.vue';
-import PadoSlider from '@/components/PadoSlider.vue';
+import VESlider from '@/components/VESlider.vue';
 import VERect from '@/components/VERect.vue';
 import VEPoint from '@/components/VEPoint.vue';
 import { rect } from '@sepalang/pado/modules/stance';
@@ -169,7 +169,7 @@ export default {
   components: {
     AppLayout,
     Layer,
-    PadoSlider,
+    VESlider,
     VERect,
     VEPoint
   },

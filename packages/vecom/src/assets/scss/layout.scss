@@ -1,12 +1,12 @@
 @import './_remark.scss';
 
-.v-pado-slider {
+.ve-slider {
   @include inline-block;
   position:relative;
   width:100%;
   height:10px;
 
-  .v-pado-slider-scrollbar {
+  .ve-slider-scrollbar {
     @include absolute(top, 50%);
     transform:translateY(-50%);
     width:100%;
@@ -14,7 +14,7 @@
     background-color:silver;
   }
   
-  .v-pado-slider-scroller {
+  .ve-slider-scroller {
     @include absolute(left,0px);
     width:10px;
     height:10px;
@@ -33,7 +33,7 @@
   width:100px;
   height:100px;
 
-  .v-pado-slider-scrollbar {
+  .ve-slider-scrollbar {
     @include absolute(0, 0);
     width:100%;
     height:100%;
@@ -41,7 +41,7 @@
     border:1px dashed #ccc;
   }
   
-  .v-pado-slider-scroller {
+  .ve-slider-scroller {
     @include absolute(left,0px);
     width:10px;
     height:10px;
