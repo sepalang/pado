@@ -1,5 +1,5 @@
 import { isArray, isNumber } from '../functions/isLike'
-import { asArray } from '../functions/cast'
+import { asArray, toNumber } from '../functions/cast'
 import { validMatrix, multiplyMatrix } from '../functions/matrix'
 import { makeMatrixArray } from './matrix'
 
@@ -608,6 +608,78 @@ Rect.prototype = {
   }
 }
 
+const Movement = function (distance, rotate, time){
+  
+  const __ref = {
+    rotate  : toNumber(rotate),
+    distance: toNumber(distance),
+    time    : toNumber(time)
+  }
+  
+  Object.defineProperties(this, {
+    rotate: {
+      enumerable: true,
+      get (){
+        return __ref.rotate
+      }
+    },
+    distance: {
+      enumerable: true,
+      get (){
+        return __ref.distance
+      }
+    },
+    time: {
+      enumerable: true,
+      get (){
+        return __ref.time
+      }
+    },
+    angle: {
+      enumerable: false,
+      get (){
+        const { rotate } = this
+        return !rotate ? 0 : 360 * (rotate + 0)
+      },
+      set (angle){
+        const angleValue = toNumber(angle)
+        __ref.rotate = !isNumber(angleValue) ? 0 : angleValue / 360
+        !isNumber(__ref.rotate) && (__ref.rotate = 0)
+        return this
+      }
+    },
+    theta: {
+      enumerable: false,
+      get (){
+        const { angle } = this
+        return angle * Math.PI / 180.0
+      }
+    }
+  })
+}
+
+Movement.prototype = {
+  clone (){
+    return new Movement(this.distance, this.rotate, this.time)
+  },
+  from (object){
+    const { theta, distance } = this
+    
+    if(object instanceof Point){
+      const { x, y } = object
+      return new Point(
+        x + distance * Math.cos(theta),
+        y + distance * Math.sin(theta)
+      )
+    }
+    return null
+  },
+  setAngle (angle){
+    this.angle = angle
+    return this
+  }
+}
+
 export const point = function (x, y, z, w){
   return typeof x === "object" 
     ? new Point(x.x, x.y, x.z, x.w) 
@@ -622,4 +694,8 @@ export const rect = function (left, top, width, height, x, y, valid){
   return typeof left === "object"
     ? new Rect(left.left, left.top, left.width, left.height, left.x, left.y, left.valid)
     : new Rect(left, top, width, height, x, y, valid)
+}
+
+export const movement = function (distance, rotate, time){
+  return new Movement(distance, rotate, time)
 }
