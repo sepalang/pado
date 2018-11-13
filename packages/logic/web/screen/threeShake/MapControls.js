@@ -16,7 +16,7 @@ export default function expandMapControls(THREE){
 //    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
 //    Pan - left mouse, or arrow keys / touch: one-finger move
 
-THREE.MapControls = function ( object, domElement ) {
+THREE.MapControls = function ({ object, scene, domElement }) {
 
   this.object = object;
 
@@ -27,6 +27,7 @@ THREE.MapControls = function ( object, domElement ) {
 
   // "target" sets the location of focus, where the object orbits around
   this.target = new THREE.Vector3();
+  
 
   // How far you can dolly in and out ( PerspectiveCamera only )
   this.minDistance = 0;
@@ -399,17 +400,16 @@ THREE.MapControls = function ( object, domElement ) {
     }();
 
     function dollyIn( dollyScale ) {
-
       if ( scope.object.isPerspectiveCamera ) {
-
+        
         scale /= dollyScale;
 
       } else if ( scope.object.isOrthographicCamera ) {
-
+        
         scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom * dollyScale ) );
         scope.object.updateProjectionMatrix();
         zoomChanged = true;
-
+        
       } else {
 
         console.warn( 'WARNING: MapControls.js encountered an unknown camera type - dolly/zoom disabled.' );
@@ -420,7 +420,6 @@ THREE.MapControls = function ( object, domElement ) {
     }
 
     function dollyOut( dollyScale ) {
-
       if ( scope.object.isPerspectiveCamera ) {
 
         scale *= dollyScale;
@@ -535,13 +534,56 @@ THREE.MapControls = function ( object, domElement ) {
     }
 
     function handleMouseWheel( event ) {
-      // console.log( 'handleMouseWheel' );
+      //
+      //
+      // https://github.com/MrMaksymov/three/blob/master/OrbitControls.js
+      
+      const camera = scope.object;
+      const element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2(0, 0);
+      
+      //var rect = element.getBoundingClientRect();
+      //mouse.x = ( ( event.clientX - rect.left ) / ( rect.width - rect.left ) ) * 2 - 1;
+      //mouse.y = - ( ( event.clientY - rect.top ) / ( rect.bottom - rect.top) ) * 2 + 1;
+      
+      mouse.x = (event.layerX / element.offsetWidth) * 2 - 1;
+      mouse.y = -(event.layerY / element.offsetHeight) * 2 + 1;
+      //
+      raycaster.setFromCamera(mouse, camera);
+      
+      let scalar = 5; // 커서 아래에 아무 것도없는 경우 최소 단계
+      const [ intersect ] = raycaster.intersectObjects( scene.children, true );
+      if(intersect){
+        scalar = Math.pow(intersect.distance, 0.7);
+        //검증은 "무한 줌"이 필요하지 않기 때문에 필요하지 않습니다.
+        //rayCaster.setFromCamera에 zNear 카메라가 있습니다.
+      }
+      
+      let vec3dir;
       
       if ( event.deltaY < 0 ) {
-        dollyOut( getZoomScale(), event );
+        vec3dir = raycaster.ray.direction.normalize().multiplyScalar( scalar );
       } else if ( event.deltaY > 0 ) {
-        dollyIn( getZoomScale(), event );
+        vec3dir = raycaster.ray.direction.normalize().multiplyScalar( -scalar );
+        
       }
+      
+      if(vec3dir){
+        camera.position.add(vec3dir);
+        scope.target = scope.target.add(vec3dir);
+      }
+      
+      // //
+      //
+      //
+      
+      if ( event.deltaY < 0 ) {
+        dollyOut(getZoomScale());
+      } else if ( event.deltaY > 0 ) {
+        dollyIn(getZoomScale());
+      }
+      
       scope.update();
     }
 

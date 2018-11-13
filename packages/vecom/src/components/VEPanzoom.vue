@@ -10,8 +10,8 @@ import { mapScreen } from '@sepalang/logic/web/screen';
 
 export default {
   data:()=>({
-    width:200,
-    height:200
+    width:300,
+    height:300
   }),
   computed: {
     bounds (){
@@ -26,10 +26,6 @@ export default {
       content:this.$refs.content,
       ...this.bounds
     });
-    console.log("  panzoom.element",panzoom.element)
-    
-  
-    
   }
 };
 </script>

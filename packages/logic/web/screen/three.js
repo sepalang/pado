@@ -3,7 +3,7 @@ const { OrthographicCamera, PerspectiveCamera, Scene, CSS3DRenderer, CSS3DObject
 
 export const mapScreen = function(container, { width, height, content }){
   
-  const DEFAULT_Z = 280;
+  const DEFAULT_Z = 250;
   //const camera = new PerspectiveCamera( 40, width / height, 1, 10000 );
   const camera = new OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 1, 1000)
   camera.position.z = DEFAULT_Z;
@@ -20,7 +20,7 @@ export const mapScreen = function(container, { width, height, content }){
   container.appendChild( renderer.domElement );
   
   //
-  const controls = new MapControls( camera, renderer.domElement );
+  const controls = new MapControls({object:camera, domElement:renderer.domElement, scene});
   //controls.enableDamping = true;
   controls.dampingFactor = 1;
   controls.screenSpacePanning = true;
