@@ -7,6 +7,7 @@ import ModalPage from '@/pages/ModalPage.vue';
 import GridMapPage from '@/pages/GridMapPage.vue';
 import SliderPage from '@/pages/SliderPage.vue';
 import ScreenPage from '@/pages/ScreenPage.vue';
+import PanzoomPage from '@/pages/PanzoomPage.vue';
 import ControlsPage from '@/pages/ControlsPage.vue';
 import LinePage from '@/pages/LinePage.vue';
 import WowPage from '@/pages/WowPage.vue';
@@ -41,6 +42,10 @@ export default new Router({
     {
       path     : '/screen',
       component: ScreenPage
+    },
+    {
+      path     : '/panzoom',
+      component: PanzoomPage
     },
     {
       path     : '/grid-map',

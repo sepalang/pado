@@ -19,5 +19,8 @@
     "@sepalang/lintpad": "^0.2.1",
     "@sepalang/testpad": "0.1.1",
     "@sepalang/pado": "0.3.0"
+  },
+  "devDependencies": {
+    "three": "^0.98.0"
   }
 }
