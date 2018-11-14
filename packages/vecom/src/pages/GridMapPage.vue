@@ -47,6 +47,7 @@
                 <Layer root @click="selectRect(';ayer')">
                   <VERect 
                     v-for="item in piecesRects"
+                    mixins="selectable"
                     :key="item.meta.coords+''"
                     :left="item.rect.left"
                     :top="item.rect.top"
@@ -62,13 +63,14 @@
             <td>
               <Layer root :size="rectSize">
                 <Layer>
-                  <VERect :size="rectSize">
+                  <VERect mixins="print" :size="rectSize">
                     <template slot-scope="scope">Root Size<br>{{scope.rect.width}}</template>
                   </VERect>
                 </Layer>
                 <Layer>
                   <VEPoint
                     v-for="point in piecesPoints"
+                    mixins="print"
                     :key="point.key"
                     :x="point.x"
                     :y="point.y"
@@ -97,6 +99,7 @@
               <Layer root :size="rectSize">
                 <VEPoint
                   v-for="item in selectedPoints"
+                  mixins="print"
                   :key="item.meta.coords+''"
                   :x="item.point.x"
                   :y="item.point.y"
@@ -110,6 +113,7 @@
               <Layer root :size="rectSize">
                 <VEPoint
                   v-for="item in selectedPoints"
+                  mixins="print"
                   :key="item.meta.coords+''"
                   :x="item.point.x"
                   :y="item.point.y"
@@ -123,6 +127,7 @@
               <Layer root :size="rectSize">
                 <VEPoint
                   v-for="item in selectedPoints"
+                  mixins="print"
                   :key="item.meta.coords+''"
                   :x="item.point.x"
                   :y="item.point.y"
@@ -139,6 +144,7 @@
               <Layer root :size="rectSize*2">
                 <VEPoint
                   v-for="item in relativePoints"
+                  mixins="print"
                   :key="item.meta.coords+''"
                   :rx="item.point.rx"
                   :ry="item.point.ry"

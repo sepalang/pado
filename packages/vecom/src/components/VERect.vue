@@ -119,5 +119,11 @@ export default {
       border:1px dashed gray;
     }
     
+    &[mixins~="selectable"]{
+      cursor:pointer;
+      &:hover {
+        background-color:#ecf6ff;
+      }
+    }
   }
 </style>
