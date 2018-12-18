@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/logic",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "UI component interface",
   "main": "index.js",
   "scripts": {
