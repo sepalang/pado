@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/logic",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "UI component interface",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   "dependencies": {
     "@sepalang/lintpad": "^0.2.1",
     "@sepalang/testpad": "0.1.1",
-    "@sepalang/pado": "0.3.0"
+    "@sepalang/pado": "0.4.3"
   },
   "devDependencies": {
     "three": "^0.98.0"
