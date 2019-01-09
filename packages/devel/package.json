@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@sepalang/logic": "^0.0.2",
-    "@sepalang/pado": "^0.4.3",
+    "@sepalang/pado": "^0.4.5",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1"
   },
