@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/pado",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -28,7 +28,7 @@
     "repl": "padoc --exec .util/repl/index.js -i -g",
     "lint": "lintpad packages/pado -m lib",
     "lint:fix": "npm run lint -- --fix",
-    "bootstrap": "lerna bootstrap --hoist"
+    "bootstrap": "npm install --save-dev lerna && lerna bootstrap $(cat lernabootstrap)"
   },
   "author": "AHN HO JUNG",
   "license": "MIT",
@@ -39,8 +39,8 @@
   "devDependencies": {
     "@sepalang/lintpad": "^0.2.1",
     "@sepalang/padoc": "^0.10.0",
-    "@sepalang/testpad": "0.1.1",
-    "lerna": "^3.4.3",
+    "@sepalang/testpad": "^0.1.2",
+    "lerna": "^3.10.1",
     "madge": "^3.2.0",
     "rimraf": "^2.6.2"
   }

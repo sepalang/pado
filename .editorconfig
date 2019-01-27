@@ -8,6 +8,9 @@ charset = utf-8
 trim_trailing_whitespace = false
 insert_final_newline = true
 
+[lernabootstrap]
+insert_final_newline = false
+
 
 [*.md]
 trim_trailing_whitespace = true
