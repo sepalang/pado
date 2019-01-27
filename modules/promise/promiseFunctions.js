@@ -245,9 +245,11 @@
             }, _callee, this);
           }));
 
-          return function output(_x) {
+          function output(_x) {
             return _output.apply(this, arguments);
-          };
+          }
+
+          return output;
         }(),
         limitOutput: 1
       }).operate({
@@ -283,9 +285,11 @@
             }, _callee2, this);
           }));
 
-          return function input(_x2) {
+          function input(_x2) {
             return _input.apply(this, arguments);
-          };
+          }
+
+          return input;
         }(),
         output: function output(_ref3) {
           var entry = _ref3.entry;
