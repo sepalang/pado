@@ -1,6 +1,7 @@
 import {
   isNone,
   likeString,
+  likeNumber,
   isObject,
   likeObject,
   isEmpty,
@@ -39,6 +40,21 @@ describe('Functions isLike', ()=>{
     expect(likeString(null)).toEqual(false)
     expect(likeString(NaN)).toEqual(false)
     expect(likeString(true)).toEqual(false)
+  })
+  
+  it('likeNumber', ()=>{
+    expect(likeNumber(0)).toEqual(true)
+    expect(likeNumber("0")).toEqual(true)
+    expect(likeNumber(-20)).toEqual(true)
+    expect(likeNumber("-20")).toEqual(true)
+    expect(likeNumber(100.1)).toEqual(true)
+    expect(likeNumber("100.1")).toEqual(true)
+    expect(likeNumber("100.1.1")).toEqual(false)
+    expect(likeNumber(Number.POSITIVE_INFINITY)).toEqual(false)
+    expect(likeNumber(Number.NEGATIVE_INFINITY)).toEqual(false)
+    expect(likeNumber(NaN)).toEqual(false)
+    expect(likeNumber(true)).toEqual(false)
+    expect(likeNumber(undefined)).toEqual(false)
   })
   
   // isEmpty
