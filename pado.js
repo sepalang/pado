@@ -123,7 +123,7 @@
     return false;
   };
   var likeNumber = function likeNumber(data) {
-    if (isNumber(data) || isInfinity(data)) return true;
+    if (isNumber(data)) return true;
     if (typeof data === "string") return String(parseFloat(data)) === String(data);
     return false;
   };
