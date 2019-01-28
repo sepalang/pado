@@ -1,22 +1,22 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.regexp.search", "core-js/modules/es6.regexp.match", "core-js/modules/es6.regexp.replace", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.regexp.constructor", "./isLike", "./read", "./cast"], factory);
+    define(["exports", "core-js/modules/es6.regexp.match", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.regexp.split", "core-js/modules/es6.regexp.constructor", "core-js/modules/es6.regexp.search", "./isLike", "./read", "./cast", "./baseFunction"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.regexp.search"), require("core-js/modules/es6.regexp.match"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.regexp.constructor"), require("./isLike"), require("./read"), require("./cast"));
+    factory(exports, require("core-js/modules/es6.regexp.match"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.regexp.constructor"), require("core-js/modules/es6.regexp.search"), require("./isLike"), require("./read"), require("./cast"), require("./baseFunction"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.webDom, global.es6Array, global.es6Object, global.es6Regexp, global.isLike, global.read, global.cast);
+    factory(mod.exports, global.es6Regexp, global.webDom, global.es6Array, global.es6Object, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.isLike, global.read, global.cast, global.baseFunction);
     global.remark = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _es6Regexp2, _es6Regexp3, _es6Regexp4, _webDom, _es6Array, _es6Object, _es6Regexp5, _isLike, _read, _cast) {
+})(this, function (_exports, _es6Regexp, _webDom, _es6Array, _es6Object, _es6Regexp2, _es6Regexp3, _es6Regexp4, _isLike, _read, _cast, _baseFunction) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.diffStructure = _exports.findIndexes = _exports.findIndex = _exports.matchString = _exports.entries = _exports.deepKeys = _exports.keys = _exports.stringTest = _exports.valueOf = _exports.fallback = void 0;
+  _exports.diffStructure = _exports.findIndexes = _exports.findIndex = _exports.entries = _exports.deepKeys = _exports.keys = _exports.valueOf = _exports.fallback = void 0;
 
   var fallback = function fallback(value, fallbackFn) {
     for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
@@ -37,39 +37,7 @@
   };
 
   _exports.valueOf = valueOf;
-
-  var stringTest = function stringTest(string, rule, meta) {
-    if (!(0, _isLike.likeString)(string)) return false;
-    if (typeof rule === "undefined") return true;
-    return typeof rule === "function" ? Boolean(rule(string, meta)) : (0, _isLike.likeString)(rule) ? (string + '').indexOf(rule + '') > -1 : rule instanceof RegExp ? rule.test(string) : (0, _isLike.isArray)(rule) ? rule.some(function (filterKey) {
-      return filterKey === string;
-    }) : false;
-  };
-
-  _exports.stringTest = stringTest;
-
-  var keys = function keys(target, filterExp, strict) {
-    var result = [];
-
-    if (!(0, _isLike.likeObject)(target)) {
-      return result;
-    }
-
-    if (strict === true ? (0, _isLike.isArray)(target) : (0, _isLike.likeArray)(target)) {
-      Object.keys(target).filter(function (key) {
-        if (isNaN(key)) return;
-        var numberKey = parseInt(key, 10);
-        stringTest(numberKey, filterExp, target[key]) && result.push(parseInt(numberKey, 10));
-      });
-    } else if (strict === true ? (0, _isLike.isPlainObject)(target) : (0, _isLike.likeObject)(target)) {
-      Object.keys(target).forEach(function (key) {
-        stringTest(key, filterExp, target[key]) && result.push(key);
-      });
-    }
-
-    return result;
-  };
-
+  var keys = _baseFunction.baseKeys;
   _exports.keys = keys;
 
   var deepKeys = function () {
@@ -103,41 +71,8 @@
   }();
 
   _exports.deepKeys = deepKeys;
-
-  var entries = function entries(it) {
-    var result = [];
-
-    switch (typeof it) {
-      case "object":
-        // eslint-disable-next-line no-unused-expressions
-        (0, _isLike.isNone)(it) ? 0 : (0, _isLike.likeArray)(it) ? (0, _cast.asArray)(it).forEach(function (v, k) {
-          result.push([k, v]);
-        }) : Object.keys(it).forEach(function (key) {
-          result.push([key, it[key]]);
-        });
-        break;
-    }
-
-    return result;
-  }; //remark.spec.js
-
-
+  var entries = _baseFunction.baseEntries;
   _exports.entries = entries;
-
-  var matchString = function matchString(it, search, at) {
-    if (at === void 0) {
-      at = 0;
-    }
-
-    if (typeof it !== "string") throw new Error("matchString :: worng argument " + it);
-    if (typeof search === "string") search = search.replace(new RegExp("(\\.|\\[|\\])", "g"), function (s) {
-      return "\\" + s;
-    });
-    var result = it.substr(at).match(search);
-    return result ? [result.index + at, result[0].length] : [-1, 0];
-  };
-
-  _exports.matchString = matchString;
 
   var findIndex = function () {
     var __find_string = function __find_string(it, search, at) {

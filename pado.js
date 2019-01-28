@@ -123,7 +123,7 @@
     return false;
   };
   var likeNumber = function likeNumber(data) {
-    if (isNumber(data) || isInfinity(data)) return true;
+    if (isNumber(data)) return true;
     if (typeof data === "string") return String(parseFloat(data)) === String(data);
     return false;
   };
@@ -285,6 +285,715 @@
     return typeof target === "object" && target !== null && typeof target['then'] === "function" && typeof target['catch'] === "function";
   };
 
+  var baseAsArray = function baseAsArray(data, defaultArray) {
+    if (defaultArray === void 0) {
+      defaultArray = undefined;
+    }
+
+    if (isArray(data)) {
+      return data;
+    }
+
+    if (isNone(data)) {
+      return isArray(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
+    }
+
+    if (typeof data === "object" && typeof data.toArray === "function") {
+      return data.toArray();
+    }
+
+    return [data];
+  };
+  var stringTest = function stringTest(string, rule, meta) {
+    if (!likeString(string)) return false;
+    if (typeof rule === "undefined") return true;
+    return typeof rule === "function" ? Boolean(rule(string, meta)) : likeString(rule) ? (string + '').indexOf(rule + '') > -1 : rule instanceof RegExp ? rule.test(string) : isArray(rule) ? rule.some(function (filterKey) {
+      return filterKey === string;
+    }) : false;
+  }; //remark.spec.js
+
+  var matchString = function matchString(it, search, at) {
+    if (at === void 0) {
+      at = 0;
+    }
+
+    if (typeof it !== "string") throw new Error("matchString :: worng argument " + it);
+    if (typeof search === "string") search = search.replace(new RegExp("(\\.|\\[|\\])", "g"), function (s) {
+      return "\\" + s;
+    });
+    var result = it.substr(at).match(search);
+    return result ? [result.index + at, result[0].length] : [-1, 0];
+  };
+  var baseKeys = function baseKeys(target, filterExp, strict) {
+    var result = [];
+
+    if (!likeObject(target)) {
+      return result;
+    }
+
+    if (strict === true ? isArray(target) : likeArray(target)) {
+      Object.keys(target).filter(function (key) {
+        if (isNaN(key)) return;
+        var numberKey = parseInt(key, 10);
+        stringTest(numberKey, filterExp, target[key]) && result.push(parseInt(numberKey, 10));
+      });
+    } else if (strict === true ? isPlainObject(target) : likeObject(target)) {
+      Object.keys(target).forEach(function (key) {
+        stringTest(key, filterExp, target[key]) && result.push(key);
+      });
+    }
+
+    return result;
+  };
+  var baseEntries = function baseEntries(it) {
+    var result = [];
+
+    switch (typeof it) {
+      case "object":
+        // eslint-disable-next-line no-unused-expressions
+        isNone(it) ? 0 : likeArray(it) ? baseAsArray(it).forEach(function (v, k) {
+          result.push([k, v]);
+        }) : Object.keys(it).forEach(function (key) {
+          result.push([key, it[key]]);
+        });
+        break;
+    }
+
+    return result;
+  };
+
+  var asArray = baseAsArray;
+  var toArray = function toArray(data, option) {
+    if (typeof data === "undefined" || data === null || isAbsoluteNaN(data)) return [];
+    if (isArray(data)) return Array.prototype.slice.call(data);
+    if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
+    if (typeof data === "string" && typeof option === "string") return data.split(option);
+    return [data];
+  };
+  var asObject = function asObject(data, defaultKey) {
+    if (defaultKey === void 0) {
+      defaultKey = "default";
+    }
+
+    if (isPlainObject(data)) {
+      return data;
+    } else {
+      var _ref;
+
+      return _ref = {}, _ref[defaultKey] = data, _ref;
+    }
+  };
+  var toNumber = function toNumber(v, d) {
+    switch (typeof v) {
+      case "number":
+        return v;
+
+      case "string":
+        var vr = v.replace(/[^.\d\-]/g, "") * 1;
+        return isAbsoluteNaN(vr) ? 0 : vr;
+        break;
+    }
+
+    switch (typeof d) {
+      case "number":
+        return d;
+
+      case "string":
+        var dr = d * 1;
+        return isAbsoluteNaN(dr) ? 0 : dr;
+        break;
+    }
+
+    return 0;
+  };
+  var cleanObject = function cleanObject(data) {
+    if (data instanceof Array) {
+      Array.prototype.splice.call(data, 0, data.length);
+    } else if (typeof data == "object") {
+      Object.keys(data).forEach(function (key) {
+        delete data[key];
+      });
+    }
+
+    return data;
+  };
+  var clone = function clone(target) {
+    switch (typeof target) {
+      case "undefined":
+      case "function":
+      case "boolean":
+      case "number":
+      case "string":
+        return target;
+        break;
+
+      case "object":
+        if (target === null) return target;
+
+        if (isArray(target)) {
+          var _r = [];
+
+          for (var i = 0, length = target.length; i < length; i++) {
+            _r.push(target[i]);
+          }
+
+          return _r;
+        }
+
+        if (!isPlainObject(target)) {
+          if (target instanceof Date) {
+            var _r2 = new Date();
+
+            _r2.setTime(target.getTime());
+
+            return _r2;
+          }
+
+          return target;
+        }
+
+        var r = {};
+        Object.keys(target).forEach(function (k) {
+          if (target.hasOwnProperty(k)) r[k] = target[k];
+        });
+        return r;
+        break;
+
+      default:
+        console.error("clone::copy failed : target => ", target);
+        return target;
+        break;
+    }
+  };
+  var cloneDeep = function cloneDeep(target) {
+    if (typeof target === "object") {
+      var d;
+
+      if (isArray(target)) {
+        if (!isArray(d)) {
+          d = [];
+        }
+
+        for (var i = 0, l = target.length; i < l; i++) {
+          d.push(typeof target[i] === "object" && target[i] !== null ? clone(target[i]) : target[i]);
+        }
+
+        return d;
+      } else {
+        d = {};
+        Object.keys(target).forEach(function (p) {
+          typeof target[p] === "object" && target[p] !== null && d[p] ? clone(target[p], d[p]) : d[p] = target[p];
+        });
+        return d;
+      }
+    } else {
+      return clone(target);
+    }
+  };
+
+  var getKeyWithValue = function getKeyWithValue(obj, value) {
+    if (isArray(obj)) {
+      for (var i = 0, l = obj.length; i < l; i++) {
+        if (obj[i] === value) return i;
+      }
+    }
+
+    if (isObject(obj)) {
+      for (var key in obj) {
+        if (obj[key] === value) return key;
+      }
+    }
+
+    return undefined;
+  };
+
+  var removeValue = function removeValue(obj, value) {
+    var detect = true;
+    var array = isArray(obj);
+
+    while (detect) {
+      var key = getKeyWithValue(obj, value);
+
+      if (typeof key === "undefined") {
+        detect = false;
+      } else {
+        if (array) {
+          obj.splice(key, 1);
+        } else {
+          delete obj[key];
+        }
+      }
+    }
+
+    return obj;
+  }; // Only one unique value is left.
+
+  var unique = function unique(array, findKey) {
+    var result = [];
+    var uniqueSet = new Set();
+
+    if (typeof findKey === "undefined") {
+      findKey = function findKey(v) {
+        return v;
+      };
+    }
+
+    if (typeof findKey === "string") {
+      var keyPath = findKey;
+
+      findKey = function findKey(v) {
+        return v[keyPath];
+      };
+    }
+
+    array.forEach(function (v) {
+      var key = findKey(v);
+      if (uniqueSet.has(key)) return;
+      uniqueSet.add(key);
+      result.push(v);
+    });
+    return result;
+  };
+  var getKeyBy = function getKeyBy(object, value) {
+    if (isFunction(value)) {
+      if (isArray(object)) for (var i = 0, l = object.length; i < l; i++) {
+        if (value(object[i], i) === true) return i;
+      }
+      if (isObject(object)) for (var key in object) {
+        if (value(object[key], key) === true) return key;
+      }
+    } else {
+      if (isArray(object)) for (var i = 0, l = object.length; i < l; i++) {
+        if (object[i] === value) return i;
+      }
+      if (isObject(object)) for (var key in object) {
+        if (object[key] === value) return key;
+      }
+    }
+  }; // Change the positions of the specified indexes in the array
+
+  var moveOf = function moveOf(data, oldIndex, newIndex) {
+    data = asArray(data);
+    oldIndex !== newIndex && isNumber(oldIndex) && isNumber(newIndex) && oldIndex >= 0 && oldIndex < data.length && Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
+    return data;
+  };
+  var move = function move(data, oldIndex, newIndex) {
+    return moveOf(toArray(data), oldIndex, newIndex);
+  }; // Supports self concat.
+
+  var baseConcatOf = function baseConcatOf(data, args) {
+    var result = asArray(data);
+    return args.forEach(function (data) {
+      asArray(data).forEach(function (value) {
+        result.push(value);
+      });
+    }), result;
+  };
+
+  var concatOf = function concatOf(data) {
+    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    return baseConcatOf(data, args);
+  };
+  var concat = function concat(data) {
+    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
+    }
+
+    return baseConcatOf(toArray(data), args);
+  }; // Removes the value of data that does not return a positive value to the filter function.
+
+  var filterOf = function filterOf(data, filterFn, exitFn) {
+    var dataArray = asArray(data);
+    var dataKeys = baseKeys(data);
+    var isOnExit = typeof exitFn === "function";
+    var exitArray = isOnExit ? [] : null;
+
+    for (var i = 0, removedIndex = 0, l = dataKeys.length; i < l; i++, removedIndex++) {
+      var datumKey = dataKeys[i];
+      var datum = dataArray[datumKey];
+
+      if (filterFn(datum, datumKey) !== true) {
+        var exitDatum = dataArray.splice(i, 1);
+        i--;
+        l--;
+        isOnExit && exitArray.push([removedIndex, exitDatum]);
+      }
+    }
+
+    isOnExit && exitFn(exitArray, dataArray);
+    return dataArray;
+  };
+  var filter = function filter(data, func, exitFn) {
+    return filterOf(toArray(data), func, exitFn);
+  }; // Put the specified value in the specified index.
+
+  var insertOf = function insertOf(data, v, a) {
+    data = asArray(data);
+    return data.splice(typeof a === "number" ? a : 0, 0, v), data;
+  };
+  var insert = function insert(data, v, a) {
+    return insertOf(toArray(data), v, a);
+  }; // Removes all contents of an array or object.
+
+  var clearOf = function clearOf(data, fillFn, sp) {
+    if (isArray(data)) {
+      sp = Array.prototype.splice.call(data, 0, data.length);
+    } else if (typeof data == "object") {
+      sp = {};
+
+      for (var key in data) {
+        sp[key] = data[key];
+        delete data[key];
+      }
+    }
+
+    return fillFn && fillFn(data, sp), data;
+  }; // sort
+
+  var sortOf = function sortOf(data, filter) {
+    if (data.length == 0) {
+      return data;
+    }
+
+    switch (filter) {
+      case 'desc':
+        filter = function filter(a, b) {
+          return a > b;
+        };
+
+        break;
+
+      case undefined:
+      case 'asc':
+      default:
+        if (typeof filter !== "function") {
+          filter = function filter(a, b) {
+            return a < b;
+          };
+        }
+
+        break;
+    }
+
+    var result = [data[0]];
+
+    for (var i = 1, l = data.length; i < l; i++) {
+      for (var ri = 0, rl = result.length; ri < rl; ri++) {
+        if (filter(data[i], result[ri]) === true) {
+          insertOf(result, data[i], ri);
+          break;
+        }
+
+        if (ri + 1 === result.length) {
+          result.push(data[i]);
+        }
+      }
+    }
+
+    clearOf(data);
+
+    for (var i = 0, l = result.length; i < l; data.push(result[i]), i++) {
+    }
+
+    return data;
+  };
+  var sort = function sort(data, filter) {
+    return sortOf(toArray(data), filter);
+  }; // If have defined multiple key names in one hash, change them appropriately.
+  // rebase({ "a,b":1 }) => { "a":1, "b":1 }
+
+  var rebase = function rebase(obj, ref) {
+    var result = {};
+
+    for (var key in obj) {
+      if (key === ".*") {
+        var refValue = obj[key];
+
+        for (var i = 0, d = Object.keys(ref), l = d.length; i < l; i++) {
+          var refKey = d[i];
+
+          if (typeof refValue === "function") {
+            result[refKey] = obj[key];
+          } else {
+            if (typeof refValue !== "object" && typeof refValue !== "object" || isNode(refValue)) {
+              result[refKey] = refValue;
+            } else {
+              result[refKey] = Object.assign(result[refKey], refValue);
+            }
+          }
+        }
+      } else if (key.indexOf(",") > -1) {
+        key.split(",").forEach(function (deepKey) {
+          deepKey = deepKey.trim();
+
+          if (typeof obj[key] === "function") {
+            result[deepKey] = obj[key];
+          } else {
+            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode(obj[key])) {
+              result[deepKey] = obj[key];
+            } else {
+              result[deepKey] = Object.assign(result[deepKey] || (isArray(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
+            }
+          }
+        });
+      } else {
+        if (typeof obj[key] === "function") {
+          result[key] = obj[key];
+        } else {
+          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || isNode(obj[key])) {
+            result[key] = obj[key];
+          } else {
+            result[key] = Object.assign(result[key], obj[key]);
+          }
+        }
+      }
+    }
+
+    return result;
+  };
+
+  var removeKey = function removeKey(datum, rule) {
+    if (!isObject(datum)) return datum;
+    var removeRule = typeof rule === "function" ? function (key, value) {
+      return rule(value, key);
+    } : rule;
+    var removeKeys = baseKeys(datum, removeRule);
+    if (!removeKeys.length) return datum;
+    isArray(datum) ? removeKeys.forEach(function (originalIndex, offset) {
+      var removeIndex = originalIndex - offset;
+      datum.splice(removeIndex, 1);
+    }) : removeKeys.forEach(function (key) {
+      delete datum[key];
+    });
+    return datum;
+  }; // If the rule matches the rule, remove the key
+
+
+  var omitOf = function omitOf(datum, rule) {
+    return removeKey(datum, rule);
+  };
+  var omit = function omit(datum, rule) {
+    return omitOf(clone(datum), rule);
+  }; // If the rule matches the rule, preserve the key.
+
+  var pickOf = function pickOf(datum, rule) {
+    return removeKey(datum, function (value, key) {
+      return !stringTest(key, rule, value);
+    });
+  };
+  var pick = function pick(datum, rule) {
+    return pickOf(clone(datum), rule);
+  }; // Remove the key that has a value of undefined
+  //const COMPACT_MATCH_FN = value=>typeof value !== "undefined"
+
+  var COMPACT_MATCH_FN = function COMPACT_MATCH_FN(value) {
+    return typeof value === "undefined";
+  };
+
+  var compactOf = function compactOf(datum) {
+    return omitOf(datum, COMPACT_MATCH_FN);
+  };
+  var compact = function compact(datum) {
+    return compactOf(clone(datum));
+  }; // Clears key values starting with $
+
+  var FREE_MATCH_EXPRESSION = /^\$/;
+  var freeOf = function freeOf(datum) {
+    return omitOf(datum, FREE_MATCH_EXPRESSION);
+  };
+  var free = function free(datum) {
+    return freeOf(clone(datum));
+  }; // Remove the key that begins with $ or has a value of undefined.
+
+  var purgeOf = function purgeOf(datum) {
+    return omitOf(datum, function (value, key) {
+      return FREE_MATCH_EXPRESSION.test(key) || COMPACT_MATCH_FN(value);
+    });
+  };
+  var purge = function purge(datum) {
+    return purgeOf(clone(datum));
+  };
+  /* Experimental
+  export const injectOf = (data,injectFn)=>keys(data).reduce((dest, key)=>((dest[key] = injectFn(dest[key], key)), dest),asObject(data))
+  export const inject = (data, injectFn)=>injectOf(clone(data), injectFn);
+
+  export const mapOf = (data, mapFn)=>asArray(data).map(mapFn);
+  export const map = (data, mapFn)=>mapOf(clone(data), mapFn);
+  */
+  //
+
+  var instance = function instance(func, proto) {
+    var ins;
+
+    var DummyInstance = function DummyInstance(param) {
+      if (typeof param === "object") for (var k in param) {
+        this[k] = param[k];
+      }
+    };
+
+    if (typeof func == "object") {
+      if (typeof proto === "object") DummyInstance.prototype = proto;
+      ins = new DummyInstance(func);
+    }
+
+    if (typeof func == "function") {
+      if (typeof proto === "object") func.prototype = proto;
+      ins = new func();
+    }
+
+    return ins;
+  };
+  var alloc = function alloc(init) {
+    var fn = init();
+
+    var rn = function rn() {
+      for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
+      }
+
+      return fn.apply(this, args);
+    };
+
+    rn['reset'] = function () {
+      fn = init(rn, rn);
+    };
+
+    rn['$constructor'] = fn;
+    return rn;
+  }; // TODO
+
+  /*
+  const syncData = (function (){
+    const ENTER_HOOK  = (newDatum)=>Object.assign({}, newDatum)
+    const UPDATE_HOOK = (oldDatum, newDatum)=>Object.assign({}, oldDatum, newDatum)
+    
+    return function (oldData, newData, getId, options){
+      if(!/string|function/.test(typeof getId)) throw new Error("syncData need getId")
+    
+      if(typeof getId === "string"){
+        const getIdString = getId
+        getId = e=>_.get(e, getIdString)
+      }
+
+      oldData = asArray(oldData)
+      newData = asArray(newData)
+
+      const result = []
+      const hooks  = asObject(options, "afterEach")
+      
+      if(typeof hooks["enter"] !== "function"){
+        hooks["enter"] = ENTER_HOOK
+      }
+      
+      if(typeof hooks["update"] !== "function"){
+        hooks["update"] = UPDATE_HOOK
+      }
+      
+      const oldDataMap = _.map(oldData, e=>{
+        return { id: getId(e), ref: e }
+      })
+      
+      
+      asArray(newData).forEach((newDatum, i)=>{
+        const newId = getId(newDatum)
+        
+        let oldDatum = _.get(oldDataMap[_.findIndex(oldDataMap, e=>e.id === newId)], "ref")
+        let genDatum
+        let dirty = false
+        // eslint-disable-next-line no-undef
+        if(oldDatum){
+          // change is not dirty, modify is dirty
+          if(typeof oldDatum !== typeof newDatum){
+            dirty = false
+          } else { // same type
+            const oldOwnKeys = Object.keys(oldDatum).filter(key=>!(key.indexOf("$") === 0))
+            const newOwnKeys = Object.keys(newDatum).filter(key=>!(key.indexOf("$") === 0))
+
+            // inspect key chnage
+            if(_.isEqual(oldOwnKeys, newOwnKeys)){
+              dirty = !_.isEqual(_.pick(oldDatum, oldOwnKeys), _.pick(newDatum, newOwnKeys))
+            } else {
+              dirty = true
+            }
+          }
+          
+          if(typeof hooks["beforeUpdate"] === "function"){
+            if(hooks["beforeUpdate"](oldDatum, newDatum) === false){
+              return
+            }
+          }
+          
+          genDatum = hooks["update"](oldDatum, newDatum)
+          
+          if(typeof hooks["afterUpdate"] === "function"){
+            genDatum = hooks["afterUpdate"](genDatum, oldDatum, newDatum)
+          }
+        } else {
+          if(typeof hooks["beforeEnter"] === "function"){
+            if(hooks["beforeEnter"](newDatum) === false){
+              return
+            }
+          }
+          
+          genDatum = hooks["enter"](newDatum)
+          
+          if(typeof hooks["afterEnter"] === "function"){
+            genDatum = hooks["afterEnter"](genDatum, newDatum)
+          }
+        }
+
+        if(typeof hooks["afterEach"] === "function"){
+          hooks["afterEach"](genDatum, i, dirty)
+        }
+
+        result.push(genDatum)
+      })
+
+      return result
+    }
+  }())
+  */
+
+  var baseCaseSplit = function baseCaseSplit(s) {
+    s = s.replace(/^\#/, "").trim();
+    var e = s.split(/\s+/);
+    if (e.length > 1) return e;
+    var k = s.split(/\-+/);
+    if (k.length > 1) return k;
+
+    var _ = s.split(/\_+/);
+
+    if (_.length > 1) return _;
+    return s.replace(/[A-Z][a-z]/g, function (s) {
+      return "%@" + s;
+    }).replace(/^\%\@/, "").split("%@");
+  };
+
+  var pascalCase = function pascalCase(string, joinString) {
+    if (joinString === void 0) {
+      joinString = "";
+    }
+
+    var words = baseCaseSplit(string);
+
+    for (var i = 0, l = words.length; i < l; i++) {
+      words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1).toLowerCase();
+    }
+
+    return words.join(joinString);
+  };
+  var camelCase = function camelCase(string, joinString) {
+    if (joinString === void 0) {
+      joinString = "";
+    }
+
+    var pascalCaseString = pascalCase(string, joinString);
+    return "" + (pascalCaseString.substr(0, 1) || '').toLowerCase() + (pascalCaseString.substr(1) || '');
+  };
+
   var all = function all(data, fn) {
     data = asArray(data);
 
@@ -327,9 +1036,41 @@
     }) : result;
   };
 
+  var fill = function fill(collection, fillLength, emptyDefault) {
+    if (emptyDefault === void 0) {
+      emptyDefault = undefined;
+    }
+
+    var data = asArray(collection);
+    var dataLength = data.length;
+    fillLength = isNumber(fillLength) ? fillLength : 0;
+    var fillFn = typeof emptyDefault !== "function" ? function () {
+      return emptyDefault;
+    } : emptyDefault;
+
+    for (var i = 0, l = fillLength - dataLength; i < l; data.push(fillFn(dataLength++, i++))) {
+    }
+
+    return collection;
+  };
+
+  var baseCut = function baseCut(collection, cutLength, emptyDefault, useFill) {
+    var data = asArray(collection);
+    var rest;
+    cutLength = isNumber(cutLength) ? cutLength : 1;
+
+    if (data.length > cutLength) {
+      rest = data.splice(cutLength, Number.POSITIVE_INFINITY);
+      return [data, rest];
+    }
+
+    useFill === true && (data = fill(data, cutLength, emptyDefault));
+    return [data, []];
+  };
+
   var readString = function () {
     var rebaseMatches = function rebaseMatches(matches) {
-      return entries(asArray(matches));
+      return baseEntries(asArray(matches));
     };
 
     return function (text, matches, castFn, props) {
@@ -752,907 +1493,6 @@
 
     enterScope(rootValue, 0, rootParam);
     return rootParam;
-  };
-
-  var fallback = function fallback(value, fallbackFn) {
-    for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-      args[_key - 2] = arguments[_key];
-    }
-
-    return typeof value === "undefined" ? fallbackFn.apply(void 0, args) : value;
-  };
-  var valueOf = function valueOf(value) {
-    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-      args[_key2 - 1] = arguments[_key2];
-    }
-
-    return typeof value === "function" ? value.apply(void 0, args) : value;
-  };
-  var stringTest = function stringTest(string, rule, meta) {
-    if (!likeString(string)) return false;
-    if (typeof rule === "undefined") return true;
-    return typeof rule === "function" ? Boolean(rule(string, meta)) : likeString(rule) ? (string + '').indexOf(rule + '') > -1 : rule instanceof RegExp ? rule.test(string) : isArray(rule) ? rule.some(function (filterKey) {
-      return filterKey === string;
-    }) : false;
-  };
-  var keys = function keys(target, filterExp, strict) {
-    var result = [];
-
-    if (!likeObject(target)) {
-      return result;
-    }
-
-    if (strict === true ? isArray(target) : likeArray(target)) {
-      Object.keys(target).filter(function (key) {
-        if (isNaN(key)) return;
-        var numberKey = parseInt(key, 10);
-        stringTest(numberKey, filterExp, target[key]) && result.push(parseInt(numberKey, 10));
-      });
-    } else if (strict === true ? isPlainObject(target) : likeObject(target)) {
-      Object.keys(target).forEach(function (key) {
-        stringTest(key, filterExp, target[key]) && result.push(key);
-      });
-    }
-
-    return result;
-  };
-  var deepKeys = function () {
-    var nestedDeepKeys = function nestedDeepKeys(target, filter$$1, scope, total) {
-      if (typeof target === "object") {
-        keys(target, function (key) {
-          var child = target[key];
-          var useKey = filter$$1(child, key, scope.length);
-
-          if (!useKey) {
-            return;
-          }
-
-          var currentScope = clone(scope);
-          currentScope.push(key);
-          total.push(currentScope);
-          nestedDeepKeys(child, filter$$1, currentScope, total);
-        }, true);
-      }
-    };
-
-    return function (target, filter$$1) {
-      var result = [];
-      nestedDeepKeys(target, filter$$1 ? function (child, key) {
-        filter$$1(child, key);
-      } : function () {
-        return true;
-      }, [], result);
-      return result;
-    };
-  }();
-  var entries = function entries(it) {
-    var result = [];
-
-    switch (typeof it) {
-      case "object":
-        // eslint-disable-next-line no-unused-expressions
-        isNone(it) ? 0 : likeArray(it) ? asArray(it).forEach(function (v, k) {
-          result.push([k, v]);
-        }) : Object.keys(it).forEach(function (key) {
-          result.push([key, it[key]]);
-        });
-        break;
-    }
-
-    return result;
-  }; //remark.spec.js
-
-  var matchString = function matchString(it, search, at) {
-    if (at === void 0) {
-      at = 0;
-    }
-
-    if (typeof it !== "string") throw new Error("matchString :: worng argument " + it);
-    if (typeof search === "string") search = search.replace(new RegExp("(\\.|\\[|\\])", "g"), function (s) {
-      return "\\" + s;
-    });
-    var result = it.substr(at).match(search);
-    return result ? [result.index + at, result[0].length] : [-1, 0];
-  };
-  var findIndex = function () {
-    var __find_string = function __find_string(it, search, at) {
-      return it.indexOf(search, at);
-    };
-
-    var __find_regexp = function __find_regexp(it, search, at) {
-      var i = it.substring(at || 0).search(search);
-      return i >= 0 ? i + (at || 0) : i;
-    };
-
-    return function (it, search, at) {
-      return (search instanceof RegExp ? __find_regexp : __find_string)(it, search, at);
-    };
-  }(); //remark.spec.js
-
-  var findIndexes = function () {
-    return function (c, s, at) {
-      if (typeof c === "string" || typeof c === "number") {
-        var idxs = [];
-        var s = likeRegexp(s) ? s : s + "";
-        var at = !at || !isNumber(at) || at < 0 ? 0 : at;
-        var next;
-
-        do {
-          var i = findIndex(c, s, at);
-
-          if (i > -1) {
-            at = (s.length || 1) + i;
-            idxs.push(i);
-            next = true;
-          } else {
-            next = false;
-          }
-        } while (next);
-
-        return idxs;
-      }
-    };
-  }(); //TODO: Union hasValue
-
-  var NESTED_HAS_PROC = function NESTED_HAS_PROC(obj, key) {
-    var keys = key.split(".");
-    if (!keys.length) return false;
-    var pointer = obj;
-
-    for (var ki in keys) {
-      var k = keys[ki];
-
-      if (!pointer.hasOwnProperty(k)) {
-        return false;
-      } else {
-        pointer = pointer[k];
-      }
-    }
-
-    return true;
-  };
-
-  var diffStructure = function diffStructure(before, after) {
-    var afterKeys = Object.keys(after);
-    var beforeKeys;
-    var canDiff = false;
-
-    if (isObject(before)) {
-      if (isArray(before)) {
-        beforeKeys = before;
-      } else {
-        beforeKeys = Object.keys(before);
-        canDiff = true;
-      }
-    } else {
-      beforeKeys = [];
-    }
-
-    var analysis = {
-      after: after,
-      before: before,
-      keys: unique(afterKeys.concat(beforeKeys)).reduce(function (dest, key) {
-        dest[key] = undefined;
-        return dest;
-      }, {}),
-      match: [],
-      missing: [],
-      surplus: [],
-      diff: [],
-      pass: false //match, missing
-
-    };
-
-    for (var ki in beforeKeys) {
-      if (!beforeKeys.hasOwnProperty(ki)) continue;
-      var key = beforeKeys[ki];
-
-      if (NESTED_HAS_PROC(after, key)) {
-        analysis.match.push(key);
-        analysis.keys[key] = "match";
-
-        if (canDiff && !isEqual(get(after, key), get(before, key))) {
-          analysis.diff.push(key);
-          analysis.keys[key] = "diff";
-        }
-      } else {
-        analysis.surplus.push(key);
-        analysis.keys[key] = "surplus";
-      }
-    } //surplus
-
-
-    asArray(afterKeys).forEach(function (key) {
-      if (!hasValue(analysis.match, key)) {
-        analysis.missing.push(key);
-        analysis.keys[key] = "missing";
-      }
-    }); //absolute
-
-    analysis.pass = !analysis.missing.length && !analysis.surplus.length;
-    return analysis;
-  };
-
-  var asArray = function asArray(data, defaultArray) {
-    if (defaultArray === void 0) {
-      defaultArray = undefined;
-    }
-
-    if (isArray(data)) {
-      return data;
-    }
-
-    if (isNone(data)) {
-      return isArray(defaultArray) ? defaultArray : isNone(defaultArray) ? [] : [defaultArray];
-    }
-
-    if (typeof data === "object" && typeof data.toArray === "function") {
-      return data.toArray();
-    }
-
-    return [data];
-  };
-  var toArray = function toArray(data, option) {
-    if (typeof data === "undefined" || data === null || isAbsoluteNaN(data)) return [];
-    if (isArray(data)) return Array.prototype.slice.call(data);
-    if (typeof data === "object" && typeof data.toArray === "function") return data.toArray();
-    if (typeof data === "string" && typeof option === "string") return data.split(option);
-    return [data];
-  };
-  var asObject = function asObject(data, defaultKey) {
-    if (defaultKey === void 0) {
-      defaultKey = "default";
-    }
-
-    if (isPlainObject(data)) {
-      return data;
-    } else {
-      var _ref;
-
-      return _ref = {}, _ref[defaultKey] = data, _ref;
-    }
-  };
-  var toNumber = function toNumber(v, d) {
-    switch (typeof v) {
-      case "number":
-        return v;
-
-      case "string":
-        var vr = v.replace(/[^.\d\-]/g, "") * 1;
-        return isAbsoluteNaN(vr) ? 0 : vr;
-        break;
-    }
-
-    switch (typeof d) {
-      case "number":
-        return d;
-
-      case "string":
-        var dr = d * 1;
-        return isAbsoluteNaN(dr) ? 0 : dr;
-        break;
-    }
-
-    return 0;
-  };
-  var cleanObject = function cleanObject(data) {
-    if (data instanceof Array) {
-      Array.prototype.splice.call(data, 0, data.length);
-    } else if (typeof data == "object") {
-      Object.keys(data).forEach(function (key) {
-        delete data[key];
-      });
-    }
-
-    return data;
-  };
-  var clone = function clone(target) {
-    switch (typeof target) {
-      case "undefined":
-      case "function":
-      case "boolean":
-      case "number":
-      case "string":
-        return target;
-        break;
-
-      case "object":
-        if (target === null) return target;
-
-        if (isArray(target)) {
-          var _r = [];
-
-          for (var i = 0, length = target.length; i < length; i++) {
-            _r.push(target[i]);
-          }
-
-          return _r;
-        }
-
-        if (!isPlainObject(target)) {
-          if (target instanceof Date) {
-            var _r2 = new Date();
-
-            _r2.setTime(target.getTime());
-
-            return _r2;
-          }
-
-          return target;
-        }
-
-        var r = {};
-        Object.keys(target).forEach(function (k) {
-          if (target.hasOwnProperty(k)) r[k] = target[k];
-        });
-        return r;
-        break;
-
-      default:
-        console.error("clone::copy failed : target => ", target);
-        return target;
-        break;
-    }
-  };
-  var cloneDeep = function cloneDeep(target) {
-    if (typeof target === "object") {
-      var d;
-
-      if (isArray(target)) {
-        if (!isArray(d)) {
-          d = [];
-        }
-
-        for (var i = 0, l = target.length; i < l; i++) {
-          d.push(typeof target[i] === "object" && target[i] !== null ? clone(target[i]) : target[i]);
-        }
-
-        return d;
-      } else {
-        d = {};
-        Object.keys(target).forEach(function (p) {
-          typeof target[p] === "object" && target[p] !== null && d[p] ? clone(target[p], d[p]) : d[p] = target[p];
-        });
-        return d;
-      }
-    } else {
-      return clone(target);
-    }
-  };
-
-  var getKeyWithValue = function getKeyWithValue(obj, value) {
-    if (isArray(obj)) {
-      for (var i = 0, l = obj.length; i < l; i++) {
-        if (obj[i] === value) return i;
-      }
-    }
-
-    if (isObject(obj)) {
-      for (var key in obj) {
-        if (obj[key] === value) return key;
-      }
-    }
-
-    return undefined;
-  };
-
-  var removeValue = function removeValue(obj, value) {
-    var detect = true;
-    var array = isArray(obj);
-
-    while (detect) {
-      var key = getKeyWithValue(obj, value);
-
-      if (typeof key === "undefined") {
-        detect = false;
-      } else {
-        if (array) {
-          obj.splice(key, 1);
-        } else {
-          delete obj[key];
-        }
-      }
-    }
-
-    return obj;
-  }; // Only one unique value is left.
-
-  var unique = function unique(array, findKey) {
-    var result = [];
-    var uniqueSet = new Set();
-
-    if (typeof findKey === "undefined") {
-      findKey = function findKey(v) {
-        return v;
-      };
-    }
-
-    if (typeof findKey === "string") {
-      var keyPath = findKey;
-
-      findKey = function findKey(v) {
-        return v[keyPath];
-      };
-    }
-
-    array.forEach(function (v) {
-      var key = findKey(v);
-      if (uniqueSet.has(key)) return;
-      uniqueSet.add(key);
-      result.push(v);
-    });
-    return result;
-  };
-  var getKeyBy = function getKeyBy(object, value) {
-    if (isFunction(value)) {
-      if (isArray(object)) for (var i = 0, l = object.length; i < l; i++) {
-        if (value(object[i], i) === true) return i;
-      }
-      if (isObject(object)) for (var key in object) {
-        if (value(object[key], key) === true) return key;
-      }
-    } else {
-      if (isArray(object)) for (var i = 0, l = object.length; i < l; i++) {
-        if (object[i] === value) return i;
-      }
-      if (isObject(object)) for (var key in object) {
-        if (object[key] === value) return key;
-      }
-    }
-  }; // Change the positions of the specified indexes in the array
-
-  var moveOf = function moveOf(data, oldIndex, newIndex) {
-    data = asArray(data);
-    oldIndex !== newIndex && isNumber(oldIndex) && isNumber(newIndex) && oldIndex >= 0 && oldIndex < data.length && Array.prototype.splice.call(data, newIndex > data.length ? data.length : newIndex, 0, Array.prototype.splice.call(data, oldIndex, 1)[0]);
-    return data;
-  };
-  var move = function move(data, oldIndex, newIndex) {
-    return moveOf(toArray(data), oldIndex, newIndex);
-  }; // Supports self concat.
-
-  var baseConcatOf = function baseConcatOf(data, args) {
-    var result = asArray(data);
-    return args.forEach(function (data) {
-      asArray(data).forEach(function (value) {
-        result.push(value);
-      });
-    }), result;
-  };
-
-  var concatOf = function concatOf(data) {
-    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-
-    return baseConcatOf(data, args);
-  };
-  var concat = function concat(data) {
-    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-      args[_key2 - 1] = arguments[_key2];
-    }
-
-    return baseConcatOf(toArray(data), args);
-  }; // Removes the value of data that does not return a positive value to the filter function.
-
-  var filterOf = function filterOf(data, filterFn, exitFn) {
-    var dataArray = asArray(data);
-    var dataKeys = keys(data);
-    var isOnExit = typeof exitFn === "function";
-    var exitArray = isOnExit ? [] : null;
-
-    for (var i = 0, removedIndex = 0, l = dataKeys.length; i < l; i++, removedIndex++) {
-      var datumKey = dataKeys[i];
-      var datum = dataArray[datumKey];
-
-      if (filterFn(datum, datumKey) !== true) {
-        var exitDatum = dataArray.splice(i, 1);
-        i--;
-        l--;
-        isOnExit && exitArray.push([removedIndex, exitDatum]);
-      }
-    }
-
-    isOnExit && exitFn(exitArray, dataArray);
-    return dataArray;
-  };
-  var filter = function filter(data, func, exitFn) {
-    return filterOf(toArray(data), func, exitFn);
-  }; // Put the specified value in the specified index.
-
-  var insertOf = function insertOf(data, v, a) {
-    data = asArray(data);
-    return data.splice(typeof a === "number" ? a : 0, 0, v), data;
-  };
-  var insert = function insert(data, v, a) {
-    return insertOf(toArray(data), v, a);
-  }; // Removes all contents of an array or object.
-
-  var clearOf = function clearOf(data, fillFn, sp) {
-    if (isArray(data)) {
-      sp = Array.prototype.splice.call(data, 0, data.length);
-    } else if (typeof data == "object") {
-      sp = {};
-
-      for (var key in data) {
-        sp[key] = data[key];
-        delete data[key];
-      }
-    }
-
-    return fillFn && fillFn(data, sp), data;
-  }; // sort
-
-  var sortOf = function sortOf(data, filter) {
-    if (data.length == 0) {
-      return data;
-    }
-
-    switch (filter) {
-      case 'desc':
-        filter = function filter(a, b) {
-          return a > b;
-        };
-
-        break;
-
-      case undefined:
-      case 'asc':
-      default:
-        if (typeof filter !== "function") {
-          filter = function filter(a, b) {
-            return a < b;
-          };
-        }
-
-        break;
-    }
-
-    var result = [data[0]];
-
-    for (var i = 1, l = data.length; i < l; i++) {
-      for (var ri = 0, rl = result.length; ri < rl; ri++) {
-        if (filter(data[i], result[ri]) === true) {
-          insertOf(result, data[i], ri);
-          break;
-        }
-
-        if (ri + 1 === result.length) {
-          result.push(data[i]);
-        }
-      }
-    }
-
-    clearOf(data);
-
-    for (var i = 0, l = result.length; i < l; data.push(result[i]), i++) {
-    }
-
-    return data;
-  };
-  var sort = function sort(data, filter) {
-    return sortOf(toArray(data), filter);
-  }; // If have defined multiple key names in one hash, change them appropriately.
-  // rebase({ "a,b":1 }) => { "a":1, "b":1 }
-
-  var rebase = function rebase(obj, ref) {
-    var result = {};
-
-    for (var key in obj) {
-      if (key === ".*") {
-        var refValue = obj[key];
-
-        for (var i = 0, d = Object.keys(ref), l = d.length; i < l; i++) {
-          var refKey = d[i];
-
-          if (typeof refValue === "function") {
-            result[refKey] = obj[key];
-          } else {
-            if (typeof refValue !== "object" && typeof refValue !== "object" || isNode(refValue)) {
-              result[refKey] = refValue;
-            } else {
-              result[refKey] = Object.assign(result[refKey], refValue);
-            }
-          }
-        }
-      } else if (key.indexOf(",") > -1) {
-        key.split(",").forEach(function (deepKey) {
-          deepKey = deepKey.trim();
-
-          if (typeof obj[key] === "function") {
-            result[deepKey] = obj[key];
-          } else {
-            if (!result.hasOwnProperty(deepKey) && typeof obj[key] !== "object" || isNode(obj[key])) {
-              result[deepKey] = obj[key];
-            } else {
-              result[deepKey] = Object.assign(result[deepKey] || (isArray(obj[key]) ? [] : {}), obj[key], obj[deepKey]);
-            }
-          }
-        });
-      } else {
-        if (typeof obj[key] === "function") {
-          result[key] = obj[key];
-        } else {
-          if (typeof result[key] !== "object" && typeof obj[key] !== "object" || isNode(obj[key])) {
-            result[key] = obj[key];
-          } else {
-            result[key] = Object.assign(result[key], obj[key]);
-          }
-        }
-      }
-    }
-
-    return result;
-  };
-
-  var removeKey = function removeKey(datum, rule) {
-    if (!isObject(datum)) return datum;
-    var removeRule = typeof rule === "function" ? function (key, value) {
-      return rule(value, key);
-    } : rule;
-    var removeKeys = keys(datum, removeRule);
-    if (!removeKeys.length) return datum;
-    isArray(datum) ? removeKeys.forEach(function (originalIndex, offset) {
-      var removeIndex = originalIndex - offset;
-      datum.splice(removeIndex, 1);
-    }) : removeKeys.forEach(function (key) {
-      delete datum[key];
-    });
-    return datum;
-  }; // If the rule matches the rule, remove the key
-
-
-  var omitOf = function omitOf(datum, rule) {
-    return removeKey(datum, rule);
-  };
-  var omit = function omit(datum, rule) {
-    return omitOf(clone(datum), rule);
-  }; // If the rule matches the rule, preserve the key.
-
-  var pickOf = function pickOf(datum, rule) {
-    return removeKey(datum, function (value, key) {
-      return !stringTest(key, rule, value);
-    });
-  };
-  var pick = function pick(datum, rule) {
-    return pickOf(clone(datum), rule);
-  }; // Remove the key that has a value of undefined
-  //const COMPACT_MATCH_FN = value=>typeof value !== "undefined"
-
-  var COMPACT_MATCH_FN = function COMPACT_MATCH_FN(value) {
-    return typeof value === "undefined";
-  };
-
-  var compactOf = function compactOf(datum) {
-    return omitOf(datum, COMPACT_MATCH_FN);
-  };
-  var compact = function compact(datum) {
-    return compactOf(clone(datum));
-  }; // Clears key values starting with $
-
-  var FREE_MATCH_EXPRESSION = /^\$/;
-  var freeOf = function freeOf(datum) {
-    return omitOf(datum, FREE_MATCH_EXPRESSION);
-  };
-  var free = function free(datum) {
-    return freeOf(clone(datum));
-  }; // Remove the key that begins with $ or has a value of undefined.
-
-  var purgeOf = function purgeOf(datum) {
-    return omitOf(datum, function (value, key) {
-      return FREE_MATCH_EXPRESSION.test(key) || COMPACT_MATCH_FN(value);
-    });
-  };
-  var purge = function purge(datum) {
-    return purgeOf(clone(datum));
-  };
-  /* Experimental
-  export const injectOf = (data,injectFn)=>keys(data).reduce((dest, key)=>((dest[key] = injectFn(dest[key], key)), dest),asObject(data))
-  export const inject = (data, injectFn)=>injectOf(clone(data), injectFn);
-
-  export const mapOf = (data, mapFn)=>asArray(data).map(mapFn);
-  export const map = (data, mapFn)=>mapOf(clone(data), mapFn);
-  */
-  //
-
-  var instance = function instance(func, proto) {
-    var ins;
-
-    var DummyInstance = function DummyInstance(param) {
-      if (typeof param === "object") for (var k in param) {
-        this[k] = param[k];
-      }
-    };
-
-    if (typeof func == "object") {
-      if (typeof proto === "object") DummyInstance.prototype = proto;
-      ins = new DummyInstance(func);
-    }
-
-    if (typeof func == "function") {
-      if (typeof proto === "object") func.prototype = proto;
-      ins = new func();
-    }
-
-    return ins;
-  };
-  var alloc = function alloc(init) {
-    var fn = init();
-
-    var rn = function rn() {
-      for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        args[_key3] = arguments[_key3];
-      }
-
-      return fn.apply(this, args);
-    };
-
-    rn['reset'] = function () {
-      fn = init(rn, rn);
-    };
-
-    rn['$constructor'] = fn;
-    return rn;
-  }; // TODO
-
-  /*
-  const syncData = (function (){
-    const ENTER_HOOK  = (newDatum)=>Object.assign({}, newDatum)
-    const UPDATE_HOOK = (oldDatum, newDatum)=>Object.assign({}, oldDatum, newDatum)
-    
-    return function (oldData, newData, getId, options){
-      if(!/string|function/.test(typeof getId)) throw new Error("syncData need getId")
-    
-      if(typeof getId === "string"){
-        const getIdString = getId
-        getId = e=>_.get(e, getIdString)
-      }
-
-      oldData = asArray(oldData)
-      newData = asArray(newData)
-
-      const result = []
-      const hooks  = asObject(options, "afterEach")
-      
-      if(typeof hooks["enter"] !== "function"){
-        hooks["enter"] = ENTER_HOOK
-      }
-      
-      if(typeof hooks["update"] !== "function"){
-        hooks["update"] = UPDATE_HOOK
-      }
-      
-      const oldDataMap = _.map(oldData, e=>{
-        return { id: getId(e), ref: e }
-      })
-      
-      
-      asArray(newData).forEach((newDatum, i)=>{
-        const newId = getId(newDatum)
-        
-        let oldDatum = _.get(oldDataMap[_.findIndex(oldDataMap, e=>e.id === newId)], "ref")
-        let genDatum
-        let dirty = false
-        // eslint-disable-next-line no-undef
-        if(oldDatum){
-          // change is not dirty, modify is dirty
-          if(typeof oldDatum !== typeof newDatum){
-            dirty = false
-          } else { // same type
-            const oldOwnKeys = Object.keys(oldDatum).filter(key=>!(key.indexOf("$") === 0))
-            const newOwnKeys = Object.keys(newDatum).filter(key=>!(key.indexOf("$") === 0))
-
-            // inspect key chnage
-            if(_.isEqual(oldOwnKeys, newOwnKeys)){
-              dirty = !_.isEqual(_.pick(oldDatum, oldOwnKeys), _.pick(newDatum, newOwnKeys))
-            } else {
-              dirty = true
-            }
-          }
-          
-          if(typeof hooks["beforeUpdate"] === "function"){
-            if(hooks["beforeUpdate"](oldDatum, newDatum) === false){
-              return
-            }
-          }
-          
-          genDatum = hooks["update"](oldDatum, newDatum)
-          
-          if(typeof hooks["afterUpdate"] === "function"){
-            genDatum = hooks["afterUpdate"](genDatum, oldDatum, newDatum)
-          }
-        } else {
-          if(typeof hooks["beforeEnter"] === "function"){
-            if(hooks["beforeEnter"](newDatum) === false){
-              return
-            }
-          }
-          
-          genDatum = hooks["enter"](newDatum)
-          
-          if(typeof hooks["afterEnter"] === "function"){
-            genDatum = hooks["afterEnter"](genDatum, newDatum)
-          }
-        }
-
-        if(typeof hooks["afterEach"] === "function"){
-          hooks["afterEach"](genDatum, i, dirty)
-        }
-
-        result.push(genDatum)
-      })
-
-      return result
-    }
-  }())
-  */
-
-  var baseCaseSplit = function baseCaseSplit(s) {
-    s = s.replace(/^\#/, "").trim();
-    var e = s.split(/\s+/);
-    if (e.length > 1) return e;
-    var k = s.split(/\-+/);
-    if (k.length > 1) return k;
-
-    var _ = s.split(/\_+/);
-
-    if (_.length > 1) return _;
-    return s.replace(/[A-Z][a-z]/g, function (s) {
-      return "%@" + s;
-    }).replace(/^\%\@/, "").split("%@");
-  };
-
-  var pascalCase = function pascalCase(string, joinString) {
-    if (joinString === void 0) {
-      joinString = "";
-    }
-
-    var words = baseCaseSplit(string);
-
-    for (var i = 0, l = words.length; i < l; i++) {
-      words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1).toLowerCase();
-    }
-
-    return words.join(joinString);
-  };
-  var camelCase = function camelCase(string, joinString) {
-    if (joinString === void 0) {
-      joinString = "";
-    }
-
-    var pascalCaseString = pascalCase(string, joinString);
-    return "" + (pascalCaseString.substr(0, 1) || '') + (pascalCaseString.substr(1) || '');
-  };
-
-  var fill = function fill(collection, fillLength, emptyDefault) {
-    if (emptyDefault === void 0) {
-      emptyDefault = undefined;
-    }
-
-    var data = asArray(collection);
-    var dataLength = data.length;
-    fillLength = isNumber(fillLength) ? fillLength : 0;
-    var fillFn = typeof emptyDefault !== "function" ? function () {
-      return emptyDefault;
-    } : emptyDefault;
-
-    for (var i = 0, l = fillLength - dataLength; i < l; data.push(fillFn(dataLength++, i++))) {
-    }
-
-    return collection;
-  };
-
-  var baseCut = function baseCut(collection, cutLength, emptyDefault, useFill) {
-    var data = asArray(collection);
-    var rest;
-    cutLength = isNumber(cutLength) ? cutLength : 1;
-
-    if (data.length > cutLength) {
-      rest = data.splice(cutLength, Number.POSITIVE_INFINITY);
-      return [data, rest];
-    }
-
-    useFill === true && (data = fill(data, cutLength, emptyDefault));
-    return [data, []];
   };
 
   var cut = function cut(collection, cutLength, fillContent) {
@@ -2232,6 +2072,170 @@
     }
 
     return scale;
+  };
+
+  var fallback = function fallback(value, fallbackFn) {
+    for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+      args[_key - 2] = arguments[_key];
+    }
+
+    return typeof value === "undefined" ? fallbackFn.apply(void 0, args) : value;
+  };
+  var valueOf = function valueOf(value) {
+    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
+    }
+
+    return typeof value === "function" ? value.apply(void 0, args) : value;
+  };
+  var keys = baseKeys;
+  var deepKeys = function () {
+    var nestedDeepKeys = function nestedDeepKeys(target, filter$$1, scope, total) {
+      if (typeof target === "object") {
+        keys(target, function (key) {
+          var child = target[key];
+          var useKey = filter$$1(child, key, scope.length);
+
+          if (!useKey) {
+            return;
+          }
+
+          var currentScope = clone(scope);
+          currentScope.push(key);
+          total.push(currentScope);
+          nestedDeepKeys(child, filter$$1, currentScope, total);
+        }, true);
+      }
+    };
+
+    return function (target, filter$$1) {
+      var result = [];
+      nestedDeepKeys(target, filter$$1 ? function (child, key) {
+        filter$$1(child, key);
+      } : function () {
+        return true;
+      }, [], result);
+      return result;
+    };
+  }();
+  var entries = baseEntries;
+  var findIndex = function () {
+    var __find_string = function __find_string(it, search, at) {
+      return it.indexOf(search, at);
+    };
+
+    var __find_regexp = function __find_regexp(it, search, at) {
+      var i = it.substring(at || 0).search(search);
+      return i >= 0 ? i + (at || 0) : i;
+    };
+
+    return function (it, search, at) {
+      return (search instanceof RegExp ? __find_regexp : __find_string)(it, search, at);
+    };
+  }(); //remark.spec.js
+
+  var findIndexes = function () {
+    return function (c, s, at) {
+      if (typeof c === "string" || typeof c === "number") {
+        var idxs = [];
+        var s = likeRegexp(s) ? s : s + "";
+        var at = !at || !isNumber(at) || at < 0 ? 0 : at;
+        var next;
+
+        do {
+          var i = findIndex(c, s, at);
+
+          if (i > -1) {
+            at = (s.length || 1) + i;
+            idxs.push(i);
+            next = true;
+          } else {
+            next = false;
+          }
+        } while (next);
+
+        return idxs;
+      }
+    };
+  }(); //TODO: Union hasValue
+
+  var NESTED_HAS_PROC = function NESTED_HAS_PROC(obj, key) {
+    var keys = key.split(".");
+    if (!keys.length) return false;
+    var pointer = obj;
+
+    for (var ki in keys) {
+      var k = keys[ki];
+
+      if (!pointer.hasOwnProperty(k)) {
+        return false;
+      } else {
+        pointer = pointer[k];
+      }
+    }
+
+    return true;
+  };
+
+  var diffStructure = function diffStructure(before, after) {
+    var afterKeys = Object.keys(after);
+    var beforeKeys;
+    var canDiff = false;
+
+    if (isObject(before)) {
+      if (isArray(before)) {
+        beforeKeys = before;
+      } else {
+        beforeKeys = Object.keys(before);
+        canDiff = true;
+      }
+    } else {
+      beforeKeys = [];
+    }
+
+    var analysis = {
+      after: after,
+      before: before,
+      keys: unique(afterKeys.concat(beforeKeys)).reduce(function (dest, key) {
+        dest[key] = undefined;
+        return dest;
+      }, {}),
+      match: [],
+      missing: [],
+      surplus: [],
+      diff: [],
+      pass: false //match, missing
+
+    };
+
+    for (var ki in beforeKeys) {
+      if (!beforeKeys.hasOwnProperty(ki)) continue;
+      var key = beforeKeys[ki];
+
+      if (NESTED_HAS_PROC(after, key)) {
+        analysis.match.push(key);
+        analysis.keys[key] = "match";
+
+        if (canDiff && !isEqual(get(after, key), get(before, key))) {
+          analysis.diff.push(key);
+          analysis.keys[key] = "diff";
+        }
+      } else {
+        analysis.surplus.push(key);
+        analysis.keys[key] = "surplus";
+      }
+    } //surplus
+
+
+    asArray(afterKeys).forEach(function (key) {
+      if (!hasValue(analysis.match, key)) {
+        analysis.missing.push(key);
+        analysis.keys[key] = "missing";
+      }
+    }); //absolute
+
+    analysis.pass = !analysis.missing.length && !analysis.surplus.length;
+    return analysis;
   };
 
   var argumentNamesBy = function getArgs(fn) {
@@ -4198,6 +4202,76 @@
       return this;
     }
   };
+
+  var Movement = function Movement(distance, rotate, time) {
+    var __ref = {
+      rotate: toNumber(rotate),
+      distance: toNumber(distance),
+      time: toNumber(time)
+    };
+    Object.defineProperties(this, {
+      rotate: {
+        enumerable: true,
+        get: function get() {
+          return __ref.rotate;
+        }
+      },
+      distance: {
+        enumerable: true,
+        get: function get() {
+          return __ref.distance;
+        }
+      },
+      time: {
+        enumerable: true,
+        get: function get() {
+          return __ref.time;
+        }
+      },
+      angle: {
+        enumerable: false,
+        get: function get() {
+          var rotate = this.rotate;
+          return !rotate ? 0 : 360 * (rotate + 0);
+        },
+        set: function set(angle) {
+          var angleValue = toNumber(angle);
+          __ref.rotate = !isNumber(angleValue) ? 0 : angleValue / 360;
+          !isNumber(__ref.rotate) && (__ref.rotate = 0);
+          return this;
+        }
+      },
+      theta: {
+        enumerable: false,
+        get: function get() {
+          var angle = this.angle;
+          return angle * Math.PI / 180.0;
+        }
+      }
+    });
+  };
+
+  Movement.prototype = {
+    clone: function clone$$1() {
+      return new Movement(this.distance, this.rotate, this.time);
+    },
+    from: function from(object) {
+      var theta = this.theta,
+          distance = this.distance;
+
+      if (object instanceof Point) {
+        var x = object.x,
+            y = object.y;
+        return new Point(x + distance * Math.cos(theta), y + distance * Math.sin(theta));
+      }
+
+      return null;
+    },
+    setAngle: function setAngle(angle) {
+      this.angle = angle;
+      return this;
+    }
+  };
   var point = function point(x, y, z, w) {
     return typeof x === "object" ? new Point(x.x, x.y, x.z, x.w) : new Point(x, y, z, w);
   };
@@ -4216,6 +4290,9 @@
   };
   var rect = function rect(left, top, width, height, x, y, valid) {
     return typeof left === "object" ? new Rect(left.left, left.top, left.width, left.height, left.x, left.y, left.valid) : new Rect(left, top, width, height, x, y, valid);
+  };
+  var movement = function movement(distance, rotate, time) {
+    return new Movement(distance, rotate, time);
   };
 
   var ManualReactive = function ManualReactive(watch, effect, judgeOfEqual) {
@@ -4489,11 +4566,9 @@
     toggle: toggle,
     fallback: fallback,
     valueOf: valueOf,
-    stringTest: stringTest,
     keys: keys,
     deepKeys: deepKeys,
     entries: entries,
-    matchString: matchString,
     findIndex: findIndex,
     findIndexes: findIndexes,
     diffStructure: diffStructure,
@@ -4517,6 +4592,7 @@
     point: point,
     vertex: vertex,
     rect: rect,
+    movement: movement,
     affect: affect,
     MatrixArray: MatrixArray,
     makeMatrixArray: makeMatrixArray,

@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.array.fill", "core-js/modules/es6.function.name", "core-js/modules/es6.array.sort", "./isLike", "./remark", "./enumerable", "./cast"], factory);
+    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.array.fill", "core-js/modules/es6.function.name", "core-js/modules/es6.array.sort", "./isLike", "./baseFunction", "./enumerable", "./cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.function.name"), require("core-js/modules/es6.array.sort"), require("./isLike"), require("./remark"), require("./enumerable"), require("./cast"));
+    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.function.name"), require("core-js/modules/es6.array.sort"), require("./isLike"), require("./baseFunction"), require("./enumerable"), require("./cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.es6Array, global.es6Function, global.es6Array, global.isLike, global.remark, global.enumerable, global.cast);
+    factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.es6Array, global.es6Function, global.es6Array, global.isLike, global.baseFunction, global.enumerable, global.cast);
     global.read = mod.exports;
   }
-})(this, function (_exports, _webDom, _es6Array, _es6Object, _es6Array2, _es6Function, _es6Array3, _isLike, _remark, _enumerable, _cast) {
+})(this, function (_exports, _webDom, _es6Array, _es6Object, _es6Array2, _es6Function, _es6Array3, _isLike, _baseFunction, _enumerable, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -25,7 +25,7 @@
   //read.readString.spec.js
   var readString = function () {
     var rebaseMatches = function rebaseMatches(matches) {
-      return (0, _remark.entries)((0, _cast.asArray)(matches));
+      return (0, _baseFunction.baseEntries)((0, _cast.asArray)(matches));
     };
 
     return function (text, matches, castFn, props) {
@@ -64,7 +64,7 @@
         var matchesMap = matchEntries.map(function (_ref2) {
           var matchType = _ref2[0],
               matchExp = _ref2[1];
-          return [(0, _remark.matchString)(text, matchExp, cursor), matchType, matchExp];
+          return [(0, _baseFunction.matchString)(text, matchExp, cursor), matchType, matchExp];
         });
         var firstMatch = (0, _cast.asArray)(matchesMap).sort(function (_ref3, _ref4) {
           var a = _ref3[0],

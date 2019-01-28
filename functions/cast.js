@@ -1,43 +1,23 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.object.assign", "core-js/modules/es6.string.iterator", "core-js/modules/es6.set", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike", "./remark"], factory);
+    define(["exports", "core-js/modules/es6.object.assign", "core-js/modules/es6.string.iterator", "core-js/modules/es6.set", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.regexp.replace", "core-js/modules/es6.regexp.split", "./isLike", "./baseFunction"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.string.iterator"), require("core-js/modules/es6.set"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"), require("./remark"));
+    factory(exports, require("core-js/modules/es6.object.assign"), require("core-js/modules/es6.string.iterator"), require("core-js/modules/es6.set"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.regexp.replace"), require("core-js/modules/es6.regexp.split"), require("./isLike"), require("./baseFunction"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Object, global.es6String, global.es6, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike, global.remark);
+    factory(mod.exports, global.es6Object, global.es6String, global.es6, global.es6Array, global.es6Object, global.webDom, global.es6Regexp, global.es6Regexp, global.isLike, global.baseFunction);
     global.cast = mod.exports;
   }
-})(this, function (_exports, _es6Object, _es6String, _es, _es6Array, _es6Object2, _webDom, _es6Regexp, _es6Regexp2, _isLike, _remark) {
+})(this, function (_exports, _es6Object, _es6String, _es, _es6Array, _es6Object2, _webDom, _es6Regexp, _es6Regexp2, _isLike, _baseFunction) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
   _exports.alloc = _exports.instance = _exports.purge = _exports.purgeOf = _exports.free = _exports.freeOf = _exports.compact = _exports.compactOf = _exports.pick = _exports.pickOf = _exports.omit = _exports.omitOf = _exports.rebase = _exports.sort = _exports.sortOf = _exports.clearOf = _exports.insert = _exports.insertOf = _exports.filter = _exports.filterOf = _exports.concat = _exports.concatOf = _exports.move = _exports.moveOf = _exports.getKeyBy = _exports.unique = _exports.removeValue = _exports.cloneDeep = _exports.clone = _exports.cleanObject = _exports.toNumber = _exports.asObject = _exports.toArray = _exports.asArray = void 0;
-
-  var asArray = function asArray(data, defaultArray) {
-    if (defaultArray === void 0) {
-      defaultArray = undefined;
-    }
-
-    if ((0, _isLike.isArray)(data)) {
-      return data;
-    }
-
-    if ((0, _isLike.isNone)(data)) {
-      return (0, _isLike.isArray)(defaultArray) ? defaultArray : (0, _isLike.isNone)(defaultArray) ? [] : [defaultArray];
-    }
-
-    if (typeof data === "object" && typeof data.toArray === "function") {
-      return data.toArray();
-    }
-
-    return [data];
-  };
-
+  var asArray = _baseFunction.baseAsArray;
   _exports.asArray = asArray;
 
   var toArray = function toArray(data, option) {
@@ -324,7 +304,7 @@
 
   var filterOf = function filterOf(data, filterFn, exitFn) {
     var dataArray = asArray(data);
-    var dataKeys = (0, _remark.keys)(data);
+    var dataKeys = (0, _baseFunction.baseKeys)(data);
     var isOnExit = typeof exitFn === "function";
     var exitArray = isOnExit ? [] : null;
 
@@ -501,7 +481,7 @@
     var removeRule = typeof rule === "function" ? function (key, value) {
       return rule(value, key);
     } : rule;
-    var removeKeys = (0, _remark.keys)(datum, removeRule);
+    var removeKeys = (0, _baseFunction.baseKeys)(datum, removeRule);
     if (!removeKeys.length) return datum;
     (0, _isLike.isArray)(datum) ? removeKeys.forEach(function (originalIndex, offset) {
       var removeIndex = originalIndex - offset;
@@ -528,7 +508,7 @@
 
   var pickOf = function pickOf(datum, rule) {
     return removeKey(datum, function (value, key) {
-      return !(0, _remark.stringTest)(key, rule, value);
+      return !(0, _baseFunction.stringTest)(key, rule, value);
     });
   };
 

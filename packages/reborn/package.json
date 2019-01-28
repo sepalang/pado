@@ -13,7 +13,7 @@
   "devDependencies": {
     "@sepalang/padoc": "^0.10.0",
     "@sepalang/pado": "^0.4.5",
-    "@sepalang/logic": "^0.0.2",
+    "@sepalang/logic": "^0.0.4",
     "rimraf": "^2.6.2"
   }
 }

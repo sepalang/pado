@@ -55,7 +55,7 @@
     }
 
     var pascalCaseString = pascalCase(string, joinString);
-    return "" + (pascalCaseString.substr(0, 1) || '') + (pascalCaseString.substr(1) || '');
+    return "" + (pascalCaseString.substr(0, 1) || '').toLowerCase() + (pascalCaseString.substr(1) || '');
   };
 
   _exports.camelCase = camelCase;
