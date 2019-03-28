@@ -1,7 +1,12 @@
-.DS_Store
-/.cache
-node_modules
-package-lock.json
+# packages
+**/node_modules
+**/package-lock.json
+
+# report
 .util/report/*
 !.util/report/*.md
+
+# os log
+.DS_Store
+/.cache
 lerna-debug.log

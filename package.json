@@ -28,7 +28,7 @@
     "repl": "padoc --exec .util/repl/index.js -i -g",
     "lint": "lintpad packages/pado -m lib",
     "lint:fix": "npm run lint -- --fix",
-    "bootstrap": "npm install --save-dev lerna && lerna bootstrap $(cat lernabootstrap)"
+    "bootstrap": "npx lerna bootstrap $(cat lernabootstrap)"
   },
   "author": "AHN HO JUNG",
   "license": "MIT",
@@ -40,7 +40,6 @@
     "@sepalang/lintpad": "^0.2.1",
     "@sepalang/padoc": "^0.10.0",
     "@sepalang/testpad": "^0.1.2",
-    "lerna": "^3.10.7",
     "madge": "^3.2.0",
     "rimraf": "^2.6.2"
   }
