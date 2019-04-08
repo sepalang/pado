@@ -6,6 +6,7 @@
   "scripts": {
     "1": "padoc --pack 'test/1/*.js' test/1/packed -m es",
     "2": "padoc --pack 'test/2/*.js' test/2/packed -m es",
+    "3": "padoc --pack 'test/3/promise.web.js' test/3/packed/promise.web.js -m iife -n promise",
     "all": "npm run 1 && npm run 2"
   },
   "author": "AHN HO JUNG",
