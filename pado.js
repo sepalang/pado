@@ -1035,6 +1035,71 @@
       return fn.apply(undefined, applyArgs);
     }) : result;
   };
+  var deepForEach = function deepForEach(nsData, key, proc, startParam) {
+    if (nsData && key && proc) {
+      var nestedTreeDownProcess = function nestedTreeDownProcess(nested, key, proc, parentReturn, depth) {
+        ++depth;
+        var procIndex = 0;
+        asArray(nested, function (data, forKey) {
+          if (isArray(data)) {
+            data.length && nestedTreeDownProcess(data, key, proc, parentReturn, depth);
+          } else {
+            if (isArray(nested) && isObject(data) || isObject(data) && forKey == key) {
+              var destChilds = [];
+
+              if (key === Object) {
+                asArray(Object.keys(data)).forEach(function (ok) {
+                  isArray(data[ok]) && destChilds.push(data[ok]);
+                });
+              }
+
+              typeof data[key] === "object" && destChilds.push(data[key]);
+              var procReturn = proc(data, parentReturn, depth, procIndex++);
+              asArray(destChilds, function (dest) {
+                nestedTreeDownProcess(dest, key, proc, procReturn, depth);
+              });
+            }
+          }
+        });
+      };
+
+      if (isObject(nsData) && !isArray(nsData)) {
+        var destChilds = [];
+        key === Object && Object.keys(nsData).forEach(function (ok) {
+          isArray(nsData[ok]) && destChilds.push(nsData[ok]);
+        });
+        typeof nsData[key] === "object" && destChilds.push(nsData[key]);
+        startParam = proc(nsData, startParam, 0);
+        asArray(destChilds).forEach(function (dest) {
+          nestedTreeDownProcess(dest, key, proc, startParam, 0);
+        });
+      } else {
+        nestedTreeDownProcess(nsData, key, proc, startParam, -1);
+      }
+
+      return nsData;
+    }
+  };
+  var nested = function nested(nsData, key, select, proc) {
+    var result = [];
+    var fineded = false;
+    deepForEach(nsData, key, function (data, parentReturn, depth, index) {
+      if (fineded) return;
+
+      if (typeof select === "function" ? select(data, parentReturn, depth, index) : data === select) {
+        fineded = true;
+        return result = parentReturn.concat([data]);
+      }
+
+      return parentReturn.concat([data]);
+    }, []);
+
+    if (typeof proc === "function") {
+      asArray(result).forEach(proc);
+    }
+
+    return result;
+  };
 
   var fill = function fill(collection, fillLength, emptyDefault) {
     if (emptyDefault === void 0) {
@@ -4542,6 +4607,8 @@
     times: times,
     hashMap: hashMap,
     pairs: pairs,
+    deepForEach: deepForEach,
+    nested: nested,
     cut: cut,
     cuts: cuts,
     top: top,
