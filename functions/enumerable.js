@@ -79,7 +79,7 @@
       var nestedTreeDownProcess = function nestedTreeDownProcess(nested, key, proc, parentReturn, depth) {
         ++depth;
         var procIndex = 0;
-        (0, _cast.asArray)(nested, function (data, forKey) {
+        (0, _cast.asArray)(nested).forEach(function (data, forKey) {
           if ((0, _isLike.isArray)(data)) {
             data.length && nestedTreeDownProcess(data, key, proc, parentReturn, depth);
           } else {
@@ -94,7 +94,7 @@
 
               typeof data[key] === "object" && destChilds.push(data[key]);
               var procReturn = proc(data, parentReturn, depth, procIndex++);
-              (0, _cast.asArray)(destChilds, function (dest) {
+              (0, _cast.asArray)(destChilds).forEach(function (dest) {
                 nestedTreeDownProcess(dest, key, proc, procReturn, depth);
               });
             }

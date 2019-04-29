@@ -51,7 +51,7 @@ export const deepForEach = (nsData, key, proc, startParam)=>{
       ++depth;
       let procIndex = 0;
 
-      asArray(nested, (data, forKey) => {
+      asArray(nested).forEach((data, forKey) => {
         if (isArray(data)) {
           data.length && nestedTreeDownProcess(data, key, proc, parentReturn, depth);
         } else {
@@ -68,10 +68,10 @@ export const deepForEach = (nsData, key, proc, startParam)=>{
 
             const procReturn = proc(data, parentReturn, depth, procIndex++);
 
-            asArray(destChilds, dest => { nestedTreeDownProcess(dest, key, proc, procReturn, depth); });
+            asArray(destChilds).forEach(dest => { nestedTreeDownProcess(dest, key, proc, procReturn, depth); });
           }
         }
-      })
+      });
     };
 
     if (isObject(nsData) && !isArray(nsData)) {
