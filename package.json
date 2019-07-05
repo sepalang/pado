@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/pado",
-  "version": "0.4.10",
+  "version": "0.4.11",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
@@ -40,6 +40,7 @@
     "@sepalang/lintpad": "^0.2.1",
     "@sepalang/padoc": "^0.11.0",
     "@sepalang/testpad": "^0.1.2",
+    "core-js": "^2.6.9",
     "madge": "^3.2.0",
     "rimraf": "^2.6.2"
   }
