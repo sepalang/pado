@@ -1,6 +1,6 @@
 {
   "name": "@sepalang/pado",
-  "version": "0.4.11",
+  "version": "0.5.0",
   "description": "Yet another functional programming helper",
   "main": "index.js",
   "repository": {
