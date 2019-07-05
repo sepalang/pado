@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.number.constructor"], factory);
+    define(["exports"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.number.constructor"));
+    factory(exports);
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Number);
+    factory(mod.exports);
     global.format = mod.exports;
   }
-})(this, function (_exports, _es6Number) {
+})(this, function (_exports) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

@@ -1,8 +1,8 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global.pado = factory());
-}(this, (function () { 'use strict';
+  (global = global || self, global.pado = factory());
+}(this, function () { 'use strict';
 
   function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
@@ -55,20 +55,24 @@
     return obj;
   }
 
-  function _objectSpread(target) {
+  function _objectSpread2(target) {
     for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i] != null ? arguments[i] : {};
-      var ownKeys = Object.keys(source);
+      if (i % 2) {
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
 
-      if (typeof Object.getOwnPropertySymbols === 'function') {
-        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-          return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-        }));
+        if (typeof Object.getOwnPropertySymbols === 'function') {
+          ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+            return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+          }));
+        }
+
+        ownKeys.forEach(function (key) {
+          _defineProperty(target, key, source[key]);
+        });
+      } else {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(arguments[i]));
       }
-
-      ownKeys.forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
     }
 
     return target;
@@ -1040,7 +1044,7 @@
       var nestedTreeDownProcess = function nestedTreeDownProcess(nested, key, proc, parentReturn, depth) {
         ++depth;
         var procIndex = 0;
-        asArray(nested, function (data, forKey) {
+        asArray(nested).forEach(function (data, forKey) {
           if (isArray(data)) {
             data.length && nestedTreeDownProcess(data, key, proc, parentReturn, depth);
           } else {
@@ -1055,7 +1059,7 @@
 
               typeof data[key] === "object" && destChilds.push(data[key]);
               var procReturn = proc(data, parentReturn, depth, procIndex++);
-              asArray(destChilds, function (dest) {
+              asArray(destChilds).forEach(function (dest) {
                 nestedTreeDownProcess(dest, key, proc, procReturn, depth);
               });
             }
@@ -1280,7 +1284,7 @@
             });
           }
         };
-        castFn(_objectSpread({}, payload, matching, casting, scope));
+        castFn(_objectSpread2({}, payload, {}, matching, {}, casting, {}, scope));
         return true;
       };
 
@@ -2155,11 +2159,11 @@
   };
   var keys = baseKeys;
   var deepKeys = function () {
-    var nestedDeepKeys = function nestedDeepKeys(target, filter$$1, scope, total) {
+    var nestedDeepKeys = function nestedDeepKeys(target, filter, scope, total) {
       if (typeof target === "object") {
         keys(target, function (key) {
           var child = target[key];
-          var useKey = filter$$1(child, key, scope.length);
+          var useKey = filter(child, key, scope.length);
 
           if (!useKey) {
             return;
@@ -2168,15 +2172,15 @@
           var currentScope = clone(scope);
           currentScope.push(key);
           total.push(currentScope);
-          nestedDeepKeys(child, filter$$1, currentScope, total);
+          nestedDeepKeys(child, filter, currentScope, total);
         }, true);
       }
     };
 
-    return function (target, filter$$1) {
+    return function (target, filter) {
       var result = [];
-      nestedDeepKeys(target, filter$$1 ? function (child, key) {
-        filter$$1(child, key);
+      nestedDeepKeys(target, filter ? function (child, key) {
+        filter(child, key);
       } : function () {
         return true;
       }, [], result);
@@ -2408,37 +2412,37 @@
   PromiseFunction.reject = reject;
 
   var defer = function defer() {
-    var resolve$$1, reject$$1;
-    var promise$$1 = new PromiseClass(function () {
-      resolve$$1 = arguments[0];
-      reject$$1 = arguments[1];
+    var resolve, reject;
+    var promise = new PromiseClass(function () {
+      resolve = arguments[0];
+      reject = arguments[1];
     });
     return {
-      resolve: resolve$$1,
-      reject: reject$$1,
-      promise: promise$$1
+      resolve: resolve,
+      reject: reject,
+      promise: promise
     };
   };
   promise.defer = defer;
   var timeout = function timeout(fn, time) {
     if (typeof fn === "number") {
-      return newPromise(function (resolve$$1) {
+      return newPromise(function (resolve) {
         return setTimeout(function () {
-          return resolve$$1(time);
+          return resolve(time);
         }, fn);
       });
     } else {
-      return newPromise(function (resolve$$1) {
+      return newPromise(function (resolve) {
         return setTimeout(function () {
-          return resolve$$1(typeof fn === "function" ? fn() : fn);
+          return resolve(typeof fn === "function" ? fn() : fn);
         }, time);
       });
     }
   };
   promise.timeout = timeout;
-  var valueOf$1 = function valueOf$$1(maybeQ) {
-    return newPromise(function (resolve$$1, reject$$1) {
-      likePromise(maybeQ) ? maybeQ.then(resolve$$1).catch(reject$$1) : resolve$$1(maybeQ);
+  var valueOf$1 = function valueOf(maybeQ) {
+    return newPromise(function (resolve, reject) {
+      likePromise(maybeQ) ? maybeQ.then(resolve).catch(reject) : resolve(maybeQ);
     });
   };
   promise.valueOf = valueOf$1;
@@ -2466,14 +2470,14 @@
       var current = 0;
       concurrent = isNumber(concurrent) || concurrent > 0 ? concurrent : 1;
       Object.defineProperty(this, "avaliablePullCount", {
-        get: function get$$1() {
+        get: function get() {
           var limit = _this.limitInput - _this.inputs.length;
           if (limit < 0) limit = 0;
           return limit;
         }
       });
       Object.defineProperty(this, "avaliableOutputCount", {
-        get: function get$$1() {
+        get: function get() {
           return _this.limitOutput + current + _this.outputs.length;
         }
       });
@@ -2548,7 +2552,7 @@
                                 return _context.stop();
                             }
                           }
-                        }, _callee, this);
+                        }, _callee);
                       }));
 
                       return function outputHandle(_x2) {
@@ -2605,7 +2609,7 @@
                     return _context2.stop();
                 }
               }
-            }, _callee2, this, [[5, 13]]);
+            }, _callee2, null, [[5, 13]]);
           }));
 
           return function (_x) {
@@ -2721,12 +2725,12 @@
       notifyConsole = undefined;
     }
 
-    return new PromiseClass(function (resolve$$1, reject$$1) {
+    return new PromiseClass(function (resolve, reject) {
       if (notifyConsole === true) {
         console.warn("abort promise");
       }
 
-      reject$$1(abortMessage);
+      reject(abortMessage);
     });
   };
 
@@ -2782,7 +2786,7 @@
       },
       domainValue: {
         enumerable: true,
-        get: function get$$1() {
+        get: function get() {
           return hashMap(cloneDeep(_this.get()), function (posSize) {
             return posSize[0];
           });
@@ -2790,7 +2794,7 @@
       },
       domainSize: {
         enumerable: true,
-        get: function get$$1() {
+        get: function get() {
           return hashMap(cloneDeep(_this.get()), function (posSize) {
             return posSize[1];
           });
@@ -2798,7 +2802,7 @@
       },
       rangeStart: {
         enumerable: true,
-        get: function get$$1() {
+        get: function get() {
           return _this.$space.domainRange(hashMap(_this.get(), function (posSize) {
             return posSize[0];
           }));
@@ -2806,7 +2810,7 @@
       },
       rangeSize: {
         enumerable: true,
-        get: function get$$1() {
+        get: function get() {
           return _this.$space.domainRangeSize(hashMap(_this.get(), function (posSize) {
             return posSize[1];
           }));
@@ -2820,7 +2824,7 @@
   Object.defineProperties(BlockPrototype, {
     domainMap: {
       enumerable: false,
-      get: function get$$1() {
+      get: function get() {
         return hashMap(cloneDeep(this.get()), function (posSize) {
           return {
             start: posSize[0],
@@ -2832,7 +2836,7 @@
     },
     rangeMap: {
       enumerable: false,
-      get: function get$$1() {
+      get: function get() {
         var rangeSize = this.rangeSize;
         return hashMap(this.rangeStart, function ($start, sel) {
           var $size = sel ? rangeSize[sel] : rangeSize;
@@ -2846,7 +2850,7 @@
     },
     rangeEnd: {
       enumerable: false,
-      get: function get$$1() {
+      get: function get() {
         return this.rangeMap(this.rangeMap, function (map) {
           return map.end;
         });
@@ -2880,7 +2884,7 @@
 
       return this;
     },
-    clone: function clone$$1() {
+    clone: function clone() {
       return new Block(this);
     },
     setPosition: function setPosition(value, sel) {
@@ -2893,7 +2897,7 @@
       if ($posSize instanceof Array) $posSize[1] = value;
       return this;
     },
-    get: function get$$1() {
+    get: function get() {
       return cloneDeep(typeof this.$posSize === "function" ? this.$posSize() : this.$posSize);
     },
     conflicts: function conflicts(otherBlocks, selector) {
@@ -2987,8 +2991,8 @@
       return block;
     },
     domainBlock: function domainBlock(cursor, callback) {
-      var domainGrid = hashMap(this.$space.range, function (range$$1) {
-        return range$$1[2];
+      var domainGrid = hashMap(this.$space.range, function (range) {
+        return range[2];
       });
       var block = this.block(hashMap(this.$space.rangeDomain(cursor), function (cursorPoint, key) {
         return [cursorPoint, get(domainGrid, key)];
@@ -2999,7 +3003,7 @@
     }
   };
 
-  var Space = function Space(domain, range$$1) {
+  var Space = function Space(domain, range) {
     this.$niceDomain = true;
     this.$niceRange = true;
     Object.defineProperties(this, {
@@ -3035,7 +3039,7 @@
           });
           this.$domain = domain;
         },
-        get: function get$$1() {
+        get: function get() {
           return hashMap(cloneDeep(this.$domain), function (domain) {
             for (var i = 0, l = domain.length; i < l; i++) {
               if (typeof domain[i] === "function") domain[i] = domain[i]();
@@ -3047,29 +3051,29 @@
       },
       range: {
         enumerable: true,
-        set: function set(range$$1) {
-          range$$1 = hashMap(range$$1, function (range$$1) {
-            if (!range$$1[2]) {
-              range$$1[2] = 1;
+        set: function set(range) {
+          range = hashMap(range, function (range) {
+            if (!range[2]) {
+              range[2] = 1;
             }
 
-            return range$$1;
+            return range;
           });
-          this.$range = range$$1;
+          this.$range = range;
         },
-        get: function get$$1() {
-          return hashMap(cloneDeep(this.$range), function (range$$1) {
-            for (var i = 0, l = range$$1.length; i < l; i++) {
-              if (typeof range$$1[i] === "function") range$$1[i] = range$$1[i]();
+        get: function get() {
+          return hashMap(cloneDeep(this.$range), function (range) {
+            for (var i = 0, l = range.length; i < l; i++) {
+              if (typeof range[i] === "function") range[i] = range[i]();
             }
 
-            return range$$1;
+            return range;
           });
         }
       }
     });
     this.$domain = domain;
-    this.$range = range$$1;
+    this.$range = range;
   };
 
   Space.prototype = {
@@ -3097,8 +3101,8 @@
     }
   };
   var space = function () {
-    return function (domain, range$$1) {
-      return new Space(domain, range$$1);
+    return function (domain, range) {
+      return new Space(domain, range);
     };
   }();
   var block = function () {
@@ -3212,7 +3216,7 @@
   };
   Object.defineProperties(LimitterPrototype, {
     done: {
-      get: function get$$1() {
+      get: function get() {
         return this.value === limitNumber(this.value, this.maximum, this.minimum);
       }
     }
@@ -3262,7 +3266,7 @@
         });
         return result;
       },
-      toArray: function toArray$$1() {
+      toArray: function toArray() {
         return Array.from(this);
       },
       eachColumn: function eachColumn(eachFn) {
@@ -3475,7 +3479,7 @@
       if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
       return this;
     },
-    clone: function clone$$1() {
+    clone: function clone() {
       return new Point(this.x, this.y, this.z, this.w, this.meta);
     },
     call: function call(fn) {
@@ -3659,7 +3663,7 @@
       });
       return result;
     },
-    clone: function clone$$1() {
+    clone: function clone() {
       return new Vertex(this);
     },
     eq: function eq(index) {
@@ -3880,7 +3884,7 @@
       if (typeof obj === "object") this.meta = Object.assign(this.meta && this.meta || {}, obj);
       return this;
     },
-    clone: function clone$$1() {
+    clone: function clone() {
       return new Rect(this.left, this.top, this.width, this.height, this.meta);
     },
     toJSON: function toJSON(withMeta) {
@@ -4040,7 +4044,7 @@
       var pieceHeight = height / row;
       eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
 
-      var pacExt = _objectSpread({}, this.defaultPerspective());
+      var pacExt = _objectSpread2({}, this.defaultPerspective());
 
       if (this.meta.matrix && this.meta.matrix instanceof Array) {
         Object.assign(pacExt, {
@@ -4049,7 +4053,7 @@
       }
 
       var pacResult = makeMatrixArray(column, row, function (index, colIndex, rowIndex) {
-        var pacMeta = _objectSpread({
+        var pacMeta = _objectSpread2({
           column: colIndex,
           row: rowIndex,
           coords: [colIndex, rowIndex],
@@ -4165,7 +4169,7 @@
           enumerable: false,
           get: function get() {
             return function () {
-              return _objectSpread({}, diffResult);
+              return _objectSpread2({}, diffResult);
             };
           }
         }
@@ -4317,7 +4321,7 @@
   };
 
   Movement.prototype = {
-    clone: function clone$$1() {
+    clone: function clone() {
       return new Movement(this.distance, this.rotate, this.time);
     },
     from: function from(object) {
@@ -4408,8 +4412,8 @@
           return abort();
         } else {
           $pending = true;
-          return promise$1(function (resolve$$1, reject$$1) {
-            return valueOf$1(func.apply(_this, args)).then(resolve$$1).catch(reject$$1);
+          return promise$1(function (resolve, reject) {
+            return valueOf$1(func.apply(_this, args)).then(resolve).catch(reject);
           }).then(function (e) {
             $pending = false;
             return e;
@@ -4430,7 +4434,7 @@
       return function (payload) {
         var _this2 = this;
 
-        return promise$1(function (resolve$$1, reject$$1) {
+        return promise$1(function (resolve, reject) {
           var _marked =
           /*#__PURE__*/
           regeneratorRuntime.mark(iterator);
@@ -4462,7 +4466,7 @@
                     return _context.stop();
                 }
               }
-            }, _marked, this);
+            }, _marked);
           }
 
           var doWhile = function doWhile(_ref, taskPayload) {
@@ -4470,11 +4474,11 @@
                 done = _ref.done;
 
             if (done) {
-              resolve$$1(taskPayload);
+              resolve(taskPayload);
             } else {
               valueOf$1(proc.call(_this2, taskPayload)).then(function (nextPayload) {
                 doWhile(iterator.next(), nextPayload);
-              }).catch(reject$$1);
+              }).catch(reject);
             }
           };
 
@@ -4542,6 +4546,9 @@
 
 
   var functions = /*#__PURE__*/Object.freeze({
+    dateExp: dateExp,
+    timestampExp: timestampExp,
+    timescaleExp: timescaleExp,
     isAbsoluteNaN: isAbsoluteNaN,
     isNone: isNone,
     isInfinity: isInfinity,
@@ -4567,6 +4574,28 @@
     isExsist: isExsist,
     notExsist: notExsist,
     likePromise: likePromise,
+    pascalCase: pascalCase,
+    camelCase: camelCase,
+    all: all,
+    times: times,
+    hashMap: hashMap,
+    pairs: pairs,
+    deepForEach: deepForEach,
+    nested: nested,
+    cut: cut,
+    cuts: cuts,
+    top: top,
+    rand64: rand64,
+    tokenize: tokenize,
+    randRange: randRange,
+    rangeModel: rangeModel,
+    range: range,
+    domainRangeValue: domainRangeValue,
+    domainRangeInterpolate: domainRangeInterpolate,
+    matrixRange: matrixRange,
+    validMatrix: validMatrix,
+    asMatrix: asMatrix,
+    multiplyMatrix: multiplyMatrix,
     asArray: asArray,
     toArray: toArray,
     asObject: asObject,
@@ -4601,31 +4630,6 @@
     purge: purge,
     instance: instance,
     alloc: alloc,
-    pascalCase: pascalCase,
-    camelCase: camelCase,
-    all: all,
-    times: times,
-    hashMap: hashMap,
-    pairs: pairs,
-    deepForEach: deepForEach,
-    nested: nested,
-    cut: cut,
-    cuts: cuts,
-    top: top,
-    rand64: rand64,
-    tokenize: tokenize,
-    randRange: randRange,
-    rangeModel: rangeModel,
-    range: range,
-    domainRangeValue: domainRangeValue,
-    domainRangeInterpolate: domainRangeInterpolate,
-    matrixRange: matrixRange,
-    validMatrix: validMatrix,
-    asMatrix: asMatrix,
-    multiplyMatrix: multiplyMatrix,
-    dateExp: dateExp,
-    timestampExp: timestampExp,
-    timescaleExp: timescaleExp,
     limitNumber: limitNumber,
     accurateTimeout: accurateTimeout,
     turn: turn,
@@ -4685,12 +4689,12 @@
     return BOX;
   };
 
-  var DEFAULT = BowFactory(_objectSpread({}, functions));
+  var DEFAULT = BowFactory(_objectSpread2({}, functions));
   var factory = BowFactory;
 
-  var DEFAULT$1 = factory(_objectSpread({}, functions));
+  var DEFAULT$1 = factory(_objectSpread2({}, functions));
 
   return DEFAULT$1;
 
-})));
+}));
 //# sourceMappingURL=pado.js.map

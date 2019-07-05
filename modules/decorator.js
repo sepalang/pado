@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "regenerator-runtime/runtime", "core-js/modules/web.dom.iterable", "./promise", "../functions/cast", "../functions/isLike"], factory);
+    define(["exports", "./promise", "../functions/cast", "../functions/isLike"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("regenerator-runtime/runtime"), require("core-js/modules/web.dom.iterable"), require("./promise"), require("../functions/cast"), require("../functions/isLike"));
+    factory(exports, require("./promise"), require("../functions/cast"), require("../functions/isLike"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.runtime, global.webDom, global.promise, global.cast, global.isLike);
+    factory(mod.exports, global.promise, global.cast, global.isLike);
     global.decorator = mod.exports;
   }
-})(this, function (_exports, _runtime, _webDom, _promise, _cast, _isLike) {
+})(this, function (_exports, _promise, _cast, _isLike) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -89,7 +89,7 @@
                     return _context.stop();
                 }
               }
-            }, _marked, this);
+            }, _marked);
           }
 
           var doWhile = function doWhile(_ref, taskPayload) {

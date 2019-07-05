@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.match", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.regexp.split", "core-js/modules/es6.regexp.constructor", "core-js/modules/es6.regexp.search", "./isLike", "./read", "./cast", "./baseFunction"], factory);
+    define(["exports", "./isLike", "./read", "./cast", "./baseFunction"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.match"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.regexp.constructor"), require("core-js/modules/es6.regexp.search"), require("./isLike"), require("./read"), require("./cast"), require("./baseFunction"));
+    factory(exports, require("./isLike"), require("./read"), require("./cast"), require("./baseFunction"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.webDom, global.es6Array, global.es6Object, global.es6Regexp, global.es6Regexp, global.es6Regexp, global.isLike, global.read, global.cast, global.baseFunction);
+    factory(mod.exports, global.isLike, global.read, global.cast, global.baseFunction);
     global.remark = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _webDom, _es6Array, _es6Object, _es6Regexp2, _es6Regexp3, _es6Regexp4, _isLike, _read, _cast, _baseFunction) {
+})(this, function (_exports, _isLike, _read, _cast, _baseFunction) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

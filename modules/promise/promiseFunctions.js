@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "regenerator-runtime/runtime", "core-js/modules/es6.array.fill", "core-js/modules/es6.string.repeat", "core-js/modules/es6.number.constructor", "core-js/modules/web.dom.iterable", "core-js/modules/es6.promise", "core-js/modules/es6.string.iterator", "core-js/modules/es6.array.from", "./promiseEngine", "./promise", "../../functions/cast", "../../functions/isLike", "../../functions/nice", "../../functions/hack", "../operate"], factory);
+    define(["exports", "./promiseEngine", "./promise", "../../functions/cast", "../../functions/isLike", "../../functions/nice", "../../functions/hack", "../operate"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("regenerator-runtime/runtime"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.string.repeat"), require("core-js/modules/es6.number.constructor"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.promise"), require("core-js/modules/es6.string.iterator"), require("core-js/modules/es6.array.from"), require("./promiseEngine"), require("./promise"), require("../../functions/cast"), require("../../functions/isLike"), require("../../functions/nice"), require("../../functions/hack"), require("../operate"));
+    factory(exports, require("./promiseEngine"), require("./promise"), require("../../functions/cast"), require("../../functions/isLike"), require("../../functions/nice"), require("../../functions/hack"), require("../operate"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Object, global.runtime, global.es6Array, global.es6String, global.es6Number, global.webDom, global.es6, global.es6String, global.es6Array, global.promiseEngine, global.promise, global.cast, global.isLike, global.nice, global.hack, global.operate);
+    factory(mod.exports, global.promiseEngine, global.promise, global.cast, global.isLike, global.nice, global.hack, global.operate);
     global.promiseFunctions = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Object, _runtime, _es6Array2, _es6String, _es6Number, _webDom, _es, _es6String2, _es6Array3, _promiseEngine, _promise, _cast, _isLike, _nice, _hack, _operate) {
+})(this, function (_exports, _promiseEngine, _promise, _cast, _isLike, _nice, _hack, _operate) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -22,9 +22,7 @@
 
   function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
-
-  function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+  function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
   var promisify = function promisify(asyncErrCallbackfn) {
     var argumentNames = (0, _hack.argumentNamesBy)(asyncErrCallbackfn).slice(1);
@@ -168,7 +166,7 @@
 
     deferReset(0);
 
-    var wheelControls = _objectSpread({}, defer, {
+    var wheelControls = _extends({}, defer, {
       then: function then(fn) {
         defer.promise.then(fn);
         thenStack.push(fn);
@@ -242,12 +240,14 @@
                     return _context.stop();
                 }
               }
-            }, _callee, this);
+            }, _callee);
           }));
 
-          return function output(_x) {
+          function output(_x) {
             return _output.apply(this, arguments);
-          };
+          }
+
+          return output;
         }(),
         limitOutput: 1
       }).operate({
@@ -280,12 +280,14 @@
                     return _context2.stop();
                 }
               }
-            }, _callee2, this);
+            }, _callee2);
           }));
 
-          return function input(_x2) {
+          function input(_x2) {
             return _input.apply(this, arguments);
-          };
+          }
+
+          return input;
         }(),
         output: function output(_ref3) {
           var entry = _ref3.entry;

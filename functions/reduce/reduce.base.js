@@ -1,18 +1,16 @@
-require("core-js/modules/es6.array.fill");
-
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.number.constructor", "../isLike", "../cast", "../reform"], factory);
+    define(["exports", "../isLike", "../cast", "../reform"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.number.constructor"), require("../isLike"), require("../cast"), require("../reform"));
+    factory(exports, require("../isLike"), require("../cast"), require("../reform"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Number, global.isLike, global.cast, global.reform);
+    factory(mod.exports, global.isLike, global.cast, global.reform);
     global.reduceBase = mod.exports;
   }
-})(this, function (_exports, _es6Number, _isLike, _cast, _reform) {
+})(this, function (_exports, _isLike, _cast, _reform) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/es6.array.fill", "core-js/modules/es6.function.name", "core-js/modules/es6.array.sort", "./isLike", "./baseFunction", "./enumerable", "./cast"], factory);
+    define(["exports", "./isLike", "./baseFunction", "./enumerable", "./cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/es6.array.fill"), require("core-js/modules/es6.function.name"), require("core-js/modules/es6.array.sort"), require("./isLike"), require("./baseFunction"), require("./enumerable"), require("./cast"));
+    factory(exports, require("./isLike"), require("./baseFunction"), require("./enumerable"), require("./cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.webDom, global.es6Array, global.es6Object, global.es6Array, global.es6Function, global.es6Array, global.isLike, global.baseFunction, global.enumerable, global.cast);
+    factory(mod.exports, global.isLike, global.baseFunction, global.enumerable, global.cast);
     global.read = mod.exports;
   }
-})(this, function (_exports, _webDom, _es6Array, _es6Object, _es6Array2, _es6Function, _es6Array3, _isLike, _baseFunction, _enumerable, _cast) {
+})(this, function (_exports, _isLike, _baseFunction, _enumerable, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -18,9 +18,7 @@
   });
   _exports.readDown = _exports.hasValue = _exports.hasProperty = _exports.get = _exports.readPath = _exports.readString = void 0;
 
-  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
-
-  function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+  function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
   //read.readString.spec.js
   var readString = function () {
@@ -170,7 +168,7 @@
             });
           }
         };
-        castFn(_objectSpread({}, payload, matching, casting, scope));
+        castFn(_extends({}, payload, {}, matching, {}, casting, {}, scope));
         return true;
       };
 

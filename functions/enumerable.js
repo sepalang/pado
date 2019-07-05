@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "./isLike", "./cast"], factory);
+    define(["exports", "./isLike", "./cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("./isLike"), require("./cast"));
+    factory(exports, require("./isLike"), require("./cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Object, global.webDom, global.isLike, global.cast);
+    factory(mod.exports, global.isLike, global.cast);
     global.enumerable = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Object, _webDom, _isLike, _cast) {
+})(this, function (_exports, _isLike, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

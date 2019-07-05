@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.number.constructor", "../functions"], factory);
+    define(["exports", "../functions"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.number.constructor"), require("../functions"));
+    factory(exports, require("../functions"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Number, global.functions);
+    factory(mod.exports, global.functions);
     global.ranger = mod.exports;
   }
-})(this, function (_exports, _es6Number, _functions) {
+})(this, function (_exports, _functions) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

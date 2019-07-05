@@ -1,9 +1,3 @@
-require("core-js/modules/es6.array.iterator");
-
-require("core-js/modules/es6.object.keys");
-
-require("core-js/modules/web.dom.iterable");
-
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "./promise", "./block", "./operate", "./session", "./ranger", "./stance", "./affect", "./matrix", "./decorator"], factory);

@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.object.assign", "../functions", "../functions/isLike", "../functions/cast"], factory);
+    define(["exports", "../functions", "../functions/isLike", "../functions/cast"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.object.assign"), require("../functions"), require("../functions/isLike"), require("../functions/cast"));
+    factory(exports, require("../functions"), require("../functions/isLike"), require("../functions/cast"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Object, global.functions, global.isLike, global.cast);
+    factory(mod.exports, global.functions, global.isLike, global.cast);
     global.block = mod.exports;
   }
-})(this, function (_exports, _es6Object, _functions, _isLike, _cast) {
+})(this, function (_exports, _functions, _isLike, _cast) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

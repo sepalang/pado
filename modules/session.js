@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.promise", "core-js/modules/web.dom.iterable", "core-js/modules/es6.array.iterator", "core-js/modules/es6.string.iterator", "./promise"], factory);
+    define(["exports", "./promise"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.promise"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.string.iterator"), require("./promise"));
+    factory(exports, require("./promise"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6, global.webDom, global.es6Array, global.es6String, global.promise);
+    factory(mod.exports, global.promise);
     global.session = mod.exports;
   }
-})(this, function (_exports, _es, _webDom, _es6Array, _es6String, _promise) {
+})(this, function (_exports, _promise) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

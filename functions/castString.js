@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.regexp.split", "core-js/modules/es6.regexp.replace"], factory);
+    define(["exports"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.regexp.replace"));
+    factory(exports);
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Regexp, global.es6Regexp);
+    factory(mod.exports);
     global.castString = mod.exports;
   }
-})(this, function (_exports, _es6Regexp, _es6Regexp2) {
+})(this, function (_exports) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {

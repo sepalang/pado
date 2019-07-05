@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "core-js/modules/es6.array.sort", "core-js/modules/es6.regexp.split", "core-js/modules/es6.date.to-json", "core-js/modules/es6.array.iterator", "core-js/modules/es6.object.keys", "core-js/modules/web.dom.iterable", "core-js/modules/es6.object.assign", "../functions/isLike", "../functions/cast", "../functions/matrix", "./matrix"], factory);
+    define(["exports", "../functions/isLike", "../functions/cast", "../functions/matrix", "./matrix"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("core-js/modules/es6.array.sort"), require("core-js/modules/es6.regexp.split"), require("core-js/modules/es6.date.to-json"), require("core-js/modules/es6.array.iterator"), require("core-js/modules/es6.object.keys"), require("core-js/modules/web.dom.iterable"), require("core-js/modules/es6.object.assign"), require("../functions/isLike"), require("../functions/cast"), require("../functions/matrix"), require("./matrix"));
+    factory(exports, require("../functions/isLike"), require("../functions/cast"), require("../functions/matrix"), require("./matrix"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.es6Array, global.es6Regexp, global.es6Date, global.es6Array, global.es6Object, global.webDom, global.es6Object, global.isLike, global.cast, global.matrix, global.matrix);
+    factory(mod.exports, global.isLike, global.cast, global.matrix, global.matrix);
     global.stance = mod.exports;
   }
-})(this, function (_exports, _es6Array, _es6Regexp, _es6Date, _es6Array2, _es6Object, _webDom, _es6Object2, _isLike, _cast, _matrix, _matrix2) {
+})(this, function (_exports, _isLike, _cast, _matrix, _matrix2) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -18,9 +18,7 @@
   });
   _exports.movement = _exports.rect = _exports.vertex = _exports.point = void 0;
 
-  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
-
-  function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+  function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
   var likePoint = function likePoint(p) {
     return typeof p === "object" && p.hasOwnProperty("x") && p.hasOwnProperty("y");
@@ -765,7 +763,7 @@
       var pieceHeight = height / row;
       eachResultHook = typeof eachResultHook === "function" ? eachResultHook : undefined;
 
-      var pacExt = _objectSpread({}, this.defaultPerspective());
+      var pacExt = _extends({}, this.defaultPerspective());
 
       if (this.meta.matrix && this.meta.matrix instanceof Array) {
         Object.assign(pacExt, {
@@ -774,7 +772,7 @@
       }
 
       var pacResult = (0, _matrix2.makeMatrixArray)(column, row, function (index, colIndex, rowIndex) {
-        var pacMeta = _objectSpread({
+        var pacMeta = _extends({
           column: colIndex,
           row: rowIndex,
           coords: [colIndex, rowIndex],
@@ -890,7 +888,7 @@
           enumerable: false,
           get: function get() {
             return function () {
-              return _objectSpread({}, diffResult);
+              return _extends({}, diffResult);
             };
           }
         }
