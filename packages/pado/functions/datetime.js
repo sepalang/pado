@@ -59,7 +59,12 @@ export const timescaleExp = function (exp){
     return exp
   }
   if(typeof exp === "string"){
-    // 
+    // destructure 00:00:00 
+    exp = exp.replace(/(\d+|)\:(\d+|)\:(\d+|)/, function (t) {
+      const [h, m, s] = t.split(":");
+      return `${h | '0'}h ${m | '0'}m ${s | '0'}s`
+    })
+    //
     exp = exp.replace(/\d+(Y|year)/, function (t){
       t.replace(/\d+/, function (d){ scale += d * 31536000000 })
       return ""
