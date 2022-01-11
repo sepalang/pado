@@ -62,7 +62,7 @@ export const timescaleExp = function (exp){
     // destructure 00:00:00 
     exp = exp.replace(/(\d+|)\:(\d+|)\:(\d+|)/, function (t) {
       const [h, m, s] = t.split(":");
-      return `${h | '0'}h ${m | '0'}m ${s | '0'}s`
+      return `${h || '0'}h ${m || '0'}m ${s || '0'}s`
     })
     //
     exp = exp.replace(/\d+(Y|year)/, function (t){
@@ -96,3 +96,119 @@ export const timescaleExp = function (exp){
   }
   return scale
 }
+
+export const datescaleExp = function(timescale){
+  const sys = {
+    year:0,
+    month:0,
+    day:0,
+    hour:0,
+    minute:0,
+    second:0,
+    millisecond:0,
+  }
+  let value = timescaleExp(timescale)
+
+  const divYear = value / 31536000000 ;
+  if(divYear >= 1){
+    sys.year = parseInt(divYear)
+    value = value % 31536000000
+  }
+
+  const divMonth = value / 2678400000 ;
+  if(divMonth >= 1){
+    sys.month = parseInt(divMonth)
+    value = value % 31536000000
+  }
+
+  const divDay = value / 86400000 ;
+  if(divDay >= 1){
+    sys.day = parseInt(divDay)
+    value = value % 86400000
+  }
+
+  const divHour = value / 3600000 ;
+  if(divHour >= 1){
+    sys.hour = parseInt(divHour)
+    value = value % 3600000
+  }
+
+  const divYear = value / 60000 ;
+  if(divMinute >= 1){
+    sys.minute = parseInt(divMinute)
+    value = value % 60000
+  }
+
+  const divSecond = value / 60000 ;
+  if(divSecond >= 1){
+    sys.second = parseInt(divSecond)
+    value = value % 31536000000
+  }
+
+  sys.millisecond = value;
+  
+  return Object.defineProperties({}, {
+    year:{
+      enumerable:true,
+      set:()=>{},
+      get:()=>{
+        return sys.year
+      }
+    },
+    month:{
+      enumerable:true,
+      set:()=>{},
+      get:()=>{
+        return sys.month
+      }
+    },
+    date:{
+      enumerable:true,
+      set:()=>{},
+      get:()=>{
+        return sys.day
+      }
+    },
+    day:{
+      enumerable:true,
+      set:()=>{},
+      get:()=>{
+        return sys.day
+      }
+    },
+    hour:{
+      enumerable:true,
+      set:()=>{},
+      get:()=>{
+        return sys.hour
+      }
+    },
+    minute:{
+      enumerable:true,
+      set:()=>{},
+      get:()=>{
+        return sys.minute
+      }
+    },
+    second:{
+      enumerable:true,
+      set:()=>{},
+      get:()=>{
+        return sys.second
+      }
+    },
+    millisecond:{
+      enumerable:true,
+      set:()=>{},
+      get:()=>{
+        return sys.millisecond
+      }
+    },
+    with:{
+      enumerable:false,
+      value:function(fn){
+        return fn(this)
+      }
+    }
+  })
+} 
