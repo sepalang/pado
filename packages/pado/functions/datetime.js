@@ -53,162 +53,174 @@ export const timestampExp = function (exp){
   return 0
 }
 
-export const timescaleExp = function (exp){
-  var scale = 0
-  if(typeof exp === "number"){
-    return exp
+export const timescaleExp = function (_exp) {
+  let scale = 0;
+  let exp = _exp;
+  if (typeof exp === 'number') {
+    return exp;
   }
-  if(typeof exp === "string"){
-    // destructure 00:00:00 
-    exp = exp.replace(/(\d+|)\:(\d+|)\:(\d+|)/, function (t) {
-      const [h, m, s] = t.split(":");
-      return `${h || '0'}h ${m || '0'}m ${s || '0'}s`
-    })
+  if (typeof exp === 'string') {
+    // destructure 00:00:00
+    exp = exp.replace(/(\d+|):(\d+|):(\d+|)/, (t) => {
+      const [h, m, s] = t.split(':');
+      return `${h || '0'}h ${m || '0'}m ${s || '0'}s`;
+    });
     //
-    exp = exp.replace(/\d+(Y|year)/, function (t){
-      t.replace(/\d+/, function (d){ scale += d * 31536000000 })
-      return ""
-    })
-    exp = exp.replace(/\d+(M|month)/, function (t){
-      t.replace(/\d+/, function (d){ scale += d * 2678400000 })
-      return ""
-    })
-    exp = exp.replace(/\d+(D|day)/, function (t){
-      t.replace(/\d+/, function (d){ scale += d * 86400000 })
-      return ""
-    })
-    exp = exp.replace(/\d+(h|hour)/, function (t){
-      t.replace(/\d+/, function (d){ scale += d * 3600000 })
-      return ""
-    })
-    exp = exp.replace(/\d+(ms|millisecond)/, function (t){
-      t.replace(/\d+/, function (d){ scale += d * 1 })
-      return ""
-    })
-    exp = exp.replace(/\d+(m|minute)/, function (t){
-      t.replace(/\d+/, function (d){ scale += d * 60000 })
-      return ""
-    })
-    exp = exp.replace(/\d+(s|second)/, function (t){
-      t.replace(/\d+/, function (d){ scale += d * 1000 })
-      return ""
-    })
+    exp = exp.replace(/\d+(Y|year)/, (t) => {
+      t.replace(/\d+/, (d) => {
+        scale += parseInt(d, 10) * 31536000000;
+        return '';
+      });
+      return '';
+    });
+    exp = exp.replace(/\d+(M|month)/, (t) => {
+      t.replace(/\d+/, (d) => {
+        scale += parseInt(d, 10) * 2678400000;
+        return '';
+      });
+      return '';
+    });
+    exp = exp.replace(/\d+(D|date|day)/, (t) => {
+      t.replace(/\d+/, (d) => {
+        scale += parseInt(d, 10) * 86400000;
+        return '';
+      });
+      return '';
+    });
+    exp = exp.replace(/\d+(h|hour)/, (t) => {
+      t.replace(/\d+/, (d) => {
+        scale += parseInt(d, 10) * 3600000;
+        return '';
+      });
+      return '';
+    });
+    exp = exp.replace(/\d+(ms|millisecond)/, (t) => {
+      t.replace(/\d+/, (d) => {
+        scale += parseInt(d, 10) * 1;
+        return '';
+      });
+      return '';
+    });
+    exp = exp.replace(/\d+(m|minute)/, (t) => {
+      t.replace(/\d+/, (d) => {
+        scale += parseInt(d, 10) * 60000;
+        return '';
+      });
+      return '';
+    });
+    exp = exp.replace(/\d+(s|second)/, (t) => {
+      t.replace(/\d+/, (d) => {
+        scale += parseInt(d, 10) * 1000;
+        return '';
+      });
+      return '';
+    });
   }
-  return scale
-}
+  return scale;
+};
 
-export const datescaleExp = function(timescale){
+export const datescaleExp = function (timescale) {
   const sys = {
-    year:0,
-    month:0,
-    day:0,
-    hour:0,
-    minute:0,
-    second:0,
-    millisecond:0,
-  }
-  let value = timescaleExp(timescale)
+    year: 0,
+    month: 0,
+    date: 0,
+    hour: 0,
+    minute: 0,
+    second: 0,
+    millisecond: 0,
+  };
+  let value = timescaleExp(timescale);
 
-  const divYear = value / 31536000000 ;
-  if(divYear >= 1){
-    sys.year = parseInt(divYear)
-    value = value % 31536000000
-  }
-
-  const divMonth = value / 2678400000 ;
-  if(divMonth >= 1){
-    sys.month = parseInt(divMonth)
-    value = value % 31536000000
+  const divYear = value / 31536000000;
+  if (divYear >= 1) {
+    sys.year = Math.floor(divYear);
+    value %= 31536000000;
   }
 
-  const divDay = value / 86400000 ;
-  if(divDay >= 1){
-    sys.day = parseInt(divDay)
-    value = value % 86400000
+  const divMonth = value / 2678400000;
+  if (divMonth >= 1) {
+    sys.month = Math.floor(divMonth);
+    value %= 2678400000;
   }
 
-  const divHour = value / 3600000 ;
-  if(divHour >= 1){
-    sys.hour = parseInt(divHour)
-    value = value % 3600000
+  const divDate = value / 86400000;
+  if (divDate >= 1) {
+    sys.date = Math.floor(divDate);
+    value %= 86400000;
   }
 
-  const divYear = value / 60000 ;
-  if(divMinute >= 1){
-    sys.minute = parseInt(divMinute)
-    value = value % 60000
+  const divHour = value / 3600000;
+  if (divHour >= 1) {
+    sys.hour = Math.floor(divHour);
+    value %= 3600000;
   }
 
-  const divSecond = value / 60000 ;
-  if(divSecond >= 1){
-    sys.second = parseInt(divSecond)
-    value = value % 31536000000
+  const divMinute = value / 60000;
+  if (divMinute >= 1) {
+    sys.minute = Math.floor(divMinute);
+    value %= 60000;
+  }
+
+  const divSecond = value / 1000;
+  if (divSecond >= 1) {
+    sys.second = Math.floor(divSecond);
+    value %= 1000;
   }
 
   sys.millisecond = value;
-  
-  return Object.defineProperties({}, {
-    year:{
-      enumerable:true,
-      set:()=>{},
-      get:()=>{
-        return sys.year
-      }
+
+  return Object.defineProperties(
+    {},
+    {
+      year: {
+        enumerable: true,
+        set: () => { },
+        get: () => sys.year,
+      },
+      month: {
+        enumerable: true,
+        set: () => { },
+        get: () => sys.month,
+      },
+      date: {
+        enumerable: true,
+        set: () => { },
+        get: () => sys.date,
+      },
+      day: {
+        enumerable: true,
+        set: () => { },
+        get: () => sys.date,
+      },
+      hour: {
+        enumerable: true,
+        set: () => { },
+        get: () => sys.hour,
+      },
+      minute: {
+        enumerable: true,
+        set: () => { },
+        get: () => sys.minute,
+      },
+      second: {
+        enumerable: true,
+        set: () => { },
+        get: () => sys.second,
+      },
+      millisecond: {
+        enumerable: true,
+        set: () => { },
+        get: () => sys.millisecond,
+      },
+      with: {
+        enumerable: false,
+        value(fn) {
+          if (typeof fn === 'function') {
+            return fn(this);
+          }
+          return { ...sys };
+        },
+      },
     },
-    month:{
-      enumerable:true,
-      set:()=>{},
-      get:()=>{
-        return sys.month
-      }
-    },
-    date:{
-      enumerable:true,
-      set:()=>{},
-      get:()=>{
-        return sys.day
-      }
-    },
-    day:{
-      enumerable:true,
-      set:()=>{},
-      get:()=>{
-        return sys.day
-      }
-    },
-    hour:{
-      enumerable:true,
-      set:()=>{},
-      get:()=>{
-        return sys.hour
-      }
-    },
-    minute:{
-      enumerable:true,
-      set:()=>{},
-      get:()=>{
-        return sys.minute
-      }
-    },
-    second:{
-      enumerable:true,
-      set:()=>{},
-      get:()=>{
-        return sys.second
-      }
-    },
-    millisecond:{
-      enumerable:true,
-      set:()=>{},
-      get:()=>{
-        return sys.millisecond
-      }
-    },
-    with:{
-      enumerable:false,
-      value:function(fn){
-        return fn(this)
-      }
-    }
-  })
-} 
+  );
+};
